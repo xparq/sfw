@@ -1,11 +1,15 @@
+out/
+
 # Demo binary
-sfml-widgets-demo
+*.exe
 
 # Lib
 *.a
+*.lib
 
 # Compilation files
 *.o
+*.obj
 
 # Code::Blocks
 sfml-widgets.layout

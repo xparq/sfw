@@ -1,7 +1,7 @@
 TARGET  := sfml-widgets-demo
 SRCDIR  := src
 SRC     := $(shell find $(SRCDIR) -name "*.cpp" -type f)
-OBJDIR  := obj
+OBJDIR  := out
 OBJ     := $(SRC:%.cpp=$(OBJDIR)/%.o)
 
 CC      := g++

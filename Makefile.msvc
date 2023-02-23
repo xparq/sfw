@@ -1,0 +1,189 @@
+# Build: nmake -f Makefile.msvc
+
+.SUFFIXES: .cpp .obj .lib
+
+# Cfg. macros, can be overridden from the make (build) cmdline:
+#
+#	LINKMODE=static
+#	LINKMODE=dll
+#
+#	DEBUG=1
+#	DEBUG=0 (-> release)
+#
+
+# Macros set on the MAKE cmdline will override these defaults:
+LINKMODE=static
+DEBUG=0
+
+sfml_include_dir=ext/sfml/include
+sfml_lib_dir=ext/sfml/lib
+
+src_dir=src
+out_dir=out
+# The existing actual source subdirs should/will match the out/ subdirs:
+#! Note however, about CL /Fo (i.e. "F*ck output subdirs"):
+#!      "The specified directory must exist, or the compiler reports error D8003.
+#!      The directory isn't created automatically."
+#! GCC could do it all right, without a hitch. Just sayin.
+
+sfw_libname=sfw
+sfw_dirtag=sfw
+sfw_out=$(out_dir)/$(sfw_dirtag)
+sfw_objs=\
+	$(sfw_out)/Utils/Cross.obj\
+	$(sfw_out)/Utils/Box.obj\
+	$(sfw_out)/Utils/Arrow.obj\
+	$(sfw_out)/Layouts/Layout.obj\
+	$(sfw_out)/Layouts/FormLayout.obj\
+	$(sfw_out)/Layouts/HBoxLayout.obj\
+	$(sfw_out)/Layouts/VBoxLayout.obj\
+	$(sfw_out)/Theme.obj\
+	$(sfw_out)/Widget.obj\
+	$(sfw_out)/Button.obj\
+	$(sfw_out)/CheckBox.obj\
+	$(sfw_out)/Label.obj\
+	$(sfw_out)/Menu.obj\
+	$(sfw_out)/Image.obj\
+	$(sfw_out)/Slider.obj\
+	$(sfw_out)/TextBox.obj\
+	$(sfw_out)/SpriteButton.obj\
+	$(sfw_out)/ProgressBar.obj\
+
+sfw_lib=$(sfw_out)/$(sfw_libname).lib
+sfw_demo=demo.exe
+
+#-----------------------------------------------------------------------------
+CC_FLAGS=$(CC_FLAGS) -W4 -std:c++latest -MD -EHsc
+CC_FLAGS=$(CC_FLAGS) -I$(sfml_include_dir)
+
+CC_OUTDIR_FLAGS_=-Fo$(out_dir)/ -Fd$(out_dir)/
+CC_FLAGS=$(CC_FLAGS) $(CC_OUTDIR_FLAGS)
+
+CC_CMD=cl -nologo
+LINK_CMD=link -nologo
+
+BB=busybox
+ECHO=@$(BB) echo
+MKDIR=$(BB) mkdir -p
+
+BUILD_OPT_LABEL=OPTION:
+
+# Linkmode alternatives:
+CC_FLAGS_LINK_static=-DSFML_STATIC
+CC_FLAGS_LINK_dll=
+!if "$(LINKMODE)" == "static"
+CC_FLAGS_LINKMODE=$(CC_FLAGS_LINK_static)
+!else if "$(LINKMODE)" == "dll"
+CC_FLAGS_LINKMODE=$(CC_FLAGS_LINK_dll)
+!else
+!error Unknown link mode: $(LINKMODE)!
+!endif
+
+# Debug / Release alternatives:
+CC_FLAGS_DEBUG_0=-O2 -DNDEBUG
+# These -O... below are taken from Dr. Memory's README/Quick start...:
+CC_FLAGS_DEBUG_1=-Zi -Oy- -Ob0 -DDEBUG
+LINK_FLAGS_DEBUG_0=
+LINK_FLAGS_DEBUG_1=-debug
+#!!FFS... CC_FLAGS_DEBUG=$(CC_FLAGS_DEBUG_$(DEBUG))
+!if defined(DEBUG) && $(DEBUG) == 1
+CC_FLAGS_DEBUGMODE=$(CC_FLAGS_DEBUG_1)
+LINK_FLAGS_DEBUGMODE=$(LINK_FLAGS_DEBUG_1)
+!else if $(DEBUG) == 0
+CC_FLAGS_DEBUGMODE=$(CC_FLAGS_DEBUG_0)
+LINK_FLAGS_DEBUGMODE=$(LINK_FLAGS_DEBUG_0)
+!else
+!error Unknown debug mode: $(DEBUG)!
+!endif
+
+# File types for the "clean" rule (safety measure against a runaway `rm -rf *`):
+CLEANED_OUTPUT_EXT=.exe .obj .ifc .lib .pdb .ilk .tmp
+
+
+#-----------------------------------------------------------------------------
+CC_FLAGS=$(CC_FLAGS) $(CC_FLAGS_LINKMODE) $(CC_FLAGS_DEBUGMODE)
+LINK_FLAGS=$(LINK_FLAGS) $(LINK_FLAGS_DEBUGMODE) -libpath:$(sfml_lib_dir) 
+
+#-----------------------------------------------------------------------------
+# Rules, finally...
+
+#{$(src_dir)/$(UI_subdir)/}.cpp{$(out_dir)/$(UI_subdir)/}.obj::
+#!!Alas, this doesn't seem to work in inference rules:
+#!!	$(ECHO) SOURCE DRIVE + PATH: $(%|dpF)<
+#	$(CC_CMD) $(CC_FLAGS_UI) $<
+
+# NMAKE only runs the first root target by default! So... `::` is essential.
+#-----------------------------------------------------------------------------
+MAIN::
+!if defined(DEBUG) && "$(DEBUG)" != "0"
+	$(ECHO) - $(BUILD_OPT_LABEL) DEBUG
+!else
+	$(ECHO) - $(BUILD_OPT_LABEL) RELEASE (optimized)
+!endif
+!if defined(SFML_DLL)
+	$(ECHO) - $(BUILD_OPT_LABEL) Link with SFML DLLs
+	$(ECHO)
+!else
+	$(ECHO) - $(BUILD_OPT_LABEL) Static-linked SFML
+	$(ECHO)
+!endif
+#!! Make this hamfisted subdir creation less atrocious:
+#!! (Not that the rest of the "tree management" is any less lame!)
+	@$(MKDIR) $(sfw_out)
+	@$(MKDIR) $(sfw_out)/Utils
+	@$(MKDIR) $(sfw_out)/Layouts
+
+MAIN:: $(sfw_lib)
+
+MAIN:: $(sfw_demo)
+
+#-----------------------------------------------------------------------------
+clean:
+	$(ECHO) "Cleaning up..."
+	$(ECHO)
+	@set BB_GLOBBING=1
+	for %x in ($(CLEANED_OUTPUT_EXT)) do \
+		$(BB) find "$(out_dir)" -type f -name "*%x" -exec $(BB) rm "{}" ^;
+#! This didn't work, as `rm -r dir/*x` is too dumb to recurse below dir despite -r
+#! (no matter the BB_GLOBBING):
+#		@if exist "$(out_dir)/*%x" \
+#			$(BB) rm -r "$(out_dir)/*%x"
+
+
+#=============================================================================
+$(sfw_lib): $(sfw_objs)
+	lib -out:$@ $?
+
+{$(src_dir)/$(sfw_dirtag)/Utils/}.cpp{$(out_dir)/$(sfw_dirtag)/Utils/}.obj::
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Utils/  $<
+{$(src_dir)/$(sfw_dirtag)/Layouts/}.cpp{$(out_dir)/$(sfw_dirtag)/Layouts/}.obj::
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Layouts/  $<
+# No batch mode for these, so a failing one would leave the other .objs:
+{$(src_dir)/$(sfw_dirtag)/}.cpp{$(out_dir)/$(sfw_dirtag)/}.obj:
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/ $<
+# For the demo:
+{$(src_dir)/}.cpp{$(out_dir)/}.obj::
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(out_dir)/ $<
+
+
+#=============================================================================
+# The demo:
+#=============================================================================
+sfml_libs_static=sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib opengl32.lib freetype.lib\
+		user32.lib kernel32.lib gdi32.lib winmm.lib advapi32.lib
+sfml_libs_dll=sfml-graphics.lib sfml-window.lib sfml-system.lib opengl32.lib
+!if "$(LINKMODE)" == "static"
+sfml_libs=$(sfml_libs_static)
+!else if "$(LINKMODE)" == "dll"
+sfml_libs=$(sfml_libs_dll)
+!else
+!error Unknown link mode: $(LINKMODE)!
+!endif
+
+$(sfw_demo): $(out_dir)/demo.obj $(sfw_lib)
+#!! The SFML libs must come first! :-oo Got a silent launch failure otherwise!... :-/
+	$(LINK_CMD) $(LINK_FLAGS) $(sfml_libs) $** -out:$@
+
+#=============================================================================
+## Sorry, no autodeps. yet...
+#$(sfw_objs): ...not just "all headers"
