@@ -1,14 +1,16 @@
-A fork of "SFML Widgets", a simple GUI for SFML 
-===============================================
+![workflow](https://github.com/xparq/sfw/actions/workflows/ci.yml/badge.svg)
+
+A fork of "SFML Widgets", a small & simple SFML-based GUI
+=========================================================
 
 ### Changes to Alexandre Bodelot's original:
 
-- Adapted to the SFML (pre-)3.0 API. _(!!INCOMPLETE AS YET: THE TEXTURES ARE OFF!)_
-- Added Windows/MSVC build. (Incidentally, it also depends on `busybox.exe`, because I didn't
-  feel like cleaning `Makefile.msvc` yet; I just grabbed it from another project of mine...)
+- Adapted to the SFML (pre-)3.0 API. _(The demo compiles & links now, but see issue #1!)_
+- Added Windows/MSVC build. _(Incidentally, that also depends on `busybox.exe`, because I didn't
+  feel like cleaning `Makefile.msvc` yet, which I adopted from another project of mine; sorry!)_
 - Source tree changes: `src/Gui` is now `src/sfw`, `demo.cpp` moved to `src/`.
-  (An `sfw::` namespace is coming, that's one reason; I certainly didn't want it to be `Gui::`.)
-- Compiling with C++20 now.
+  (An `sfw::` namespace is coming, that's one reason, I certainly didn't want that to be `Gui::`.)
+- Compiling as C++20 now.
 
 
 Original README:
