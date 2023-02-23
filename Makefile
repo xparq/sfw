@@ -3,13 +3,15 @@ SRCDIR  := src
 SRC     := $(shell find $(SRCDIR) -name "*.cpp" -type f)
 OBJDIR  := out
 OBJ     := $(SRC:%.cpp=$(OBJDIR)/%.o)
-
+ifndef SFML_DIR
+SFML_DIR := ext/sfml
+endif
 CC      := g++
-CFLAGS  := -I$(SRCDIR) -std=c++11 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
-LDFLAGS := -lsfml-graphics -lsfml-window -lsfml-system -lGL
+CFLAGS  := -I$(SFML_DIR)/include -I$(SRCDIR) -std=c++20 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
+LDFLAGS := -L$(SFML_DIR)/lib -lsfml-graphics -lsfml-window -lsfml-system -lGL
 
 # Demo
-$(TARGET): demo/demo.cpp lib/libsfml-widgets.a
+$(TARGET): src/demo.cpp lib/libsfml-widgets.a
 	@echo "\033[1;33mlinking exec\033[0m $@"
 	@$(CC) $< $(CFLAGS) -L./lib -lsfml-widgets $(LDFLAGS) -o $@
 	@echo "\033[1;32mDone!\033[0m"

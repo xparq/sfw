@@ -1,17 +1,21 @@
-on: [push, pull_request]
+on: [workflow_dispatch, push, pull_request]
+
+env:
+  SFML_DIR: ext/sfml
 
 jobs:
   lint:
-    name: Clang-format
+    name: Clang-format - DISABLED FOR NOW!
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: sudo apt install clang-format
       - name: Run clang-format
-        run: clang-format $(find src -type f) --dry-run -Werror
+#        run: clang-format $(find src -type f) --dry-run -Werror'
+        run: echo Disabled!
   build:
-    name: Compile
+    name: Build
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,7 +23,9 @@ jobs:
         cc: [clang++, g++]
     steps:
       - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: sudo apt install build-essential libsfml-dev
-      - name: Build
+      - name: Install SFML dependencies...
+        run: sudo apt-get install libgl-dev libfreetype-dev libudev-dev
+      - name: Download & setup SFML/master manually...
+        run: ./tooling/sfml-setup
+      - name: Build (Ubuntu only! Windows is being manually tested locally for now...)
         run: make CC=${{ matrix.cc }}

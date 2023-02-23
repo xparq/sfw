@@ -152,7 +152,7 @@ clean:
 
 #=============================================================================
 $(sfw_lib): $(sfw_objs)
-	lib -out:$@ $?
+	lib -out:$@ $(sfw_objs)
 
 {$(src_dir)/$(sfw_dirtag)/Utils/}.cpp{$(out_dir)/$(sfw_dirtag)/Utils/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Utils/  $<

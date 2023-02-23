@@ -4,10 +4,11 @@ A fork of "SFML Widgets", a simple GUI for SFML
 ### Changes to Alexandre Bodelot's original:
 
 - Adapted to the SFML (pre-)3.0 API. _(!!INCOMPLETE AS YET: THE TEXTURES ARE OFF!)_
-- Added Windows/MSVC build. (Incidentally, it also depends on `busybox.exe`, becase I didn't feel
-  like cleaning `Makefile.msvc` yet; I just grabbed it from another project of mine...)
-- Source tree changed: `src/Gui` is now `src/sfw`, `demo.cpp` moved to `src/`.
+- Added Windows/MSVC build. (Incidentally, it also depends on `busybox.exe`, because I didn't
+  feel like cleaning `Makefile.msvc` yet; I just grabbed it from another project of mine...)
+- Source tree changes: `src/Gui` is now `src/sfw`, `demo.cpp` moved to `src/`.
   (An `sfw::` namespace is coming, that's one reason; I certainly didn't want it to be `Gui::`.)
+- Compiling with C++20 now.
 
 
 Original README:

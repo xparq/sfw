@@ -1,0 +1,107 @@
+#!/bin/sh
+# We are supposed to be in the repo's work-tree root; at least
+# that seems to be the case when being run from a GH Action...
+
+main(){
+	SFML_LIBROOT=`realpath -Ls ${SFML_DIR:-ext/sfml}`
+
+	# If the sfml symlink is NOT broken, then assume we are good...
+	#...which would be utterly bizarre on GHA runner, so check for that, tho!
+	if [ -L "$SFML_LIBROOT" ] && [ ! -e "$SFML_LIBROOT" ] \
+	    || [ ! -e "$SFML_LIBROOT" ] || [ -z "`ls -A $SFML_LIBROOT`" ]; then # <- this last one would fail with spaces in the path!
+		# Broken link, missing or empty dir -> Install...
+		echo "NOTE: '$SFML_LIBROOT' is missing (or a broken symlink) - redownloading..."
+		if [ -L "$SFML_LIBROOT" ]; then
+		    echo "Removing the '$SFML_LIBROOT' symlink..."
+		    unlink "$SFML_LIBROOT"
+		fi
+		install
+		retc=$?
+		[ ! $retc -eq 0 ] && return $retc
+	elif [ -L "$SFML_LIBROOT" ] && [ -e "$SFML_LIBROOT" ] && [ "$GITHUB_ACTIONS" != "" ]; then
+		echo "- Woah, where has this `readlink ${SFML_LIBROOT}` come from?! :-o"
+#	elif [...]; then
+#		echo "- ERROR: Inconsistent prj. tree layout; aborting!"
+#		return 111
+	fi
+
+	# Now we should have either an existing or a fresh install...
+	if [ ! -d "$SFML_LIBROOT/include/SFML" ] || [ ! -d "$SFML_LIBROOT/lib" ] ; then
+		echo "- ERROR: '$SFML_LIBROOT' doesn't look like an SFML package!"
+		echo "  Chickening out..."
+		return 123
+	fi
+
+	return 0
+}
+
+install(){
+#
+# The caller ought to have checked already if the target dir is OK to mess with!
+#
+	#
+	echo Download...
+	#
+	# Going for the GCC version now... (There's also one for CLANG!):
+	_SFML_PACK_NAME="debian-gcc-64.tar.gz"
+	_SFML_DOWNLOAD_URL="https://artifacts.sfml-dev.org/by-branch/master/$_SFML_PACK_NAME"
+	#NOTE: pkg. layout: ./<commit-hash>/[lib|include|...]
+	_SFML_DOWNLOAD_DIR=/tmp
+	_SFML_DOWNLOADED_PACK="$_SFML_DOWNLOAD_DIR/$_SFML_PACK_NAME"
+
+	if [ ! -d "$_SFML_DOWNLOAD_DIR" ]; then mkdir -p "$_SFML_DOWNLOAD_DIR"; fi
+	if [ ! -d "$_SFML_DOWNLOAD_DIR" ]; then
+		echo "- ERROR: '$_SFML_DOWNLOAD_DIR' is not a directory?!"
+		return 1
+	fi
+	if [ ! -d "$SFML_LIBROOT" ]; then mkdir -p "$SFML_LIBROOT"; fi
+	if [ ! -d "$SFML_LIBROOT" ]; then
+		echo "- ERROR: '$SFML_LIBROOT' is not a directory?!"
+		return 1
+	fi
+
+	sudo apt install wget
+	wget -q -P "$_SFML_DOWNLOAD_DIR" "$_SFML_DOWNLOAD_URL"
+	if [ ! -e "$_SFML_DOWNLOADED_PACK" ]; then
+		echo "- ERROR: Failed to download the SFML package."
+		return 2
+	fi
+
+	#
+	echo Unpack...
+	#
+	cd "$SFML_LIBROOT"
+	if [ ! $? -eq 0 ]; then
+	    echo "- ERROR: Failed to enter '$SFML_LIBROOT' - not a dir?!"
+	    return 3
+	fi
+
+	tar xf "$_SFML_DOWNLOADED_PACK"
+	if [ ! $? -eq 0 ]; then
+		echo "- ERROR: Failed to unpack '$_SFML_DOWNLOADED_PACK'."
+		return 4
+	fi
+
+	#
+	echo SFML dir fixup...
+	#
+	cd *
+	if [ $? -eq 0 ] && [ -e "lib" ] && [ -e "include" ]; then
+		mv * ..
+	else
+		echo "- ERROR: Unexpected SFML package layout (no 'lib' or 'include')!"
+		return 5
+	fi
+	return 0
+}
+
+#-----------------------------------------------------------------------------
+dirsave=`pwd`
+main
+retc=$?
+cd $dirsave
+if [ $? -ne 0 ]; then
+	echo "- ERROR: SFML setup failed!"
+	exit 1
+fi
+exit 0
