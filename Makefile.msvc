@@ -61,6 +61,7 @@ CC_FLAGS=$(CC_FLAGS) $(CC_OUTDIR_FLAGS)
 
 CC_CMD=cl -nologo
 LINK_CMD=link -nologo
+LIB_CMD=lib -nologo
 
 BB=busybox
 ECHO=@$(BB) echo
@@ -152,7 +153,7 @@ clean:
 
 #=============================================================================
 $(sfw_lib): $(sfw_objs)
-	lib -out:$@ $(sfw_objs)
+	$(LIB_CMD) -out:$@ $(sfw_objs)
 
 {$(src_dir)/$(sfw_dirtag)/Utils/}.cpp{$(out_dir)/$(sfw_dirtag)/Utils/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Utils/  $<

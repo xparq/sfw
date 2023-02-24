@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install SFML dependencies...
-        run: sudo apt-get install libgl-dev libfreetype-dev libudev-dev
+        run: sudo apt-get install libgl-dev
       - name: Download & setup SFML/master manually...
         run: ./tooling/sfml-setup
       - name: Build (Ubuntu only! Windows is being manually tested locally for now...)
