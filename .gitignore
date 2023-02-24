@@ -10,6 +10,9 @@ extern/**/
 # Demo binary
 *-demo
 *demo.exe
+# These will be placed along the .exe (not in the build workdir):
+*.ilk
+*.pdb
 
 # Lib
 lib/

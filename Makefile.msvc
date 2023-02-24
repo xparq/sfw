@@ -55,7 +55,7 @@ sfw_objs=\
 	$(sfw_out)/ProgressBar.obj\
 
 #-----------------------------------------------------------------------------
-CC_FLAGS=$(CC_FLAGS) -W4 -std:c++latest -MD -EHsc
+CC_FLAGS=$(CC_FLAGS) -W4 -std:c++latest -EHsc
 CC_FLAGS=$(CC_FLAGS) -I./include
 
 CC_FLAGS=$(CC_FLAGS) -I$(sfml_include_dir)
@@ -85,11 +85,11 @@ CC_FLAGS_LINKMODE=$(CC_FLAGS_LINK_dll)
 !endif
 
 # Debug / Release alternatives:
-CC_FLAGS_DEBUG_0=-O2 -DNDEBUG
+CC_FLAGS_DEBUG_0=-MD O2 -DNDEBUG
 # These -O... below are taken from Dr. Memory's README/Quick start...:
-CC_FLAGS_DEBUG_1=-Zi -Oy- -Ob0 -DDEBUG
+CC_FLAGS_DEBUG_1=-MDd -Zi -Oy- -Ob0 -DDEBUG
 LINK_FLAGS_DEBUG_0=
-LINK_FLAGS_DEBUG_1=-debug
+LINK_FLAGS_DEBUG_1=-debug -ignore:4099
 #!!FFS... CC_FLAGS_DEBUG=$(CC_FLAGS_DEBUG_$(DEBUG))
 !if defined(DEBUG) && $(DEBUG) == 1
 CC_FLAGS_DEBUGMODE=$(CC_FLAGS_DEBUG_1)
@@ -151,9 +151,6 @@ clean:
 
 
 #=============================================================================
-$(sfw_lib): $(sfw_objs)
-	$(LIB_CMD) -out:$@ $(sfw_objs)
-
 #
 # AFAIK, NMAKE can't suport multi-tag subpaths, only single-depth subdirs,
 # so each subdir has to have its distinct rule... :-/ (Hopefully I'm wrong!)
@@ -174,20 +171,30 @@ $(sfw_lib): $(sfw_objs)
 #=============================================================================
 # The demo:
 #=============================================================================
-sfml_libs_static=sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib opengl32.lib freetype.lib\
-		user32.lib kernel32.lib gdi32.lib winmm.lib advapi32.lib
-sfml_libs_dll=sfml-graphics.lib sfml-window.lib sfml-system.lib opengl32.lib
+sfml_libs_static=sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib
+sfml_libs_dll=sfml-graphics.lib sfml-window.lib sfml-system.lib
 !if "$(LINKMODE)" == "static"
 sfml_libs=$(sfml_libs_static)
+libs=$(sfml_libs) opengl32.lib freetype.lib\
+	user32.lib kernel32.lib gdi32.lib winmm.lib advapi32.lib
 !else if "$(LINKMODE)" == "dll"
 sfml_libs=$(sfml_libs_dll)
+libs=$(sfml_libs) opengl32.lib
 !else
 !error Unknown link mode: $(LINKMODE)!
 !endif
 
+!if defined(DEBUG) && $(DEBUG) == 1
+sfml_libs=$(substi .lib,-d.lib,$(sfml_libs))
+!endif
+
+
+$(sfw_lib): $(sfw_objs)
+	$(LIB_CMD) -out:$@ $(sfw_objs)
+
 $(sfw_demo): $(out_dir)/demo.obj $(sfw_lib)
 #!! The SFML libs must come first! :-oo Got a silent launch failure otherwise!... :-/
-	$(LINK_CMD) $(LINK_FLAGS) $(sfml_libs) $** -out:$@
+	$(LINK_CMD) $(LINK_FLAGS) $(libs) $** -out:$@
 
 #=============================================================================
 ## Sorry, no autodeps. yet...
