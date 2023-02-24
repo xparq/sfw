@@ -1,5 +1,5 @@
-#include "Slider.hpp"
-#include "Theme.hpp"
+#include "sfw/Slider.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

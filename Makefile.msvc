@@ -1,8 +1,16 @@
 # Build: nmake -f Makefile.msvc
-
 .SUFFIXES: .cpp .obj .lib
 
-# Cfg. macros, can be overridden from the make (build) cmdline:
+# Main targets:
+sfw_libname=sfw
+sfw_demo=$(sfw_libname)-demo.exe
+sfw_lib=$(libdir)/$(sfw_libname).lib
+
+# External deps.:
+sfml_include_dir=extern/sfml/include
+sfml_lib_dir=extern/sfml/lib
+
+# Cfg. macros (can be overridden from the make (build) cmdline):
 #
 #	LINKMODE=static
 #	LINKMODE=dll
@@ -10,25 +18,22 @@
 #	DEBUG=1
 #	DEBUG=0 (-> release)
 #
-
-# Macros set on the MAKE cmdline will override these defaults:
 LINKMODE=static
 DEBUG=0
 
-sfml_include_dir=ext/sfml/include
-sfml_lib_dir=ext/sfml/lib
-
 src_dir=src
-out_dir=out
+libsrc_dirtag=impl
+libsrc_dir=$(src_dir)/$(libsrc_dirtag)
+libdir=lib
+out_dir=.build.tmp
 # The existing actual source subdirs should/will match the out/ subdirs:
 #! Note however, about CL /Fo (i.e. "F*ck output subdirs"):
 #!      "The specified directory must exist, or the compiler reports error D8003.
 #!      The directory isn't created automatically."
 #! GCC could do it all right, without a hitch. Just sayin.
 
-sfw_libname=sfw
 sfw_dirtag=sfw
-sfw_out=$(out_dir)/$(sfw_dirtag)
+sfw_out=$(out_dir)/$(libsrc_dirtag)
 sfw_objs=\
 	$(sfw_out)/Utils/Cross.obj\
 	$(sfw_out)/Utils/Box.obj\
@@ -49,11 +54,10 @@ sfw_objs=\
 	$(sfw_out)/SpriteButton.obj\
 	$(sfw_out)/ProgressBar.obj\
 
-sfw_lib=$(sfw_out)/$(sfw_libname).lib
-sfw_demo=demo.exe
-
 #-----------------------------------------------------------------------------
 CC_FLAGS=$(CC_FLAGS) -W4 -std:c++latest -MD -EHsc
+CC_FLAGS=$(CC_FLAGS) -I./include
+
 CC_FLAGS=$(CC_FLAGS) -I$(sfml_include_dir)
 
 CC_OUTDIR_FLAGS_=-Fo$(out_dir)/ -Fd$(out_dir)/
@@ -108,11 +112,6 @@ LINK_FLAGS=$(LINK_FLAGS) $(LINK_FLAGS_DEBUGMODE) -libpath:$(sfml_lib_dir)
 #-----------------------------------------------------------------------------
 # Rules, finally...
 
-#{$(src_dir)/$(UI_subdir)/}.cpp{$(out_dir)/$(UI_subdir)/}.obj::
-#!!Alas, this doesn't seem to work in inference rules:
-#!!	$(ECHO) SOURCE DRIVE + PATH: $(%|dpF)<
-#	$(CC_CMD) $(CC_FLAGS_UI) $<
-
 # NMAKE only runs the first root target by default! So... `::` is essential.
 #-----------------------------------------------------------------------------
 MAIN::
@@ -155,13 +154,18 @@ clean:
 $(sfw_lib): $(sfw_objs)
 	$(LIB_CMD) -out:$@ $(sfw_objs)
 
-{$(src_dir)/$(sfw_dirtag)/Utils/}.cpp{$(out_dir)/$(sfw_dirtag)/Utils/}.obj::
+#
+# AFAIK, NMAKE can't suport multi-tag subpaths, only single-depth subdirs,
+# so each subdir has to have its distinct rule... :-/ (Hopefully I'm wrong!)
+#
+{$(libsrc_dir)/Utils/}.cpp{$(sfw_out)/Utils/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Utils/  $<
-{$(src_dir)/$(sfw_dirtag)/Layouts/}.cpp{$(out_dir)/$(sfw_dirtag)/Layouts/}.obj::
+{$(libsrc_dir)/Layouts/}.cpp{$(sfw_out)/Layouts/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Layouts/  $<
-# No batch mode for these, so a failing one would leave the other .objs:
-{$(src_dir)/$(sfw_dirtag)/}.cpp{$(out_dir)/$(sfw_dirtag)/}.obj:
+# No batch mode (::) for these, so if one fails, the other .objs remain:
+{$(libsrc_dir)/}.cpp{$(sfw_out)/}.obj:
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/ $<
+
 # For the demo:
 {$(src_dir)/}.cpp{$(out_dir)/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(out_dir)/ $<

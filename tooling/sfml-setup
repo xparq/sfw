@@ -3,7 +3,9 @@
 # that seems to be the case when being run from a GH Action...
 
 main(){
-	SFML_LIBROOT=`realpath -Ls ${SFML_DIR:-ext/sfml}`
+	#! Alas, just not setting -e was not enough... (Both (mostly?) complementary
+	#! options (-e and -m) exist, so who knows what the default is...)
+	SFML_LIBROOT=`realpath -Lms ${SFML_DIR:-extern/sfml}`
 
 	# If the sfml symlink is NOT broken, then assume we are good...
 	#...which would be utterly bizarre on GHA runner, so check for that, tho!

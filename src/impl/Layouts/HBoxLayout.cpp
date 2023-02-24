@@ -1,5 +1,5 @@
-#include "HBoxLayout.hpp"
-#include "../Theme.hpp"
+#include "sfw/Layouts/HBoxLayout.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

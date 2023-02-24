@@ -1,5 +1,5 @@
-#include "SpriteButton.hpp"
-#include "Theme.hpp"
+#include "sfw/SpriteButton.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

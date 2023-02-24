@@ -1,5 +1,5 @@
-#include "Button.hpp"
-#include "Theme.hpp"
+#include "sfw/Button.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {
@@ -61,7 +61,7 @@ void Button::onMouseMoved(float x, float y)
 
 
 void Button::onMousePressed(float x, float y)
-{x, y; // <- This can only silence CL -W4, but not q++ -Wall though... :)
+{x, y; // <- This can only silence CL -W4, but not g++ -Wall though... :)
     m_box.press();
 }
 

@@ -1,4 +1,4 @@
-#include "Image.hpp"
+#include "sfw/Image.hpp"
 
 namespace gui
 {

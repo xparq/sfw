@@ -1,19 +1,19 @@
 on: [workflow_dispatch, push, pull_request]
 
 env:
-  SFML_DIR: ext/sfml
+  SFML_DIR: extern/sfml
 
 jobs:
   lint:
-    name: Clang-format - DISABLED FOR NOW!
+    name: Clang-format - ENFORCING DISABLED TEMPORARILY!
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: sudo apt install clang-format
       - name: Run clang-format
-#        run: clang-format $(find src -type f) --dry-run -Werror'
-        run: echo Disabled!
+        run: clang-format $(find src/impl -type f) --dry-run
+#            -Werror
   build:
     name: Build
     runs-on: ubuntu-latest

@@ -1,5 +1,5 @@
-#include "Box.hpp"
-#include "../Theme.hpp"
+#include "sfw/Utils/Box.hpp"
+#include "sfw/Theme.hpp"
 
 
 namespace gui

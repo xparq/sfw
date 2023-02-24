@@ -1,5 +1,5 @@
-#include "CheckBox.hpp"
-#include "Theme.hpp"
+#include "sfw/CheckBox.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

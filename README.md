@@ -8,9 +8,9 @@ A fork of "SFML Widgets", a small & simple SFML-based GUI
 - Adapted to the SFML (pre-)3.0 API. _(The demo compiles & links now, but see issue #1!)_
 - Added Windows/MSVC build. _(Incidentally, that also depends on `busybox.exe`, because I didn't
   feel like cleaning `Makefile.msvc` yet, which I adopted from another project of mine; sorry!)_
-- Source tree changes: `src/Gui` is now `src/sfw`, `demo.cpp` moved to `src/`.
-  (An `sfw::` namespace is coming, that's one reason, I certainly didn't want that to be `Gui::`.)
-- Compiling as C++20 now.
+- Source tree changes, mostly to help embedding it into other projects
+- Compiling as C++20 now
+- For other (both planned and completed) changes see the issues.
 
 
 Original README:
@@ -99,13 +99,13 @@ int main()
 
 A simple press button.
 
-![button](doc/button.png)
+![button](doc/media/button.png)
 
 ### `gui::Checkbox`
 
 A button with enabled/disabled state.
 
-![checkbox](doc/checkbox.png)
+![checkbox](doc/media/checkbox.png)
 
 ### `gui::Image`
 
@@ -123,7 +123,7 @@ It's a simple wrapper around `sf::Text`, to display a text as part of the UI.
 
 A list of label/value pairs.
 
-![optionsbox](doc/optionsbox.png)
+![optionsbox](doc/media/optionsbox.png)
 
 Use templates to define value type. Example: `gui::OptionsBox<sf::Color>`.
 
@@ -133,7 +133,7 @@ Add value with: `optionsBox->addItem("Red", sf::Color::Red)`;
 
 A simple horizontal or vertical progress bar.
 
-![progress-bar](doc/progress-bar.png)
+![progress-bar](doc/media/progress-bar.png)
 
 * `orientation`: `gui::Horizontal` or `gui::Vertical`
 * `labelPlacement`: `gui::LabelNone`, or `gui::LabelOver`, or `gui::Outside`
@@ -142,7 +142,7 @@ A simple horizontal or vertical progress bar.
 
 Provides an horizontal or vertical slider.
 
-![slider](doc/slider.png)
+![slider](doc/media/slider.png)
 
 * `orientation`: `gui::Horizontal` or `gui::Vertical`
 
@@ -150,7 +150,7 @@ Provides an horizontal or vertical slider.
 
 A one-line text editor.
 
-![textbox](doc/textbox.png)
+![textbox](doc/media/textbox.png)
 
 It supports text cursor, and text selection (with mouse or keyboard shortcuts).
 

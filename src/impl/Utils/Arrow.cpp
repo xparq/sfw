@@ -1,5 +1,5 @@
-#include "Arrow.hpp"
-#include "../Theme.hpp"
+#include "sfw/Utils/Arrow.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

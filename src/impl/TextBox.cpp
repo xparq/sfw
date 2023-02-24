@@ -1,5 +1,5 @@
-#include "TextBox.hpp"
-#include "Theme.hpp"
+#include "sfw/TextBox.hpp"
+#include "sfw/Theme.hpp"
 
 #include <SFML/OpenGL.hpp>
 

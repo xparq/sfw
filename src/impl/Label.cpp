@@ -1,5 +1,5 @@
-#include "Label.hpp"
-#include "Theme.hpp"
+#include "sfw/Label.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

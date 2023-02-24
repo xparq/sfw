@@ -1,5 +1,5 @@
-#include "Cross.hpp"
-#include "../Theme.hpp"
+#include "sfw/Utils/Cross.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

@@ -1,16 +1,20 @@
-out/
+tmp/
+*.tmp
+
+# External dependencies (but keep their parent dir)
+extern/**/
+
+# Build artifacts
+.build.*/
 
 # Demo binary
-sfml-widgets-demo
-*.exe
+*-demo
+*demo.exe
 
 # Lib
+lib/
 *.a
 *.lib
-
-# Compilation files
-*.o
-*.obj
 
 # Code::Blocks
 sfml-widgets.layout

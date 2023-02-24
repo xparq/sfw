@@ -1,5 +1,5 @@
-#include "ProgressBar.hpp"
-#include "Theme.hpp"
+#include "sfw/ProgressBar.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

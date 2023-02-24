@@ -1,9 +1,9 @@
-#include "Layout.hpp"
-#include "FormLayout.hpp"
-#include "HBoxLayout.hpp"
-#include "VBoxLayout.hpp"
-#include "../Button.hpp"
-#include "../Label.hpp"
+#include "sfw/Layouts/Layout.hpp"
+#include "sfw/Layouts/FormLayout.hpp"
+#include "sfw/Layouts/HBoxLayout.hpp"
+#include "sfw/Layouts/VBoxLayout.hpp"
+#include "sfw/Button.hpp"
+#include "sfw/Label.hpp"
 
 namespace gui
 {

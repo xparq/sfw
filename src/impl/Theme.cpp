@@ -1,4 +1,4 @@
-#include "Theme.hpp"
+#include "sfw/Theme.hpp"
 
 namespace gui
 {

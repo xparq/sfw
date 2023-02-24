@@ -1,6 +1,6 @@
-#include "Widget.hpp"
-#include "Menu.hpp"
-#include "Layouts/Layout.hpp"
+#include "sfw/Widget.hpp"
+#include "sfw/Menu.hpp"
+#include "sfw/Layouts/Layout.hpp"
 #include <cmath>
 
 namespace gui
