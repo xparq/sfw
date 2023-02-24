@@ -5,15 +5,15 @@ namespace gui
 
 template <class T>
 OptionsBox<T>::OptionsBox():
-    m_currentIndex(-1),
+    m_currentIndex((size_t)-1),
     m_box(Box::Input),
     m_arrowLeft(Arrow(Arrow::Left)),
     m_arrowRight(Arrow(Arrow::Right))
 {
     // Build visual components
     m_box.item().setFont(Theme::getFont());
-    m_box.item().setCharacterSize(Theme::textSize);
-    m_box.setSize(Theme::minWidgetWidth, Theme::getBoxHeight());
+    m_box.item().setCharacterSize((unsigned)Theme::textSize);
+    m_box.setSize((float)Theme::minWidgetWidth, (float)Theme::getBoxHeight());
 
     // Pack left arrow
     m_arrowLeft.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
@@ -35,12 +35,12 @@ void OptionsBox<T>::addItem(const sf::String& label, const T& value)
     m_items.push_back(Item(label, value));
 
     m_box.item().setString(label);
-    int width = m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2;
+    float width = m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2;
     // Check if box needs to be resized
     if (width > getSize().x)
     {
-        m_box.setSize(width, Theme::getBoxHeight());
-        m_arrowRight.setPosition(width - Theme::getBoxHeight(), 0);
+        m_box.setSize(width, (float)Theme::getBoxHeight());
+        m_arrowRight.setPosition(width - (float)Theme::getBoxHeight(), 0.f);
         m_arrowRight.centerItem(m_arrowRight.item());
         setSize(m_box.getSize());
     }

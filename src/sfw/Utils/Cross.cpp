@@ -6,10 +6,12 @@ namespace gui
 
 Cross::Cross()
 {
-    const sf::IntRect& rect = Theme::getCrossTextureRect();
+    sf::FloatRect rect = (sf::FloatRect)Theme::getCrossTextureRect();
     m_vertices[0].texCoords = sf::Vector2f(rect.left, rect.top);
-    m_vertices[1].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
-    m_vertices[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
+    //!!??
+    m_vertices[1].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
+
+    m_vertices[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
     m_vertices[3].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
 
     updateGeometry(0, 0);
@@ -38,7 +40,7 @@ void Cross::setSize(float) { }
 sf::Vector2f Cross::getSize() const
 {
     const sf::IntRect& rect = Theme::getCrossTextureRect();
-    return sf::Vector2f(rect.width, rect.height);
+    return sf::Vector2f((float)rect.width, (float)rect.height);
 }
 
 
@@ -61,9 +63,12 @@ void Cross::updateGeometry(float x, float y)
 {
     const sf::IntRect& rect = Theme::getCrossTextureRect();
     m_vertices[0].position = sf::Vector2f(x, y);
-    m_vertices[1].position = sf::Vector2f(x + rect.width, y);
-    m_vertices[2].position = sf::Vector2f(x + rect.width, y + rect.height);
-    m_vertices[3].position = sf::Vector2f(x, y + rect.height);
+
+    //!!??
+    m_vertices[1].position = sf::Vector2f(x, y + rect.height);
+
+    m_vertices[2].position = sf::Vector2f(x + rect.width, y);
+    m_vertices[3].position = sf::Vector2f(x + rect.width, y + rect.height);
 }
 
 }

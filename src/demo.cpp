@@ -10,15 +10,15 @@ sf::Color hex2color(const std::string& hexcolor)
     sf::Color color = sf::Color::Black;
     if (hexcolor.size() == 7) // #ffffff
     {
-        color.r = strtoul(hexcolor.substr(1, 2).c_str(), NULL, 16);
-        color.g = strtoul(hexcolor.substr(3, 2).c_str(), NULL, 16);
-        color.b = strtoul(hexcolor.substr(5, 2).c_str(), NULL, 16);
+        color.r = (uint8_t)strtoul(hexcolor.substr(1, 2).c_str(), NULL, 16);
+        color.g = (uint8_t)strtoul(hexcolor.substr(3, 2).c_str(), NULL, 16);
+        color.b = (uint8_t)strtoul(hexcolor.substr(5, 2).c_str(), NULL, 16);
     }
     else if (hexcolor.size() == 4) // #fff
     {
-        color.r = strtoul(hexcolor.substr(1, 1).c_str(), NULL, 16) * 17;
-        color.g = strtoul(hexcolor.substr(2, 1).c_str(), NULL, 16) * 17;
-        color.b = strtoul(hexcolor.substr(3, 1).c_str(), NULL, 16) * 17;
+        color.r = (uint8_t)strtoul(hexcolor.substr(1, 1).c_str(), NULL, 16) * 17;
+        color.g = (uint8_t)strtoul(hexcolor.substr(2, 1).c_str(), NULL, 16) * 17;
+        color.b = (uint8_t)strtoul(hexcolor.substr(3, 1).c_str(), NULL, 16) * 17;
     }
     return color;
 }
@@ -171,7 +171,9 @@ try {
 
     // Custom button
     sf::Texture imgbutton;
-    imgbutton.loadFromFile("demo/themed-button.png");
+    if (!imgbutton.loadFromFile("demo/themed-button.png")) {
+        cerr << "- Failed to load button theme image!\n";
+    }
 
     gui::SpriteButton* customButton = new gui::SpriteButton(imgbutton, "Play");
     customButton->setTextSize(20);
@@ -217,7 +219,9 @@ try {
     });
 
     sf::Texture texture;
-    texture.loadFromFile("demo/sfml.png");
+    if (!texture.loadFromFile("demo/sfml.png")) {
+        cerr << "- Failed to load texture!\n";
+    }
 
     sf::Sprite sprite(texture);
     sprite.setOrigin({(float)texture.getSize().x / 2.f, (float)texture.getSize().y / 2.f});

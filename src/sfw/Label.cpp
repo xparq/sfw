@@ -9,7 +9,7 @@ Label::Label(const sf::String& string)
     m_text.setFont(Theme::getFont());
     m_text.setPosition({Theme::PADDING, Theme::PADDING});
     m_text.setFillColor(Theme::click.textColor);
-    m_text.setCharacterSize(Theme::textSize);
+    m_text.setCharacterSize((unsigned)Theme::textSize);
     setSelectable(false);
     setText(string);
 }
@@ -42,7 +42,7 @@ const sf::Color& Label::getFillColor() const
 
 void Label::setTextSize(size_t size)
 {
-    m_text.setCharacterSize(size);
+    m_text.setCharacterSize((unsigned)size);
     updateGeometry();
 }
 

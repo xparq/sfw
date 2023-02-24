@@ -14,10 +14,10 @@ SpriteButton::SpriteButton(const sf::Texture& texture, const sf::String& string)
     m_background.setTexture(texture);
     m_background.setTextureRect(sf::IntRect({0, 0}, {width, height}));
 
-    setSize(width, height);
+    setSize((float)width, (float)height);
 
     m_text.setFont(Theme::getFont());
-    m_text.setCharacterSize(Theme::textSize);
+    m_text.setCharacterSize((unsigned)Theme::textSize);
 
     setString(string);
 }
@@ -51,7 +51,7 @@ const sf::Font& SpriteButton::getFont() const
 
 void SpriteButton::setTextSize(size_t size)
 {
-    m_text.setCharacterSize(size);
+    m_text.setCharacterSize((unsigned)size);
     centerText(m_text);
 }
 

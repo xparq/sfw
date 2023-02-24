@@ -24,7 +24,7 @@ ProgressBar::ProgressBar(float length, Orientation orientation, LabelPlacement l
     m_label.setString("100%");
     m_label.setFont(Theme::getFont());
     m_label.setFillColor(Theme::input.textColor);
-    m_label.setCharacterSize(Theme::textSize);
+    m_label.setCharacterSize((unsigned)Theme::textSize);
 
     // Build bar
     const float x1 = Theme::PADDING;
@@ -36,7 +36,7 @@ ProgressBar::ProgressBar(float length, Orientation orientation, LabelPlacement l
     m_bar[2].position = {x2, y2};
     m_bar[3].position = {x1, y2};
 
-    const sf::IntRect& rect = Theme::getProgressBarTextureRect();
+    sf::FloatRect rect = (sf::FloatRect)Theme::getProgressBarTextureRect();
     m_bar[0].texCoords = sf::Vector2f(rect.left, rect.top);
     m_bar[1].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
     m_bar[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);

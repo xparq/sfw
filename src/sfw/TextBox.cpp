@@ -21,16 +21,16 @@ TextBox::TextBox(float width):
     m_text.setFont(Theme::getFont());
     m_text.setPosition({offset, offset});
     m_text.setFillColor(Theme::input.textColor);
-    m_text.setCharacterSize(Theme::textSize);
+    m_text.setCharacterSize((unsigned)Theme::textSize);
 
     m_placeholder.setFont(Theme::getFont());
     m_placeholder.setPosition({offset, offset});
     m_placeholder.setFillColor(Theme::input.textPlaceholderColor);
-    m_placeholder.setCharacterSize(Theme::textSize);
+    m_placeholder.setCharacterSize((unsigned)Theme::textSize);
 
     // Build cursor
     m_cursor.setPosition({offset, offset});
-    m_cursor.setSize(sf::Vector2f(1.f, Theme::getLineSpacing()));
+    m_cursor.setSize(sf::Vector2f(1.f, (float)Theme::getLineSpacing()));
     m_cursor.setFillColor(Theme::input.textColor);
     setCursor(0);
 
@@ -315,7 +315,7 @@ void TextBox::onMouseLeave()
 
 void TextBox::onMousePressed(float x, float)
 {
-    for (int i = m_text.getString().getSize(); i >= 0; --i)
+    for (int i = (int)m_text.getString().getSize(); i >= 0; --i)
     {
         // Place cursor after the character under the mouse
         sf::Vector2f glyphPos = m_text.findCharacterPos(i);
@@ -330,7 +330,7 @@ void TextBox::onMousePressed(float x, float)
 
 void TextBox::onMouseReleased(float x, float)
 {
-    for (int i = m_text.getString().getSize(); i >= 0; --i)
+    for (int i = (int)m_text.getString().getSize(); i >= 0; --i)
     {
         // Place cursor after the character under the mouse
         sf::Vector2f glyphPos = m_text.findCharacterPos(i);
@@ -347,7 +347,7 @@ void TextBox::onMouseMoved(float x, float)
 {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
     {
-        for (int i = m_text.getString().getSize(); i >= 0; --i)
+        for (int i = (int)m_text.getString().getSize(); i >= 0; --i)
         {
             // Place cursor after the character under the mouse
             sf::Vector2f glyphPos = m_text.findCharacterPos(i);
@@ -401,7 +401,8 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
     glEnable(GL_SCISSOR_TEST);
 
     sf::Vector2f pos = getAbsolutePosition();
-    glScissor(pos.x + Theme::borderSize, target.getSize().y - (pos.y + getSize().y), getSize().x, getSize().y);
+    glScissor((GLint)(pos.x + Theme::borderSize), (GLint)(target.getSize().y - (pos.y + getSize().y)),
+              (GLsizei)getSize().x, (GLsizei)getSize().y);
 
     if (m_text.getString().isEmpty())
     {
@@ -434,7 +435,7 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
 
         // Updating in the drawing method, deal with it
         sf::Color color = Theme::input.textColor;
-        color.a = 255 - (255 * timer / BLINK_PERIOD);
+        color.a = uint8_t(255 - (255 * timer / BLINK_PERIOD));
         m_cursor.setFillColor(color);
 
         target.draw(m_cursor, lstates);

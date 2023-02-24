@@ -20,12 +20,13 @@ Image::Image(const sf::Texture& texture):
 
 void Image::setTexture(const sf::Texture& texture)
 {
-    int width = texture.getSize().x;
-    int height = texture.getSize().y;
-    m_vertices[0].position = m_vertices[0].texCoords = sf::Vector2f(0, 0);
-    m_vertices[1].position = m_vertices[1].texCoords = sf::Vector2f(0, height);
-    m_vertices[2].position = m_vertices[2].texCoords = sf::Vector2f(width, height);
-    m_vertices[3].position = m_vertices[3].texCoords = sf::Vector2f(width, 0);
+    float width = (float)texture.getSize().x;
+    float height = (float)texture.getSize().y;
+    m_vertices[0].position = m_vertices[0].texCoords = sf::Vector2f(0.f, 0.f);
+    //!!??
+    m_vertices[1].position = m_vertices[3].texCoords = sf::Vector2f(width, 0.f);
+    m_vertices[2].position = m_vertices[1].texCoords = sf::Vector2f(0.f, height);
+    m_vertices[3].position = m_vertices[2].texCoords = sf::Vector2f(width, height);
     m_texture = &texture;
 
     // Set widget dimensions

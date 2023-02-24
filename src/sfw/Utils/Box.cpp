@@ -33,10 +33,11 @@ void Box::setSliceTextureCoords(Slice slice, float x, float y)
     int index = slice * 4;
     m_vertices[index].texCoords = sf::Vector2f(x, y);
 
-    m_vertices[++index].texCoords = sf::Vector2f(x + Theme::borderSize, y);
-    m_vertices[++index].texCoords = sf::Vector2f(x + Theme::borderSize, y + Theme::borderSize);
     //!!??
     m_vertices[++index].texCoords = sf::Vector2f(x, y + Theme::borderSize);
+
+    m_vertices[++index].texCoords = sf::Vector2f(x + Theme::borderSize, y);
+    m_vertices[++index].texCoords = sf::Vector2f(x + Theme::borderSize, y + Theme::borderSize);
 }
 
 
@@ -45,10 +46,11 @@ void Box::setSliceGeometry(Slice slice, float x1, float y1, float x2, float y2)
     int index = slice * 4;
     m_vertices[index].position = sf::Vector2f(x1, y1);
 
-    m_vertices[++index].position = sf::Vector2f(x2, y1);
-    m_vertices[++index].position = sf::Vector2f(x2, y2);
     //!!??
     m_vertices[++index].position = sf::Vector2f(x1, y2);
+
+    m_vertices[++index].position = sf::Vector2f(x2, y1);
+    m_vertices[++index].position = sf::Vector2f(x2, y2);
 }
 
 
@@ -65,10 +67,10 @@ void Box::setSize(float width, float height)
     // y2--+---+---+
     // |   |   |   |
     // y3--+---+---+
-    float x1 = Theme::borderSize;
+    float x1 = (float)Theme::borderSize;
     float x2 = width - Theme::borderSize;
     float x3 = width;
-    float y1 = Theme::borderSize;
+    float y1 = (float)Theme::borderSize;
     float y2 = height - Theme::borderSize;
     float y3 = height;
     setSliceGeometry(TOP_LEFT, 0, 0, x1, y1);
@@ -115,11 +117,11 @@ void Box::applyState(State state)
     if (state == m_state || (state == StateHovered && m_state == StateFocused))
         return;
 
-    const sf::IntRect& subrect = Theme::getTextureRect(m_type, state);
+    sf::FloatRect subrect = (sf::FloatRect)Theme::getTextureRect(m_type, state);
     float x = subrect.left;
     float y = subrect.top;
-    float width = Theme::borderSize;
-    float height = Theme::borderSize;
+    float width = (float)Theme::borderSize;
+    float height = (float)Theme::borderSize;
 
     setSliceTextureCoords(TOP_LEFT, x, y);
     setSliceTextureCoords(TOP, x + width, y);

@@ -39,7 +39,7 @@ void Menu::onEvent(const sf::Event& event)
         break;
 
     case sf::Event::MouseWheelScrolled:
-        onMouseWheelMoved(event.mouseWheelScroll.delta);
+        onMouseWheelMoved((int)event.mouseWheelScroll.delta);
         break;
 
     case sf::Event::KeyPressed:
@@ -72,9 +72,10 @@ void Menu::setMouseCursor(sf::Cursor::Type cursorType)
 {
     if (cursorType != m_cursorType)
     {
-        gui::Theme::cursor.loadFromSystem(cursorType);
-        m_window.setMouseCursor(gui::Theme::cursor);
-        m_cursorType = cursorType;
+        if (gui::Theme::cursor.loadFromSystem(cursorType)) {
+        	m_window.setMouseCursor(gui::Theme::cursor);
+	        m_cursorType = cursorType;
+	}
     }
 }
 

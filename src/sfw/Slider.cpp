@@ -10,10 +10,10 @@ Slider::Slider(float length, Orientation orientation):
     m_value(0),
     m_box(Box::Input)
 {
-    int handleHeight = Theme::getBoxHeight();
-    int handleWidth = handleHeight / 2;
-    int boxHeight = Theme::borderSize * 3;
-    int boxOffset = (handleHeight - boxHeight) / 2;
+    float handleHeight = Theme::getBoxHeight();
+    float handleWidth = handleHeight / 2;
+    float boxHeight = (float)Theme::borderSize * 3;
+    float boxOffset = (handleHeight - boxHeight) / 2;
 
     if (orientation == Horizontal)
     {
@@ -101,17 +101,17 @@ void Slider::updateHandlePosition()
 {
     if (m_orientation == Horizontal)
     {
-        int max = getSize().x - m_handle.getSize().x - Theme::borderSize * 2;
-        int x = max * m_value / 100 + Theme::borderSize;
+        float max = getSize().x - m_handle.getSize().x - Theme::borderSize * 2;
+        float x = max * m_value / 100 + Theme::borderSize;
         m_handle.setPosition(x, 0);
         m_progression[1].position.x = x;
         m_progression[2].position.x = x;
     }
     else
     {
-        int max = getSize().y - m_handle.getSize().y - Theme::borderSize * 2;
+        float max = getSize().y - m_handle.getSize().y - Theme::borderSize * 2;
         int reverse_value = 100 - m_value;
-        int y = max * reverse_value / 100 + Theme::borderSize;
+        float y = max * reverse_value / 100 + (float)Theme::borderSize;
         m_handle.setPosition(0, y);
         m_progression[0].position.y = y;
         m_progression[1].position.y = y;
@@ -156,9 +156,9 @@ void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
 void Slider::onMousePressed(float x, float y)
 {
     if (m_orientation == Horizontal)
-        setValue(100 * x / getSize().x);
+        setValue((int)(100 * x / getSize().x)); //! cast -> trunc, not round
     else
-        setValue(100 - (100 * (y) / getSize().y));
+        setValue((int)(100 - (100 * (y) / getSize().y))); //! cast -> trunc, not round
 
     m_handle.press();
 }
@@ -171,9 +171,9 @@ void Slider::onMouseMoved(float x, float y)
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
             if (m_orientation == Horizontal)
-                setValue(100 * x / getSize().x);
+                setValue((int)(100 * x / getSize().x)); //! cast -> trunc, not round
             else
-                setValue(100 - (100 * y / getSize().y));
+                setValue((int)(100 - (100 * y / getSize().y))); //! cast -> trunc, not round
         }
     }
     else if (m_handle.containsPoint(x, y))
@@ -208,3 +208,4 @@ void Slider::onStateChanged(State state)
 }
 
 }
+       	
