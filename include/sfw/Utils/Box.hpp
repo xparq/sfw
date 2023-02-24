@@ -73,33 +73,47 @@ protected:
     Type m_type;
 
 private:
-    enum Slice
+
+    // The box is a 9-cell rect. of 3 lines (strips) with 9 vertices each:
+    // 8 to draw the cells, plus 1 more for "carriage return", driving the
+    // TriangleStrip back to the left of the next line, via 2 degenerate
+    // triangles (6-7-8, 7-8-9):
+    //
+    // 0 2 4 6                                  (6)
+    // |/|/|/|  ->  then 8 := 7  ->              |
+    // 1 3 5 7                       (1)-(3)-(5)-8
+    //
+    // Now 9 goes back to 1, starting the 2nd line, and the process repeats.
+
+    static constexpr size_t VERTICES_PER_STRIP = 9;
+    static constexpr size_t VERTEX_COUNT = 3 * VERTICES_PER_STRIP;
+
+    enum Strip
     {
-        TOP_LEFT,
-        TOP,
-        TOP_RIGHT,
-        LEFT,
-        MIDDLE,
-        RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM,
-        BOTTOM_RIGHT
+        TOP_STRIP = 0,
+        MIDDLE_STRIP,
+        BOTTOM_STRIP,
+    };
+
+    enum Vertex
+    {
+        TOP_LEFT = 0,
+        BOTTOM_RIGHT = VERTICES_PER_STRIP * 3 - 1,
     };
 
     /**
-     * Set the texture coords for one of the 9 slices
+     * Set the geometry for one line of the 9 slices
      */
-    void setSliceTextureCoords(Slice slice, float x, float y);
+    void setStripGeometry(Strip strip, float x0, float x2, float x4, float x6, float top, float bottom);
 
     /**
-     * Set the geometry for one of the 9 slices
+     * Set the texture coords for one line of the 9 slices
      */
-    void setSliceGeometry(Slice slice, float x1, float y1, float x2, float y2);
+    void setStripTextureCoords(Strip strip, float txleft, float txtop, float txwidth, float txheight);
+
 
     State m_state;
 
-    // The box is a 9-slices plane, 4 vertices per slice
-    static constexpr size_t VERTEX_COUNT = 9 * 4;
     sf::Vertex m_vertices[VERTEX_COUNT];
 };
 

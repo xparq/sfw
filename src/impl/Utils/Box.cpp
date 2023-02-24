@@ -1,6 +1,6 @@
 #include "sfw/Utils/Box.hpp"
 #include "sfw/Theme.hpp"
-
+#include <cassert>
 
 namespace gui
 {
@@ -28,32 +28,6 @@ void Box::setPosition(float x, float y)
 }
 
 
-void Box::setSliceTextureCoords(Slice slice, float x, float y)
-{
-    int index = slice * 4;
-    m_vertices[index].texCoords = sf::Vector2f(x, y);
-
-    //!!??
-    m_vertices[++index].texCoords = sf::Vector2f(x, y + Theme::borderSize);
-
-    m_vertices[++index].texCoords = sf::Vector2f(x + Theme::borderSize, y);
-    m_vertices[++index].texCoords = sf::Vector2f(x + Theme::borderSize, y + Theme::borderSize);
-}
-
-
-void Box::setSliceGeometry(Slice slice, float x1, float y1, float x2, float y2)
-{
-    int index = slice * 4;
-    m_vertices[index].position = sf::Vector2f(x1, y1);
-
-    //!!??
-    m_vertices[++index].position = sf::Vector2f(x1, y2);
-
-    m_vertices[++index].position = sf::Vector2f(x2, y1);
-    m_vertices[++index].position = sf::Vector2f(x2, y2);
-}
-
-
 void Box::setSize(float width, float height)
 {
     if (width <= 0 || height <= 0)
@@ -67,28 +41,21 @@ void Box::setSize(float width, float height)
     // y2--+---+---+
     // |   |   |   |
     // y3--+---+---+
-    float x1 = (float)Theme::borderSize;
-    float x2 = width - Theme::borderSize;
+    float x1 =   (float)Theme::borderSize;
+    float x2 = width -  Theme::borderSize;
     float x3 = width;
-    float y1 = (float)Theme::borderSize;
+    float y1 =   (float)Theme::borderSize;
     float y2 = height - Theme::borderSize;
     float y3 = height;
-    setSliceGeometry(TOP_LEFT, 0, 0, x1, y1);
-    setSliceGeometry(TOP, x1, 0, x2, y1);
-    setSliceGeometry(TOP_RIGHT, x2, 0, x3, y1);
-    setSliceGeometry(LEFT, 0, y1, x1, y2);
-    setSliceGeometry(MIDDLE, x1, y1, x2, y2);
-    setSliceGeometry(RIGHT, x2, y1, x3, y2);
-    setSliceGeometry(BOTTOM_LEFT, 0, y2, x1, y3);
-    setSliceGeometry(BOTTOM, x1, y2, x2, y3);
-    setSliceGeometry(BOTTOM_RIGHT, x2, y2, x3, y3);
+    setStripGeometry(TOP_STRIP,    0, x1, x2, x3,  0, y1);
+    setStripGeometry(MIDDLE_STRIP, 0, x1, x2, x3, y1, y2);
+    setStripGeometry(BOTTOM_STRIP, 0, x1, x2, x3, y2, y3);
 }
-
 
 sf::Vector2f Box::getSize() const
 {
     // Bottom right corner - top left corner
-    return m_vertices[BOTTOM_RIGHT * 4 + 2].position - getPosition();
+    return m_vertices[BOTTOM_RIGHT].position - getPosition();
 }
 
 
@@ -96,7 +63,6 @@ void Box::press()
 {
     applyState(StatePressed);
 }
-
 
 void Box::release()
 {
@@ -106,9 +72,43 @@ void Box::release()
 
 bool Box::containsPoint(float x, float y) const
 {
-    return x > m_vertices[0].position.x && x < m_vertices[BOTTOM_RIGHT * 4 + 2].position.x
-        && y > m_vertices[0].position.y && y < m_vertices[BOTTOM_RIGHT * 4 + 2].position.y;
+    return x > m_vertices[TOP_LEFT].position.x && x < m_vertices[BOTTOM_RIGHT].position.x
+        && y > m_vertices[TOP_LEFT].position.y && y < m_vertices[BOTTOM_RIGHT].position.y;
 }
+
+
+void Box::setStripGeometry(Strip strip, float x0, float x2, float x4, float x6, float top, float bottom)
+{
+    size_t index = strip * VERTICES_PER_STRIP;
+    m_vertices[  index].position = sf::Vector2f(x0, top);
+    m_vertices[++index].position = sf::Vector2f(x0, bottom);
+    m_vertices[++index].position = sf::Vector2f(x2, top);
+    m_vertices[++index].position = sf::Vector2f(x2, bottom);
+    m_vertices[++index].position = sf::Vector2f(x4, top);
+    m_vertices[++index].position = sf::Vector2f(x4, bottom);
+    m_vertices[++index].position = sf::Vector2f(x6, top);
+    m_vertices[++index].position = sf::Vector2f(x6, bottom);
+    ++index; // Extra dummy vertex for "carriage-return"
+    m_vertices[index].position = m_vertices[index - 1].position;
+    assert(index == strip * VERTICES_PER_STRIP + VERTICES_PER_STRIP - 1);
+}
+
+void Box::setStripTextureCoords(Strip strip, float txleft, float txtop, float txwidth, float txheight)
+{
+    size_t index = strip * VERTICES_PER_STRIP;
+    m_vertices[  index].texCoords = sf::Vector2f(txleft, txtop);
+    m_vertices[++index].texCoords = sf::Vector2f(txleft, txtop + txheight);
+    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth, txtop);
+    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth, txtop + txheight);
+    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth * 2, txtop);
+    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth * 2, txtop + txheight);
+    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth * 3, txtop);
+    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth * 3, txtop + txheight);
+    ++index; // Extra dummy vertex for "carriage-return"
+    m_vertices[index].texCoords = m_vertices[index - 1].texCoords;
+    assert(index == strip * VERTICES_PER_STRIP + VERTICES_PER_STRIP - 1);
+}
+
 
 // Visual properties -----------------------------------------------------------
 
@@ -122,16 +122,9 @@ void Box::applyState(State state)
     float y = subrect.top;
     float width = (float)Theme::borderSize;
     float height = (float)Theme::borderSize;
-
-    setSliceTextureCoords(TOP_LEFT, x, y);
-    setSliceTextureCoords(TOP, x + width, y);
-    setSliceTextureCoords(TOP_RIGHT, x + width * 2, y);
-    setSliceTextureCoords(LEFT, x, y + height);
-    setSliceTextureCoords(MIDDLE, x + width, y + height);
-    setSliceTextureCoords(RIGHT, x + width * 2, y + height);
-    setSliceTextureCoords(BOTTOM_LEFT, x, y + height * 2);
-    setSliceTextureCoords(BOTTOM, x + width, y + height * 2);
-    setSliceTextureCoords(BOTTOM_RIGHT, x + width * 2, y + height * 2);
+    setStripTextureCoords(TOP_STRIP,    x, y, width, height);
+    setStripTextureCoords(MIDDLE_STRIP, x, y + height, width, height);
+    setStripTextureCoords(BOTTOM_STRIP, x, y + height * 2, width, height);
 
     if (m_state == StatePressed)
     {

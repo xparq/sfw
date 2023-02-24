@@ -169,7 +169,14 @@ clean:
 
 
 #=============================================================================
-# The demo:
+# The lib
+#=============================================================================
+$(sfw_lib): $(sfw_objs)
+	$(LIB_CMD) -out:$@ $(sfw_objs)
+
+
+#=============================================================================
+# The demo
 #=============================================================================
 sfml_libs_static=sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib
 sfml_libs_dll=sfml-graphics.lib sfml-window.lib sfml-system.lib
@@ -188,12 +195,9 @@ libs=$(sfml_libs) opengl32.lib
 sfml_libs=$(substi .lib,-d.lib,$(sfml_libs))
 !endif
 
-
-$(sfw_lib): $(sfw_objs)
-	$(LIB_CMD) -out:$@ $(sfw_objs)
-
+#-----------------------------------------------------------------------------
 $(sfw_demo): $(out_dir)/demo.obj $(sfw_lib)
-#!! The SFML libs must come first! :-oo Got a silent launch failure otherwise!... :-/
+#!!?? The SFML libs must come first?! :-o Got a silent launch failure otherwise!... :-/
 	$(LINK_CMD) $(LINK_FLAGS) $(libs) $** -out:$@
 
 #=============================================================================
