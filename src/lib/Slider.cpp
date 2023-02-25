@@ -12,10 +12,10 @@ Slider::Slider(float length, Orientation orientation):
     m_value(0),
     m_box(Box::Input)
 {
-    float handleHeight = Theme::getBoxHeight();
-    float handleWidth = handleHeight / 2;
-    float boxHeight = (float)Theme::borderSize * 3;
-    float boxOffset = (handleHeight - boxHeight) / 2;
+    size_t handleHeight = (size_t) Theme::getBoxHeight();
+    size_t handleWidth = handleHeight / 2;
+    size_t boxHeight = (size_t) Theme::borderSize * 3;
+    size_t boxOffset = (handleHeight - boxHeight) / 2;
 
     if (orientation == Horizontal)
     {
@@ -31,7 +31,7 @@ Slider::Slider(float length, Orientation orientation):
             m_progression[i].position.x = m_box.getPosition().x + Theme::borderSize;
             m_progression[i].position.y = m_box.getPosition().y + Theme::borderSize;
         }
-        m_progression[2].position.y += m_box.getSize().y - Theme::borderSize * 2;
+        m_progression[1].position.y += m_box.getSize().y - Theme::borderSize * 2;
         m_progression[3].position.y += m_box.getSize().y - Theme::borderSize * 2;
     }
     else
@@ -48,8 +48,8 @@ Slider::Slider(float length, Orientation orientation):
             m_progression[i].position.x = m_box.getPosition().x + Theme::borderSize;
             m_progression[i].position.y = m_box.getSize().y - Theme::borderSize;
         }
-        m_progression[1].position.x += m_box.getSize().x - Theme::borderSize * 2;
         m_progression[2].position.x += m_box.getSize().x - Theme::borderSize * 2;
+        m_progression[3].position.x += m_box.getSize().x - Theme::borderSize * 2;
     }
     updateHandlePosition();
 }
@@ -106,8 +106,8 @@ void Slider::updateHandlePosition()
         float max = getSize().x - m_handle.getSize().x - Theme::borderSize * 2;
         float x = max * m_value / 100 + Theme::borderSize;
         m_handle.setPosition(x, 0);
-        m_progression[1].position.x = x;
         m_progression[2].position.x = x;
+        m_progression[3].position.x = x;
     }
     else
     {
@@ -116,7 +116,7 @@ void Slider::updateHandlePosition()
         float y = max * reverse_value / 100 + (float)Theme::borderSize;
         m_handle.setPosition(0, y);
         m_progression[0].position.y = y;
-        m_progression[1].position.y = y;
+        m_progression[2].position.y = y;
     }
 }
 
