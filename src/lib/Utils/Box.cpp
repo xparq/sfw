@@ -50,9 +50,9 @@ void Box::setSize(float width, float height)
     float y1 =   (float)Theme::borderSize;
     float y2 = height - Theme::borderSize;
     float y3 = height;
-    setStripGeometry(TOP_STRIP,    0, x1, x2, x3,  0, y1);
-    setStripGeometry(MIDDLE_STRIP, 0, x1, x2, x3, y1, y2);
-    setStripGeometry(BOTTOM_STRIP, 0, x1, x2, x3, y2, y3);
+    setSegmentGeometry(TOP_SEGMENT,    0, x1, x2, x3,  0, y1);
+    setSegmentGeometry(MIDDLE_SEGMENT, 0, x1, x2, x3, y1, y2);
+    setSegmentGeometry(BOTTOM_SEGMENT, 0, x1, x2, x3, y2, y3);
 }
 
 sf::Vector2f Box::getSize() const
@@ -80,36 +80,33 @@ bool Box::containsPoint(float x, float y) const
 }
 
 
-void Box::setStripGeometry(Strip strip, float x0, float x2, float x4, float x6, float top, float bottom)
+void Box::setSegmentGeometry(StripSegment n, float x0, float x2, float x4, float x6, float top, float bottom)
 {
-    size_t index = strip * VERTICES_PER_STRIP;
-    m_vertices[  index].position = sf::Vector2f(x0, top);
-    m_vertices[++index].position = sf::Vector2f(x0, bottom);
-    m_vertices[++index].position = sf::Vector2f(x2, top);
-    m_vertices[++index].position = sf::Vector2f(x2, bottom);
-    m_vertices[++index].position = sf::Vector2f(x4, top);
-    m_vertices[++index].position = sf::Vector2f(x4, bottom);
-    m_vertices[++index].position = sf::Vector2f(x6, top);
-    m_vertices[++index].position = sf::Vector2f(x6, bottom);
-    ++index; // Extra dummy vertex for "carriage-return"
+    size_t index = n * VERTICES_PER_SEGMENT;
+    m_vertices[index++].position = sf::Vector2f(x0, top);
+    m_vertices[index++].position = sf::Vector2f(x0, bottom);
+    m_vertices[index++].position = sf::Vector2f(x2, top);
+    m_vertices[index++].position = sf::Vector2f(x2, bottom);
+    m_vertices[index++].position = sf::Vector2f(x4, top);
+    m_vertices[index++].position = sf::Vector2f(x4, bottom);
+    m_vertices[index++].position = sf::Vector2f(x6, top);
+    m_vertices[index++].position = sf::Vector2f(x6, bottom);
+    // Extra dummy vertex for "carriage-return"
     m_vertices[index].position = m_vertices[index - 1].position;
-    assert(index == strip * VERTICES_PER_STRIP + VERTICES_PER_STRIP - 1);
+    assert(index == n * VERTICES_PER_SEGMENT + VERTICES_PER_SEGMENT - 1);
 }
 
-void Box::setStripTextureCoords(Strip strip, float txleft, float txtop, float txwidth, float txheight)
+void Box::setSegmentTextureCoords(StripSegment n, float txleft, float txtop, float txwidth, float txheight)
 {
-    size_t index = strip * VERTICES_PER_STRIP;
-    m_vertices[  index].texCoords = sf::Vector2f(txleft, txtop);
-    m_vertices[++index].texCoords = sf::Vector2f(txleft, txtop + txheight);
-    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth, txtop);
-    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth, txtop + txheight);
-    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth * 2, txtop);
-    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth * 2, txtop + txheight);
-    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth * 3, txtop);
-    m_vertices[++index].texCoords = sf::Vector2f(txleft + txwidth * 3, txtop + txheight);
-    ++index; // Extra dummy vertex for "carriage-return"
+    size_t index = n * VERTICES_PER_SEGMENT;
+    for (size_t x = 0; x <= 3; ++x)
+    {
+        m_vertices[index++].texCoords = sf::Vector2f(txleft + txwidth * x, txtop);
+        m_vertices[index++].texCoords = sf::Vector2f(txleft + txwidth * x, txtop + txheight);
+    }
+    // Extra dummy vertex for "carriage-return":
     m_vertices[index].texCoords = m_vertices[index - 1].texCoords;
-    assert(index == strip * VERTICES_PER_STRIP + VERTICES_PER_STRIP - 1);
+    assert(index == n * VERTICES_PER_SEGMENT + VERTICES_PER_SEGMENT - 1);
 }
 
 
@@ -125,9 +122,9 @@ void Box::applyState(State state)
     float y = subrect.top;
     float width = (float)Theme::borderSize;
     float height = (float)Theme::borderSize;
-    setStripTextureCoords(TOP_STRIP,    x, y, width, height);
-    setStripTextureCoords(MIDDLE_STRIP, x, y + height, width, height);
-    setStripTextureCoords(BOTTOM_STRIP, x, y + height * 2, width, height);
+    setSegmentTextureCoords(TOP_SEGMENT,    x, y, width, height);
+    setSegmentTextureCoords(MIDDLE_SEGMENT, x, y + height, width, height);
+    setSegmentTextureCoords(BOTTOM_SEGMENT, x, y + height * 2, width, height);
 
     if (m_state == StatePressed)
     {

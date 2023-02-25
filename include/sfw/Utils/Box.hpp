@@ -73,44 +73,45 @@ protected:
 
 private:
 
-    // The box is a 9-cell rect. of 3 lines (stripes) with 9 vertices each:
-    // 8 to draw the cells, plus 1 more for "carriage return", driving the
-    // TriangleStrip back to the left of the next line, via 2 degenerate
-    // triangles (6-7-8, 7-8-9):
+    // A Box is drawn using a triangle strip (sf::TriangleStrip) that
+    // consists of 3 isomorphic rows (segments) of 9 vertices each:
+    // 8 to draw the (textured) rectangles, + 1 more for "carriage return",
+    // driving the triangle strip back to the left of the next segment,
+    // via 2 degenerate triangles (6-7-8, 7-8-9):
     //
     // 0 2 4 6                                  (6)
     // |/|/|/|  ->  then 8 := 7  ->              |
     // 1 3 5 7                       (1)-(3)-(5)-8
     //
-    // Now 9 goes back to 1, starting the 2nd line, and the process repeats.
-    // Note that the next stripe will start by repeating this last vertex,
-    // which will result in yet another degenerate triangle...
+    // Now 9 goes back to 1, and the process repeats with the 2nd row; etc.
+    // Note that the next segment will start by repeating this last vertex,
+    // resulting in yet another degenerate triangle.
 
-    static constexpr size_t VERTICES_PER_STRIP = 9;
-    static constexpr size_t VERTEX_COUNT = 3 * VERTICES_PER_STRIP;
+    static constexpr size_t VERTICES_PER_SEGMENT = 9;
+    static constexpr size_t VERTEX_COUNT = 3 * VERTICES_PER_SEGMENT;
 
-    enum Strip
+    enum StripSegment
     {
-        TOP_STRIP = 0,
-        MIDDLE_STRIP,
-        BOTTOM_STRIP,
+        TOP_SEGMENT,
+        MIDDLE_SEGMENT,
+        BOTTOM_SEGMENT,
     };
 
     enum Vertex
     {
-        TOP_LEFT = 0,
-        BOTTOM_RIGHT = VERTICES_PER_STRIP * 3 - 1,
+        TOP_LEFT,
+        BOTTOM_RIGHT = VERTICES_PER_SEGMENT * 3 - 1,
     };
 
     /**
      * Set the geometry for one line of the 9 slices
      */
-    void setStripGeometry(Strip strip, float x0, float x2, float x4, float x6, float top, float bottom);
+    void setSegmentGeometry(StripSegment n, float x0, float x2, float x4, float x6, float top, float bottom);
 
     /**
      * Set the texture coords for one line of the 9 slices
      */
-    void setStripTextureCoords(Strip strip, float txleft, float txtop, float txwidth, float txheight);
+    void setSegmentTextureCoords(StripSegment n, float txleft, float txtop, float txwidth, float txheight);
 
 
     State m_state;
