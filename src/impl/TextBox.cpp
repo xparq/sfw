@@ -1,6 +1,7 @@
 #include "sfw/TextBox.hpp"
 #include "sfw/Theme.hpp"
 
+#include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/OpenGL.hpp>
 
 #define BLINK_PERIOD 1.f

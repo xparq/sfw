@@ -3,6 +3,8 @@
 
 #include "Widget.hpp"
 
+#include <SFML/Graphics/Texture.hpp>
+
 namespace gui
 {
 

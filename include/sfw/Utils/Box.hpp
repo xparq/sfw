@@ -1,7 +1,6 @@
 #ifndef GUI_BOX_HPP
 #define GUI_BOX_HPP
 
-#include <SFML/Graphics.hpp>
 #include "../Widget.hpp"
 
 namespace gui

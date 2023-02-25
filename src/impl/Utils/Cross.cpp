@@ -1,6 +1,11 @@
 #include "sfw/Utils/Cross.hpp"
 #include "sfw/Theme.hpp"
 
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+
 namespace gui
 {
 

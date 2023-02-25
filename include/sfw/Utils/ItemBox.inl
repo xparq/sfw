@@ -1,5 +1,7 @@
 #include "../Theme.hpp"
 
+#include <SFML/Graphics/RenderTarget.hpp>
+
 namespace gui
 {
 

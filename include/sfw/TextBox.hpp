@@ -4,6 +4,9 @@
 #include "Widget.hpp"
 #include "Utils/Box.hpp"
 
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/System/Clock.hpp>
+
 namespace gui
 {
 

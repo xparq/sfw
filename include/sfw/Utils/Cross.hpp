@@ -1,7 +1,10 @@
 #ifndef GUI_CROSS_HPP
 #define GUI_CROSS_HPP
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Vertex.hpp>
 
 namespace gui
 {

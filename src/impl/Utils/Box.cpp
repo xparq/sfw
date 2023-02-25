@@ -1,5 +1,8 @@
 #include "sfw/Utils/Box.hpp"
 #include "sfw/Theme.hpp"
+
+#include <SFML/Graphics/RenderTarget.hpp>
+
 #include <cassert>
 
 namespace gui

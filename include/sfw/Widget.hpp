@@ -1,8 +1,12 @@
 #ifndef GUI_WIDGET_HPP
 #define GUI_WIDGET_HPP
 
-#include <SFML/Graphics.hpp>
-#include <iostream>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Cursor.hpp>
+
 #include <functional>
 
 namespace gui
@@ -83,9 +87,6 @@ protected:
 
     void setSelectable(bool selectable);
 
-    /**
-     * Notify parent that the widget has been triggered by user input
-     */
     void triggerCallback();
 
     void setState(State state);

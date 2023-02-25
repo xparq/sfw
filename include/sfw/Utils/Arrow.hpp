@@ -1,7 +1,10 @@
 #ifndef GUI_ARROW_HPP
 #define GUI_ARROW_HPP
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Drawable.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Vertex.hpp>
 
 namespace gui
 {

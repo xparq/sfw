@@ -3,6 +3,9 @@
 
 #include "Widget.hpp"
 
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+
 namespace gui
 {
 

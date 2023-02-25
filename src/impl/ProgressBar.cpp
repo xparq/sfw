@@ -1,6 +1,8 @@
 #include "sfw/ProgressBar.hpp"
 #include "sfw/Theme.hpp"
 
+#include <SFML/Graphics/RenderTarget.hpp>
+
 namespace gui
 {
 

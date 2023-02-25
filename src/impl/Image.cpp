@@ -1,5 +1,7 @@
 #include "sfw/Image.hpp"
 
+#include <SFML/Graphics.hpp>
+
 namespace gui
 {
 
