@@ -5,7 +5,7 @@ A fork of "SFML Widgets", a small & simple SFML-based GUI
 
 ### Changes to Alexandre Bodelot's original:
 
-- Adapted to the SFML (pre-)3.0 API. _(But not everything's perfect yet; see issue #20!)_
+- Adapted to the SFML (pre-)3.0 API. _(See issue #25 about minor cosmetic regressions.)_
 - Windows/MSVC build added.
 - Source tree reshuffled, mostly to help integrating into other projects.
 - Compiling as C++20 now (SFML3 is C++17 already).

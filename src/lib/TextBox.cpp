@@ -396,7 +396,7 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
 {
     auto lstates = states;
     lstates.transform *= getTransform();
-    target.draw(m_box, states);
+    target.draw(m_box, lstates);
 
     // Crop the text with GL Scissor
     glEnable(GL_SCISSOR_TEST);
@@ -438,7 +438,7 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
         if (timer >= BLINK_PERIOD)
             m_cursorTimer.restart();
 
-        // Updating in the drawing method, deal with it
+        // Hijacking draw() as a timer tick callback... (Hi five to Alexandre! ;) )
         sf::Color color = Theme::input.textColor;
         color.a = uint8_t(255 - (255 * timer / BLINK_PERIOD));
         m_cursor.setFillColor(color);
