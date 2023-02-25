@@ -1,16 +1,14 @@
-tmp/
-*.tmp
-
 # External dependencies (but keep their parent dir)
 extern/**/
 
-# Build artifacts
-.build.*/
+# Build artifacts etc.
+tmp/
+*.tmp
 
 # Demo binary
 *-demo
 *demo.exe
-# These will be placed along the .exe (not in the build workdir):
+# These will be placed along the .exe (not in the build dir):
 *.ilk
 *.pdb
 

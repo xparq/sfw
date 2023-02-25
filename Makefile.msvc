@@ -25,7 +25,7 @@ src_dir=src
 libsrc_dirtag=lib
 libsrc_dir=$(src_dir)/$(libsrc_dirtag)
 libdir=lib
-out_dir=.build.tmp
+out_dir=tmp/build
 # The existing actual source subdirs should/will match the out/ subdirs:
 #! Note however, about CL /Fo (i.e. "F*ck output subdirs"):
 #!      "The specified directory must exist, or the compiler reports error D8003.

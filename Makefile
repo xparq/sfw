@@ -4,7 +4,7 @@ LIBDIR  := lib
 LIBFILE := $(LIBDIR)/lib$(LIBNAME).a
 SRCDIR  := src
 SRC     := $(shell find $(SRCDIR) -name "*.cpp" -type f)
-OUTDIR  := .build.tmp
+OUTDIR  := tmp/build
 OBJDIR  := $(OUTDIR)
 OBJ     := $(SRC:%.cpp=$(OBJDIR)/%.o)
 ifndef SFML_DIR
