@@ -1,4 +1,6 @@
 #!/bin/bash
 
-clang-format $(find src/impl -type f) -i
+# NOTE: When called from the GH Action, it may pass --dry-run and/or -Werror, too.
+                                                                                
+clang-format $(find src/lib -type f) -i $*
 echo "Done"

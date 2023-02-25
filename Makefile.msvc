@@ -22,7 +22,7 @@ LINKMODE=static
 DEBUG=0
 
 src_dir=src
-libsrc_dirtag=impl
+libsrc_dirtag=lib
 libsrc_dir=$(src_dir)/$(libsrc_dirtag)
 libdir=lib
 out_dir=.build.tmp
@@ -85,12 +85,12 @@ CC_FLAGS_LINKMODE=$(CC_FLAGS_LINK_dll)
 !endif
 
 # Debug / Release alternatives:
-CC_FLAGS_DEBUG_0=-MD O2 -DNDEBUG
-# These -O... below are taken from Dr. Memory's README/Quick start...:
+CC_FLAGS_DEBUG_0=-MD -O2 -DNDEBUG
+# These -O...s below are taken from Dr. Memory's README/Quick start...:
 CC_FLAGS_DEBUG_1=-MDd -Zi -Oy- -Ob0 -DDEBUG
 LINK_FLAGS_DEBUG_0=
 LINK_FLAGS_DEBUG_1=-debug -ignore:4099
-#!!FFS... CC_FLAGS_DEBUG=$(CC_FLAGS_DEBUG_$(DEBUG))
+
 !if defined(DEBUG) && $(DEBUG) == 1
 CC_FLAGS_DEBUGMODE=$(CC_FLAGS_DEBUG_1)
 LINK_FLAGS_DEBUGMODE=$(LINK_FLAGS_DEBUG_1)

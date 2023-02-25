@@ -16,6 +16,7 @@ extern/**/
 
 # Lib
 lib/
+!src/lib/
 *.a
 *.lib
 

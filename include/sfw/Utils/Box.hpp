@@ -73,7 +73,7 @@ protected:
 
 private:
 
-    // The box is a 9-cell rect. of 3 lines (strips) with 9 vertices each:
+    // The box is a 9-cell rect. of 3 lines (stripes) with 9 vertices each:
     // 8 to draw the cells, plus 1 more for "carriage return", driving the
     // TriangleStrip back to the left of the next line, via 2 degenerate
     // triangles (6-7-8, 7-8-9):
@@ -83,6 +83,8 @@ private:
     // 1 3 5 7                       (1)-(3)-(5)-8
     //
     // Now 9 goes back to 1, starting the 2nd line, and the process repeats.
+    // Note that the next stripe will start by repeating this last vertex,
+    // which will result in yet another degenerate triangle...
 
     static constexpr size_t VERTICES_PER_STRIP = 9;
     static constexpr size_t VERTEX_COUNT = 3 * VERTICES_PER_STRIP;
