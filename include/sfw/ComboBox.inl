@@ -8,7 +8,7 @@ ComboBox<T>::ComboBox()
 
 
 template <class T>
-void ComboBox<T>::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void ComboBox<T>::draw([[maybe_unused]] sf::RenderTarget& target, [[maybe_unused]] const sf::RenderStates& states) const
 {
 }
 

@@ -401,8 +401,12 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
     glEnable(GL_SCISSOR_TEST);
 
     sf::Vector2f pos = getAbsolutePosition();
-    glScissor((GLint)(pos.x + Theme::borderSize), (GLint)(target.getSize().y - (pos.y + getSize().y)),
-              (GLsizei)getSize().x, (GLsizei)getSize().y);
+    glScissor(
+        (GLint)(pos.x + Theme::borderSize),
+        (GLint)(target.getSize().y - (pos.y + getSize().y)),
+        (GLsizei)getSize().x,
+        (GLsizei)getSize().y
+    );
 
     if (m_text.getString().isEmpty())
     {

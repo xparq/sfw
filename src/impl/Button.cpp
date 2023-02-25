@@ -60,8 +60,8 @@ void Button::onMouseMoved(float x, float y)
 }
 
 
-void Button::onMousePressed(float x, float y)
-{x, y; // <- This can only silence CL -W4, but not g++ -Wall though... :)
+void Button::onMousePressed([[maybe_unused]] float x, [[maybe_unused]] float y)
+{
     m_box.press();
 }
 

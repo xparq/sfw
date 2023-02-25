@@ -6,8 +6,9 @@ namespace gui
 static sf::Cursor& getDefaultCursor()
 {
     static sf::Cursor cursor;
-    if (!cursor.loadFromSystem(sf::Cursor::Arrow)) {
-        //!!...ERROR
+    if (!cursor.loadFromSystem(sf::Cursor::Arrow))
+    {
+        //!! loadFromSystem is `nodiscard`...
     }
     return cursor;
 }

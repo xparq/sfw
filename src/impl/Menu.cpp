@@ -72,10 +72,11 @@ void Menu::setMouseCursor(sf::Cursor::Type cursorType)
 {
     if (cursorType != m_cursorType)
     {
-        if (gui::Theme::cursor.loadFromSystem(cursorType)) {
-        	m_window.setMouseCursor(gui::Theme::cursor);
-	        m_cursorType = cursorType;
-	}
+        if (gui::Theme::cursor.loadFromSystem(cursorType))
+        {
+            m_window.setMouseCursor(gui::Theme::cursor);
+            m_cursorType = cursorType;
+        }
     }
 }
 

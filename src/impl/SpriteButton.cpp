@@ -69,7 +69,7 @@ void SpriteButton::draw(sf::RenderTarget& target, const sf::RenderStates& states
 
 void SpriteButton::onStateChanged(State state)
 {
-    sf::Vector2i size{(int)getSize().x, (int)getSize().y};
+    sf::Vector2i size({(int)getSize().x, (int)getSize().y});
     switch (state)
     {
     case StateDefault:
