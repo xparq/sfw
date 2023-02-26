@@ -138,6 +138,21 @@ const sf::Transform& Widget::getTransform() const
 }
 
 
+void Widget::draw([[maybe_unused]] sf::RenderTarget& target, [[maybe_unused]] const sf::RenderStates& states) const
+{
+#ifdef DEBUG
+/*
+	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
+	r.setPosition(getAbsolutePosition());
+	r.setFillColor(sf::Color::Transparent);
+	r.setOutlineThickness(2);
+	r.setOutlineColor(sf::Color::Red);
+	target.draw(r);
+*/
+#endif
+}
+
+
 void Widget::setMouseCursor(sf::Cursor::Type cursor)
 {
     // Propagate the mouse cursor to the parent, until it reaches the top-level Menu widget

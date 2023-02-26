@@ -112,6 +112,8 @@ protected:
 
     virtual void setMouseCursor(sf::Cursor::Type cursor);
 
+    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override; // NOOP
+
 private:
     Layout* m_parent;
     Widget* m_previous;

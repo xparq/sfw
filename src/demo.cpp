@@ -43,17 +43,19 @@ try {
         "demo/texture-win98.png"
     };
 
+    bool clear_bgnd = true;
+
     // Create the main window
-    sf::RenderWindow app;
-    app.create(sf::VideoMode({800, 600}), "SFML Widgets", sf::Style::Close);
-    if (!app.isOpen()) {
+    sf::RenderWindow window;
+    window.create(sf::VideoMode({1024, 768}), "SFW Demo", sf::Style::Close|sf::Style::Resize);
+    if (!window.isOpen()) {
         cerr << "- Failed to create SFML window!\n";
         return EXIT_FAILURE;
     }
-    app.setFramerateLimit(30);
+    window.setFramerateLimit(30);
 
-    gui::Menu menu(app);
-    menu.setPosition(10, 10);
+    gui::Menu demo(window);
+    demo.setPosition(10, 10);
 
     gui::Theme::loadFont("demo/tahoma.ttf");
     gui::Theme::loadTexture(defaultTheme.texturePath);
@@ -69,7 +71,7 @@ try {
     gui::Theme::PADDING = 2.f;
     gui::Theme::windowBgColor = defaultTheme.backgroundColor;
 
-    gui::HBoxLayout* hbox = menu.addHBoxLayout();
+    gui::HBoxLayout* hbox = demo.addHBoxLayout();
     gui::FormLayout* form = hbox->addFormLayout();
 
     sf::Text text("Hello world!", gui::Theme::getFont());
@@ -130,7 +132,13 @@ try {
     opt->setCallback([&]() {
         text.setFillColor(opt->getSelectedValue());
     });
-    form->addRow("Color", opt);
+    form->addRow("Text color", opt);
+
+    auto* cloned_opt = new gui::OptionsBox<sf::Color>(*opt); //!! -> Issue #26!
+    cloned_opt->setCallback([&]() {
+	gui::Theme::windowBgColor = cloned_opt->getSelectedValue();
+    });
+    form->addRow("Bgnd. (via cloned OptionBox)", cloned_opt);
 
     // Checbkox
     gui::CheckBox* checkboxBold = new gui::CheckBox();
@@ -170,17 +178,16 @@ try {
     form->addRow("Default button", new gui::Button("button"));
 
     // Custom button
-    sf::Texture imgbutton;
-    if (!imgbutton.loadFromFile("demo/themed-button.png")) {
+    sf::Texture buttonimg;
+    if (!buttonimg.loadFromFile("demo/themed-button.png")) {
         cerr << "- Failed to load button theme image!\n";
     }
-
-    gui::SpriteButton* customButton = new gui::SpriteButton(imgbutton, "Play");
+    gui::SpriteButton* customButton = new gui::SpriteButton(buttonimg, "Play");
     customButton->setTextSize(20);
     form->addRow("Custom button", customButton);
 
     gui::VBoxLayout* vbox = hbox->addVBoxLayout();
-    vbox->addLabel("This panel is on the left");
+    vbox->addLabel("Change theme:"); //!!?? It used to say: "panel on the left"... But why? It's on the right!
 
     gui::OptionsBox<Theme>* themeBox = new gui::OptionsBox<Theme>();
     themeBox->addItem("Windows 98", win98Theme);
@@ -203,49 +210,75 @@ try {
     });
 
     // Small progress bar
+    gui::Image* imgCrop = nullptr; // Hold your breath, see it created below!
     gui::HBoxLayout* hbox3 = vbox->addHBoxLayout();
-    hbox3->addLabel("Small progress bar");
+    hbox3->addLabel("Crop square size:");
     gui::ProgressBar* pbar = new gui::ProgressBar(40);
     hbox3->add(pbar);
 
     gui::Slider* vslider = new gui::Slider(100, gui::Vertical);
     vslider->setCallback([&]() {
+        cerr << "Slider value: " << vslider->getValue() << endl;
         pbar->setValue(vslider->getValue());
+        imgCrop->setCropRect({{vslider->getValue() / 4, vslider->getValue() / 10},
+                              {vslider->getValue(), vslider->getValue()}});
     });
     hbox->add(vslider);
 
-    menu.addButton("Quit", [&]() {
-        app.close();
+    // Image
+    gui::VBoxLayout* vboximg = hbox->addVBoxLayout();
+    vboximg->add(new gui::Label("Image:"));
+    vboximg->add(new gui::Image("demo/image.png"));
+//!!ADD PROTECTION AGAINST THIS ERROR TO THE LAYOUT CODE:
+//!!    hbox->add(vboximg);
+    // Cropped Images
+    vboximg->add(new gui::Label("Cropped image:"));
+    vboximg->add(new gui::Image("demo/image.png", {{0, 33}, {24, 28}}));
+    vboximg->add(new gui::Label("Cropped image, resized:"));
+    vboximg->add(imgCrop = new gui::Image("demo/sfml.png"));
+
+    // Clear-background checkbox
+    gui::HBoxLayout* hbox4 = demo.addHBoxLayout();
+    auto* checkboxBgnd = new gui::CheckBox(true);
+    checkboxBgnd->setCallback([&]() {
+        clear_bgnd = checkboxBgnd->isChecked();
+    });
+    hbox4->add(new gui::Label("Clear background"));
+    hbox4->add(checkboxBgnd);
+
+    demo.addButton("Quit", [&]() {
+        window.close();
     });
 
+/*
+    // Just an sf::Sprite, unused yet...
     sf::Texture texture;
     if (!texture.loadFromFile("demo/sfml.png")) {
         cerr << "- Failed to load texture!\n";
     }
-
     sf::Sprite sprite(texture);
     sprite.setOrigin({(float)texture.getSize().x / 2.f, (float)texture.getSize().y / 2.f});
-    sprite.setPosition({300, 360});
-
-    // Start the application loop
-    while (app.isOpen())
+    sprite.setPosition({600, 360});
+*/
+    // Start the event loop
+    while (window.isOpen())
     {
         // Process events
         sf::Event event;
-        while (app.pollEvent(event))
+        while (window.pollEvent(event))
         {
-            // Send events to menu
-            menu.onEvent(event);
+            // Send events to demo
+            demo.onEvent(event);
             if (event.type == sf::Event::Closed)
-                app.close();
+                window.close();
         }
 
         // Clear screen
-        app.clear(gui::Theme::windowBgColor);
-        app.draw(menu);
-        app.draw(text);
+	if (clear_bgnd) window.clear(gui::Theme::windowBgColor);
+        window.draw(demo);
+        window.draw(text);
         // Update the window
-        app.display();
+        window.display();
     }
 } catch (...) {
     cerr << "- Unhandled exception!\n";
