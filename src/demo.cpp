@@ -71,15 +71,15 @@ try {
     gui::Theme::PADDING = 2.f;
     gui::Theme::windowBgColor = defaultTheme.backgroundColor;
 
-    gui::HBoxLayout* hbox = demo.addHBoxLayout();
-    gui::FormLayout* form = hbox->addFormLayout();
+    auto hbox = demo.addHBoxLayout();
+    auto form = hbox->addFormLayout();
 
     sf::Text text("Hello world!", gui::Theme::getFont());
     text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
     text.setPosition({480, 240});
 
     // Textbox
-    gui::TextBox* textbox = new gui::TextBox();
+    auto textbox = new gui::TextBox();
     textbox->setText("Hello world!");
     textbox->setCallback([&]() {
         text.setString(textbox->getText());
@@ -88,16 +88,16 @@ try {
     textbox->setPlaceholder("Type something!");
     form->addRow("Text", textbox);
 
-    gui::TextBox* textbox2 = new gui::TextBox();
+    auto textbox2 = new gui::TextBox();
     textbox2->setText("Hello world!");
     textbox2->setMaxLength(5);
     form->addRow("Text with limit (5)", textbox2);
 
     // Slider + ProgressBar for rotation
-    gui::Slider* sliderRotation = new gui::Slider(1.f); // step = 1
-    gui::ProgressBar* pbarRotation1 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelNone);
-    gui::ProgressBar* pbarRotation2 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOver);
-    gui::ProgressBar* pbarRotation3 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOutside);
+    auto sliderRotation = new gui::Slider(1.f); // step = 1
+    auto pbarRotation1 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelNone);
+    auto pbarRotation2 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOver);
+    auto pbarRotation3 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOutside);
 
     sliderRotation->setCallback([&]() {
         text.setRotation(sf::degrees(sliderRotation->getValue() * 360 / 100.f));
@@ -108,10 +108,10 @@ try {
     form->addRow("Rotation", sliderRotation);
 
     // Slider + ProgressBar for scale
-    gui::Slider* sliderScale = new gui::Slider();
-    gui::ProgressBar* pbarScale1 = new gui::ProgressBar(100, gui::Vertical, gui::LabelNone);
-    gui::ProgressBar* pbarScale2 = new gui::ProgressBar(100, gui::Vertical, gui::LabelOver);
-    gui::ProgressBar* pbarScale3 = new gui::ProgressBar(100, gui::Vertical, gui::LabelOutside);
+    auto sliderScale = new gui::Slider();
+    auto pbarScale1 = new gui::ProgressBar(100, gui::Vertical, gui::LabelNone);
+    auto pbarScale2 = new gui::ProgressBar(100, gui::Vertical, gui::LabelOver);
+    auto pbarScale3 = new gui::ProgressBar(100, gui::Vertical, gui::LabelOutside);
     sliderScale->setCallback([&]() {
         float scale = 1 + sliderScale->getValue() * 2 / 100.f;
         text.setScale({scale, scale});
@@ -122,7 +122,7 @@ try {
     form->addRow("Scale", sliderScale);
 
     // OptionsBox for color
-    gui::OptionsBox<sf::Color>* opt = new gui::OptionsBox<sf::Color>();
+    auto opt = new gui::OptionsBox<sf::Color>();
     opt->addItem("Red", sf::Color::Red);
     opt->addItem("Blue", sf::Color::Blue);
     opt->addItem("Green", sf::Color::Green);
@@ -133,16 +133,16 @@ try {
     });
     form->addRow("Text color", opt);
 
-    auto* cloned_opt = new gui::OptionsBox<sf::Color>(*opt); //!! -> Issue #26!
+    auto cloned_opt = new gui::OptionsBox<sf::Color>(*opt); //!! -> Issue #26!
     cloned_opt->setCallback([&]() {
 	gui::Theme::windowBgColor = cloned_opt->getSelectedValue();
     });
     form->addRow("Bgnd. (via cloned OptionBox)", cloned_opt);
 
     // Checbkox
-    gui::CheckBox* checkboxBold = new gui::CheckBox();
+    auto checkboxBold = new gui::CheckBox();
     checkboxBold->setCallback([&]() {
-        int style = text.getStyle();
+        auto style = text.getStyle();
         if (checkboxBold->isChecked())
             style |= sf::Text::Bold;
         else
@@ -151,7 +151,7 @@ try {
     });
     form->addRow("Bold text", checkboxBold);
 
-    gui::CheckBox* checkboxUnderlined = new gui::CheckBox();
+    auto checkboxUnderlined = new gui::CheckBox();
     checkboxUnderlined->setCallback([&]() {
         int style = text.getStyle();
         if (checkboxUnderlined->isChecked())
@@ -168,7 +168,7 @@ try {
     form->addRow("Progress bar (label = Outside)", pbarRotation3);
 
     // Vertical progress bars
-    gui::Layout* layoutForVerticalProgressBars = new gui::HBoxLayout();
+    auto layoutForVerticalProgressBars = new gui::HBoxLayout();
     layoutForVerticalProgressBars->add(pbarScale1);
     layoutForVerticalProgressBars->add(pbarScale2);
     layoutForVerticalProgressBars->add(pbarScale3);
@@ -181,14 +181,14 @@ try {
     if (!buttonimg.loadFromFile("demo/themed-button.png")) {
         cerr << "- Failed to load button theme image!\n";
     }
-    gui::SpriteButton* customButton = new gui::SpriteButton(buttonimg, "Play");
+    auto customButton = new gui::SpriteButton(buttonimg, "Play");
     customButton->setTextSize(20);
     form->addRow("Custom button", customButton);
 
-    gui::VBoxLayout* vbox = hbox->addVBoxLayout();
+    auto vbox = hbox->addVBoxLayout();
     vbox->addLabel("Change theme:"); //!!?? It used to say: "panel on the left"... But why? It's on the right!
 
-    gui::OptionsBox<Theme>* themeBox = new gui::OptionsBox<Theme>();
+    auto themeBox = new gui::OptionsBox<Theme>();
     themeBox->addItem("Windows 98", win98Theme);
     themeBox->addItem("Default", defaultTheme);
     themeBox->setCallback([&]() {
@@ -199,8 +199,8 @@ try {
     vbox->add(themeBox);
 
     // Textbox
-    gui::HBoxLayout* hbox2 = vbox->addHBoxLayout();
-    gui::TextBox* textbox3 = new gui::TextBox(100);
+    auto hbox2 = vbox->addHBoxLayout();
+    auto textbox3 = new gui::TextBox(100);
     textbox3->setText("Edit Me!");
     textbox3->setPlaceholder("Button label");
     hbox2->add(textbox3);
@@ -210,12 +210,12 @@ try {
 
     // Small progress bar
     gui::Image* imgCrop = nullptr; // Hold your breath, see it created below!
-    gui::HBoxLayout* hbox3 = vbox->addHBoxLayout();
+    auto hbox3 = vbox->addHBoxLayout();
     hbox3->addLabel("Crop square size:");
-    gui::ProgressBar* pbar = new gui::ProgressBar(40);
+    auto pbar = new gui::ProgressBar(40);
     hbox3->add(pbar);
 
-    gui::Slider* vslider = new gui::Slider(1.f, 100, gui::Vertical);
+    auto vslider = new gui::Slider(1.f, 100, gui::Vertical);
     vslider->setCallback([&]() {
         cerr << "Slider value: " << vslider->getValue() << endl;
         pbar->setValue(vslider->getValue());
@@ -225,7 +225,7 @@ try {
     hbox->add(vslider);
 
     // Image
-    gui::VBoxLayout* vboximg = hbox->addVBoxLayout();
+    auto vboximg = hbox->addVBoxLayout();
     vboximg->add(new gui::Label("Image:"));
     vboximg->add(new gui::Image("demo/image.png"));
 //!!ADD PROTECTION AGAINST THIS ERROR TO THE LAYOUT CODE:
@@ -237,8 +237,8 @@ try {
     vboximg->add(imgCrop = new gui::Image("demo/sfml.png"));
 
     // Clear-background checkbox
-    gui::HBoxLayout* hbox4 = demo.addHBoxLayout();
-    auto* checkboxBgnd = new gui::CheckBox(true);
+    auto hbox4 = demo.addHBoxLayout();
+    auto checkboxBgnd = new gui::CheckBox(true);
     checkboxBgnd->setCallback([&]() {
         clear_bgnd = checkboxBgnd->isChecked();
     });
