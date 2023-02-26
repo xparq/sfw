@@ -16,18 +16,18 @@ namespace gui
 class Slider: public Widget
 {
 public:
-    Slider(float length = 200, Orientation orientation = Horizontal);
+    Slider(float step = 10.f, float length = 200, Orientation orientation = Horizontal);
 
-    int getStep() const;
+    float getStep() const;
 
     /**
      * Define the amount of units to change the slider when adjusting by drag and drop
      */
-    void setStep(int step);
+    void setStep(float step);
 
-    int getValue() const;
+    float getValue() const;
 
-    void setValue(int value);
+    void setValue(float value);
 
 protected:
     // Callbacks
@@ -44,9 +44,9 @@ private:
     void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
 
     Orientation m_orientation;
-    int m_step;
-    int m_value;
-    Box m_box;
+    float m_step;
+    float m_value;
+    Box m_groove;
     sf::Vertex m_progression[4];
     Box m_handle;
 };

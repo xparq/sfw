@@ -2,25 +2,29 @@
 #include "sfw/Theme.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <cmath>
 
 namespace gui
 {
 
-Slider::Slider(float length, Orientation orientation):
+Slider::Slider(float step, float length, Orientation orientation):
     m_orientation(orientation),
-    m_step(10),
+    m_step(step),
     m_value(0),
-    m_box(Box::Input)
+    m_groove(Box::Input)
 {
-    size_t handleHeight = (size_t) Theme::getBoxHeight();
-    size_t handleWidth = handleHeight / 2;
-    size_t boxHeight = (size_t) Theme::borderSize * 3;
-    size_t boxOffset = (handleHeight - boxHeight) / 2;
+    // (Using unsigned short here (instead of e.g. just unsigned or size_t)
+    // shuts up the "possible loss of data" warnings... Plain short would be
+    // fine, too, but unsigned (where applicable) is cleaner conceptually.)
+    unsigned short handleHeight = (unsigned short)Theme::getBoxHeight();
+    unsigned short handleWidth = handleHeight / 2;
+    unsigned short grooveHeight = (unsigned short)Theme::borderSize * 3;
+    short grooveOffset = (short)(handleHeight - grooveHeight) / 2;
 
     if (orientation == Horizontal)
     {
-        m_box.setSize(length, boxHeight);
-        m_box.setPosition(0, boxOffset);
+        m_groove.setSize(length, grooveHeight);
+        m_groove.setPosition(0, grooveOffset);
         m_handle.setSize(handleWidth, handleHeight);
 
         setSize(length, handleHeight);
@@ -28,16 +32,16 @@ Slider::Slider(float length, Orientation orientation):
         for (int i = 0; i < 4; ++i)
         {
             m_progression[i].color = Theme::windowBgColor;
-            m_progression[i].position.x = m_box.getPosition().x + Theme::borderSize;
-            m_progression[i].position.y = m_box.getPosition().y + Theme::borderSize;
+            m_progression[i].position.x = m_groove.getPosition().x + Theme::borderSize;
+            m_progression[i].position.y = m_groove.getPosition().y + Theme::borderSize;
         }
-        m_progression[1].position.y += m_box.getSize().y - Theme::borderSize * 2;
-        m_progression[3].position.y += m_box.getSize().y - Theme::borderSize * 2;
+        m_progression[1].position.y += m_groove.getSize().y - Theme::borderSize * 2;
+        m_progression[3].position.y += m_groove.getSize().y - Theme::borderSize * 2;
     }
     else
     {
-        m_box.setSize(boxHeight, length);
-        m_box.setPosition(boxOffset, 0);
+        m_groove.setSize(grooveHeight, length);
+        m_groove.setPosition(grooveOffset, 0);
         m_handle.setSize(handleHeight, handleWidth);
 
         setSize(handleHeight, length);
@@ -45,36 +49,36 @@ Slider::Slider(float length, Orientation orientation):
         for (int i = 0; i < 4; ++i)
         {
             m_progression[i].color = Theme::windowBgColor;
-            m_progression[i].position.x = m_box.getPosition().x + Theme::borderSize;
-            m_progression[i].position.y = m_box.getSize().y - Theme::borderSize;
+            m_progression[i].position.x = m_groove.getPosition().x + Theme::borderSize;
+            m_progression[i].position.y = m_groove.getSize().y - Theme::borderSize;
         }
-        m_progression[2].position.x += m_box.getSize().x - Theme::borderSize * 2;
-        m_progression[3].position.x += m_box.getSize().x - Theme::borderSize * 2;
+        m_progression[2].position.x += m_groove.getSize().x - Theme::borderSize * 2;
+        m_progression[3].position.x += m_groove.getSize().x - Theme::borderSize * 2;
     }
     updateHandlePosition();
 }
 
 
-int Slider::getStep() const
+float Slider::getStep() const
 {
     return m_step;
 }
 
 
-void Slider::setStep(int step)
+void Slider::setStep(float step)
 {
     if (step > 0 && step < 100)
         m_step = step;
 }
 
 
-int Slider::getValue() const
+float Slider::getValue() const
 {
     return m_value;
 }
 
 
-void Slider::setValue(int value)
+void Slider::setValue(float value)
 {
     // Ensure value is in bounds
     if (value < 0)
@@ -83,9 +87,9 @@ void Slider::setValue(int value)
         value = 100;
     else
     {
-        // Round value to the closest step multiple
-        int temp = value + m_step / 2;
-        value = temp - temp % m_step;
+        // Round value to the closest multiple of step
+        float temp = floor(value + m_step / 2);
+        value = temp - fmod(temp, m_step);
     }
 
     // If value has changed
@@ -112,7 +116,7 @@ void Slider::updateHandlePosition()
     else
     {
         float max = getSize().y - m_handle.getSize().y - Theme::borderSize * 2;
-        int reverse_value = 100 - m_value;
+        float reverse_value = 100.f - m_value;
         float y = max * reverse_value / 100 + (float)Theme::borderSize;
         m_handle.setPosition(0, y);
         m_progression[0].position.y = y;
@@ -125,7 +129,7 @@ void Slider::draw(sf::RenderTarget& target, const sf::RenderStates& states) cons
 {
     auto lstates = states;
     lstates.transform *= getTransform();
-    target.draw(m_box, lstates);
+    target.draw(m_groove, lstates);
     target.draw(m_progression, 4, sf::PrimitiveType::TriangleStrip, lstates);
     target.draw(m_handle, lstates);
 }
@@ -158,9 +162,9 @@ void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
 void Slider::onMousePressed(float x, float y)
 {
     if (m_orientation == Horizontal)
-        setValue((int)(100 * x / getSize().x)); //! cast -> trunc, not round
+        setValue(100 * x / getSize().x);
     else
-        setValue((int)(100 - (100 * (y) / getSize().y))); //! cast -> trunc, not round
+        setValue(100 - (100 * (y) / getSize().y));
 
     m_handle.press();
 }
@@ -173,9 +177,9 @@ void Slider::onMouseMoved(float x, float y)
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
             if (m_orientation == Horizontal)
-                setValue((int)(100 * x / getSize().x)); //! cast -> trunc, not round
+                setValue(100 * x / getSize().x);
             else
-                setValue((int)(100 - (100 * y / getSize().y))); //! cast -> trunc, not round
+                setValue(100 - (100 * y / getSize().y));
         }
     }
     else if (m_handle.containsPoint(x, y))
@@ -210,4 +214,3 @@ void Slider::onStateChanged(State state)
 }
 
 }
-       	

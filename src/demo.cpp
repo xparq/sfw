@@ -94,12 +94,11 @@ try {
     form->addRow("Text with limit (5)", textbox2);
 
     // Slider + ProgressBar for rotation
-    gui::Slider* sliderRotation = new gui::Slider();
+    gui::Slider* sliderRotation = new gui::Slider(1.f); // step = 1
     gui::ProgressBar* pbarRotation1 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelNone);
     gui::ProgressBar* pbarRotation2 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOver);
     gui::ProgressBar* pbarRotation3 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOutside);
 
-    sliderRotation->setStep(1);
     sliderRotation->setCallback([&]() {
         text.setRotation(sf::degrees(sliderRotation->getValue() * 360 / 100.f));
         pbarRotation1->setValue(sliderRotation->getValue());
@@ -216,12 +215,12 @@ try {
     gui::ProgressBar* pbar = new gui::ProgressBar(40);
     hbox3->add(pbar);
 
-    gui::Slider* vslider = new gui::Slider(100, gui::Vertical);
+    gui::Slider* vslider = new gui::Slider(1.f, 100, gui::Vertical);
     vslider->setCallback([&]() {
         cerr << "Slider value: " << vslider->getValue() << endl;
         pbar->setValue(vslider->getValue());
-        imgCrop->setCropRect({{vslider->getValue() / 4, vslider->getValue() / 10},
-                              {vslider->getValue(), vslider->getValue()}});
+        imgCrop->setCropRect({{(int)(vslider->getValue() / 4), (int)(vslider->getValue() / 10)},
+                              {(int)(vslider->getValue()), (int)vslider->getValue()}});
     });
     hbox->add(vslider);
 
