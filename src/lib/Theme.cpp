@@ -22,8 +22,8 @@ int Theme::minWidgetWidth = 86;
 float Theme::PADDING = 1.f;
 float Theme::MARGIN = 7.f;
 
-sf::Keyboard::Key Theme::nextWidgetKey = sf::Keyboard::Down;
-sf::Keyboard::Key Theme::previousWidgetKey = sf::Keyboard::Up;
+sf::Event::KeyEvent Theme::nextWidgetKey =     { .code = sf::Keyboard::Tab };
+sf::Event::KeyEvent Theme::previousWidgetKey = { .code = sf::Keyboard::Tab, .shift = true };
 
 sf::Font Theme::m_font;
 sf::Texture Theme::m_texture;

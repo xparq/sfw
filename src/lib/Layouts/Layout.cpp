@@ -4,6 +4,7 @@
 #include "sfw/Layouts/VBoxLayout.hpp"
 #include "sfw/Button.hpp"
 #include "sfw/Label.hpp"
+#include "sfw/Utils/sfml-shims.hpp"
 
 namespace gui
 {
@@ -214,13 +215,13 @@ void Layout::onMouseWheelMoved(int delta)
 
 void Layout::onKeyPressed(const sf::Event::KeyEvent& key)
 {
-    if (key.code == Theme::nextWidgetKey)
+    if (key == Theme::nextWidgetKey)
     {
         if (!focusNextWidget())
             // Try to focus first widget if possible
             focusNextWidget();
     }
-    else if (key.code == Theme::previousWidgetKey)
+    else if (key == Theme::previousWidgetKey)
     {
         if (!focusPreviousWidget())
             focusPreviousWidget();

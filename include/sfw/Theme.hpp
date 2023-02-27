@@ -1,13 +1,15 @@
 #ifndef GUI_THEME_HPP
 #define GUI_THEME_HPP
 
-#include <map>
-#include <string>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics/Font.hpp>
-
 #include "Widget.hpp"
 #include "Utils/Box.hpp"
+
+#include <SFML/Window.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Graphics/Font.hpp>
+
+#include <map>
+#include <string>
 
 namespace gui
 {
@@ -64,8 +66,9 @@ public:
 
     static float PADDING; // Spacing inside widget
     static float MARGIN;  // Spacing between widgets
-    static sf::Keyboard::Key previousWidgetKey;
-    static sf::Keyboard::Key nextWidgetKey;
+
+    static sf::Event::KeyEvent previousWidgetKey;
+    static sf::Event::KeyEvent nextWidgetKey;
 
     // Auto-initialized to default cursor
     static sf::Cursor& cursor;
