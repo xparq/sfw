@@ -223,9 +223,9 @@ int main()
     vboximg->add(new gui::Image("demo/image.png"));
 
     // Cropped Images
-    vboximg->add(new gui::Label("Cropped image:"));
+    vboximg->add(new gui::Label("Image - crop:"));
     vboximg->add(new gui::Image("demo/image.png", {{0, 33}, {24, 28}}));
-    vboximg->add(new gui::Label("Cropped image, resized:"));
+    vboximg->add(new gui::Label("Image - var. crop:"));
     vboximg->add(imgCrop = new gui::Image("demo/sfml.png"));
 
     // Clear-background checkbox

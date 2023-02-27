@@ -4,6 +4,7 @@ A fork of "SFML Widgets", a small & simple SFML-based GUI
 =========================================================
 
 Original (upstream) author: Alexandre Bodelot <alexandre.bodelot@gmail.com>
+
 License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` file.)
 
 ## Changes to Alex Bodelot's original:
@@ -27,6 +28,10 @@ _For other (both planned and completed) changes see the [issues](https://github.
 - Easy layouts: automatically align content without the need to precalculate positions/sizes
 - No CMake. (Well, that's considered a feature here; use e.g. TGUI if you can't build without CMake.)
 
+
+![screenshot](doc/demo-screenshot.png)
+
+
 ## Build
 
 ### GCC/CLANG:
@@ -42,13 +47,13 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 ## Use
 
-1. Load resources (the "skin" spritesheet image, font etc.) via the static `gui::Theme` class,
+1. Load resources (the styling template image, font etc.) via the static `gui::Theme` class,
    customize the style properties etc.
 2. Create the top-level GUI manager object, connecting it to the SFML window, like: `gui::Main myGUI(window);`.
 3. Create widgets dynamically (with `new`), set their properties, add callbacks etc.
    (Note: the `Main` object's destructor will take care of deleting them.)
 4. Add widgets in the usual fashion, to where they belong (their parent widgets, like layouts,
-   or to the Main object directly).
+   or to the `Main` object directly).
 
 
 ## Details
