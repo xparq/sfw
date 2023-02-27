@@ -17,7 +17,13 @@ namespace gui
 class TextBox: public Widget
 {
 public:
-    TextBox(float width = 200.f);
+    enum CursorStyle
+    {
+        BLINK,
+        PULSE
+    };
+
+    TextBox(float width = 200.f, CursorStyle style = BLINK);
 
     /**
      * Define textbox content
@@ -93,6 +99,7 @@ private:
     Box m_box;
     mutable sf::RectangleShape m_cursor;
     mutable sf::Clock m_cursorTimer;
+    CursorStyle m_cursorStyle;
     size_t m_cursorPos;
     size_t m_maxLength;
     size_t m_selectionFirst;

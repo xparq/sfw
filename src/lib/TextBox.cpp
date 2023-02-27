@@ -12,12 +12,13 @@
 namespace gui
 {
 
-TextBox::TextBox(float width):
+TextBox::TextBox(float width, CursorStyle style):
     m_box(Box::Input),
     m_cursorPos(0),
     m_maxLength(256),
     m_selectionFirst(0),
-    m_selectionLast(0)
+    m_selectionLast(0),
+    m_cursorStyle(style)
 {
     m_box.setSize(width, Theme::getBoxHeight());
 
@@ -32,7 +33,6 @@ TextBox::TextBox(float width):
     m_placeholder.setFillColor(Theme::input.textPlaceholderColor);
     m_placeholder.setCharacterSize((unsigned)Theme::textSize);
 
-    // Build cursor
     m_cursor.setPosition({offset, offset});
     m_cursor.setSize(sf::Vector2f(1.f, (float)Theme::getLineSpacing()));
     m_cursor.setFillColor(Theme::input.textColor);
@@ -44,15 +44,7 @@ TextBox::TextBox(float width):
 
 void TextBox::setText(const sf::String& string)
 {
-    // Trim current text if needed
-    if (string.getSize() > m_maxLength)
-    {
-        m_text.setString(string.substring(0, m_maxLength));
-    }
-    else
-    {
-        m_text.setString(string);
-    }
+    m_text.setString(string.substring(0, m_maxLength)); // Limit the length
     setCursor(getText().getSize());
 }
 
@@ -471,8 +463,8 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
 
     glDisable(GL_SCISSOR_TEST);
 
-    // Show cursor if focused and no selection
-    if (isFocused() && m_selectedText.isEmpty())
+    // Show cursor if focused
+    if (isFocused())
     {
         // Make it blink
         float timer = m_cursorTimer.getElapsedTime().asSeconds();
@@ -481,7 +473,8 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
 
         // Hijacking draw() as a timer tick callback... (Hi five to Alexandre! ;) )
         sf::Color color = Theme::input.textColor;
-        color.a = uint8_t(255 - (255 * timer / BLINK_PERIOD));
+        color.a = (m_cursorStyle == PULSE ? uint8_t(255 - (255 * timer / BLINK_PERIOD))
+                                          : uint8_t(255 - (255 * timer / BLINK_PERIOD)) & 128 ? 255 : 0);
         m_cursor.setFillColor(color);
 
         target.draw(m_cursor, lstates);

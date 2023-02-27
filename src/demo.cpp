@@ -87,7 +87,7 @@ int main()
     textbox->setPlaceholder("Type something!");
     form->addRow("Text", textbox);
 
-    auto textbox2 = new gui::TextBox();
+    auto textbox2 = new gui::TextBox(200.f, gui::TextBox::CursorStyle::PULSE);
     textbox2->setText("Hello world!");
     textbox2->setMaxLength(5);
     form->addRow("Text with limit (5)", textbox2);
