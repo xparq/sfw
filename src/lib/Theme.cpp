@@ -22,11 +22,16 @@ int Theme::minWidgetWidth = 86;
 float Theme::PADDING = 1.f;
 float Theme::MARGIN = 7.f;
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+// Note: desig. init would zero the missing fields, which is fine for us, but not for GCC. :-/
 sf::Event::KeyEvent Theme::nextWidgetKey =     { .code = sf::Keyboard::Tab };
 sf::Event::KeyEvent Theme::previousWidgetKey = { .code = sf::Keyboard::Tab, .shift = true };
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 
 sf::Font Theme::m_font;
 sf::Texture Theme::m_texture;

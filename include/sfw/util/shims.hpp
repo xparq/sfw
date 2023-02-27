@@ -1,4 +1,4 @@
-﻿#ifndef SFW_SHIMS_HPP
+#ifndef SFW_SHIMS_HPP
 #define SFW_SHIMS_HPP
 
 #include <SFML/Window/Event.hpp>
