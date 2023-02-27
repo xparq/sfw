@@ -47,7 +47,7 @@ sfw_objs=\
 	$(sfw_out)/Button.obj\
 	$(sfw_out)/CheckBox.obj\
 	$(sfw_out)/Label.obj\
-	$(sfw_out)/Menu.obj\
+	$(sfw_out)/Main.obj\
 	$(sfw_out)/Image.obj\
 	$(sfw_out)/Slider.obj\
 	$(sfw_out)/TextBox.obj\

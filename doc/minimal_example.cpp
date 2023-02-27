@@ -1,13 +1,13 @@
-#include <iostream>
+#include "sfw/Gui.hpp"
 #include <SFML/Graphics.hpp>
-#include "Gui/Gui.hpp"
+#include <iostream>
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Widgets", sf::Style::Close);
 
     // Main (root) gui manager object
-    gui::Menu gui(window);
+    gui::Main gui(window);
 
     gui::Theme::loadFont("demo/tahoma.ttf");
     gui::Theme::loadTexture("demo/texture-default.png");

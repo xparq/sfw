@@ -1,5 +1,5 @@
-#include "sfw/Theme.hpp"
 #include "sfw/Gui.hpp"
+
 #include <SFML/Graphics.hpp>
 
 #include <iostream>
@@ -54,7 +54,7 @@ try {
     }
     window.setFramerateLimit(30);
 
-    gui::Menu demo(window);
+    gui::Main demo(window);
     demo.setPosition(10, 10);
 
     gui::Theme::loadFont("demo/tahoma.ttf");

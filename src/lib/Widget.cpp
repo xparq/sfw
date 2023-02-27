@@ -1,5 +1,5 @@
 #include "sfw/Widget.hpp"
-#include "sfw/Menu.hpp"
+#include "sfw/Main.hpp"
 #include "sfw/Layouts/Layout.hpp"
 #include <cmath>
 
@@ -155,8 +155,8 @@ void Widget::draw([[maybe_unused]] sf::RenderTarget& target, [[maybe_unused]] co
 
 void Widget::setMouseCursor(sf::Cursor::Type cursor)
 {
-    // Propagate the mouse cursor to the parent, until it reaches the top-level Menu widget
-    // (Menu is the only widget that can change the mouse cursor on the RenderWindow)
+    // Propagate the request to the parent, until it reaches the top-level widget (Main),
+    // which is the only one that can change the mouse cursor, via the SFML RenderWindow.
     if (m_parent)
         m_parent->setMouseCursor(cursor);
 }

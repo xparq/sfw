@@ -3,185 +3,61 @@
 A fork of "SFML Widgets", a small & simple SFML-based GUI
 =========================================================
 
-### Changes to Alexandre Bodelot's original:
+Original (upstream) author: Alexandre Bodelot <alexandre.bodelot@gmail.com>
+License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` file.)
 
-- Adapted to the SFML (pre-)3.0 API. _(See issue #25 about minor cosmetic regressions.)_
+## Changes to Alex Bodelot's original:
+
+- Adapted to the pre-3.0 SFML _("master")_ API. _(See [issue #25](https://github.com/xparq/sfw/issues/25) about minor cosmetic regressions!)_
 - Windows/MSVC build added.
-- Source tree reshuffled, mostly to help integrating into other projects.
-- Compiling as C++20 now (SFML3 is C++17 already).
-- For other (both planned and completed) changes see the issues.
+- Compiling as C++20 now (SFML3 is C++17 already) to embrace recent C++ features.
+- Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow).
+- Reshuffled the source (to help integrating into other projects & for comfy SFML inclusion).
+- Small (ongoing) improvements to the API.
 
+_For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
 
-Original README:
-================
+## Quick Summary
 
-- Spritesheet based: a single image file to customize widget style
-- Simple events: set a `std::function<void(void)>` callback on widgets to trigger functions on UI events.
-- Layouts: automatically align content without computing positions
+- Small package with no external dependencies (beyond SFML & `std::`)
+- Simple, straightforward API
+- Spritesheet-based visuals: a single, small image file to customize widget styles (like box borders/corners etc.)
+- Simple callbacks: optional lambdas (or `std::function`s) triggered on _important_ user actions (only).
+  _(You can still derive from the widgets to override the other event handlers, too, of course.)_
+- Easy layouts: automatically align content without the need to precalculate positions/sizes
+- No CMake. (Well, that's considered a feature here; use e.g. TGUI if you can't build without CMake.)
 
-![workflow](https://github.com/abodelot/sfml-widgets/actions/workflows/ci.yml/badge.svg)
+## Build
 
-- Author: Alexandre Bodelot <alexandre.bodelot@gmail.com>
-- License: [MIT License](http://opensource.org/licenses/MIT) (See LICENSE file)
+### GCC/CLANG:
 
-Run `make` to build the library (`lib/libsfml-widgets.a`) and the demo program.
+- Run `make` to build the library (`lib/libsfw.a`) & the demo (`./sfw-demo`).
 
-You can then run the demo: `./sfml-widgets-demo`
+### MSVC (Windows):
 
-## Setup
+- Run `nmake -f Makefile.msvc` to build the lib (`lib/sfw.lib`) & the demo (`./sfw-demo.exe`).
 
-1. Load resources (font, spritesheet) in static class `gui::Theme`
-2. Use `gui::Menu` to create a new sfml-widgets menu. It needs to be connected to your SFML render window, which is given to the constructor.
-3. Create widgets, add theme to the menu and define callbacks on them. NOTE: widgets must be dynamically allocated (`new`). The `gui::Menu` destructor will take care of deallocating widgets.
+(See the Makefiles for options.)
 
-Minimal example:
 
-```cpp
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include "Gui/Gui.hpp"
+## Use
 
-int main()
-{
-    sf::RenderWindow app(sf::VideoMode(800, 600), "SFML Widgets", sf::Style::Close);
+1. Load resources (the "skin" spritesheet image, font etc.) via the static `gui::Theme` class,
+   customize the style properties etc.
+2. Create the top-level GUI manager object, connecting it to the SFML window, like: `gui::Main myGUI(window);`.
+3. Create widgets dynamically (with `new`), set their properties, add callbacks etc.
+   (Note: the `Main` object's destructor will take care of deleting them.)
+4. Add widgets in the usual fashion, to where they belong (their parent widgets, like layouts,
+   or to the Main object directly).
 
-    // Declare menu
-    gui::Menu menu(app);
 
-    gui::Theme::loadFont("demo/tahoma.ttf");
-    gui::Theme::loadTexture("demo/texture-default.png");
+## Details
 
-    // Create some button widget
-    gui::Button* button = new gui::Button("My button");
+See the headers in the [`include`](include/sfw) dir for an authoritative reference.
+(They are simple, straightforward, easy to read.)
 
-    // Insert button into menu
-    menu.add(button);
+#### See also:
 
-    // Define a callback
-    button->setCallback([] {
-        std::cout << "click!" << std::endl;
-    });
-
-    // Start the application loop
-    while (app.isOpen())
-    {
-        // Process events
-        sf::Event event;
-        while (app.pollEvent(event))
-        {
-            // Send events to the menu
-            menu.onEvent(event);
-
-            if (event.type == sf::Event::Closed)
-                app.close();
-        }
-
-        // Optional: clear window with theme background color
-        app.clear(gui::Theme::windowBgColor);
-
-        // Render menu
-        app.draw(menu);
-
-        // Update the window
-        app.display();
-    }
-
-    return 0;
-}
-```
-
-`demo/demo.cpp` conains a more complex example, featuring all widgets.
-
-## Widgets
-
-### `gui::Button`
-
-A simple press button.
-
-![button](doc/media/button.png)
-
-### `gui::Checkbox`
-
-A button with enabled/disabled state.
-
-![checkbox](doc/media/checkbox.png)
-
-### `gui::Image`
-
-Displays an SFML texture.
-
-It's a simple wrapper around `sf::Texture`, to display a texture as part of the UI.
-
-### `gui::Label`
-
-A static text element.
-
-It's a simple wrapper around `sf::Text`, to display a text as part of the UI.
-
-### `gui::OptionsBox`
-
-A list of label/value pairs.
-
-![optionsbox](doc/media/optionsbox.png)
-
-Use templates to define value type. Example: `gui::OptionsBox<sf::Color>`.
-
-Add value with: `optionsBox->addItem("Red", sf::Color::Red)`;
-
-### `gui::ProgressBar`
-
-A simple horizontal or vertical progress bar.
-
-![progress-bar](doc/media/progress-bar.png)
-
-* `orientation`: `gui::Horizontal` or `gui::Vertical`
-* `labelPlacement`: `gui::LabelNone`, or `gui::LabelOver`, or `gui::Outside`
-
-### `gui::Slider`
-
-Provides an horizontal or vertical slider.
-
-![slider](doc/media/slider.png)
-
-* `orientation`: `gui::Horizontal` or `gui::Vertical`
-
-### `gui::TextBox`
-
-A one-line text editor.
-
-![textbox](doc/media/textbox.png)
-
-It supports text cursor, and text selection (with mouse or keyboard shortcuts).
-
-## Layouts
-
-Layouts are containers for widgets. They are also widgets themselves, and can be nested!
-
-### `gui::Menu`
-
-The special, unique root layout. It behave like a `VBoxLayout`.
-
-### `gui::HBoxLayout`
-
-Lines up widgets horizontally.
-
-Use `layout->add(widget)` to append a widget on a new line.
-
-### `gui::VBoxLayout`
-
-Lines up widgets vertically.
-
-Use `layout->add(widget)` to append a widget on a new column.
-
-### `gui::FormLayout`
-
-Manages forms of input widgets and their associated labels.
-
-Use `layout->addRow("my label", widget)` to add a new line with label on the left, and widget on the right.
-
-## Theming
-
-To customize the theme, you can:
-
-- Change the theme values (padding, color, font, etc.) defined the static class `gui::Theme`.
-- Use a custom spritesheet image.
+* the original [README](https://github.com/abodelot/sfml-widgets/blob/master/README.md) for _(now partly obsolete!)_ code examples and explanations!
+* [`demo.cpp`](src/demo.cpp) for a comprehensive example
+* a fairly [minimal example](doc/minimal_example.cpp), too

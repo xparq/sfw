@@ -1,17 +1,17 @@
-#include "sfw/Menu.hpp"
+#include "sfw/Main.hpp"
 #include "sfw/Theme.hpp"
 
 namespace gui
 {
 
-Menu::Menu(sf::RenderWindow& window):
+Main::Main(sf::RenderWindow& window):
     m_window(window),
     m_cursorType(sf::Cursor::Arrow)
 {
 }
 
 
-void Menu::onEvent(const sf::Event& event)
+void Main::onEvent(const sf::Event& event)
 {
     switch (event.type)
     {
@@ -60,7 +60,7 @@ void Menu::onEvent(const sf::Event& event)
 }
 
 
-sf::Vector2f Menu::convertMousePosition(int x, int y) const
+sf::Vector2f Main::convertMousePosition(int x, int y) const
 {
     sf::Vector2f mouse = m_window.mapPixelToCoords(sf::Vector2i(x, y));
     mouse -= getPosition();
@@ -68,7 +68,7 @@ sf::Vector2f Menu::convertMousePosition(int x, int y) const
 }
 
 
-void Menu::setMouseCursor(sf::Cursor::Type cursorType)
+void Main::setMouseCursor(sf::Cursor::Type cursorType)
 {
     if (cursorType != m_cursorType)
     {

@@ -1,5 +1,5 @@
-#ifndef GUI_MENU_HPP
-#define GUI_MENU_HPP
+#ifndef GUI_MAIN_HPP
+#define GUI_MAIN_HPP
 
 #include "Layouts/VBoxLayout.hpp"
 #include <SFML/Graphics.hpp>
@@ -9,12 +9,12 @@ namespace gui
 
 /**
  * Entry point for the GUI.
- * A Menu is a VBoxLayout with a general onEvent handler
+ * The Main object is actually a VBoxLayout, with a general onEvent handler.
  */
-class Menu: public gui::VBoxLayout
+class Main: public gui::VBoxLayout
 {
 public:
-    Menu(sf::RenderWindow& window);
+    Main(sf::RenderWindow& window);
 
     /**
      * Handle an SFML event and send it to widgets
@@ -41,4 +41,4 @@ private:
 
 }
 
-#endif // GUI_MENU_HPP
+#endif // GUI_MAIN_HPP
