@@ -37,7 +37,7 @@ public:
     /**
      * Set the cursor position
      */
-    void setCursor(size_t index);
+    void setCursor(size_t index, bool extend_selection = false);
 
     /**
      * Get the cursor position

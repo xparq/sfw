@@ -4,6 +4,9 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/OpenGL.hpp>
 
+//#include <iostream> //!DEBUG
+//using namespace std;
+
 #define BLINK_PERIOD 1.f
 
 namespace gui
@@ -72,13 +75,29 @@ void TextBox::setMaxLength(size_t maxLength)
 }
 
 
-void TextBox::setCursor(size_t index)
+void TextBox::setCursor(size_t index, bool extend_selection)
 {
     if (index <= m_text.getString().getSize())
     {
         m_cursorPos = index;
-        m_selectionFirst = index;
-        m_selectionLast = index;
+        if (extend_selection)
+        {
+            // Alas, can't just preset m_selectionFirst/Last directly, because
+            // setSelectedText() would then think: nothing to do. Must use copies:
+            auto selfirst = m_selectionFirst;
+            auto sellast  = m_selectionLast;
+            //!!This is a crude quick addition only for #51 yet, that only works *sometimes*!
+            //!!(E.g. it can only extend, but not shrink; etc.)
+            if (index < selfirst) selfirst = index;
+            if (index > sellast)  sellast  = index;
+//cerr << selfirst << " - " << sellast << endl;
+            setSelectedText(selfirst, sellast);
+        }
+        else
+        {
+            m_selectionFirst = index;
+            m_selectionLast = index;
+        }
 
         float padding = Theme::borderSize + Theme::PADDING;
         m_cursor.setPosition({m_text.findCharacterPos(index).x, padding});
@@ -128,7 +147,18 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
     switch (key.code)
     {
     case sf::Keyboard::Left:
-        if (key.shift)
+        if (key.control)
+        {
+            // NOTE: assuming getString()[size] is a valid ref. (of the trailing \0)!
+
+            setCursor(m_cursorPos - 1, key.shift);
+            auto what_to_skip = m_text.getString()[m_cursorPos]; //! == ' ' will be checked to decide
+            while (m_cursorPos > 0 &&
+                   (what_to_skip == ' ' && m_text.getString()[m_cursorPos - 1] == ' '
+                 || what_to_skip != ' ' && m_text.getString()[m_cursorPos - 1] != ' '))
+                setCursor(m_cursorPos - 1, key.shift);
+        }
+        else if (key.shift)
         {
             if (m_cursorPos == m_selectionLast)
             {
@@ -145,7 +175,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
         else if (m_selectedText.isEmpty())
         {
             // Move cursor to the left
-            setCursor(m_cursorPos - 1);
+            setCursor(m_cursorPos - 1, key.shift);
         }
         else
         {
@@ -156,7 +186,18 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
         break;
 
     case sf::Keyboard::Right:
-        if (key.shift)
+        if (key.control)
+        {
+            // NOTE: assuming getString()[size] is a valid ref. (of the trailing \0)!
+
+            auto what_to_skip = m_text.getString()[m_cursorPos]; //! == ' ' will be checked to decide
+            do {
+                setCursor(m_cursorPos + 1, key.shift);
+            } while (m_cursorPos < m_text.getString().getSize() &&
+                   (what_to_skip == ' ' && m_text.getString()[m_cursorPos] == ' '
+                 || what_to_skip != ' ' && m_text.getString()[m_cursorPos] != ' '));
+        }
+        else if (key.shift)
         {
             if (m_cursorPos == m_selectionFirst)
             {
@@ -173,7 +214,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
         else if (m_selectedText.isEmpty())
         {
             // Move cursor to the right
-            setCursor(m_cursorPos + 1);
+            setCursor(m_cursorPos + 1, key.shift);
         }
         else
         {
