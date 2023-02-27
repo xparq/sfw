@@ -1,8 +1,11 @@
 #ifndef GUI_WIDGET_HPP
 #define GUI_WIDGET_HPP
 
-#include <SFML/System/Vector2.hpp>
+#include "sfw/WidgetState.hpp"
+//!!#include "sfw/Layout.hpp" //!!See forw. decl. below instead...
+
 #include <SFML/Graphics/Drawable.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Cursor.hpp>
@@ -11,15 +14,6 @@
 
 namespace gui
 {
-
-enum State
-{
-    StateDefault,
-    StateHovered,
-    StatePressed,
-    StateFocused
-};
-
 class Layout;
 
 /**
@@ -66,7 +60,7 @@ public:
 
 protected:
     // Callbacks
-    virtual void onStateChanged(State state);
+    virtual void onStateChanged(WidgetState state);
     virtual void onMouseEnter();
     virtual void onMouseLeave();
     virtual void onMouseMoved(float x, float y);
@@ -89,8 +83,8 @@ protected:
 
     void triggerCallback();
 
-    void setState(State state);
-    State getState() const;
+    void setState(WidgetState state);
+    WidgetState getState() const;
 
     /**
      * Set the widget's container (parent)
@@ -119,7 +113,7 @@ private:
     Widget* m_previous;
     Widget* m_next;
 
-    State m_state;
+    WidgetState m_state;
     sf::Vector2f m_position;
     sf::Vector2f m_size;
     bool m_selectable;

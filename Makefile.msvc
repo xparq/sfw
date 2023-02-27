@@ -35,24 +35,24 @@ out_dir=tmp/build
 sfw_dirtag=sfw
 sfw_out=$(out_dir)/$(libsrc_dirtag)
 sfw_objs=\
-	$(sfw_out)/Utils/Cross.obj\
-	$(sfw_out)/Utils/Box.obj\
-	$(sfw_out)/Utils/Arrow.obj\
-	$(sfw_out)/Layouts/Layout.obj\
+	$(sfw_out)/Main.obj\
+	$(sfw_out)/Widget.obj\
+	$(sfw_out)/Theme.obj\
+	$(sfw_out)/Layout.obj\
 	$(sfw_out)/Layouts/FormLayout.obj\
 	$(sfw_out)/Layouts/HBoxLayout.obj\
 	$(sfw_out)/Layouts/VBoxLayout.obj\
-	$(sfw_out)/Theme.obj\
-	$(sfw_out)/Widget.obj\
-	$(sfw_out)/Button.obj\
-	$(sfw_out)/CheckBox.obj\
-	$(sfw_out)/Label.obj\
-	$(sfw_out)/Main.obj\
-	$(sfw_out)/Image.obj\
-	$(sfw_out)/Slider.obj\
-	$(sfw_out)/TextBox.obj\
-	$(sfw_out)/SpriteButton.obj\
-	$(sfw_out)/ProgressBar.obj\
+	$(sfw_out)/Shapes/Cross.obj\
+	$(sfw_out)/Shapes/Box.obj\
+	$(sfw_out)/Shapes/Arrow.obj\
+	$(sfw_out)/Widgets/Button.obj\
+	$(sfw_out)/Widgets/CheckBox.obj\
+	$(sfw_out)/Widgets/Label.obj\
+	$(sfw_out)/Widgets/Image.obj\
+	$(sfw_out)/Widgets/Slider.obj\
+	$(sfw_out)/Widgets/TextBox.obj\
+	$(sfw_out)/Widgets/SpriteButton.obj\
+	$(sfw_out)/Widgets/ProgressBar.obj\
 
 #-----------------------------------------------------------------------------
 CC_FLAGS=$(CC_FLAGS) -W4 -std:c++latest -EHsc
@@ -130,7 +130,8 @@ MAIN::
 #!! Make this hamfisted subdir creation less atrocious:
 #!! (Not that the rest of the "tree management" is any less lame!)
 	@$(MKDIR) $(sfw_out)
-	@$(MKDIR) $(sfw_out)/Utils
+	@$(MKDIR) $(sfw_out)/Shapes
+	@$(MKDIR) $(sfw_out)/Widgets
 	@$(MKDIR) $(sfw_out)/Layouts
 
 MAIN:: $(sfw_lib)
@@ -155,12 +156,14 @@ clean:
 # AFAIK, NMAKE can't suport multi-tag subpaths, only single-depth subdirs,
 # so each subdir has to have its distinct rule... :-/ (Hopefully I'm wrong!)
 #
-{$(libsrc_dir)/Utils/}.cpp{$(sfw_out)/Utils/}.obj::
-	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Utils/  $<
+{$(libsrc_dir)/Shapes/}.cpp{$(sfw_out)/Shapes/}.obj::
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Shapes/  $<
 {$(libsrc_dir)/Layouts/}.cpp{$(sfw_out)/Layouts/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Layouts/  $<
 # No batch mode (::) for these, so if one fails, the other .objs remain:
-{$(libsrc_dir)/}.cpp{$(sfw_out)/}.obj:
+{$(libsrc_dir)/Widgets/}.cpp{$(sfw_out)/Widgets/}.obj::
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Widgets/  $<
+{$(libsrc_dir)/}.cpp{$(sfw_out)/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/ $<
 
 # For the demo:

@@ -1,7 +1,7 @@
 #ifndef GUI_MAIN_HPP
 #define GUI_MAIN_HPP
 
-#include "Layouts/VBoxLayout.hpp"
+#include "sfw/Layouts/VBoxLayout.hpp"
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>

@@ -1,8 +1,8 @@
 #ifndef GUI_THEME_HPP
 #define GUI_THEME_HPP
 
-#include "Widget.hpp"
-#include "Utils/Box.hpp"
+#include "sfw/Widget.hpp"
+#include "sfw/Shapes/Box.hpp"
 
 #include <SFML/Window.hpp>
 #include <SFML/Window/Event.hpp>
@@ -29,7 +29,7 @@ public:
     static bool loadTexture(const std::string& path);
     static const sf::Texture& getTexture();
 
-    static const sf::IntRect& getTextureRect(Box::Type type, State state);
+    static const sf::IntRect& getTextureRect(Box::Type type, WidgetState state);
 
     static const sf::IntRect& getCrossTextureRect();
 

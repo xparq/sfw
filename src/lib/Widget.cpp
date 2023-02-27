@@ -1,6 +1,5 @@
 #include "sfw/Widget.hpp"
-#include "sfw/Main.hpp"
-#include "sfw/Layouts/Layout.hpp"
+#include "sfw/Layout.hpp"
 #include <cmath>
 
 namespace gui
@@ -10,7 +9,7 @@ Widget::Widget():
     m_parent(nullptr),
     m_previous(nullptr),
     m_next(nullptr),
-    m_state(StateDefault),
+    m_state(WidgetState::Default),
     m_selectable(true)
 {
 }
@@ -88,7 +87,7 @@ bool Widget::isSelectable() const
 
 bool Widget::isFocused() const
 {
-    return m_state == StateFocused || m_state == StatePressed;
+    return m_state == WidgetState::Focused || m_state == WidgetState::Pressed;
 }
 
 
@@ -119,14 +118,14 @@ void Widget::setParent(Layout* parent)
 }
 
 
-void Widget::setState(State state)
+void Widget::setState(WidgetState state)
 {
     m_state = state;
     onStateChanged(state);
 }
 
 
-State Widget::getState() const
+WidgetState Widget::getState() const
 {
     return m_state;
 }
@@ -140,17 +139,24 @@ const sf::Transform& Widget::getTransform() const
 
 void Widget::draw([[maybe_unused]] sf::RenderTarget& target, [[maybe_unused]] const sf::RenderStates& states) const
 {
+}
+
 #ifdef DEBUG
-/*
+/*!!??
+namespace debug {
+//!!??error: "Already has a body"... :-o
+void Widget::draw([[maybe_unused]] sf::RenderTarget& target, [[maybe_unused]] const sf::RenderStates& states) const
+{
 	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
 	r.setPosition(getAbsolutePosition());
 	r.setFillColor(sf::Color::Transparent);
 	r.setOutlineThickness(2);
 	r.setOutlineColor(sf::Color::Red);
 	target.draw(r);
-*/
-#endif
 }
+}
+??!!*/
+#endif
 
 
 void Widget::setMouseCursor(sf::Cursor::Type cursor)
@@ -171,7 +177,7 @@ void Widget::centerText(sf::Text& text)
 
 // callbacks -------------------------------------------------------------------
 
-void Widget::onStateChanged(State) { }
+void Widget::onStateChanged(WidgetState) { }
 void Widget::onMouseEnter() { }
 void Widget::onMouseLeave() { }
 void Widget::onMouseMoved(float, float) { }

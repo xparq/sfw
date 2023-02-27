@@ -1,7 +1,6 @@
 #include "sfw/Gui.hpp"
 
 #include <SFML/Graphics.hpp>
-
 #include <iostream>
 using namespace std;
 

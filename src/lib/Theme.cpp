@@ -22,12 +22,16 @@ int Theme::minWidgetWidth = 86;
 float Theme::PADDING = 1.f;
 float Theme::MARGIN = 7.f;
 
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
 // Note: desig. init would zero the missing fields, which is fine for us, but not for GCC. :-/
-sf::Event::KeyEvent Theme::nextWidgetKey = { .code = sf::Keyboard::Tab };
+sf::Event::KeyEvent Theme::nextWidgetKey =     { .code = sf::Keyboard::Tab };
 sf::Event::KeyEvent Theme::previousWidgetKey = { .code = sf::Keyboard::Tab, .shift = true };
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 
 sf::Font Theme::m_font;
 sf::Texture Theme::m_texture;
@@ -74,21 +78,21 @@ const sf::Texture& Theme::getTexture()
 }
 
 
-const sf::IntRect& Theme::getTextureRect(Box::Type type, State state)
+const sf::IntRect& Theme::getTextureRect(Box::Type type, WidgetState state)
 {
     TextureID id(BOX_DEFAULT);
     switch (state)
     {
-    case StateDefault:
+    case WidgetState::Default:
         id = type == Box::Click ? BOX_DEFAULT : BOX_INPUT_DEFAULT;
         break;
-    case StateHovered:
+    case WidgetState::Hovered:
         id = type == Box::Click ? BOX_HOVERED : BOX_INPUT_DEFAULT;
         break;
-    case StatePressed:
+    case WidgetState::Pressed:
         id = type == Box::Click ? BOX_PRESSED : BOX_INPUT_FOCUSED;
         break;
-    case StateFocused:
+    case WidgetState::Focused:
         id = type == Box::Click ? BOX_FOCUSED : BOX_INPUT_FOCUSED;
         break;
     }
