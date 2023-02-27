@@ -1,7 +1,7 @@
 #ifndef GUI_SLIDER_HPP
 #define GUI_SLIDER_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
 #include "Utils/Box.hpp"
 #include "Enums/Enums.hpp"
 

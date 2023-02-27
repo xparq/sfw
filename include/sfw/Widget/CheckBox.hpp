@@ -1,7 +1,7 @@
 #ifndef GUI_CHECKBOX_HPP
 #define GUI_CHECKBOX_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
 #include "Utils/Box.hpp"
 #include "Utils/Cross.hpp"
 

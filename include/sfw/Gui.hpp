@@ -8,16 +8,16 @@
 #include "Enums/Enums.hpp"
 
 // Widgets
-#include "Button.hpp"
-#include "CheckBox.hpp"
-#include "ComboBox.hpp"
-#include "Image.hpp"
-#include "Label.hpp"
-#include "OptionsBox.hpp"
-#include "ProgressBar.hpp"
-#include "Slider.hpp"
-#include "SpriteButton.hpp"
-#include "TextBox.hpp"
+#include "Widget/Button.hpp"
+#include "Widget/CheckBox.hpp"
+#include "Widget/ComboBox.hpp"
+#include "Widget/Image.hpp"
+#include "Widget/Label.hpp"
+#include "Widget/OptionsBox.hpp"
+#include "Widget/ProgressBar.hpp"
+#include "Widget/Slider.hpp"
+#include "Widget/SpriteButton.hpp"
+#include "Widget/TextBox.hpp"
 
 // Layouts
 #include "Layouts/FormLayout.hpp"

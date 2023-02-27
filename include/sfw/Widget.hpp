@@ -1,8 +1,8 @@
 #ifndef GUI_WIDGET_HPP
 #define GUI_WIDGET_HPP
 
-#include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Drawable.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Cursor.hpp>

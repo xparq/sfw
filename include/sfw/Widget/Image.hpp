@@ -1,7 +1,8 @@
 #ifndef GUI_IMAGE_HPP
 #define GUI_IMAGE_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
+
 #include <SFML/Graphics/Texture.hpp>
 #include <string>
 

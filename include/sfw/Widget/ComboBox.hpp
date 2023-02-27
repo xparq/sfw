@@ -1,7 +1,7 @@
 #ifndef GUI_COMBOBOX_HPP
 #define GUI_COMBOBOX_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
 
 namespace gui
 {

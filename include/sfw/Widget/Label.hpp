@@ -1,8 +1,7 @@
 #ifndef GUI_LABEL_HPP
 #define GUI_LABEL_HPP
 
-#include "Widget.hpp"
-
+#include "../Widget.hpp"
 
 namespace gui
 {

@@ -1,7 +1,7 @@
 #ifndef GUI_BUTTON_HPP
 #define GUI_BUTTON_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
 #include "Utils/ItemBox.hpp"
 
 namespace gui

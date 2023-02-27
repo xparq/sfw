@@ -1,7 +1,7 @@
 #ifndef GUI_OPTIONSBOX_HPP
 #define GUI_OPTIONSBOX_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
 #include "Utils/Arrow.hpp"
 #include "Utils/ItemBox.hpp"
 

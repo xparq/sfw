@@ -1,7 +1,7 @@
 #ifndef GUI_PROGRESS_BAR_HPP
 #define GUI_PROGRESS_BAR_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
 #include "Utils/Box.hpp"
 #include "Enums/Enums.hpp"
 

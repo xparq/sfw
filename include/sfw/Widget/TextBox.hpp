@@ -1,7 +1,7 @@
 #ifndef GUI_TEXTBOX_HPP
 #define GUI_TEXTBOX_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
 #include "Utils/Box.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>

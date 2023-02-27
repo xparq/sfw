@@ -1,7 +1,7 @@
 #ifndef GUI_SPRITEBUTTON_HPP
 #define GUI_SPRITEBUTTON_HPP
 
-#include "Widget.hpp"
+#include "../Widget.hpp"
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
