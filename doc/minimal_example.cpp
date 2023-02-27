@@ -6,42 +6,40 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML Widgets", sf::Style::Close);
 
-    // Main (root) gui manager object
+    // The main GUI manager object
     gui::Main gui(window);
 
-    gui::Theme::loadFont("demo/tahoma.ttf");
+    // Load the visual styling template (sprite-sheet) image
     gui::Theme::loadTexture("demo/texture-default.png");
 
+    gui::Theme::loadFont("demo/tahoma.ttf");
+
     // Create a button
-    gui::Button* button = new gui::Button("My button");
-    button->setCallback([] {
-        std::cout << "click!" << std::endl;
-    });
+    auto button = new gui::Button("My button");
+    button->setCallback([] { std::cout << "click!" << std::endl; });
     gui.add(button);
 
-    // The main event loop
-    // (Note: this simple polling loop redraws the entire GUI in every frame, even if nothing has changed.)
+    // The main event loop (Note: the entire GUI will be redrawn in every frame.)
     while (window.isOpen())
     {
-        // Process events currently in the queue
-        // (This inner loop allows eating multiple events in one frame, to avoid possible congestion!)
+        // Process each event currently in the queue (to avoid possible congestion)
         sf::Event event;
         while (window.pollEvent(event))
         {
-            // Send events to the gui
+            // Send events to the GUI!
             gui.onEvent(event);
 
             if (event.type == sf::Event::Closed)
                 window.close();
         }
 
-        // Optional: clear window with theme background color
+        // Clear the window with the theme's background color
         window.clear(gui::Theme::windowBgColor);
 
-        // Render the gui
+        // Render the GUI
         window.draw(gui);
 
-        // Update the window
+        // Show the refreshed window
         window.display();
     }
 

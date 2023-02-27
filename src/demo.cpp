@@ -32,7 +32,6 @@ struct Theme
 //----------------------------------------------------------------------------
 int main()
 {
-try {
     Theme defaultTheme = {
         hex2color("#dddbde"),
         "demo/texture-default.png"
@@ -81,7 +80,7 @@ try {
     // Textbox
     auto textbox = new gui::TextBox();
     textbox->setText("Hello world!");
-    textbox->setCallback([&]() {
+    textbox->setCallback([&] {
         text.setString(textbox->getText());
         text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
     });
@@ -99,7 +98,7 @@ try {
     auto pbarRotation2 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOver);
     auto pbarRotation3 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOutside);
 
-    sliderRotation->setCallback([&]() {
+    sliderRotation->setCallback([&] {
         text.setRotation(sf::degrees(sliderRotation->getValue() * 360 / 100.f));
         pbarRotation1->setValue(sliderRotation->getValue());
         pbarRotation2->setValue(sliderRotation->getValue());
@@ -112,7 +111,7 @@ try {
     auto pbarScale1 = new gui::ProgressBar(100, gui::Vertical, gui::LabelNone);
     auto pbarScale2 = new gui::ProgressBar(100, gui::Vertical, gui::LabelOver);
     auto pbarScale3 = new gui::ProgressBar(100, gui::Vertical, gui::LabelOutside);
-    sliderScale->setCallback([&]() {
+    sliderScale->setCallback([&] {
         float scale = 1 + sliderScale->getValue() * 2 / 100.f;
         text.setScale({scale, scale});
         pbarScale1->setValue(sliderScale->getValue());
@@ -128,20 +127,16 @@ try {
     opt->addItem("Green", sf::Color::Green);
     opt->addItem("Yellow", sf::Color::Yellow);
     opt->addItem("White", sf::Color::White);
-    opt->setCallback([&]() {
-        text.setFillColor(opt->getSelectedValue());
-    });
+    opt->setCallback([&] { text.setFillColor(opt->getSelectedValue()); });
     form->addRow("Text color", opt);
 
     auto cloned_opt = new gui::OptionsBox<sf::Color>(*opt); //!! -> Issue #26!
-    cloned_opt->setCallback([&]() {
-	gui::Theme::windowBgColor = cloned_opt->getSelectedValue();
-    });
+    cloned_opt->setCallback([&] { gui::Theme::windowBgColor = cloned_opt->getSelectedValue(); });
     form->addRow("Bgnd. (via cloned OptionBox)", cloned_opt);
 
     // Checbkox
     auto checkboxBold = new gui::CheckBox();
-    checkboxBold->setCallback([&]() {
+    checkboxBold->setCallback([&] {
         auto style = text.getStyle();
         if (checkboxBold->isChecked())
             style |= sf::Text::Bold;
@@ -152,7 +147,7 @@ try {
     form->addRow("Bold text", checkboxBold);
 
     auto checkboxUnderlined = new gui::CheckBox();
-    checkboxUnderlined->setCallback([&]() {
+    checkboxUnderlined->setCallback([&] {
         int style = text.getStyle();
         if (checkboxUnderlined->isChecked())
             style |= sf::Text::Underlined;
@@ -191,7 +186,7 @@ try {
     auto themeBox = new gui::OptionsBox<Theme>();
     themeBox->addItem("Windows 98", win98Theme);
     themeBox->addItem("Default", defaultTheme);
-    themeBox->setCallback([&]() {
+    themeBox->setCallback([&] {
         const Theme& theme = themeBox->getSelectedValue();
         gui::Theme::loadTexture(theme.texturePath);
         gui::Theme::windowBgColor = theme.backgroundColor;
@@ -204,9 +199,7 @@ try {
     textbox3->setText("Edit Me!");
     textbox3->setPlaceholder("Button label");
     hbox2->add(textbox3);
-    hbox2->addButton("Create button", [&]() {
-        vbox->add(new gui::Button(textbox3->getText()));
-    });
+    hbox2->addButton("Create button", [&] { vbox->add(new gui::Button(textbox3->getText())); });
 
     // Small progress bar
     gui::Image* imgCrop = nullptr; // Hold your breath, see it created below!
@@ -216,7 +209,7 @@ try {
     hbox3->add(pbar);
 
     auto vslider = new gui::Slider(1.f, 100, gui::Vertical);
-    vslider->setCallback([&]() {
+    vslider->setCallback([&] {
         cerr << "Slider value: " << vslider->getValue() << endl;
         pbar->setValue(vslider->getValue());
         imgCrop->setCropRect({{(int)(vslider->getValue() / 4), (int)(vslider->getValue() / 10)},
@@ -228,8 +221,7 @@ try {
     auto vboximg = hbox->addVBoxLayout();
     vboximg->add(new gui::Label("Image:"));
     vboximg->add(new gui::Image("demo/image.png"));
-//!!ADD PROTECTION AGAINST THIS ERROR TO THE LAYOUT CODE:
-//!!    hbox->add(vboximg);
+
     // Cropped Images
     vboximg->add(new gui::Label("Cropped image:"));
     vboximg->add(new gui::Image("demo/image.png", {{0, 33}, {24, 28}}));
@@ -239,26 +231,12 @@ try {
     // Clear-background checkbox
     auto hbox4 = demo.addHBoxLayout();
     auto checkboxBgnd = new gui::CheckBox(true);
-    checkboxBgnd->setCallback([&]() {
-        clear_bgnd = checkboxBgnd->isChecked();
-    });
+    checkboxBgnd->setCallback([&] { clear_bgnd = checkboxBgnd->isChecked(); });
     hbox4->add(new gui::Label("Clear background"));
     hbox4->add(checkboxBgnd);
 
-    demo.addButton("Quit", [&]() {
-        window.close();
-    });
+    demo.addButton("Quit", [&] { window.close(); });
 
-/*
-    // Just an sf::Sprite, unused yet...
-    sf::Texture texture;
-    if (!texture.loadFromFile("demo/sfml.png")) {
-        cerr << "- Failed to load texture!\n";
-    }
-    sf::Sprite sprite(texture);
-    sprite.setOrigin({(float)texture.getSize().x / 2.f, (float)texture.getSize().y / 2.f});
-    sprite.setPosition({600, 360});
-*/
     // Start the event loop
     while (window.isOpen())
     {
@@ -279,9 +257,6 @@ try {
         // Update the window
         window.display();
     }
-} catch (...) {
-    cerr << "- Unhandled exception!\n";
-    return EXIT_FAILURE;
-}
+
     return EXIT_SUCCESS;
 }

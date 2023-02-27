@@ -59,5 +59,5 @@ See the headers in the [`include`](include/sfw) dir for an authoritative referen
 #### See also:
 
 * the original [README](https://github.com/abodelot/sfml-widgets/blob/master/README.md) for _(now partly obsolete!)_ code examples and explanations!
-* [`demo.cpp`](src/demo.cpp) for a comprehensive example
-* a fairly [minimal example](doc/minimal_example.cpp), too
+* a [minimal example](doc/minimal_example.cpp)
+* a fairly comprehensive example: [`demo.cpp`](src/demo.cpp)
