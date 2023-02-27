@@ -3,7 +3,8 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal (polling loop)", sf::Style::Close);
+    window.setFramerateLimit(30);
 
     // The main GUI manager object
     gui::Main gui(window);
@@ -18,13 +19,12 @@ int main()
     button->setCallback([&] { window.close(); });
     gui.add(button);
 
-    // Event loop (blocking variant, with waitEvent)
+    // Main event loop (polling variant; note: the entire GUI will be redrawn in every frame)
     while (window.isOpen())
     {
-        // Show content anew, or as updated in the previous cycle
-        window.display();
-
-        if (sf::Event event; window.waitEvent(event))
+        // Process events in the queue (each one, to avoid possible congestion)
+        sf::Event event;
+        while (window.pollEvent(event))
         {
             // Send events to the GUI!
             gui.onEvent(event);
@@ -38,6 +38,9 @@ int main()
 
         // Render the GUI
         window.draw(gui);
+
+        // Show the refreshed window
+        window.display();
     }
 
     return 0;
