@@ -1,6 +1,6 @@
 #include "sfw/Layouts/FormLayout.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/Label.hpp"
+#include "sfw/Widgets/Label.hpp"
 
 namespace gui
 {

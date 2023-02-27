@@ -1,7 +1,7 @@
 #ifndef GUI_HBOXLAYOUT_HPP
 #define GUI_HBOXLAYOUT_HPP
 
-#include "Layout.hpp"
+#include "sfw/Layout.hpp"
 
 namespace gui
 {

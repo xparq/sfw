@@ -1,5 +1,5 @@
-#ifndef __SFW_GEOMETRY_HPP__
-#define __SFW_GEOMETRY_HPP__
+#ifndef SFW_GEOMETRY_HPP
+#define SFW_GEOMETRY_HPP
 
 namespace gui
 {
@@ -12,4 +12,4 @@ enum Orientation
 
 }
 
-#endif // __SFW_GEOMETRY_HPP__
+#endif // SFW_GEOMETRY_HPP

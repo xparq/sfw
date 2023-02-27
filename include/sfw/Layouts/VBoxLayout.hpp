@@ -1,7 +1,7 @@
 #ifndef GUI_VBOXLAYOUT_HPP
 #define GUI_VBOXLAYOUT_HPP
 
-#include "Layout.hpp"
+#include "sfw/Layout.hpp"
 
 namespace gui
 {
