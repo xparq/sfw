@@ -1,5 +1,7 @@
-﻿#ifndef SFML_SHIMS_HPP
-#define SFML_SHIMS_HPP
+#ifndef _SFW_SHIMS_HPP_
+#define _SFW_SHIMS_HPP_
+
+#include <SFML/Window/Event.hpp>
 
  // FFS, still no default == for POD structs, even in c++20?! :-o :-/
 bool operator==(const sf::Event::KeyEvent& key1, const sf::Event::KeyEvent& key2)
@@ -13,4 +15,4 @@ bool operator==(const sf::Event::KeyEvent& key1, const sf::Event::KeyEvent& key2
 	;
 }
 
-#endif // SFML_SHIMS_HPP
+#endif // _SFW_SHIMS_HPP_

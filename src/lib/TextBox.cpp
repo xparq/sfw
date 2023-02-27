@@ -14,11 +14,11 @@ namespace gui
 
 TextBox::TextBox(float width, CursorStyle style):
     m_box(Box::Input),
+    m_cursorStyle(style),
     m_cursorPos(0),
     m_maxLength(256),
     m_selectionFirst(0),
-    m_selectionLast(0),
-    m_cursorStyle(style)
+    m_selectionLast(0)
 {
     m_box.setSize(width, Theme::getBoxHeight());
 
@@ -146,8 +146,8 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
             setCursor(m_cursorPos - 1, key.shift);
             auto what_to_skip = m_text.getString()[m_cursorPos]; //! == ' ' will be checked to decide
             while (m_cursorPos > 0 &&
-                   (what_to_skip == ' ' && m_text.getString()[m_cursorPos - 1] == ' '
-                 || what_to_skip != ' ' && m_text.getString()[m_cursorPos - 1] != ' '))
+                   ((what_to_skip == ' ' && m_text.getString()[m_cursorPos - 1] == ' ')
+                 || (what_to_skip != ' ' && m_text.getString()[m_cursorPos - 1] != ' '))) // sorry, the extra () noise is to shut GCC up (-Wparentheses)
                 setCursor(m_cursorPos - 1, key.shift);
         }
         else if (key.shift)
@@ -186,8 +186,8 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
             do {
                 setCursor(m_cursorPos + 1, key.shift);
             } while (m_cursorPos < m_text.getString().getSize() &&
-                   (what_to_skip == ' ' && m_text.getString()[m_cursorPos] == ' '
-                 || what_to_skip != ' ' && m_text.getString()[m_cursorPos] != ' '));
+                   ((what_to_skip == ' ' && m_text.getString()[m_cursorPos] == ' ')
+                 || (what_to_skip != ' ' && m_text.getString()[m_cursorPos] != ' '))); // sorry, the extra () noise is to shut GCC up (-Wparentheses)
         }
         else if (key.shift)
         {

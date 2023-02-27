@@ -4,7 +4,7 @@
 #include "sfw/Layouts/VBoxLayout.hpp"
 #include "sfw/Button.hpp"
 #include "sfw/Label.hpp"
-#include "sfw/Utils/sfml-shims.hpp"
+#include "sfw/Utils/shims.hpp"
 
 namespace gui
 {

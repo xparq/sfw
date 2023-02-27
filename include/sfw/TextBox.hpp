@@ -97,9 +97,9 @@ private:
     sf::Text m_text;
     sf::Text m_placeholder;
     Box m_box;
+    CursorStyle m_cursorStyle;
     mutable sf::RectangleShape m_cursor;
     mutable sf::Clock m_cursorTimer;
-    CursorStyle m_cursorStyle;
     size_t m_cursorPos;
     size_t m_maxLength;
     size_t m_selectionFirst;
