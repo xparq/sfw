@@ -49,12 +49,13 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 1. Load resources (the styling template image, font etc.) via the static `gui::Theme` class,
    customize the style properties etc.
-2. Create the top-level GUI manager object, connecting it to the SFML window, like: `gui::Main myGUI(window);`.
-3. Create widgets dynamically (with `new`), set their properties, add callbacks etc.
+2. Create the top-level GUI manager object, connecting it to the SFML window, like: `gui::Main my_GUI(window);`.
+3. Create widgets with `new`, set their properties, add callbacks etc.
    (Note: the `Main` object's destructor will take care of deleting them.)
-4. Add widgets in the usual fashion, to where they belong (their parent widgets, like layouts,
-   or to the `Main` object directly).
-
+4. Add widgets to various containers (layouts, incl. the root object) like: `someplace.add(my_widget)`).
+5. In your app's event loop pass events to the GUI: `my_GUI.onEvent(event);`.
+6. Draw the GUI in your frame refresh loop: `window.draw(my_GUI);`.
+7. Have fun!
 
 ## Details
 

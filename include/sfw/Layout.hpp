@@ -5,7 +5,6 @@
 
 namespace gui
 {
-class Button; //!!Get rid of this! See addButton(...) below.
 
 /**
  * Base class for layouts. Layouts are special widgets which act as containers
@@ -24,10 +23,6 @@ public:
      */
     Widget* add(Widget* widget);
     template <typename W> W* add(W* widget) { return (W*) (Widget*) add((Widget*)widget); }
-
-    /// Helpers
-    //!!Get rid of this as soon as the Button ctor can take these same params (-> #48):
-    Button* addButton(const sf::String& string, std::function<void(void)> callback);
 
 protected:
     void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;

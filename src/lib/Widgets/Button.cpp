@@ -13,6 +13,18 @@ Button::Button(const sf::String& string)
     setSize(m_box.getSize());
 }
 
+Button::Button(const sf::String& string, std::function<void()> callback):
+    Button(string)
+{
+    setCallback(callback);
+}
+
+Button::Button(const sf::String& string, std::function<void(Button*)> callback):
+    Button(string)
+{
+    setCallback(callback);
+}
+
 
 void Button::setString(const sf::String& string)
 {

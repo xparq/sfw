@@ -15,6 +15,8 @@ class Button: public Widget
 {
 public:
     Button(const sf::String& string);
+    Button(const sf::String& string, std::function<void()> callback);
+    Button(const sf::String& string, std::function<void(Button*)> callback);
 
     /**
      * Set the displayed button label

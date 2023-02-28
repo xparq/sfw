@@ -183,7 +183,7 @@ int main()
     // Textbox for new button labels
     auto hbox2 = vboxRight->add(new gui::HBoxLayout());
     auto tbButtName = hbox2->add(new gui::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-    hbox2->addButton("Create button", [&] { vboxRight->add(new gui::Button(tbButtName->getText())); });
+    hbox2->add(new gui::Button("Create button", [&] { vboxRight->add(new gui::Button(tbButtName->getText())); }));
 
     // Static images (also a cropped one)
 
@@ -222,7 +222,7 @@ int main()
     }));
 
     // Exit button
-    demo.addButton("Quit", [&] { window.close(); });
+    demo.add(new gui::Button("Quit", [&] { window.close(); }));
 
 
     // Start the event loop

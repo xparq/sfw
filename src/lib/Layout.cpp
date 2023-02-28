@@ -1,8 +1,9 @@
 #include "sfw/Layout.hpp"
+
+#include "sfw/Theme.hpp"
 #include "sfw/util/shims.hpp"
 
-//!!Get rid of this; see #84!
-#include "sfw/Widgets/Button.hpp"
+#include "SFML/Graphics/RenderTarget.hpp"
 
 namespace gui
 {
@@ -45,16 +46,6 @@ Widget* Layout::add(Widget* widget)
     }
     recomputeGeometry();
     return widget;
-}
-
-
-//!!Get rid of this, as soon as the Button ctor can take these same params:
-Button* Layout::addButton(const sf::String& string, std::function<void(void)> callback)
-{
-    Button* button = new Button(string);
-    button->setCallback(callback);
-    add(button);
-    return button;
 }
 
 
