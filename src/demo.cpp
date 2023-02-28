@@ -1,8 +1,10 @@
 #include "sfw/Gui.hpp"
-#include "sfw/util/hex2color.hpp"
 
+#include "sfw/util/hex2color.hpp"
 #include <SFML/Graphics.hpp>
-#include <iostream>
+
+#include <string> // to_string
+#include <iostream> // cerr, for errors
 using namespace std;
 
 struct ThemeCfg
@@ -62,10 +64,10 @@ int main()
     demo.setPosition(10, 10);
 
     // A horizontal layout to allow multiple subpanels side-by-side
-    auto hbox = demo.addHBoxLayout();
+    auto hbox = demo.add(new gui::HBoxLayout());
 
     // A "form" panel (on the left)
-    auto form = hbox->addFormLayout();
+    auto form = hbox->add(new gui::FormLayout());
 
     // A text box to set the text of the SFML Text object (created above)
     form->addRow("Text",
@@ -76,8 +78,10 @@ int main()
     );
 
     // Another text box (with text length limit & pulsating cursor)
-    form->addRow("Text with limit (5)",
-        (new gui::TextBox(200.f, gui::TextBox::CursorStyle::PULSE))->setText("Hello world!")->setMaxLength(5));
+    // Also keeping the widget pointer for use by other widgets later.
+    auto textbox = new gui::TextBox(50.f, gui::TextBox::CursorStyle::PULSE);
+    textbox->setText("Hello world!")->setMaxLength(5);
+    form->addRow("Text with limit (5)", textbox);
 
     // Slider + progress bars for rotating the text
     auto sliderRotation = new gui::Slider(1.f); // step = 1
@@ -162,44 +166,44 @@ int main()
     }
 
     // Another panel, on th right
-    auto vboxRight = hbox->addVBoxLayout();
+    auto vboxRight = hbox->add(new gui::VBoxLayout());
 
     // Theme selection
-    vboxRight->addLabel("Change theme:");
+    vboxRight->add(new gui::Label("Change theme:"));
     using OBTheme = gui::OptionsBox<ThemeCfg>;
-    vboxRight->add((new OBTheme())
+    vboxRight->add(new OBTheme())
         ->addItem("Windows 98", win98Theme)
         ->addItem("Default", defaultTheme)
         ->setCallback([&] (OBTheme* w) {
             auto& theme = w->getSelectedValue();
             gui::Theme::loadTexture(theme.texturePath);
             gui::Theme::windowBgColor = theme.backgroundColor;
-    }));
+        });
 
     // Textbox for new button labels
-    auto hbox2 = vboxRight->addHBoxLayout();
-    auto tbbutt = (new gui::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-    hbox2->add(tbbutt);
-    hbox2->addButton("Create button", [&] { vboxRight->add(new gui::Button(tbbutt->getText())); });
+    auto hbox2 = vboxRight->add(new gui::HBoxLayout());
+    auto tbButtName = hbox2->add(new gui::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+    hbox2->addButton("Create button", [&] { vboxRight->add(new gui::Button(tbButtName->getText())); });
 
     // Static images (also a cropped one)
 
-    // Progress bar for crop size
+    // Slider & progress bar for crop size
     gui::Image* imgCrop = nullptr; // Hold your breath, see it created below!
-    auto hbox3 = vboxRight->addHBoxLayout();
-    hbox3->addLabel("Crop square size:");
+    auto hbox3 = vboxRight->add(new gui::HBoxLayout());
+    hbox3->add(new gui::Label("Crop square size:"));
     auto pbar = new gui::ProgressBar(40);
     hbox3->add(pbar);
     // Slider for crop size
-    hbox->add((new gui::Slider(1.f, 100, gui::Vertical))->setCallback([&] (gui::Slider* w) {
-        cerr << "Slider value: " << w->getValue() << endl;
+    hbox->add((new gui::Slider(1.f, 100, gui::Vertical))->setCallback([&](gui::Slider* w) {
         pbar->setValue(w->getValue());
+        // Show the slider value in a text box:
+        textbox->setText(to_string((int)w->getValue()));
         imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
                               {(int)w->getValue(), (int)w->getValue()}});
     }));
 
     // Image directly from file
-    auto vboximg = hbox->addVBoxLayout();
+    auto vboximg = hbox->add(new gui::VBoxLayout());
     vboximg->add(new gui::Label("Image:"));
     vboximg->add(new gui::Image("demo/image.png"));
 
@@ -211,7 +215,7 @@ int main()
 
 
     // Clear-background checkbox
-    auto hbox4 = demo.addHBoxLayout();
+    auto hbox4 = demo.add(new gui::HBoxLayout());
     hbox4->add(new gui::Label("Clear background"));
     hbox4->add((new gui::CheckBox(true))->setCallback([&] (gui::CheckBox* w) {
         clear_bgnd = w->isChecked();

@@ -5,13 +5,7 @@
 
 namespace gui
 {
-///*!!These should be templated away, too... See Widget::setCallback<T> for a similar technique!
-class Label;
-class Button;
-class FormLayout;
-class HBoxLayout;
-class VBoxLayout;
-//*/
+class Button; //!!Get rid of this! See addButton(...) below.
 
 /**
  * Base class for layouts. Layouts are special widgets which act as containers
@@ -29,13 +23,11 @@ public:
      * @return added widget
      */
     Widget* add(Widget* widget);
+    template <typename W> W* add(W* widget) { return (W*) (Widget*) add((Widget*)widget); }
 
     /// Helpers
+    //!!Get rid of this as soon as the Button ctor can take these same params (-> #48):
     Button* addButton(const sf::String& string, std::function<void(void)> callback);
-    Label* addLabel(const sf::String& string);
-    FormLayout* addFormLayout();
-    HBoxLayout* addHBoxLayout();
-    VBoxLayout* addVBoxLayout();
 
 protected:
     void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;

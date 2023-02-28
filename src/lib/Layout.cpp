@@ -1,10 +1,8 @@
 #include "sfw/Layout.hpp"
-#include "sfw/Layouts/FormLayout.hpp"
-#include "sfw/Layouts/HBoxLayout.hpp"
-#include "sfw/Layouts/VBoxLayout.hpp"
-#include "sfw/Widgets/Button.hpp"
-#include "sfw/Widgets/Label.hpp"
 #include "sfw/util/shims.hpp"
+
+//!!Get rid of this; see #84!
+#include "sfw/Widgets/Button.hpp"
 
 namespace gui
 {
@@ -50,44 +48,13 @@ Widget* Layout::add(Widget* widget)
 }
 
 
+//!!Get rid of this, as soon as the Button ctor can take these same params:
 Button* Layout::addButton(const sf::String& string, std::function<void(void)> callback)
 {
     Button* button = new Button(string);
     button->setCallback(callback);
     add(button);
     return button;
-}
-
-
-Label* Layout::addLabel(const sf::String& string)
-{
-    Label* label = new Label(string);
-    add(label);
-    return label;
-}
-
-
-FormLayout* Layout::addFormLayout()
-{
-    FormLayout* form = new FormLayout();
-    add(form);
-    return form;
-}
-
-
-HBoxLayout* Layout::addHBoxLayout()
-{
-    HBoxLayout* hbox = new HBoxLayout();
-    add(hbox);
-    return hbox;
-}
-
-
-VBoxLayout* Layout::addVBoxLayout()
-{
-    VBoxLayout* vbox = new VBoxLayout();
-    add(vbox);
-    return vbox;
 }
 
 

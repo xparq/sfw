@@ -13,7 +13,7 @@ int main()
     gui::Theme::loadFont("demo/tahoma.ttf");
 
     // Create a button
-    gui.add((new gui::Button("Close!"))->setCallback([&] { window.close(); }));
+    gui.add(new gui::Button("Close!"))->setCallback([&] { window.close(); });
     // Or, verbosely:
     // auto button = new gui::Button("Close!");
     // button->setCallback([&] { window.close(); });
