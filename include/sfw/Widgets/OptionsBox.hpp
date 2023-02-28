@@ -23,13 +23,13 @@ public:
      * @param label: displayed label when selected
      * @param value: value associated
      */
-    void addItem(const sf::String& label, const T& value);
+    auto addItem(const sf::String& label, const T& value);
 
     /**
      * Make an item the current one
      * @param item_index: position of the item in the list
      */
-    void selectItem(size_t item_index);
+    auto selectItem(size_t item_index);
 
     /**
      * Get the value of the selected item
@@ -45,12 +45,16 @@ public:
     /**
      * Select next item in the list
      */
-    void selectNext();
+    auto selectNext();
 
     /**
      * Select previous item in the list
      */
-    void selectPrevious();
+    auto selectPrevious();
+
+    // See Widget.hpp for the templates of these:
+    OptionsBox<T>* setCallback(std::function<void()> callback) { return Widget::setCallback<OptionsBox<T>>(callback); }
+    OptionsBox<T>* setCallback(std::function<void(OptionsBox<T>*)> callback);
 
 protected:
     // Callbacks

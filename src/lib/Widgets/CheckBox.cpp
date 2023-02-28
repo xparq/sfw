@@ -67,4 +67,10 @@ void CheckBox::onKeyPressed(const sf::Event::KeyEvent& key)
     }
 }
 
+
+CheckBox* CheckBox::setCallback(std::function<void(CheckBox*)> callback)
+{
+    return (CheckBox*) Widget::setCallback( [callback] (Widget* w) { callback( (CheckBox*)w ); });
 }
+
+} // namespace

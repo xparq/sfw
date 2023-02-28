@@ -56,7 +56,28 @@ public:
     /**
      * Set a function to be called when this widget is triggered
      */
-    void setCallback(std::function<void(void)> callback);
+    template <typename W> W* setCallback(std::function<void()> callback)
+    {
+        m_callback = callback;
+        return (W*)this;
+    }
+    template <typename W> W* setCallback(std::function<void(W*)> callback)
+    {
+        m_callback = [this, callback]{ return callback(this); };
+        return (W*)this;
+    }
+    // The actual (derived) widgets should then provide specialized variants as:
+    // InterestingWidget* setCallback(std::function<void()> callback) { return Widget::setCallback<InterestingWidget>(callback); }
+    // InterestingWidget* setCallback(std::function<void(InterestingWidget*)> callback)
+    // {
+    //     return (InterestingWidget*) Widget::setCallback( [callback] (Widget* w) { callback( (InterestingWidget*)w ); });
+    // }
+    //
+    // These are also added here for completeness, and to help client code
+    // that uses legacy widgets (via abundant casting...) that still don't have
+    // their own specialized API variants (of the templates abobe):
+    Widget* setCallback(std::function<void()> callback);
+    Widget* setCallback(std::function<void(Widget*)> callback);
 
 protected:
     // Callbacks
@@ -117,9 +138,7 @@ private:
     sf::Vector2f m_position;
     sf::Vector2f m_size;
     bool m_selectable;
-
-    std::function<void(void)> m_callback;
-
+    std::function<void()> m_callback;
     sf::Transform m_transform;
 };
 

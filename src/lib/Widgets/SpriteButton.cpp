@@ -10,13 +10,7 @@ SpriteButton::SpriteButton(const sf::Texture& texture, const sf::String& string)
     Widget(),
     m_pressed(false)
 {
-    int width = texture.getSize().x;
-    int height = texture.getSize().y / 3; // default, hover, focus
-
-    m_background.setTexture(texture);
-    m_background.setTextureRect(sf::IntRect({0, 0}, {width, height}));
-
-    setSize((float)width, (float)height);
+    setTexture(texture);
 
     m_text.setFont(Theme::getFont());
     m_text.setCharacterSize((unsigned)Theme::textSize);
@@ -25,10 +19,24 @@ SpriteButton::SpriteButton(const sf::Texture& texture, const sf::String& string)
 }
 
 
-void SpriteButton::setString(const sf::String& string)
+SpriteButton* SpriteButton::setTexture(const sf::Texture& texture)
+{
+    int width = texture.getSize().x;
+    int height = texture.getSize().y / 3; // default, hover, focus
+
+    m_background.setTexture(texture);
+    m_background.setTextureRect(sf::IntRect({0, 0}, {width, height}));
+
+    setSize((float)width, (float)height);
+    return this;
+}
+
+
+SpriteButton* SpriteButton::setString(const sf::String& string)
 {
     m_text.setString(string);
     centerText(m_text);
+    return this;
 }
 
 
@@ -38,10 +46,11 @@ const sf::String& SpriteButton::getString() const
 }
 
 
-void SpriteButton::setFont(const sf::Font& font)
+SpriteButton* SpriteButton::setFont(const sf::Font& font)
 {
     m_text.setFont(font);
     centerText(m_text);
+    return this;
 }
 
 
@@ -51,10 +60,11 @@ const sf::Font& SpriteButton::getFont() const
 }
 
 
-void SpriteButton::setTextSize(size_t size)
+SpriteButton* SpriteButton::setTextSize(size_t size)
 {
     m_text.setCharacterSize((unsigned)size);
     centerText(m_text);
+    return this;
 }
 
 
@@ -153,4 +163,10 @@ void SpriteButton::release()
     }
 }
 
+
+SpriteButton* SpriteButton::setCallback(std::function<void(SpriteButton*)> callback)
+{
+    return (SpriteButton*) Widget::setCallback( [callback] (Widget* w) { callback( (SpriteButton*)w ); });
 }
+
+} // namespace

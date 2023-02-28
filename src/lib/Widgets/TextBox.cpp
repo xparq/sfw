@@ -4,6 +4,8 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/OpenGL.hpp>
 
+#include <functional>
+
 //#include <iostream> //!DEBUG
 //using namespace std;
 
@@ -42,10 +44,12 @@ TextBox::TextBox(float width, CursorStyle style):
 }
 
 
-void TextBox::setText(const sf::String& string)
+TextBox* TextBox::setText(const sf::String& string)
 {
     m_text.setString(string.substring(0, m_maxLength)); // Limit the length
     setCursor(getText().getSize());
+
+    return this;
 }
 
 
@@ -55,7 +59,7 @@ const sf::String& TextBox::getText() const
 }
 
 
-void TextBox::setMaxLength(size_t maxLength)
+TextBox* TextBox::setMaxLength(size_t maxLength)
 {
     m_maxLength = maxLength;
     // Trim current text if needed
@@ -64,6 +68,8 @@ void TextBox::setMaxLength(size_t maxLength)
         m_text.setString(m_text.getString().substring(0, m_maxLength));
         setCursor(m_maxLength);
     }
+
+    return this;
 }
 
 
@@ -529,9 +535,11 @@ void TextBox::deleteSelectedText()
 }
 
 
-void TextBox::setPlaceholder(const sf::String& placeholder)
+TextBox*  TextBox::setPlaceholder(const sf::String& placeholder)
 {
     m_placeholder.setString(placeholder);
+
+    return this;
 }
 
 
@@ -540,4 +548,10 @@ const sf::String& TextBox::getPlaceholder() const
     return m_placeholder.getString();
 }
 
+
+TextBox* TextBox::setCallback(std::function<void(TextBox*)> callback)
+{
+    return (TextBox*) Widget::setCallback( [callback] (Widget* w) { callback( (TextBox*)w ); });
 }
+
+} // namespace

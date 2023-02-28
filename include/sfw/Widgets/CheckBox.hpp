@@ -21,6 +21,10 @@ public:
 
     void check(bool checked);
 
+    // See Widget.hpp for the templates of these:
+    CheckBox* setCallback(std::function<void()> callback)         { return Widget::setCallback<CheckBox>(callback); }
+    CheckBox* setCallback(std::function<void(CheckBox*)> callback);
+
 protected:
     // Callbacks
     void onStateChanged(WidgetState state) override;

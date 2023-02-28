@@ -29,6 +29,10 @@ public:
 
     void setValue(float value);
 
+    // See Widget.hpp for the templates of these:
+    Slider* setCallback(std::function<void()> callback)         { return Widget::setCallback<Slider>(callback); }
+    Slider* setCallback(std::function<void(Slider*)> callback);
+
 protected:
     // Callbacks
     void onKeyPressed(const sf::Event::KeyEvent& key) override;

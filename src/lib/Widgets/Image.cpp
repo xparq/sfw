@@ -103,4 +103,4 @@ void Image::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
 #endif
 }
 
-}
+} // namespace

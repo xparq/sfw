@@ -5,14 +5,13 @@
 
 namespace gui
 {
-
-class Widget;
+///*!!These should be templated away, too... See Widget::setCallback<T> for a similar technique!
 class Label;
 class Button;
 class FormLayout;
 class HBoxLayout;
 class VBoxLayout;
-
+//*/
 
 /**
  * Base class for layouts. Layouts are special widgets which act as containers

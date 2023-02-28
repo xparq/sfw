@@ -96,10 +96,18 @@ void Widget::setSelectable(bool selectable)
     m_selectable = selectable;
 }
 
+// These two are template specializations now, see the header!
 
-void Widget::setCallback(std::function<void(void)> callback)
+Widget* Widget::setCallback(std::function<void()> callback)
 {
     m_callback = callback;
+    return this;
+}
+
+Widget* Widget::setCallback(std::function<void(Widget*)> callback)
+{
+    m_callback = [this, callback]{ return callback(this); };
+    return this;
 }
 
 
@@ -188,4 +196,4 @@ void Widget::onKeyPressed(const sf::Event::KeyEvent&) { }
 void Widget::onKeyReleased(const sf::Event::KeyEvent&) { }
 void Widget::onTextEntered(uint32_t) { }
 
-}
+} // namespace

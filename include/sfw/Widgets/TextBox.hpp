@@ -28,7 +28,7 @@ public:
     /**
      * Define textbox content
      */
-    void setText(const sf::String& string);
+    TextBox* setText(const sf::String& string);
 
     /**
      * Get textbox content
@@ -38,7 +38,7 @@ public:
     /**
      * Define max length of textbox content (default is 256 characters)
      */
-    void setMaxLength(size_t maxLength);
+    TextBox* setMaxLength(size_t maxLength);
 
     /**
      * Set the cursor position
@@ -68,12 +68,16 @@ public:
     /**
      * Set placeholder text
      */
-    void setPlaceholder(const sf::String& placeholder);
+    TextBox* setPlaceholder(const sf::String& placeholder);
 
     /**
      * Get placeholder text
      */
     const sf::String& getPlaceholder() const;
+
+    // See Widget.hpp for the templates of these:
+    TextBox* setCallback(std::function<void()> callback)         { return Widget::setCallback<TextBox>(callback); }
+    TextBox* setCallback(std::function<void(TextBox*)> callback);
 
 protected:
     // Callbacks

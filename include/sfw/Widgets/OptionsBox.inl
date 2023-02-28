@@ -30,7 +30,7 @@ OptionsBox<T>::OptionsBox():
 
 
 template <class T>
-void OptionsBox<T>::addItem(const sf::String& label, const T& value)
+auto OptionsBox<T>::addItem(const sf::String& label, const T& value)
 {
     m_items.push_back(Item(label, value));
 
@@ -46,11 +46,12 @@ void OptionsBox<T>::addItem(const sf::String& label, const T& value)
     }
 
     selectItem(m_items.size() - 1);
+    return this;
 }
 
 
 template <class T>
-void OptionsBox<T>::selectItem(size_t item_index)
+auto OptionsBox<T>::selectItem(size_t item_index)
 {
     if (item_index < m_items.size())
     {
@@ -58,6 +59,7 @@ void OptionsBox<T>::selectItem(size_t item_index)
         m_box.item().setString(m_items[item_index].label);
         m_box.centerTextHorizontally(m_box.item());
     }
+    return this;
 }
 
 
@@ -76,7 +78,7 @@ size_t OptionsBox<T>::getSelectedIndex() const
 
 
 template <class T>
-void OptionsBox<T>::selectNext()
+auto OptionsBox<T>::selectNext()
 {
     if (m_items.size() > 1)
     {
@@ -84,11 +86,12 @@ void OptionsBox<T>::selectNext()
         selectItem(m_currentIndex == (m_items.size() - 1) ? 0 : m_currentIndex + 1);
         triggerCallback();
     }
+    return this;
 }
 
 
 template <class T>
-void OptionsBox<T>::selectPrevious()
+auto OptionsBox<T>::selectPrevious()
 {
     if (m_items.size() > 1)
     {
@@ -214,4 +217,12 @@ OptionsBox<T>::Item::Item(const sf::String& string, const T& val):
 {
 }
 
+
+template <class T>
+OptionsBox<T>* OptionsBox<T>::setCallback(std::function<void(OptionsBox<T>*)> callback)
+{
+    return (OptionsBox<T>*) Widget::setCallback( [callback] (Widget* w) { callback( (OptionsBox*)w ); });
 }
+
+
+} // namespace

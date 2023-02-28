@@ -70,4 +70,4 @@ void Label::updateGeometry()
     );
 }
 
-}
+} // namespace

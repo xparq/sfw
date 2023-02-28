@@ -17,16 +17,21 @@ class SpriteButton: public Widget
 public:
     SpriteButton(const sf::Texture& texture, const sf::String& label = "");
 
-    void setString(const sf::String& string);
+    SpriteButton* setString(const sf::String& string);
     const sf::String& getString() const;
 
-    void setFont(const sf::Font& font);
+    SpriteButton* setFont(const sf::Font& font);
     const sf::Font& getFont() const;
 
-    void setTextSize(size_t size);
+    SpriteButton* setTextSize(size_t size);
 
-    void setTexture(const sf::Texture& texture);
+    SpriteButton* setTexture(const sf::Texture& texture);
 
+    // See Widget.hpp for the templates of these:
+    SpriteButton* setCallback(std::function<void()> callback)         { return Widget::setCallback<SpriteButton>(callback); }
+    SpriteButton* setCallback(std::function<void(SpriteButton*)> callback);
+
+protected:
     void onStateChanged(WidgetState state) override;
     void onMouseMoved(float x, float y) override;
     void onMousePressed(float x, float y) override;

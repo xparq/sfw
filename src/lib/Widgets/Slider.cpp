@@ -213,4 +213,9 @@ void Slider::onStateChanged(WidgetState state)
     }
 }
 
+Slider* Slider::setCallback(std::function<void(Slider*)> callback)
+{
+    return (Slider*) Widget::setCallback( [callback] (Widget* w) { callback( (Slider*)w ); });
 }
+
+} // namespace

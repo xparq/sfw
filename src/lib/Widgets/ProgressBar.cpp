@@ -120,4 +120,4 @@ void ProgressBar::draw(sf::RenderTarget& target, const sf::RenderStates& states)
         target.draw(m_label, lstates);
 }
 
-}
+} // namespace

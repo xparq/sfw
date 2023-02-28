@@ -8,15 +8,16 @@ int main()
     // The main GUI manager object
     gui::Main gui(window);
 
-    // Load the visual styling template (sprite-sheet) image
+    // Load the visual styling template (sprite-sheet) image, and some font
     gui::Theme::loadTexture("demo/texture-default.png");
-
     gui::Theme::loadFont("demo/tahoma.ttf");
 
     // Create a button
-    auto button = new gui::Button("Close!");
-    button->setCallback([&] { window.close(); });
-    gui.add(button);
+    gui.add((new gui::Button("Close!"))->setCallback([&] { window.close(); }));
+    // Or, verbosely:
+    // auto button = new gui::Button("Close!");
+    // button->setCallback([&] { window.close(); });
+    // gui.add(button);
 
     // Event loop (blocking variant, with waitEvent)
     while (window.isOpen())

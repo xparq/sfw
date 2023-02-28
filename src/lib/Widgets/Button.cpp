@@ -93,4 +93,9 @@ void Button::onKeyReleased(const sf::Event::KeyEvent& key)
     }
 }
 
+Button* Button::setCallback(std::function<void(Button*)> callback)
+{
+    return (Button*) Widget::setCallback( [callback] (Widget* w) { callback( (Button*)w ); });
 }
+
+} // namespace
