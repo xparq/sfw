@@ -32,27 +32,31 @@ out_dir=tmp/build
 #!      The directory isn't created automatically."
 #! GCC could do it all right, without a hitch. Just sayin.
 
+
 sfw_dirtag=sfw
+sfw_widgets_dirtag=Widgets
+sfw_layouts_dirtag=Layouts
+sfw_shapes_dirtag=Gfx/Shapes
 sfw_out=$(out_dir)/$(libsrc_dirtag)
 sfw_objs=\
 	$(sfw_out)/GUI.obj\
 	$(sfw_out)/Widget.obj\
 	$(sfw_out)/Theme.obj\
 	$(sfw_out)/Layout.obj\
-	$(sfw_out)/Layouts/FormLayout.obj\
-	$(sfw_out)/Layouts/HBoxLayout.obj\
-	$(sfw_out)/Layouts/VBoxLayout.obj\
-	$(sfw_out)/Shapes/CheckMark.obj\
-	$(sfw_out)/Shapes/Box.obj\
-	$(sfw_out)/Shapes/Arrow.obj\
-	$(sfw_out)/Widgets/Button.obj\
-	$(sfw_out)/Widgets/CheckBox.obj\
-	$(sfw_out)/Widgets/Label.obj\
-	$(sfw_out)/Widgets/Image.obj\
-	$(sfw_out)/Widgets/Slider.obj\
-	$(sfw_out)/Widgets/TextBox.obj\
-	$(sfw_out)/Widgets/SpriteButton.obj\
-	$(sfw_out)/Widgets/ProgressBar.obj\
+	$(sfw_out)/$(sfw_shapes_dirtag)/CheckMark.obj\
+	$(sfw_out)/$(sfw_shapes_dirtag)/Box.obj\
+	$(sfw_out)/$(sfw_shapes_dirtag)/Arrow.obj\
+	$(sfw_out)/$(sfw_layouts_dirtag)/FormLayout.obj\
+	$(sfw_out)/$(sfw_layouts_dirtag)/HBoxLayout.obj\
+	$(sfw_out)/$(sfw_layouts_dirtag)/VBoxLayout.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/Button.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/CheckBox.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/Label.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/Image.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/Slider.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/TextBox.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/SpriteButton.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/ProgressBar.obj\
 
 #-----------------------------------------------------------------------------
 CC_FLAGS=$(CC_FLAGS) -W4 -std:c++latest -EHsc
@@ -130,7 +134,7 @@ MAIN::
 #!! Make this hamfisted subdir creation less atrocious:
 #!! (Not that the rest of the "tree management" is any less lame!)
 	@$(MKDIR) $(sfw_out)
-	@$(MKDIR) $(sfw_out)/Shapes
+	@$(MKDIR) $(sfw_out)/Gfx/Shapes
 	@$(MKDIR) $(sfw_out)/Widgets
 	@$(MKDIR) $(sfw_out)/Layouts
 
@@ -156,13 +160,13 @@ clean:
 # AFAIK, NMAKE can't suport multi-tag subpaths, only single-depth subdirs,
 # so each subdir has to have its distinct rule... :-/ (Hopefully I'm wrong!)
 #
-{$(libsrc_dir)/Shapes/}.cpp{$(sfw_out)/Shapes/}.obj::
-	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Shapes/  $<
-{$(libsrc_dir)/Layouts/}.cpp{$(sfw_out)/Layouts/}.obj::
-	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Layouts/  $<
+{$(libsrc_dir)/$(sfw_shapes_dirtag)/}.cpp{$(sfw_out)/$(sfw_shapes_dirtag)/}.obj::
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/$(sfw_shapes_dirtag)/  $<
+{$(libsrc_dir)/$(sfw_layouts_dirtag)/}.cpp{$(sfw_out)/$(sfw_layouts_dirtag)/}.obj::
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/$(sfw_layouts_dirtag)/  $<
 # No batch mode (::) for these, so if one fails, the other .objs remain:
-{$(libsrc_dir)/Widgets/}.cpp{$(sfw_out)/Widgets/}.obj::
-	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/Widgets/  $<
+{$(libsrc_dir)/$(sfw_widgets_dirtag)/}.cpp{$(sfw_out)/$(sfw_widgets_dirtag)/}.obj:
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/$(sfw_widgets_dirtag)/  $<
 {$(libsrc_dir)/}.cpp{$(sfw_out)/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/ $<
 

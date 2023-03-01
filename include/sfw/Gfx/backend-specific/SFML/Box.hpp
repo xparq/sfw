@@ -1,5 +1,5 @@
-#ifndef GUI_BOX_HPP
-#define GUI_BOX_HPP
+#ifndef GUI_BOX_SFML_HPP
+#define GUI_BOX_SFML_HPP
 
 #include "sfw/WidgetState.hpp"
 
@@ -126,4 +126,4 @@ private:
 
 } // namespace
 
-#endif // GUI_BOX_HPP
+#endif // GUI_BOX_SFML_HPP

@@ -1,5 +1,5 @@
-#ifndef GUI_CHECKMARK_HPP
-#define GUI_CHECKMARK_HPP
+#ifndef GUI_CHECKMARK_SFML_HPP
+#define GUI_CHECKMARK_SFML_HPP
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -31,4 +31,4 @@ private:
 
 } // namespace
 
-#endif // GUI_CHECKMARK_HPP
+#endif // GUI_CHECKMARK_SFML_HPP

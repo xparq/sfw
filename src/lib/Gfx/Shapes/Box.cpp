@@ -1,4 +1,4 @@
-#include "sfw/Shapes/Box.hpp"
+#include "sfw/Gfx/Shapes/Box.hpp"
 #include "sfw/Theme.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>

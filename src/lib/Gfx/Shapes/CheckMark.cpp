@@ -1,4 +1,4 @@
-#include "sfw/Shapes/CheckMark.hpp"
+#include "sfw/Gfx/Shapes/CheckMark.hpp"
 #include "sfw/Theme.hpp"
 
 #include <SFML/System/Vector2.hpp>

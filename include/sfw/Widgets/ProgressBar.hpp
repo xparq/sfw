@@ -2,7 +2,7 @@
 #define GUI_PROGRESS_BAR_HPP
 
 #include "sfw/Widget.hpp"
-#include "sfw/Shapes/Box.hpp"
+#include "sfw/Gfx/Shapes/Box.hpp"
 #include "sfw/Geometry.hpp"
 
 namespace sfw

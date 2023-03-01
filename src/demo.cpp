@@ -1,4 +1,5 @@
-#include "sfw/cfg/USE_SFML"
+// NOT YET FOR CLIENT USE, but as a reminder...:
+// Default (and the only option...) anyway: #include "sfw/cfg/USE_SFML"
 #include "sfw/GUI.hpp"
 
 #include <SFML/Graphics.hpp>

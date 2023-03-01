@@ -1,7 +1,7 @@
-#ifndef GUI_ITEMBOX_HPP
-#define GUI_ITEMBOX_HPP
+#ifndef GUI_ITEMBOX_SFML_HPP
+#define GUI_ITEMBOX_SFML_HPP
 
-#include "sfw/Shapes/Box.hpp"
+#include "sfw/Gfx/Shapes/Box.hpp"
 
 namespace sfw
 {
@@ -33,4 +33,4 @@ private:
 
 #include "ItemBox.inl"
 
-#endif // GUI_ITEMBOX_HPP
+#endif // GUI_ITEMBOX_SFML_HPP

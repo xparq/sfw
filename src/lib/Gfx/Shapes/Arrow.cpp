@@ -1,4 +1,4 @@
-#include "sfw/Shapes/Arrow.hpp"
+#include "sfw/Gfx/Shapes/Arrow.hpp"
 #include "sfw/Theme.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>

@@ -2,8 +2,8 @@
 #define GUI_OPTIONSBOX_HPP
 
 #include "sfw/Widget.hpp"
-#include "sfw/Shapes/Arrow.hpp"
-#include "sfw/Shapes/ItemBox.hpp"
+#include "sfw/Gfx/Shapes/Arrow.hpp"
+#include "sfw/Gfx/Shapes/ItemBox.hpp"
 
 namespace sfw
 {

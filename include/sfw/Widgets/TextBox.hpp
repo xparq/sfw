@@ -2,7 +2,7 @@
 #define GUI_TEXTBOX_HPP
 
 #include "sfw/Widget.hpp"
-#include "sfw/Shapes/Box.hpp"
+#include "sfw/Gfx/Shapes/Box.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Clock.hpp>
