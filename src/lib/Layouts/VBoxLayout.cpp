@@ -1,7 +1,7 @@
 #include "sfw/Layouts/VBoxLayout.hpp"
 #include "sfw/Theme.hpp"
 
-namespace gui
+namespace sfw
 {
 
 void VBoxLayout::recomputeGeometry()
@@ -21,4 +21,4 @@ void VBoxLayout::recomputeGeometry()
     Widget::setSize(size);
 }
 
-}
+} // namespace

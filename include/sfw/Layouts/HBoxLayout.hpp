@@ -3,7 +3,7 @@
 
 #include "sfw/Layout.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -16,6 +16,6 @@ private:
     void recomputeGeometry() override;
 };
 
-}
+} // namespace
 
 #endif // GUI_HBOXLAYOUT_HPP

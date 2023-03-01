@@ -1,17 +1,17 @@
-#include "sfw/Main.hpp"
+#include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
 
-namespace gui
+namespace sfw
 {
 
-Main::Main(sf::RenderWindow& window):
+GUI::GUI(sf::RenderWindow& window):
     m_window(window),
     m_cursorType(sf::Cursor::Arrow)
 {
 }
 
 
-void Main::process(const sf::Event& event)
+void GUI::process(const sf::Event& event)
 {
     switch (event.type)
     {
@@ -60,7 +60,7 @@ void Main::process(const sf::Event& event)
 }
 
 
-sf::Vector2f Main::convertMousePosition(int x, int y) const
+sf::Vector2f GUI::convertMousePosition(int x, int y) const
 {
     sf::Vector2f mouse = m_window.mapPixelToCoords(sf::Vector2i(x, y));
     mouse -= getPosition();
@@ -68,20 +68,20 @@ sf::Vector2f Main::convertMousePosition(int x, int y) const
 }
 
 
-void Main::setMouseCursor(sf::Cursor::Type cursorType)
+void GUI::setMouseCursor(sf::Cursor::Type cursorType)
 {
     if (cursorType != m_cursorType)
     {
-        if (gui::Theme::cursor.loadFromSystem(cursorType))
+        if (Theme::cursor.loadFromSystem(cursorType))
         {
-            m_window.setMouseCursor(gui::Theme::cursor);
+            m_window.setMouseCursor(Theme::cursor);
             m_cursorType = cursorType;
         }
     }
 }
 
 
-void Main::render()
+void GUI::render()
 {
     draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! RenderContext(...) failed with CLANG
 }

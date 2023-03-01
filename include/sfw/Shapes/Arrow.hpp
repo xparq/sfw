@@ -6,7 +6,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 
-namespace gui
+namespace sfw
 {
 
 class Arrow: public sf::Drawable
@@ -39,6 +39,6 @@ private:
     Direction m_direction;
 };
 
-}
+} // namespace
 
 #endif // GUI_ARROW_HPP

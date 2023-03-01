@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-namespace gui
+namespace sfw
 {
 
 Box::Box(Type type):
@@ -163,4 +163,4 @@ void Box::centerTextVertically(sf::Text& text)
     text.setPosition({Theme::getBoxHeight() - Theme::PADDING, y});
 }
 
-}
+} // namespace

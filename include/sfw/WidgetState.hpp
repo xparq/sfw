@@ -1,7 +1,7 @@
 #ifndef GUI_WIDGETSTATE_HPP
 #define GUI_WIDGETSTATE_HPP
 
-namespace gui
+namespace sfw
 {
 
 enum class WidgetState
@@ -12,6 +12,6 @@ enum class WidgetState
     Focused
 };
 
-}
+} // namespace
 
 #endif // GUI_WIDGETSTATE_HPP

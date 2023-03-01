@@ -3,7 +3,7 @@
 
 #include "sfw/Widget.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -24,7 +24,7 @@ private:
     void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
 };
 
-}
+} // namespace
 
 #include "ComboBox.inl"
 

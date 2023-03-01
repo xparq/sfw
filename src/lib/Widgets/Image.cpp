@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-namespace gui
+namespace sfw
 {
 
 Image::Image()

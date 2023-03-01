@@ -1,7 +1,7 @@
 #ifndef SFW_GEOMETRY_HPP
 #define SFW_GEOMETRY_HPP
 
-namespace gui
+namespace sfw
 {
 
 enum Orientation

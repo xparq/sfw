@@ -9,17 +9,17 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Cursor.hpp>
 
-namespace gui
+namespace sfw
 {
 
 /**
  * Entry point for the GUI.
  * The Main object is actually a VBoxLayout, with a catch-all event handler.
  */
-class Main: public gui::VBoxLayout
+class GUI: public VBoxLayout
 {
 public:
-    Main(sf::RenderWindow& window);
+    GUI(sf::RenderWindow& window);
 
     void process(const sf::Event& event);
     void render();

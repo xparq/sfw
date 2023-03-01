@@ -3,7 +3,7 @@
 
 #include "sfw/Widget.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -53,6 +53,6 @@ private:
     Widget* m_focus;
 };
 
-}
+} // namespace
 
 #endif // GUI_LAYOUT_HPP

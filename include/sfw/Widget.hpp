@@ -13,7 +13,7 @@
 
 #include <functional>
 
-namespace gui
+namespace sfw
 {
 class Layout;
 
@@ -147,6 +147,6 @@ private:
     sf::Transform m_transform;
 };
 
-}
+} // namespace
 
 #endif // GUI_WIDGET_HPP

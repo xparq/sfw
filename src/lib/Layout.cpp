@@ -5,7 +5,7 @@
 
 #include "SFML/Graphics/RenderTarget.hpp"
 
-namespace gui
+namespace sfw
 {
 
 Layout::Layout():
@@ -310,4 +310,4 @@ bool Layout::focusNextWidget()
     return false;
 }
 
-}
+} // namespace

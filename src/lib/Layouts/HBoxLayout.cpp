@@ -1,7 +1,7 @@
 #include "sfw/Layouts/HBoxLayout.hpp"
 #include "sfw/Theme.hpp"
 
-namespace gui
+namespace sfw
 {
 
 void HBoxLayout::recomputeGeometry()
@@ -21,4 +21,4 @@ void HBoxLayout::recomputeGeometry()
     Widget::setSize(size);
 }
 
-}
+} // namespace

@@ -1,7 +1,7 @@
 #ifndef SFW_RENDER_HPP	
 #define SFW_RENDER_HPP
 
-namespace gui
+namespace sfw
 {
 namespace gfx
 {
@@ -38,7 +38,7 @@ public:
 
 
 } // namespace gfx
-} // namespace gui
+} // namespace sfw
 
 
 //----------------------------------------------------------------------------

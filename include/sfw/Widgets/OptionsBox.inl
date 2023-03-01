@@ -1,6 +1,6 @@
 #include "sfw/Theme.hpp"
 
-namespace gui
+namespace sfw
 {
 
 template <class T>
@@ -224,6 +224,5 @@ OptionsBox<T>* OptionsBox<T>::setCallback(std::function<void(OptionsBox<T>*)> ca
 {
     return (OptionsBox<T>*) Widget::setCallback( [callback] (Widget* w) { callback( (OptionsBox*)w ); });
 }
-
 
 } // namespace

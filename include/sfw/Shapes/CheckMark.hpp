@@ -1,18 +1,18 @@
-#ifndef GUI_CROSS_HPP
-#define GUI_CROSS_HPP
+#ifndef GUI_CHECKMARK_HPP
+#define GUI_CHECKMARK_HPP
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 
-namespace gui
+namespace sfw
 {
 
-class Cross: public sf::Drawable
+class CheckMark: public sf::Drawable
 {
 public:
-    Cross();
+    CheckMark();
 
     void setPosition(sf::Vector2f pos);
     void move(sf::Vector2f delta);
@@ -29,6 +29,6 @@ private:
     sf::Vertex m_vertices[4];
 };
 
-}
+} // namespace
 
-#endif // GUI_CROSS_HPP
+#endif // GUI_CHECKMARK_HPP

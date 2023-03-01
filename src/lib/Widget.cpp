@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 #endif
 
-namespace gui
+namespace sfw
 {
 
 Widget::Widget():

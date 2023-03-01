@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-namespace gui
+namespace sfw
 {
 
 Label::Label(const sf::String& string)

@@ -35,14 +35,14 @@ out_dir=tmp/build
 sfw_dirtag=sfw
 sfw_out=$(out_dir)/$(libsrc_dirtag)
 sfw_objs=\
-	$(sfw_out)/Main.obj\
+	$(sfw_out)/GUI.obj\
 	$(sfw_out)/Widget.obj\
 	$(sfw_out)/Theme.obj\
 	$(sfw_out)/Layout.obj\
 	$(sfw_out)/Layouts/FormLayout.obj\
 	$(sfw_out)/Layouts/HBoxLayout.obj\
 	$(sfw_out)/Layouts/VBoxLayout.obj\
-	$(sfw_out)/Shapes/Cross.obj\
+	$(sfw_out)/Shapes/CheckMark.obj\
 	$(sfw_out)/Shapes/Box.obj\
 	$(sfw_out)/Shapes/Arrow.obj\
 	$(sfw_out)/Widgets/Button.obj\

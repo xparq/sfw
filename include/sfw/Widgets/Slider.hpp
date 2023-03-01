@@ -5,7 +5,7 @@
 #include "sfw/Shapes/Box.hpp"
 #include "sfw/Geometry.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -55,6 +55,6 @@ private:
     Box m_handle;
 };
 
-}
+} // namespace
 
 #endif // GUI_SLIDER_HPP

@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics/Drawable.hpp>
 
-namespace gui
+namespace sfw
 {
 namespace gfx
 {
@@ -53,5 +53,5 @@ public:
 
 
 } // namespace gfx
-} // namespace gui
+} // namespace sfw
 #endif // SFW_RENDER_SFML_HPP

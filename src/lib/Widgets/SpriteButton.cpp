@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-namespace gui
+namespace sfw
 {
 
 SpriteButton::SpriteButton(const sf::Texture& texture, const sf::String& string):

@@ -5,7 +5,7 @@
 #include "sfw/Shapes/Box.hpp"
 #include "sfw/Geometry.hpp"
 
-namespace gui
+namespace sfw
 {
 
 enum LabelPlacement
@@ -44,6 +44,6 @@ private:
     float m_value;
 };
 
-}
+} // namespace
 
 #endif // GUI_PROGRESS_BAR_HPP

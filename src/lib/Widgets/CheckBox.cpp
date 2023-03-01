@@ -3,16 +3,16 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-namespace gui
+namespace sfw
 {
 
 CheckBox::CheckBox(bool checked):
     m_box(Box::Input)
 {
     float offset = Theme::PADDING + Theme::borderSize;
-    float box_size = m_cross.getSize().x + offset * 2;
+    float box_size = m_checkmark.getSize().x + offset * 2;
     m_box.setSize(box_size, box_size);
-    m_cross.setPosition({offset, offset});
+    m_checkmark.setPosition({offset, offset});
     check(checked);
 
     setSize(m_box.getSize());
@@ -37,7 +37,7 @@ void CheckBox::draw(const gfx::RenderContext& ctx) const
     sfml_renderstates.transform *= getTransform();
     ctx.target.draw(m_box, sfml_renderstates);
     if (m_checked)
-        ctx.target.draw(m_cross, sfml_renderstates);
+        ctx.target.draw(m_checkmark, sfml_renderstates);
 #ifdef DEBUG
 //    Widget::draw_outline({ctx.target, sfml_renderstates}); // Not the original, untransformed ctx.props!
 #endif

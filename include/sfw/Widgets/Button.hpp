@@ -4,7 +4,7 @@
 #include "sfw/Widget.hpp"
 #include "sfw/Shapes/ItemBox.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -44,6 +44,6 @@ private:
     ItemBox<sf::Text> m_box;
 };
 
-}
+} // namespace
 
 #endif // GUI_BUTTON_HPP

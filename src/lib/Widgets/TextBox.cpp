@@ -11,7 +11,7 @@
 
 #define BLINK_PERIOD 1.f
 
-namespace gui
+namespace sfw
 {
 
 TextBox::TextBox(float width, CursorStyle style):

@@ -1,7 +1,7 @@
 #include "sfw/Widgets/Button.hpp"
 #include "sfw/Theme.hpp"
 
-namespace gui
+namespace sfw
 {
 
 Button::Button(const sf::String& string)

@@ -5,7 +5,7 @@
 #include "sfw/Shapes/Arrow.hpp"
 #include "sfw/Shapes/ItemBox.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -88,7 +88,7 @@ private:
     ItemBox<Arrow> m_arrowRight;
 };
 
-}
+} // namespace
 
 #include "OptionsBox.inl"
 

@@ -7,7 +7,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Clock.hpp>
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -111,6 +111,6 @@ private:
     sf::String m_selectedText;
 };
 
-}
+} // namespace
 
 #endif // GUI_TEXTBOX_HPP

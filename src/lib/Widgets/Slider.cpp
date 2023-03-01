@@ -4,7 +4,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <cmath>
 
-namespace gui
+namespace sfw
 {
 
 Slider::Slider(float step, float length, Orientation orientation):

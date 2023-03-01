@@ -6,7 +6,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <string>
 
-namespace gui
+namespace sfw
 {
 
 /**

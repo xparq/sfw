@@ -3,7 +3,7 @@
 
 #include "sfw/Shapes/Box.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -29,7 +29,7 @@ private:
     T m_item;
 };
 
-}
+} // namespace
 
 #include "ItemBox.inl"
 

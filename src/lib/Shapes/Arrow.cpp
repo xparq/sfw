@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-namespace gui
+namespace sfw
 {
 
 Arrow::Arrow(Direction direction):
@@ -90,4 +90,4 @@ void Arrow::updateGeometry(float x, float y, Direction direction)
     m_direction = direction;
 }
 
-}
+} // namespace

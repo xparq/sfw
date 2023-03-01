@@ -8,7 +8,7 @@
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/System/Vector2.hpp>
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -124,6 +124,6 @@ private:
     sf::Vertex m_vertices[VERTEX_COUNT];
 };
 
-}
+} // namespace
 
 #endif // GUI_BOX_HPP

@@ -40,55 +40,55 @@ int main()
     // Start building the GUI...
 
     // Customize the config
-    gui::Theme::loadFont("demo/tahoma.ttf");
-    gui::Theme::loadTexture(defaultTheme.texturePath);
-    gui::Theme::textSize = 11;
-    gui::Theme::click.textColor      = hex2color("#191B18");
-    gui::Theme::click.textColorHover = hex2color("#191B18");
-    gui::Theme::click.textColorFocus = hex2color("#000");
-    gui::Theme::input.textColor = hex2color("#000");
-    gui::Theme::input.textColorHover = hex2color("#000");
-    gui::Theme::input.textColorFocus = hex2color("#000");
-    gui::Theme::input.textSelectionColor = hex2color("#8791AD");
-    gui::Theme::input.textPlaceholderColor = hex2color("#8791AD");
-    gui::Theme::PADDING = 2.f;
-    gui::Theme::windowBgColor = defaultTheme.backgroundColor;
+    sfw::Theme::loadFont("demo/tahoma.ttf");
+    sfw::Theme::loadTexture(defaultTheme.texturePath);
+    sfw::Theme::textSize = 11;
+    sfw::Theme::click.textColor      = hex2color("#191B18");
+    sfw::Theme::click.textColorHover = hex2color("#191B18");
+    sfw::Theme::click.textColorFocus = hex2color("#000");
+    sfw::Theme::input.textColor = hex2color("#000");
+    sfw::Theme::input.textColorHover = hex2color("#000");
+    sfw::Theme::input.textColorFocus = hex2color("#000");
+    sfw::Theme::input.textSelectionColor = hex2color("#8791AD");
+    sfw::Theme::input.textPlaceholderColor = hex2color("#8791AD");
+    sfw::Theme::PADDING = 2.f;
+    sfw::Theme::windowBgColor = defaultTheme.backgroundColor;
 
     // A native SFML example Text object, to be manipulated via the GUI
-    sf::Text text("Hello world!", gui::Theme::getFont());
+    sf::Text text("Hello world!", sfw::Theme::getFont());
     text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
     text.setPosition({480, 240});
 
     // The main GUI controller:
-    gui::Main demo(window);
+    sfw::GUI demo(window);
     demo.setPosition(10, 10);
 
     // A horizontal layout to allow multiple subpanels side-by-side
-    auto hbox = demo.add(new gui::HBoxLayout());
+    auto hbox = demo.add(new sfw::HBoxLayout());
 
     // A "form" panel (on the left)
-    auto form = hbox->add(new gui::FormLayout());
+    auto form = hbox->add(new sfw::FormLayout());
 
     // A text box to set the text of the SFML Text object (created above)
     form->addRow("Text",
-        (new gui::TextBox())->setPlaceholder("Type something!")->setText("Hello world!")
-        ->setCallback([&](gui::TextBox* tb) { text.setString(tb->getText());
+        (new sfw::TextBox())->setPlaceholder("Type something!")->setText("Hello world!")
+        ->setCallback([&](sfw::TextBox* tb) { text.setString(tb->getText());
             text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
         })
     );
 
     // Another text box (with text length limit & pulsating cursor)
     // Also keeping the widget pointer for use by other widgets later.
-    auto textbox = new gui::TextBox(50.f, gui::TextBox::CursorStyle::PULSE);
+    auto textbox = new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE);
     textbox->setText("Hello world!")->setMaxLength(5);
     form->addRow("Text with limit (5)", textbox);
 
     // Slider + progress bars for rotating the text
-    auto sliderRotation = new gui::Slider(1.f); // step = 1
-    auto pbarRotation1 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelNone);
-    auto pbarRotation2 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOver);
-    auto pbarRotation3 = new gui::ProgressBar(200.f, gui::Horizontal, gui::LabelOutside);
-    sliderRotation->setCallback([&](gui::Slider* w) {
+    auto sliderRotation = new sfw::Slider(1.f); // step = 1
+    auto pbarRotation1 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
+    auto pbarRotation2 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
+    auto pbarRotation3 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
+    sliderRotation->setCallback([&](sfw::Slider* w) {
         text.setRotation(sf::degrees(w->getValue() * 360 / 100.f));
         pbarRotation1->setValue(w->getValue());
         pbarRotation2->setValue(w->getValue());
@@ -97,11 +97,11 @@ int main()
     form->addRow("Rotation", sliderRotation);
 
     // Slider + progress bars for scaling the text
-    auto sliderScale = new gui::Slider();
-    auto pbarScale1 = new gui::ProgressBar(100, gui::Vertical, gui::LabelNone);
-    auto pbarScale2 = new gui::ProgressBar(100, gui::Vertical, gui::LabelOver);
-    auto pbarScale3 = new gui::ProgressBar(100, gui::Vertical, gui::LabelOutside);
-    sliderScale->setCallback([&] (gui::Slider* w) {
+    auto sliderScale = new sfw::Slider();
+    auto pbarScale1 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelNone);
+    auto pbarScale2 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOver);
+    auto pbarScale3 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
+    sliderScale->setCallback([&] (sfw::Slider* w) {
         float scale = 1 + w->getValue() * 2 / 100.f;
         text.setScale({scale, scale});
         pbarScale1->setValue(w->getValue());
@@ -111,7 +111,7 @@ int main()
     form->addRow("Scale", sliderScale);
 
     // Options selector for color
-    using OBColor = gui::OptionsBox<sf::Color>;
+    using OBColor = sfw::OptionsBox<sf::Color>;
     auto opt = (new OBColor()) // <- Keeping in a var now, just to clone it later...
         ->addItem("Red", sf::Color::Red)
         ->addItem("Blue", sf::Color::Blue)
@@ -123,18 +123,18 @@ int main()
 
     // A cloned options selector (for backgroud color)
     form->addRow("Bgnd. (via cloned OptionsBox)", (new OBColor(*static_cast<OBColor*>(opt)))
-            ->setCallback([&] (OBColor* w) { gui::Theme::windowBgColor = w->getSelectedValue(); }));
+            ->setCallback([&] (OBColor* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
 
     // Checbkoxes (to set text properties)
 
-    form->addRow("Bold text", (new gui::CheckBox())->setCallback([&] (gui::CheckBox* w) {
+    form->addRow("Bold text", (new sfw::CheckBox())->setCallback([&] (sfw::CheckBox* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Bold;
         else                style &= ~sf::Text::Bold;
         text.setStyle(style);
     }));
 
-    form->addRow("Underlined text", (new gui::CheckBox())->setCallback([&] (gui::CheckBox* w) {
+    form->addRow("Underlined text", (new sfw::CheckBox())->setCallback([&] (sfw::CheckBox* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Underlined;
         else                style &= ~sf::Text::Underlined;
@@ -147,13 +147,13 @@ int main()
     form->addRow("Progress bar (label = Outside)", pbarRotation3);
 
     // Setup a stacked layout for the vertical progress bars (used for text scaling)
-    auto layoutForVerticalProgressBars = new gui::HBoxLayout();
+    auto layoutForVerticalProgressBars = new sfw::HBoxLayout();
     layoutForVerticalProgressBars->add(pbarScale1);
     layoutForVerticalProgressBars->add(pbarScale2);
     layoutForVerticalProgressBars->add(pbarScale3);
     form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
 
-    form->addRow("Default button", new gui::Button("button"));
+    form->addRow("Default button", new sfw::Button("button"));
 
     // Custom bitmap button
     sf::Texture buttonimg;
@@ -161,40 +161,40 @@ int main()
         !buttonimg.loadFromFile("demo/themed-button.png")) {
         cerr << "- Failed to load button theme image!\n";
     } else {
-        form->addRow("Custom button", (new gui::SpriteButton(buttonimg, "Play"))->setTextSize(20)
-                                      ->setCallback([]/*(gui::SpriteButton* w)*/ { /*compilation test*/ }));
+        form->addRow("Custom button", (new sfw::SpriteButton(buttonimg, "Play"))->setTextSize(20)
+                                      ->setCallback([]/*(sfw::SpriteButton* w)*/ { /*compilation test*/ }));
     }
 
     // Another panel, on th right
-    auto vboxRight = hbox->add(new gui::VBoxLayout());
+    auto vboxRight = hbox->add(new sfw::VBoxLayout());
 
     // Theme selection
-    vboxRight->add(new gui::Label("Change theme:"));
-    using OBTheme = gui::OptionsBox<ThemeCfg>;
+    vboxRight->add(new sfw::Label("Change theme:"));
+    using OBTheme = sfw::OptionsBox<ThemeCfg>;
     vboxRight->add(new OBTheme())
         ->addItem("Windows 98", win98Theme)
         ->addItem("Default", defaultTheme)
         ->setCallback([&] (OBTheme* w) {
             auto& theme = w->getSelectedValue();
-            gui::Theme::loadTexture(theme.texturePath);
-            gui::Theme::windowBgColor = theme.backgroundColor;
+            sfw::Theme::loadTexture(theme.texturePath);
+            sfw::Theme::windowBgColor = theme.backgroundColor;
         });
 
     // Textbox for new button labels
-    auto hbox2 = vboxRight->add(new gui::HBoxLayout());
-    auto tbButtName = hbox2->add(new gui::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-    hbox2->add(new gui::Button("Create button", [&] { vboxRight->add(new gui::Button(tbButtName->getText())); }));
+    auto hbox2 = vboxRight->add(new sfw::HBoxLayout());
+    auto tbButtName = hbox2->add(new sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+    hbox2->add(new sfw::Button("Create button", [&] { vboxRight->add(new sfw::Button(tbButtName->getText())); }));
 
     // Static images (also a cropped one)
 
     // Slider & progress bar for crop size
-    gui::Image* imgCrop = nullptr; // Hold your breath, see it created below!
-    auto hbox3 = vboxRight->add(new gui::HBoxLayout());
-    hbox3->add(new gui::Label("Crop square size:"));
-    auto pbar = new gui::ProgressBar(40);
+    sfw::Image* imgCrop = nullptr; // Hold your breath, see it created below!
+    auto hbox3 = vboxRight->add(new sfw::HBoxLayout());
+    hbox3->add(new sfw::Label("Crop square size:"));
+    auto pbar = new sfw::ProgressBar(40);
     hbox3->add(pbar);
     // Slider for crop size
-    hbox->add((new gui::Slider(1.f, 100, gui::Vertical))->setCallback([&](gui::Slider* w) {
+    hbox->add((new sfw::Slider(1.f, 100, sfw::Vertical))->setCallback([&](sfw::Slider* w) {
         pbar->setValue(w->getValue());
         // Show the slider value in a text box:
         textbox->setText(to_string((int)w->getValue()));
@@ -203,26 +203,26 @@ int main()
     }));
 
     // Image directly from file
-    auto vboximg = hbox->add(new gui::VBoxLayout());
-    vboximg->add(new gui::Label("Image:"));
-    vboximg->add(new gui::Image("demo/image.png"));
+    auto vboximg = hbox->add(new sfw::VBoxLayout());
+    vboximg->add(new sfw::Label("Image:"));
+    vboximg->add(new sfw::Image("demo/image.png"));
 
     // Images from file, cropped
-    vboximg->add(new gui::Label("Image - crop:"));
-    vboximg->add(new gui::Image("demo/image.png", {{0, 33}, {24, 28}}));
-    vboximg->add(new gui::Label("Image - var. crop:"));
-    vboximg->add(imgCrop = new gui::Image("demo/sfml.png"));
+    vboximg->add(new sfw::Label("Image - crop:"));
+    vboximg->add(new sfw::Image("demo/image.png", {{0, 33}, {24, 28}}));
+    vboximg->add(new sfw::Label("Image - var. crop:"));
+    vboximg->add(imgCrop = new sfw::Image("demo/sfml.png"));
 
 
     // Clear-background checkbox
-    auto hbox4 = demo.add(new gui::HBoxLayout());
-    hbox4->add(new gui::Label("Clear background"));
-    hbox4->add((new gui::CheckBox(true))->setCallback([&] (gui::CheckBox* w) {
+    auto hbox4 = demo.add(new sfw::HBoxLayout());
+    hbox4->add(new sfw::Label("Clear background"));
+    hbox4->add((new sfw::CheckBox(true))->setCallback([&] (sfw::CheckBox* w) {
         clear_bgnd = w->isChecked();
     }));
 
     // Exit button
-    demo.add(new gui::Button("Quit", [&] { window.close(); }));
+    demo.add(new sfw::Button("Quit", [&] { window.close(); }));
 
 
     // Start the event loop
@@ -240,7 +240,7 @@ int main()
         }
 
         // Clear screen
-	if (clear_bgnd) window.clear(gui::Theme::windowBgColor);
+	if (clear_bgnd) window.clear(sfw::Theme::windowBgColor);
 
         // Render the GUI
         demo.render();

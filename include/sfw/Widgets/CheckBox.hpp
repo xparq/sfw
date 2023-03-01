@@ -3,9 +3,9 @@
 
 #include "sfw/Widget.hpp"
 #include "sfw/Shapes/Box.hpp"
-#include "sfw/Shapes/Cross.hpp"
+#include "sfw/Shapes/CheckMark.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -35,10 +35,10 @@ private:
     void draw(const gfx::RenderContext& ctx) const override;
 
     Box m_box;
-    Cross m_cross;
+    CheckMark m_checkmark;
     bool m_checked;
 };
 
-}
+} // namespace
 
 #endif // GUI_CHECKBOX_HPP

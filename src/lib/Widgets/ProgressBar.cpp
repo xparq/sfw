@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-namespace gui
+namespace sfw
 {
 
 ProgressBar::ProgressBar(float length, Orientation orientation, LabelPlacement labelPlacement):

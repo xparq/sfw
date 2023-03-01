@@ -1,7 +1,7 @@
 #ifndef GUI_ALL_HPP
 #define GUI_ALL_HPP
 
-#include "sfw/Main.hpp"
+#include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
 #include "sfw/Geometry.hpp"
 

@@ -2,7 +2,7 @@
 #include "sfw/Theme.hpp"
 #include "sfw/Widgets/Label.hpp"
 
-namespace gui
+namespace sfw
 {
 
 FormLayout::FormLayout():
@@ -13,7 +13,7 @@ FormLayout::FormLayout():
 
 Widget* FormLayout::addRow(const sf::String& str, Widget* widget)
 {
-    gui::Label* label = new gui::Label(str);
+    Label* label = new Label(str);
     if (label->getSize().x > m_labelWidth)
     {
         m_labelWidth = label->getSize().x;
@@ -54,4 +54,4 @@ void FormLayout::recomputeGeometry()
     Widget::setSize(size);
 }
 
-}
+} // namespace

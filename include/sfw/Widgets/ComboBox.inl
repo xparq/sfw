@@ -1,4 +1,4 @@
-namespace gui
+namespace sfw
 {
 
 template <class T>
@@ -12,4 +12,4 @@ void ComboBox<T>::draw([[maybe_unused]] sf::RenderTarget& target, [[maybe_unused
 {
 }
 
-}
+} // namespace

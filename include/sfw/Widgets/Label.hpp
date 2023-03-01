@@ -3,7 +3,7 @@
 
 #include "sfw/Widget.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -38,6 +38,6 @@ private:
     sf::Text m_text;
 };
 
-}
+} // namespace
 
 #endif // GUI_LABEL_HPP

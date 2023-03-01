@@ -1,6 +1,6 @@
 #include "sfw/Theme.hpp"
 
-namespace gui
+namespace sfw
 {
 
 static sf::Cursor& getDefaultCursor()
@@ -100,9 +100,9 @@ const sf::IntRect& Theme::getTextureRect(Box::Type type, WidgetState state)
 }
 
 
-const sf::IntRect& Theme::getCrossTextureRect()
+const sf::IntRect& Theme::getCheckMarkTextureRect()
 {
-    return m_subrects[CROSS];
+    return m_subrects[CHECKMARK];
 }
 
 
@@ -129,4 +129,4 @@ int Theme::getLineSpacing()
     return (int)m_font.getLineSpacing((unsigned)textSize);
 }
 
-}
+} // namespace

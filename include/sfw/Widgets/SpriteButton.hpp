@@ -6,7 +6,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -50,6 +50,6 @@ private:
     bool m_pressed;
 };
 
-}
+} // namespace
 
 #endif // GUI_SPRITEBUTTON_HPP

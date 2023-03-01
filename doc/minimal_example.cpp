@@ -6,16 +6,16 @@ int main()
     sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal", sf::Style::Close);
 
     // The main GUI manager object
-    gui::Main gui(window);
+    sfw::GUI gui(window);
 
     // Load the visual styling template (sprite-sheet) image, and some font
-    gui::Theme::loadTexture("demo/texture-default.png");
-    gui::Theme::loadFont("demo/tahoma.ttf");
+    sfw::Theme::loadTexture("demo/texture-default.png");
+    sfw::Theme::loadFont("demo/tahoma.ttf");
 
     // Create a button
-    gui.add(new gui::Button("Close!"))->setCallback([&] { window.close(); });
+    gui.add(new sfw::Button("Close!"))->setCallback([&] { window.close(); });
     // Or, verbosely:
-    // auto button = new gui::Button("Close!");
+    // auto button = new sfw::Button("Close!");
     // button->setCallback([&] { window.close(); });
     // gui.add(button);
 
@@ -35,7 +35,7 @@ int main()
         }
 
         // Clear the window with the theme's background color
-        window.clear(gui::Theme::windowBgColor);
+        window.clear(sfw::Theme::windowBgColor);
 
         // Render the GUI
         gui.render();

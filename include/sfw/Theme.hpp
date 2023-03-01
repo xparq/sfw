@@ -11,7 +11,7 @@
 #include <map>
 #include <string>
 
-namespace gui
+namespace sfw
 {
 
 class Theme
@@ -31,7 +31,7 @@ public:
 
     static const sf::IntRect& getTextureRect(Box::Type type, WidgetState state);
 
-    static const sf::IntRect& getCrossTextureRect();
+    static const sf::IntRect& getCheckMarkTextureRect();
 
     static const sf::IntRect& getArrowTextureRect();
 
@@ -82,7 +82,7 @@ private:
         BOX_FOCUSED,
         BOX_INPUT_DEFAULT,
         BOX_INPUT_FOCUSED,
-        CROSS,
+        CHECKMARK,
         ARROW,
         PROGRESS_BAR,
         _TEXTURE_ID_COUNT
@@ -93,6 +93,6 @@ private:
     static sf::IntRect m_subrects[_TEXTURE_ID_COUNT];
 };
 
-}
+} // namsepace
 
 #endif // GUI_THEME_HPP

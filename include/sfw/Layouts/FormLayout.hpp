@@ -3,7 +3,7 @@
 
 #include "sfw/Layout.hpp"
 
-namespace gui
+namespace sfw
 {
 
 /**
@@ -27,6 +27,6 @@ private:
     float m_labelWidth;
 };
 
-}
+} // namespace
 
 #endif // GUI_FORMLAYOUT_HPP

@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
-namespace gui
+namespace sfw
 {
 
 template <class T>
@@ -58,4 +58,4 @@ void ItemBox<T>::onRelease()
     m_item.move({0.f, -1.f});
 }
 
-}
+} // namespace
