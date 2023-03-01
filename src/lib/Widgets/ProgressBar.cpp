@@ -109,15 +109,15 @@ float ProgressBar::getValue() const
 }
 
 
-void ProgressBar::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void ProgressBar::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    target.draw(m_box, lstates);
-    lstates.texture = &Theme::getTexture();
-    target.draw(m_bar, 4, sf::PrimitiveType::TriangleStrip, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    ctx.target.draw(m_box, sfml_renderstates);
+    sfml_renderstates.texture = &Theme::getTexture();
+    ctx.target.draw(m_bar, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
     if (m_labelPlacement != LabelNone)
-        target.draw(m_label, lstates);
+        ctx.target.draw(m_label, sfml_renderstates);
 }
 
 } // namespace

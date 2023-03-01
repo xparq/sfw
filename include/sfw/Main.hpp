@@ -1,6 +1,7 @@
 #ifndef GUI_MAIN_HPP
 #define GUI_MAIN_HPP
 
+#include "sfw/Gfx/Render.hpp"
 #include "sfw/Layouts/VBoxLayout.hpp"
 
 #include <SFML/System/Vector2.hpp>
@@ -13,17 +14,15 @@ namespace gui
 
 /**
  * Entry point for the GUI.
- * The Main object is actually a VBoxLayout, with a general onEvent handler.
+ * The Main object is actually a VBoxLayout, with a catch-all event handler.
  */
 class Main: public gui::VBoxLayout
 {
 public:
     Main(sf::RenderWindow& window);
 
-    /**
-     * Handle an SFML event and send it to widgets
-     */
-    void onEvent(const sf::Event& event);
+    void process(const sf::Event& event);
+    void render();
 
 private:
     /**
@@ -43,6 +42,6 @@ private:
     sf::Cursor::Type m_cursorType;
 };
 
-}
+} // namespace
 
 #endif // GUI_MAIN_HPP

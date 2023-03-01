@@ -44,12 +44,11 @@ const sf::String& Button::getString() const
     return m_box.item().getString();
 }
 
-
-void Button::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void Button::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    target.draw(m_box, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    ctx.target.draw(m_box, sfml_renderstates);
 }
 
 // Callbacks -------------------------------------------------------------------

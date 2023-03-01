@@ -2,7 +2,8 @@
 #define GUI_WIDGET_HPP
 
 #include "sfw/WidgetState.hpp"
-//!!#include "sfw/Layout.hpp" //!!See forw. decl. below instead...
+#include "sfw/Gfx/Render.hpp"
+//!!#include "sfw/Layout.hpp" // See forw. decl. below instead...
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -19,7 +20,7 @@ class Layout;
 /**
  * Abstract base class for gui widgets
  */
-class Widget: public sf::Drawable
+class Widget: public gfx::Drawable
 {
 public:
     Widget();
@@ -95,10 +96,12 @@ protected:
     void setSize(const sf::Vector2f& size);
     void setSize(float widget, float height);
 
-    friend class Layout;
-    friend class FormLayout;
-    friend class HBoxLayout;
-    friend class VBoxLayout;
+//----------------------
+friend class Layout;
+friend class FormLayout;
+friend class HBoxLayout;
+friend class VBoxLayout;
+//----------------------
 
     void setSelectable(bool selectable);
 
@@ -127,7 +130,9 @@ protected:
 
     virtual void setMouseCursor(sf::Cursor::Type cursor);
 
-    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override; // NOOP
+#ifdef DEBUG
+    void draw_outline(const gfx::RenderContext& ctx) const;
+#endif
 
 private:
     Layout* m_parent;

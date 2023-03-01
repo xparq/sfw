@@ -1,6 +1,6 @@
 #include "sfw/Widgets/Image.hpp"
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
 
 namespace gui
 {
@@ -92,14 +92,14 @@ void Image::setColor(const sf::Color& color)
 }
 
 
-void Image::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void Image::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    lstates.texture = &m_texture;
-    target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    sfml_renderstates.texture = &m_texture;
+    ctx.target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
 #ifdef DEBUG
-	Widget::draw(target, lstates); // Not the original `states`!
+//    Widget::draw_outline({ctx.target, sfml_renderstates}); // Not the original, untransformed ctx.props!
 #endif
 }
 

@@ -1,5 +1,5 @@
-#ifndef GUI_GUI_HPP
-#define GUI_GUI_HPP
+#ifndef GUI_ALL_HPP
+#define GUI_ALL_HPP
 
 #include "sfw/Main.hpp"
 #include "sfw/Theme.hpp"
@@ -22,4 +22,7 @@
 #include "sfw/Layouts/HBoxLayout.hpp"
 #include "sfw/Layouts/VBoxLayout.hpp"
 
-#endif // GUI_GUI_HPP
+// Misc
+#include "sfw/util/hex2color.hpp"
+
+#endif // GUI_ALL_HPP

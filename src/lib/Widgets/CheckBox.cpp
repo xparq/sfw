@@ -31,13 +31,16 @@ void CheckBox::check(bool checked)
 }
 
 
-void CheckBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void CheckBox::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    target.draw(m_box, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    ctx.target.draw(m_box, sfml_renderstates);
     if (m_checked)
-        target.draw(m_cross, lstates);
+        ctx.target.draw(m_cross, sfml_renderstates);
+#ifdef DEBUG
+//    Widget::draw_outline({ctx.target, sfml_renderstates}); // Not the original, untransformed ctx.props!
+#endif
 }
 
 // callbacks -------------------------------------------------------------------

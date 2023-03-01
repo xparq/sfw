@@ -125,13 +125,16 @@ void Slider::updateHandlePosition()
 }
 
 
-void Slider::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void Slider::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    target.draw(m_groove, lstates);
-    target.draw(m_progression, 4, sf::PrimitiveType::TriangleStrip, lstates);
-    target.draw(m_handle, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    ctx.target.draw(m_groove, sfml_renderstates);
+    ctx.target.draw(m_progression, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
+    ctx.target.draw(m_handle, sfml_renderstates);
+#ifdef DEBUG
+//    Widget::draw_outline({ctx.target, sfml_renderstates}); // Not the original, untransformed ctx.props!
+#endif
 }
 
 

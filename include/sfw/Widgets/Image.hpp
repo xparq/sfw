@@ -34,12 +34,12 @@ public:
     void setColor(const sf::Color& color);
 
 private:
-    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+    void draw(const gfx::RenderContext& ctx) const override;
 
     sf::Vertex m_vertices[4];
     sf::Texture m_texture;
 };
 
-}
+} // namespace
 
 #endif // GUI_IMAGE_HPP

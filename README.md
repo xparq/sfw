@@ -7,14 +7,14 @@ Original (upstream) author: Alexandre Bodelot <alexandre.bodelot@gmail.com>
 
 License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` file.)
 
-## Changes to Alex Bodelot's original:
+## Changes to the original:
 
 - Adapted to the pre-3.0 SFML _("master")_ API. _(See [issue #25](https://github.com/xparq/sfw/issues/25) about minor cosmetic regressions!)_
 - Windows/MSVC build added.
 - Compiling as C++20 now (SFML3 is C++17 already) to embrace recent C++ features.
 - Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow).
-- Reshuffled the source (to help integrating into other projects & for comfy SFML inclusion).
-- Small (ongoing) improvements to the API.
+- Cleaner API, new widgets (e.g. (cropped) Image), improvements to existing widgets.
+- Reshuffled source tree (to help integrating into other projects, to allow growth, to "host" SFML locally).
 
 _For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
 
@@ -53,8 +53,8 @@ _For other (both planned and completed) changes see the [issues](https://github.
 3. Create widgets with `new`, set their properties, add callbacks etc.
    (Note: the `Main` object's destructor will take care of deleting them.)
 4. Add widgets to various containers (layouts, incl. the root object) like: `someplace.add(my_widget)`).
-5. In your app's event loop pass events to the GUI: `my_GUI.onEvent(event);`.
-6. Draw the GUI in your frame refresh loop: `window.draw(my_GUI);`.
+5. In your app's event loop pass events to the GUI: `my_GUI.process(event);`.
+6. Draw the GUI in your frame refresh loop: `my_GUI.render();`.
 7. Have fun!
 
 ## Details

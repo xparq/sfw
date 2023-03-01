@@ -11,7 +11,7 @@ Main::Main(sf::RenderWindow& window):
 }
 
 
-void Main::onEvent(const sf::Event& event)
+void Main::process(const sf::Event& event)
 {
     switch (event.type)
     {
@@ -80,4 +80,10 @@ void Main::setMouseCursor(sf::Cursor::Type cursorType)
     }
 }
 
+
+void Main::render()
+{
+    draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! RenderContext(...) failed with CLANG
 }
+
+} // namespace

@@ -91,7 +91,7 @@ protected:
     void onStateChanged(WidgetState state) override;
 
 private:
-    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+    void draw(const gfx::RenderContext& ctx) const override;
 
     /**
      * Delete selected text if any

@@ -210,13 +210,13 @@ void Layout::onTextEntered(uint32_t unicode)
 }
 
 
-void Layout::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void Layout::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
     for (const Widget* widget = m_first; widget != nullptr; widget = widget->m_next)
     {
-        target.draw(*widget, lstates);
+        widget->draw(gfx::RenderContext{ctx.target, sfml_renderstates});
     }
 }
 

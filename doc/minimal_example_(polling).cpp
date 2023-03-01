@@ -1,4 +1,4 @@
-#include "sfw/Gui.hpp"
+#include "sfw/GUI.hpp"
 #include <SFML/Graphics.hpp>
 
 int main()
@@ -28,7 +28,7 @@ int main()
         while (window.pollEvent(event))
         {
             // Send events to the GUI!
-            gui.onEvent(event);
+            gui.process(event);
 
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -38,7 +38,7 @@ int main()
         window.clear(gui::Theme::windowBgColor);
 
         // Render the GUI
-        window.draw(gui);
+        gui.render();
 
         // Show the refreshed window
         window.display();

@@ -1,6 +1,6 @@
-#include "sfw/Gui.hpp"
+#include "sfw/cfg/USE_SFML"
+#include "sfw/GUI.hpp"
 
-#include "sfw/util/hex2color.hpp"
 #include <SFML/Graphics.hpp>
 
 #include <string> // to_string
@@ -232,16 +232,22 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
-            // Send events to demo
-            demo.onEvent(event);
+            // Send events to the demo GUI
+            demo.process(event);
+
             if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
                 window.close();
         }
 
         // Clear screen
 	if (clear_bgnd) window.clear(gui::Theme::windowBgColor);
-        window.draw(demo);
+
+        // Render the GUI
+        demo.render();
+
+        // Draw the example SFML text
         window.draw(text);
+
         // Update the window
         window.display();
     }

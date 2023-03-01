@@ -55,11 +55,14 @@ size_t Label::getTextSize() const
 }
 
 
-void Label::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void Label::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    target.draw(m_text, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    ctx.target.draw(m_text, sfml_renderstates);
+#ifdef DEBUG
+//    Widget::draw_outline({ctx.target, sfml_renderstates}); // Not the original, untransformed ctx.props!
+#endif
 }
 
 

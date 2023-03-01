@@ -68,12 +68,12 @@ SpriteButton* SpriteButton::setTextSize(size_t size)
 }
 
 
-void SpriteButton::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void SpriteButton::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    target.draw(m_background, lstates);
-    target.draw(m_text, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    ctx.target.draw(m_background, sfml_renderstates);
+    ctx.target.draw(m_text, sfml_renderstates);
 }
 
 

@@ -45,7 +45,7 @@ protected:
 private:
     void updateHandlePosition();
 
-    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+    void draw(const gfx::RenderContext& ctx) const override;
 
     Orientation m_orientation;
     float m_step;

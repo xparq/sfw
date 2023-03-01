@@ -431,11 +431,11 @@ void TextBox::onStateChanged(WidgetState state)
 }
 
 
-void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void TextBox::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    target.draw(m_box, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    ctx.target.draw(m_box, sfml_renderstates);
 
     // Crop the text with GL Scissor
     glEnable(GL_SCISSOR_TEST);
@@ -443,14 +443,14 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
     sf::Vector2f pos = getAbsolutePosition();
     glScissor(
         (GLint)(pos.x + Theme::borderSize),
-        (GLint)(target.getSize().y - (pos.y + getSize().y)),
+        (GLint)(ctx.target.getSize().y - (pos.y + getSize().y)),
         (GLsizei)getSize().x,
         (GLsizei)getSize().y
     );
 
     if (m_text.getString().isEmpty())
     {
-        target.draw(m_placeholder, lstates);
+        ctx.target.draw(m_placeholder, sfml_renderstates);
     }
     else
     {
@@ -462,9 +462,9 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
             selRect.setPosition(startPos);
             selRect.setSize({m_text.findCharacterPos(m_selectionLast).x - startPos.x, m_cursor.getSize().y});
             selRect.setFillColor(Theme::input.textSelectionColor);
-            target.draw(selRect, lstates);
+            ctx.target.draw(selRect, sfml_renderstates);
         }
-        target.draw(m_text, lstates);
+        ctx.target.draw(m_text, sfml_renderstates);
     }
 
     glDisable(GL_SCISSOR_TEST);
@@ -483,7 +483,7 @@ void TextBox::draw(sf::RenderTarget& target, const sf::RenderStates& states) con
                                           : uint8_t(255 - (255 * timer / BLINK_PERIOD)) & 128 ? 255 : 0);
         m_cursor.setFillColor(color);
 
-        target.draw(m_cursor, lstates);
+        ctx.target.draw(m_cursor, sfml_renderstates);
     }
 }
 

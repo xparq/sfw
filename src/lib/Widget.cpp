@@ -2,6 +2,10 @@
 #include "sfw/Layout.hpp"
 #include <cmath>
 
+#ifdef DEBUG
+#include <SFML/Graphics.hpp>
+#endif
+
 namespace gui
 {
 
@@ -145,25 +149,16 @@ const sf::Transform& Widget::getTransform() const
 }
 
 
-void Widget::draw([[maybe_unused]] sf::RenderTarget& target, [[maybe_unused]] const sf::RenderStates& states) const
-{
-}
-
 #ifdef DEBUG
-/*!!??
-namespace debug {
-//!!??error: "Already has a body"... :-o
-void Widget::draw([[maybe_unused]] sf::RenderTarget& target, [[maybe_unused]] const sf::RenderStates& states) const
+void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
 {
 	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
 	r.setPosition(getAbsolutePosition());
 	r.setFillColor(sf::Color::Transparent);
 	r.setOutlineThickness(2);
 	r.setOutlineColor(sf::Color::Red);
-	target.draw(r);
+	ctx.target.draw(r);
 }
-}
-??!!*/
 #endif
 
 

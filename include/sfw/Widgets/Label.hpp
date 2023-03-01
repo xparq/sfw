@@ -31,7 +31,7 @@ public:
     size_t getTextSize() const;
 
 private:
-    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+    void draw(const gfx::RenderContext& ctx) const override;
 
     void updateGeometry();
 

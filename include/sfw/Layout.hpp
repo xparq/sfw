@@ -25,7 +25,7 @@ public:
     template <typename W> W* add(W* widget) { return (W*) (Widget*) add((Widget*)widget); }
 
 protected:
-    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+    void draw(const gfx::RenderContext& ctx) const override;
 
     // Callbacks ---------------------------------------------------------------
     void onStateChanged(WidgetState state) override;

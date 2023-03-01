@@ -32,7 +32,7 @@ protected:
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
 
 private:
-    void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+    void draw(const gfx::RenderContext& ctx) const override;
 
     Box m_box;
     Cross m_cross;

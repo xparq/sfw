@@ -103,14 +103,15 @@ auto OptionsBox<T>::selectPrevious()
 
 
 template <class T>
-void OptionsBox<T>::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
 {
-    auto lstates = states;
-    lstates.transform *= getTransform();
-    target.draw(m_box, lstates);
-    target.draw(m_arrowLeft, lstates);
-    target.draw(m_arrowRight, lstates);
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    ctx.target.draw(m_box, sfml_renderstates);
+    ctx.target.draw(m_arrowLeft, sfml_renderstates);
+    ctx.target.draw(m_arrowRight, sfml_renderstates);
 }
+
 
 
 template <class T>
