@@ -31,16 +31,19 @@ int main()
     sf::RenderWindow window;
     window.create(sf::VideoMode({1024, 768}), "SFW Demo", sf::Style::Close|sf::Style::Resize);
     if (!window.isOpen()) {
-        cerr << "- Failed to create SFML window!\n";
+        cerr << "- Failed to create the SFML window!\n";
         return EXIT_FAILURE;
     }
     window.setFramerateLimit(30);
 
-    // Start building the GUI...
+    // Setting up the GUI...
 
-    // Customize the config
-    sfw::Theme::loadFont("demo/tahoma.ttf");
-    sfw::Theme::loadTexture(defaultTheme.texturePath);
+    if (!sfw::Theme::loadFont("demo/verdana.ttf")) {
+        return EXIT_FAILURE; // SFML has already explained the situation...
+    }
+    if (!sfw::Theme::loadTexture(defaultTheme.texturePath)) {
+        return EXIT_FAILURE; // SFML has already explained the situation...
+    }
     sfw::Theme::textSize = 11;
     sfw::Theme::click.textColor      = hex2color("#191B18");
     sfw::Theme::click.textColorHover = hex2color("#191B18");
@@ -154,11 +157,9 @@ int main()
     form->addRow("Default button", new sfw::Button("button"));
 
     // Custom bitmap button
-    sf::Texture buttonimg;
-    if (//!!Not here, as local temporary: sf::Texture buttonimg;
-        !buttonimg.loadFromFile("demo/themed-button.png")) {
-        cerr << "- Failed to load button theme image!\n";
-    } else {
+    sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
+    if (buttonimg.loadFromFile("demo/themed-button.png")) // SFML would print an error if failed
+    {
         form->addRow("Custom button", (new sfw::SpriteButton(buttonimg, "Play"))->setTextSize(20)
                                       ->setCallback([]/*(sfw::SpriteButton* w)*/ { /*compilation test*/ }));
     }
@@ -201,13 +202,13 @@ int main()
     // Image directly from file
     auto vboximg = hbox->add(new sfw::VBoxLayout());
     vboximg->add(new sfw::Label("Image:"));
-    vboximg->add(new sfw::Image("demo/image.png"));
+    vboximg->add(new sfw::Image("demo/some image.png"));
 
     // Images from file, cropped
     vboximg->add(new sfw::Label("Image - crop:"));
-    vboximg->add(new sfw::Image("demo/image.png", {{0, 33}, {24, 28}}));
+    vboximg->add(new sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
     vboximg->add(new sfw::Label("Image - var. crop:"));
-    vboximg->add(imgCrop = new sfw::Image("demo/sfml.png"));
+    vboximg->add(imgCrop = new sfw::Image("demo/SFML logo.png"));
 
 
     // Clear-background checkbox
