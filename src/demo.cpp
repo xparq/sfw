@@ -7,15 +7,15 @@
 #include <iostream> // cerr, for errors
 using namespace std;
 
-struct ThemeCfg
-{
-    sf::Color backgroundColor;
-    std::string texturePath;
-};
-
 //----------------------------------------------------------------------------
 int main()
 {
+    struct ThemeCfg
+    {
+        sf::Color backgroundColor;
+        std::string texturePath;
+    };
+
     ThemeCfg defaultTheme = {
         hex2color("#e6e8e0"),
         "demo/texture-default.png"
@@ -77,38 +77,38 @@ int main()
         })
     );
 
-    // Another text box (with text length limit & pulsating cursor)
-    // Also keeping the widget pointer for use by other widgets later.
+    // Another text edit box (with length limit & pulsating cursor)
+    // (Keeping the widget pointer for use by other widgets.)
     auto textbox = new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE);
     textbox->setText("Hello world!")->setMaxLength(5);
     form->addRow("Text with limit (5)", textbox);
 
     // Slider + progress bars for rotating the text
-    auto sliderRotation = new sfw::Slider(1.f); // step = 1
+    auto sliderForRotation = new sfw::Slider(1.f); // step = 1
     auto pbarRotation1 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
     auto pbarRotation2 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
     auto pbarRotation3 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
-    sliderRotation->setCallback([&](sfw::Slider* w) {
+    sliderForRotation->setCallback([&](sfw::Slider* w) {
         text.setRotation(sf::degrees(w->getValue() * 360 / 100.f));
         pbarRotation1->setValue(w->getValue());
         pbarRotation2->setValue(w->getValue());
         pbarRotation3->setValue(w->getValue());
     });
-    form->addRow("Rotation", sliderRotation);
+    form->addRow("Rotation", sliderForRotation);
 
     // Slider + progress bars for scaling the text
-    auto sliderScale = new sfw::Slider();
+    auto sliderForSize = new sfw::Slider();
     auto pbarScale1 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelNone);
     auto pbarScale2 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOver);
     auto pbarScale3 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
-    sliderScale->setCallback([&] (sfw::Slider* w) {
+    sliderForSize->setCallback([&](sfw::Slider* w) {
         float scale = 1 + w->getValue() * 2 / 100.f;
         text.setScale({scale, scale});
         pbarScale1->setValue(w->getValue());
         pbarScale2->setValue(w->getValue());
         pbarScale3->setValue(w->getValue());
     });
-    form->addRow("Scale", sliderScale);
+    form->addRow("Scale", sliderForSize);
 
     // Options selector for color
     using OBColor = sfw::OptionsBox<sf::Color>;
@@ -118,23 +118,21 @@ int main()
         ->addItem("Green", sf::Color::Green)
         ->addItem("Yellow", sf::Color::Yellow)
         ->addItem("White", sf::Color::White)
-        ->setCallback([&] (OBColor* w) { text.setFillColor(w->getSelectedValue()); });
+        ->setCallback([&](OBColor* w) { text.setFillColor(w->getSelectedValue()); });
     form->addRow("Text color", opt);
 
     // A cloned options selector (for backgroud color)
     form->addRow("Bgnd. (via cloned OptionsBox)", (new OBColor(*static_cast<OBColor*>(opt)))
-            ->setCallback([&] (OBColor* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
+            ->setCallback([&](OBColor* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
 
     // Checbkoxes (to set text properties)
-
-    form->addRow("Bold text", (new sfw::CheckBox())->setCallback([&] (sfw::CheckBox* w) {
+    form->addRow("Bold text", (new sfw::CheckBox())->setCallback([&](sfw::CheckBox* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Bold;
         else                style &= ~sf::Text::Bold;
         text.setStyle(style);
     }));
-
-    form->addRow("Underlined text", (new sfw::CheckBox())->setCallback([&] (sfw::CheckBox* w) {
+    form->addRow("Underlined text", (new sfw::CheckBox())->setCallback([&](sfw::CheckBox* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Underlined;
         else                style &= ~sf::Text::Underlined;
@@ -174,7 +172,7 @@ int main()
     vboxRight->add(new OBTheme())
         ->addItem("Windows 98", win98Theme)
         ->addItem("Default", defaultTheme)
-        ->setCallback([&] (OBTheme* w) {
+        ->setCallback([&](OBTheme* w) {
             auto& theme = w->getSelectedValue();
             sfw::Theme::loadTexture(theme.texturePath);
             sfw::Theme::windowBgColor = theme.backgroundColor;
@@ -217,7 +215,7 @@ int main()
     // Clear-background checkbox
     auto hbox4 = demo.add(new sfw::HBoxLayout());
     hbox4->add(new sfw::Label("Clear background"));
-    hbox4->add((new sfw::CheckBox(true))->setCallback([&] (sfw::CheckBox* w) {
+    hbox4->add((new sfw::CheckBox(true))->setCallback([&](sfw::CheckBox* w) {
         clear_bgnd = w->isChecked();
     }));
 

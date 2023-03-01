@@ -47,7 +47,7 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 ## Use
 
-0. #include "sfw/GUI.hpp"
+0. `#include "sfw/GUI.hpp"`
 1. Load resources (the styling template image, font etc.) via the static `sfw::Theme` class,
    customize the style properties etc.
 2. Create the top-level GUI manager object, connecting it to the SFML window, like: `sfw::GUI my_GUI(window);`.
