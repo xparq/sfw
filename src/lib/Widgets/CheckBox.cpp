@@ -18,6 +18,12 @@ CheckBox::CheckBox(bool checked):
     setSize(m_box.getSize());
 }
 
+CheckBox::CheckBox(std::function<void(CheckBox*)> callback, bool checked):
+    CheckBox(checked)
+{
+    setCallback(callback);
+}
+
 
 bool CheckBox::isChecked() const
 {

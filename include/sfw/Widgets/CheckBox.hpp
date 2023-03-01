@@ -16,14 +16,15 @@ class CheckBox: public Widget
 {
 public:
     CheckBox(bool checked = false);
+    CheckBox(std::function<void(CheckBox*)> callback, bool checked = false);
 
     bool isChecked() const;
 
     void check(bool checked);
 
     // See Widget.hpp for the templates of these:
-    CheckBox* setCallback(std::function<void()> callback)         { return Widget::setCallback<CheckBox>(callback); }
     CheckBox* setCallback(std::function<void(CheckBox*)> callback);
+    CheckBox* setCallback(std::function<void()> callback)         { return Widget::setCallback<CheckBox>(callback); }
 
 protected:
     // Callbacks

@@ -1,5 +1,3 @@
-// NOT YET FOR CLIENT USE, but as a reminder...:
-// Default (and the only option...) anyway: #include "sfw/cfg/USE_SFML"
 #include "sfw/GUI.hpp"
 
 #include <SFML/Graphics.hpp>
@@ -73,7 +71,8 @@ int main()
     // A text box to set the text of the SFML Text object (created above)
     form->addRow("Text",
         (new sfw::TextBox())->setPlaceholder("Type something!")->setText("Hello world!")
-        ->setCallback([&](auto* tb) { text.setString(tb->getText());
+        ->setCallback([&](auto* w) {
+            text.setString(w->getText());
             text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
         })
     );
@@ -113,13 +112,13 @@ int main()
 
     // Options selector for color
     using OBColor = sfw::OptionsBox<sf::Color>;
-    auto opt = (new OBColor()) // <- Keeping in a var now, just to clone it later...
+    // (Keeping in a var only to clone it later.)
+    auto opt = (new OBColor([&](auto* w) { text.setFillColor(w->getSelectedValue()); }))
         ->addItem("Red", sf::Color::Red)
         ->addItem("Blue", sf::Color::Blue)
         ->addItem("Green", sf::Color::Green)
         ->addItem("Yellow", sf::Color::Yellow)
-        ->addItem("White", sf::Color::White)
-        ->setCallback([&](auto* w) { text.setFillColor(w->getSelectedValue()); });
+        ->addItem("White", sf::Color::White);
     form->addRow("Text color", opt);
 
     // A cloned options selector (for backgroud color)
@@ -127,13 +126,13 @@ int main()
             ->setCallback([&](auto* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
 
     // Checbkoxes (to set text properties)
-    form->addRow("Bold text", (new sfw::CheckBox())->setCallback([&](auto* w) {
+    form->addRow("Bold text", new sfw::CheckBox([&](auto* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Bold;
         else                style &= ~sf::Text::Bold;
         text.setStyle(style);
     }));
-    form->addRow("Underlined text", (new sfw::CheckBox())->setCallback([&](auto* w) {
+    form->addRow("Underlined text", new sfw::CheckBox([&](auto* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Underlined;
         else                style &= ~sf::Text::Underlined;
@@ -169,15 +168,13 @@ int main()
 
     // Theme selection
     vboxRight->add(new sfw::Label("Change theme:"));
-    using OBTheme = sfw::OptionsBox<ThemeCfg>;
-    vboxRight->add(new OBTheme())
-        ->addItem("Windows 98", win98Theme)
-        ->addItem("Default", defaultTheme)
-        ->setCallback([&](auto* w) {
-            auto& theme = w->getSelectedValue();
-            sfw::Theme::loadTexture(theme.texturePath);
-            sfw::Theme::windowBgColor = theme.backgroundColor;
-        });
+    vboxRight->add(new sfw::OptionsBox<ThemeCfg>([&](auto* w) {
+        auto& theme = w->getSelectedValue();
+        sfw::Theme::loadTexture(theme.texturePath);
+        sfw::Theme::windowBgColor = theme.backgroundColor;
+    }))
+    ->addItem("Windows 98", win98Theme)
+    ->addItem("Default", defaultTheme);
 
     // Textbox for new button labels
     auto hbox2 = vboxRight->add(new sfw::HBoxLayout());
@@ -216,9 +213,7 @@ int main()
     // Clear-background checkbox
     auto hbox4 = demo.add(new sfw::HBoxLayout());
     hbox4->add(new sfw::Label("Clear background"));
-    hbox4->add((new sfw::CheckBox(true))->setCallback([&](auto* w) {
-        clear_bgnd = w->isChecked();
-    }));
+    hbox4->add(new sfw::CheckBox([&](auto* w) { clear_bgnd = w->isChecked(); }, true));
 
     // Exit button
     demo.add(new sfw::Button("Quit", [&] { window.close(); }));
@@ -247,7 +242,7 @@ int main()
         // Draw the example SFML text
         window.draw(text);
 
-        // Update the window
+        // Show the updated window
         window.display();
     }
 

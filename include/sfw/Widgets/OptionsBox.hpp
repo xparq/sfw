@@ -17,6 +17,7 @@ class OptionsBox: public Widget
 {
 public:
     OptionsBox();
+    OptionsBox(std::function<void(OptionsBox<T>*)> callback);
 
     /**
      * Append a new item in the list
@@ -53,8 +54,8 @@ public:
     auto selectPrevious();
 
     // See Widget.hpp for the templates of these:
-    OptionsBox<T>* setCallback(std::function<void()> callback) { return Widget::setCallback<OptionsBox<T>>(callback); }
     OptionsBox<T>* setCallback(std::function<void(OptionsBox<T>*)> callback);
+    OptionsBox<T>* setCallback(std::function<void()> callback) { return Widget::setCallback<OptionsBox<T>>(callback); }
 
 protected:
     // Callbacks

@@ -28,6 +28,13 @@ OptionsBox<T>::OptionsBox():
     setSize(m_box.getSize());
 }
 
+template <class T>
+OptionsBox<T>::OptionsBox(std::function<void(OptionsBox<T>*)> callback):
+    OptionsBox()
+{
+    setCallback(callback);    
+}
+
 
 template <class T>
 auto OptionsBox<T>::addItem(const sf::String& label, const T& value)
