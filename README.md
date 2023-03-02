@@ -29,7 +29,7 @@ _For other (both planned and completed) changes see the [issues](https://github.
 - No CMake. (Well, that's considered a feature here; use e.g. TGUI if you can't build without CMake.)
 
 
-![screenshot](doc/demo-screenshot-3.png)
+![screenshot](doc/media/demo-screenshot-4.png)
 
 
 ## Build

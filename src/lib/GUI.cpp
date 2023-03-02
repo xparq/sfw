@@ -83,6 +83,10 @@ void GUI::setMouseCursor(sf::Cursor::Type cursorType)
 
 void GUI::render()
 {
+    if (sfw::Theme::clearWindow)
+        m_window.clear(sfw::Theme::windowBgColor);
+
+    // Draw whatever we have (via our ancestor, a top-level VBoxLayout)
     draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! RenderContext(...) failed with CLANG
 }
 

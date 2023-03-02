@@ -25,8 +25,6 @@ int main()
         "demo/texture-win98.png"
     };
 
-    bool clear_bgnd = true;
-
     // Create the main window
     sf::RenderWindow window;
     window.create(sf::VideoMode({1024, 768}), "SFW Demo", sf::Style::Close|sf::Style::Resize);
@@ -176,11 +174,6 @@ int main()
     ->addItem("Windows 98", win98Theme)
     ->addItem("Default", defaultTheme);
 
-    // Textbox for new button labels
-    auto hbox2 = middle_panel->add(new sfw::HBoxLayout());
-    auto tbButtName = hbox2->add(new sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-    hbox2->add(new sfw::Button("Create button", [&] { middle_panel->add(new sfw::Button(tbButtName->getText())); }));
-
     // Static images (also a cropped one)
 
     // Slider & progress bar for crop size
@@ -191,7 +184,7 @@ int main()
     hbox3->add(pbar);
 
     // Slider for crop size (it shouldn't just be put here, kinda dangling on its own, but well...)
-    hbox3->add((new sfw::Slider(1.f, 100.f, sfw::Vertical))->setCallback([&](auto* w) {
+    middle_panel->add((new sfw::Slider(1.f, 100.f))->setCallback([&](auto* w) {
         pbar->setValue(w->getValue());
         // Show the slider value in a text box:
         textbox->setText(to_string((int)w->getValue()));
@@ -212,21 +205,26 @@ int main()
 
     auto right_bar = main_hbox->add(new sfw::VBoxLayout());
 
-    // For some insight/diagnostics:
+    // Show the GUI textures, for some insight/diagnostics
     right_bar->add(new sfw::Label("Theme textures:"));
     auto txbox = right_bar->add(new sfw::HBoxLayout());
-    auto tximg = new sfw::Image(sfw::Theme::getTexture()); // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
+    auto tximg = (new sfw::Image(sfw::Theme::getTexture())) // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
+        ->scale(2);
     txbox->add((new sfw::Slider(1.f, 100.f, sfw::Vertical))
-                ->setCallback([&](auto* w) { tximg->scale(1 + (100.f - w->getValue()) / 25.f); })
-                ->setStep(25.f)->setValue(75.f)
+        ->setCallback([&](auto* w) { tximg->scale(1 + (100.f - w->getValue()) / 25.f); })
+        ->setStep(25.f)->setValue(75.f)
     );
-    tximg->scale(2);
     txbox->add(tximg);
+
+    // Textbox for new button labels & button-factory button...
+    auto hbox2 = middle_panel->add(new sfw::HBoxLayout());
+    auto tbButtName = hbox2->add(new sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+    hbox2->add(new sfw::Button("Create button", [&] { middle_panel->add(new sfw::Button(tbButtName->getText())); }));
 
     // Clear-background checkbox
     auto hbox4 = demo.add(new sfw::HBoxLayout());
     hbox4->add(new sfw::Label("Clear background"));
-    hbox4->add(new sfw::CheckBox([&](auto* w) { clear_bgnd = w->isChecked(); }, true));
+    hbox4->add(new sfw::CheckBox([&](auto* w) { sfw::Theme::clearWindow = w->isChecked(); }, true));
 
     //form->add("This is just some text on its own."); // Shouldn't compile!
 
@@ -247,9 +245,6 @@ int main()
             if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
                 window.close();
         }
-
-        // Clear screen
-	if (clear_bgnd) window.clear(sfw::Theme::windowBgColor);
 
         // Render the GUI
         demo.render();

@@ -17,6 +17,7 @@ size_t Theme::textSize = 12;
 Theme::Style Theme::click;
 Theme::Style Theme::input;
 sf::Color Theme::windowBgColor;
+bool Theme::clearWindow = true;
 int Theme::borderSize = 1;
 int Theme::minWidgetWidth = 86;
 float Theme::PADDING = 1.f;

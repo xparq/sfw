@@ -32,13 +32,11 @@ public:
     static const sf::IntRect& getTextureRect(Box::Type type, WidgetState state);
 
     static const sf::IntRect& getCheckMarkTextureRect();
-
     static const sf::IntRect& getArrowTextureRect();
-
     static const sf::IntRect& getProgressBarTextureRect();
 
     /**
-     * Widget height based on text size
+     * Default widget height based on text size
      */
     static float getBoxHeight();
 
@@ -61,6 +59,7 @@ public:
     static Style input;
 
     static sf::Color windowBgColor;
+    static bool clearWindow;
     static int borderSize;
     static int minWidgetWidth;
 

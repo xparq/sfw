@@ -34,10 +34,7 @@ int main()
                 window.close();
         }
 
-        // Clear the window with the theme's background color
-        window.clear(sfw::Theme::windowBgColor);
-
-        // Render the GUI
+        // Render the GUI (will clear the window first, by default)
         gui.render();
     }
 
