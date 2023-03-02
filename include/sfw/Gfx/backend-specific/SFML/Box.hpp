@@ -62,8 +62,8 @@ public:
         item.setPosition(
             {(float)int(getPosition().x + (size.x - itemSize.x) / 2),
              (float)int(getPosition().y + (size.y - itemSize.y) / 2)}
-            //! The weird back-and-forth casting is floor() without <cmath>
-            //! (see issue #97), and also to shut up the int->float warnings
+             //! The weird back-and-forth casting is floor() without <cmath>
+             //! (see issue #97), and also to shut up int->float warnings
         );
     }
 

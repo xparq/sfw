@@ -110,7 +110,7 @@ void Slider::updateHandlePosition()
     if (m_orientation == Horizontal)
     {
         float max = getSize().x - m_handle.getSize().x - Theme::borderSize * 2;
-        float x = max * m_value / 100 + Theme::borderSize;
+        float x = floor(max * m_value / 100 + Theme::borderSize);
         m_handle.setPosition(x, 0);
         m_progression[2].position.x = x;
         m_progression[3].position.x = x;
@@ -119,7 +119,7 @@ void Slider::updateHandlePosition()
     {
         float max = getSize().y - m_handle.getSize().y - Theme::borderSize * 2;
         float reverse_value = 100.f - m_value;
-        float y = max * reverse_value / 100 + (float)Theme::borderSize;
+        float y = floor(max * reverse_value / 100 + (float)Theme::borderSize);
         m_handle.setPosition(0, y);
         m_progression[0].position.y = y;
         m_progression[2].position.y = y;

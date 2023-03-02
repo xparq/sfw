@@ -36,12 +36,7 @@ int main()
 
     // Setting up the GUI...
 
-    if (!sfw::Theme::loadFont("demo/verdana.ttf")) {
-        return EXIT_FAILURE; // SFML has already explained the situation...
-    }
-    if (!sfw::Theme::loadTexture(defaultTheme.texturePath)) {
-        return EXIT_FAILURE; // SFML has already explained the situation...
-    }
+    sfw::Theme::borderSize = 99; // This will get recalculated by loadTexture, so no use with template textures!
     sfw::Theme::textSize = 11;
     sfw::Theme::click.textColor      = hex2color("#191B18");
     sfw::Theme::click.textColorHover = hex2color("#191B18");
@@ -54,14 +49,21 @@ int main()
     sfw::Theme::PADDING = 2.f;
     sfw::Theme::windowBgColor = defaultTheme.backgroundColor;
 
-    // A native SFML example Text object, to be manipulated via the GUI
-    sf::Text text("Hello world!", sfw::Theme::getFont());
-    text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
-    text.setPosition({480, 240});
+    if (!sfw::Theme::loadFont("demo/verdana.ttf")) {
+        return EXIT_FAILURE; // SFML has already explained the situation...
+    }
+    if (!sfw::Theme::loadTexture(defaultTheme.texturePath)) {
+        return EXIT_FAILURE; // SFML has already explained the situation...
+    }
 
     // The main GUI controller:
     sfw::GUI demo(window);
     demo.setPosition(10, 10);
+
+    // A native SFML example Text object, to be manipulated via the GUI
+    sf::Text text("Hello world!", sfw::Theme::getFont());
+    text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
+    text.setPosition({480, 240});
 
     // A horizontal layout for multiple panels side-by-side
     auto main_hbox = demo.add(new sfw::HBoxLayout());
@@ -121,7 +123,7 @@ int main()
     form->addRow("Text color", opt);
 
     // A cloned options selector (for backgroud color)
-    form->addRow("Screen Bgnd. (copied widget)", (new OBColor(*static_cast<OBColor*>(opt)))
+    form->addRow("Screen bgnd. (copied widget)", (new OBColor(*static_cast<OBColor*>(opt)))
         ->addItem("Default", hex2color("#e6e8e0"))
         ->setCallback([&](auto* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
 
