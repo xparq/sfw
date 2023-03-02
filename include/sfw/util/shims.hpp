@@ -9,8 +9,9 @@
 #ifndef SFW_GFX_BACKEND
 //!!Should only be a warning about including some default!
 //!!But #warning is c++23(!...), and isn't supported by MSVC yet. :-/
-//!!(Note that GCC has supported if, for quite a long time.)
-//!!#warning Backend was not selected. Use: #include "sfw/cfg/USE_{backendname}" Selecting SFML by default...
+//!!(Note that GCC has supported it for quite a long time.)
+//!!#warning Backend was not selected. Use: #include "sfw/cfg/USE_{backendname}"
+//!!#warning Selecting SFML as default graphics backend...
 #include "sfw/cfg/USE_SFML"
 #endif
 

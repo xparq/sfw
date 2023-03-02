@@ -15,34 +15,38 @@ Image::Image(const std::string& filename, const sf::IntRect& r): Image()
     setTexture(filename, r);
 }
 
-Image::Image(const sf::Image& image/*!!, const sf::IntRect& crop = nullrect!!*/): Image()
+Image::Image(const sf::Image& image, const sf::IntRect& r): Image()
 {
-    setTexture(image);
+    setTexture(image, r);
 }
 
-Image::Image(const sf::Texture& texture/*!!, const sf::IntRect& crop = nullrect!!*/): Image()
+Image::Image(const sf::Texture& texture, const sf::IntRect& r): Image()
 {
-    setTexture(texture);
+    setTexture(texture, r);
 }
 
 
-void Image::setTexture(const std::string& filename, const sf::IntRect& r)
+Image* Image::setTexture(const std::string& filename, const sf::IntRect& r)
 {
-    if (!m_texture.loadFromFile(filename, r))
+    if (m_texture.loadFromFile(filename, r))
     {
-        // SFML has already written an error.
-        return;
+        setTexture(m_texture);
     }
-    setTexture(m_texture);
+    // else: SFML has already written an error, but we should add our own error feedback here!!
+
+    return this;
 }
 
-void Image::setTexture(const sf::Image& image)
+Image* Image::setTexture(const sf::Image& image, const sf::IntRect& r)
 {
-    m_texture.update(image);
-    setTexture(m_texture);
+    if (m_texture.loadFromImage(image, r)) //!!?? What does SFML do with a null/invalid rect?!
+    {
+        setTexture(m_texture);
+    }
+    return this;
 }
 
-void Image::setTexture(const sf::Texture& texture)
+Image* Image::setTexture(const sf::Texture& texture, const sf::IntRect& r)
 {
     // Don't copy over itself (but still alow cropping even then)
     if (&m_texture != &texture)
@@ -50,11 +54,12 @@ void Image::setTexture(const sf::Texture& texture)
         m_texture = texture;
     }
 
-    setCropRect({{0, 0}, {(int)m_texture.getSize().x, (int)m_texture.getSize().y}});
+    setCropRect(r == NullRect ? sf::IntRect{{0, 0}, {(int)m_texture.getSize().x, (int)m_texture.getSize().y}} : r);
+    return this;
 }
 
 
-void Image::setCropRect(const sf::IntRect& r)
+Image* Image::setCropRect(const sf::IntRect& r)
 {
     float left = (float) (r.left ? r.left : 0);
     float top  = (float) (r.top  ? r.top  : 0);
@@ -71,12 +76,9 @@ void Image::setCropRect(const sf::IntRect& r)
     m_vertices[3].texCoords = sf::Vector2f(left + width, top + height);
 
     // Set widget geometry
-    m_vertices[0].position = sf::Vector2f(0, 0);
-    m_vertices[1].position = sf::Vector2f(0, height);
-    m_vertices[2].position = sf::Vector2f(width, 0);
-    m_vertices[3].position = sf::Vector2f(width, height);
-
+    updateGeometry(0, 0, width, height);
     setSize(width, height);
+    return this;
 }
 
 sf::IntRect Image::getCropRect() const
@@ -85,10 +87,29 @@ sf::IntRect Image::getCropRect() const
         sf::Vector2i(m_vertices[3].texCoords - m_vertices[0].texCoords));
 }
 
-void Image::setColor(const sf::Color& color)
+
+void Image::updateGeometry(float left, float top, float right, float bottom)
+{
+    m_vertices[0].position = {left, top};
+    m_vertices[1].position = {left, bottom};
+    m_vertices[2].position = {right, top};
+    m_vertices[3].position = {right, bottom};
+}
+
+
+Image* Image::rescale(float factor)
+{
+    setSize(getSize() * factor);
+    updateGeometry(0, 0, getSize().x, getSize().y);
+    return this;
+}
+
+
+Image* Image::setColor(const sf::Color& color)
 {
     for (int i = 0; i < 4; ++i)
         m_vertices[i].color = color;
+    return this;
 }
 
 

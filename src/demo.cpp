@@ -125,7 +125,7 @@ int main()
     form->addRow("Text color", opt);
 
     // A cloned options selector (for backgroud color)
-    form->addRow("Bgnd. (via cloned OptionsBox)", (new OBColor(*static_cast<OBColor*>(opt)))
+    form->addRow("Screen Bgnd. (copied widget)", (new OBColor(*static_cast<OBColor*>(opt)))
             ->setCallback([&](auto* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
 
     // Checbkoxes (to set text properties)
@@ -205,10 +205,16 @@ int main()
     vboximg->add(new sfw::Image("demo/some image.png"));
 
     // Images from file, cropped
-    vboximg->add(new sfw::Label("Image - crop:"));
+    vboximg->add(new sfw::Label("Image crop:"));
     vboximg->add(new sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
-    vboximg->add(new sfw::Label("Image - var. crop:"));
+    vboximg->add(new sfw::Label("Image crop varied:"));
     vboximg->add(imgCrop = new sfw::Image("demo/SFML logo.png"));
+
+    auto themeTXpanel = hbox->add(new sfw::VBoxLayout());
+
+    // For some insight/diagnostics:
+    themeTXpanel->add(new sfw::Label("Theme textures:"));
+    themeTXpanel->add(new sfw::Image())->setTexture(sfw::Theme::getTexture())->rescale(3); // note: e.g. the ARROW is at {{0, 42}, {6, 6}});
 
 
     // Clear-background checkbox

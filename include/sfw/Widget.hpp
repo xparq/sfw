@@ -94,7 +94,7 @@ protected:
     virtual void onTextEntered(uint32_t unicode);
 
     void setSize(const sf::Vector2f& size);
-    void setSize(float widget, float height);
+    void setSize(float width, float height);
 
 //----------------------
 friend class Layout;

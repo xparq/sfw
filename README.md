@@ -9,11 +9,11 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 
 ## Changes to the original:
 
-- Adapted to the pre-3.0 SFML _("master")_ API. _(See [issue #25](https://github.com/xparq/sfw/issues/25) about minor cosmetic regressions!)_
+- Adapted to the pre-3.0 SFML _("master")_ API. _(See minor cosmetic regressions #25, #97!)_
 - Windows/MSVC build added.
 - Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already).
 - Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow).
-- Cleaner API, new widgets (e.g. (cropped) Image), improvements to existing widgets.
+- Cleaner API, improvements to existing widgets etc.
 - Reshuffled source tree (to help integrating into other projects, to allow growth, to "host" SFML locally).
 
 _For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
@@ -29,7 +29,7 @@ _For other (both planned and completed) changes see the [issues](https://github.
 - No CMake. (Well, that's considered a feature here; use e.g. TGUI if you can't build without CMake.)
 
 
-![screenshot](doc/demo-screenshot.png)
+![screenshot](doc/demo-screenshot-3.png)
 
 
 ## Build

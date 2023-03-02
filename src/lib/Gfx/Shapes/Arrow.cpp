@@ -19,10 +19,12 @@ Arrow::Arrow(Direction direction):
 }
 
 
-void Arrow::setFillColor(const sf::Color& color)
+void Arrow::setFillColor([[maybe_unused]] const sf::Color& color)
 {
-    for (int i = 0; i < 4; ++i)
-        m_vertices[i].color = color;
+//!! -> #97: "...mysterious overpaint with setFillColor"
+//!!
+//!!    for (int i = 0; i < 4; ++i)
+//!!        m_vertices[i].color = color;
 }
 
 
@@ -75,16 +77,16 @@ void Arrow::updateGeometry(float x, float y, Direction direction)
         m_vertices[3].position = sf::Vector2f(x, y);
         break;
     case Left:
-        m_vertices[0].position = sf::Vector2f(x, y + rect.width);
-        m_vertices[1].position = sf::Vector2f(x + rect.height, y + rect.width);
+        m_vertices[0].position = sf::Vector2f(x, y + rect.height);
+        m_vertices[1].position = sf::Vector2f(x + rect.width, y + rect.height);
         m_vertices[2].position = sf::Vector2f(x, y);
-        m_vertices[3].position = sf::Vector2f(x + rect.height, y);
+        m_vertices[3].position = sf::Vector2f(x + rect.width, y);
         break;
     case Right:
-        m_vertices[0].position = sf::Vector2f(x + rect.height, y);
+        m_vertices[0].position = sf::Vector2f(x + rect.width, y);
         m_vertices[1].position = sf::Vector2f(x, y);
-        m_vertices[2].position = sf::Vector2f(x + rect.height, y + rect.width);
-        m_vertices[3].position = sf::Vector2f(x, y + rect.width);
+        m_vertices[2].position = sf::Vector2f(x + rect.width, y + rect.height);
+        m_vertices[3].position = sf::Vector2f(x, y + rect.height);
         break;
     }
     m_direction = direction;
