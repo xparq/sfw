@@ -13,7 +13,7 @@ void VBoxLayout::recomputeGeometry()
         w->setPosition(pos);
         pos.y += w->getSize().y + Theme::MARGIN;
 
-        // Layout's width is the wider widget's width
+        // Layout's width is the widest widget's width
         if (w->getSize().x > size.x)
             size.x = w->getSize().x;
     }

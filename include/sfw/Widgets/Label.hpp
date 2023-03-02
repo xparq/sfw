@@ -13,7 +13,7 @@ namespace sfw
 class Label: public Widget
 {
 public:
-    Label(const sf::String& string = "");
+    explicit Label(const sf::String& string = "");
 
     /**
      * Label's text

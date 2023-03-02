@@ -12,6 +12,7 @@
 #include <SFML/Window/Cursor.hpp>
 
 #include <functional>
+#include <type_traits>
 
 namespace sfw
 {
@@ -57,14 +58,17 @@ public:
     /**
      * Set a function to be called when this widget is triggered
      */
-    template <typename W> W* setCallback(std::function<void()> callback)
-    {
-        m_callback = callback;
-        return (W*)this;
-    }
     template <typename W> W* setCallback(std::function<void(W*)> callback)
+        requires (std::is_base_of_v<Widget, W>)
     {
         m_callback = [this, callback]{ return callback(this); };
+        return (W*)this;
+    }
+
+    template <typename W> W* setCallback(std::function<void()> callback)
+        requires (std::is_base_of_v<Widget, W>)
+    {
+        m_callback = callback;
         return (W*)this;
     }
     // The actual (derived) widgets should then provide specialized variants as:
@@ -77,8 +81,8 @@ public:
     // These are also added here for completeness, and to help client code
     // that uses legacy widgets (via abundant casting...) that still don't have
     // their own specialized API variants (of the templates abobe):
-    Widget* setCallback(std::function<void()> callback);
     Widget* setCallback(std::function<void(Widget*)> callback);
+    Widget* setCallback(std::function<void()> callback);
 
 protected:
     // Callbacks

@@ -3,6 +3,8 @@
 
 #include "sfw/Widget.hpp"
 
+#include <type_traits>
+
 namespace sfw
 {
 
@@ -22,7 +24,8 @@ public:
      * @return added widget
      */
     Widget* add(Widget* widget);
-    template <typename W> W* add(W* widget) { return (W*) (Widget*) add((Widget*)widget); }
+    template <class W> W* add(W* widget) requires (std::is_base_of_v<Widget, W>)
+        { return (W*) (Widget*) add((Widget*)widget); }
 
 protected:
     void draw(const gfx::RenderContext& ctx) const override;

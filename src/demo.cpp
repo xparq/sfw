@@ -65,11 +65,11 @@ int main()
     sfw::GUI demo(window);
     demo.setPosition(10, 10);
 
-    // A horizontal layout to allow multiple subpanels side-by-side
-    auto hbox = demo.add(new sfw::HBoxLayout());
+    // A horizontal layout for multiple panels side-by-side
+    auto main_hbox = demo.add(new sfw::HBoxLayout());
 
-    // A "form" panel (on the left)
-    auto form = hbox->add(new sfw::FormLayout());
+    // A "form" panel on the left
+    auto form = main_hbox->add(new sfw::FormLayout());
 
     // A text box to set the text of the SFML Text object (created above)
     form->addRow("Text",
@@ -126,7 +126,8 @@ int main()
 
     // A cloned options selector (for backgroud color)
     form->addRow("Screen Bgnd. (copied widget)", (new OBColor(*static_cast<OBColor*>(opt)))
-            ->setCallback([&](auto* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
+        ->addItem("Default", hex2color("#e6e8e0"))
+        ->setCallback([&](auto* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
 
     // Checbkoxes (to set text properties)
     form->addRow("Bold text", new sfw::CheckBox([&](auto* w) {
@@ -164,12 +165,12 @@ int main()
                                       ->setCallback([]/*(sfw::SpriteButton* w)*/ { /*compilation test*/ }));
     }
 
-    // Another panel, on th right
-    auto vboxRight = hbox->add(new sfw::VBoxLayout());
+    // A panel in the middle
+    auto middle_panel = main_hbox->add(new sfw::VBoxLayout());
 
     // Theme selection
-    vboxRight->add(new sfw::Label("Change theme:"));
-    vboxRight->add(new sfw::OptionsBox<ThemeCfg>([&](auto* w) {
+    middle_panel->add(new sfw::Label("Change theme:"));
+    middle_panel->add(new sfw::OptionsBox<ThemeCfg>([&](auto* w) {
         auto& theme = w->getSelectedValue();
         sfw::Theme::loadTexture(theme.texturePath);
         sfw::Theme::windowBgColor = theme.backgroundColor;
@@ -178,20 +179,21 @@ int main()
     ->addItem("Default", defaultTheme);
 
     // Textbox for new button labels
-    auto hbox2 = vboxRight->add(new sfw::HBoxLayout());
+    auto hbox2 = middle_panel->add(new sfw::HBoxLayout());
     auto tbButtName = hbox2->add(new sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-    hbox2->add(new sfw::Button("Create button", [&] { vboxRight->add(new sfw::Button(tbButtName->getText())); }));
+    hbox2->add(new sfw::Button("Create button", [&] { middle_panel->add(new sfw::Button(tbButtName->getText())); }));
 
     // Static images (also a cropped one)
 
     // Slider & progress bar for crop size
     sfw::Image* imgCrop = nullptr; // Hold your breath, see it created below!
-    auto hbox3 = vboxRight->add(new sfw::HBoxLayout());
+    auto hbox3 = middle_panel->add(new sfw::HBoxLayout());
     hbox3->add(new sfw::Label("Crop square size:"));
     auto pbar = new sfw::ProgressBar(40);
     hbox3->add(pbar);
-    // Slider for crop size
-    hbox->add((new sfw::Slider(1.f, 100, sfw::Vertical))->setCallback([&](auto* w) {
+
+    // Slider for crop size (it shouldn't just be put here, kinda dangling on its own, but well...)
+    hbox3->add((new sfw::Slider(1.f, 100, sfw::Vertical))->setCallback([&](auto* w) {
         pbar->setValue(w->getValue());
         // Show the slider value in a text box:
         textbox->setText(to_string((int)w->getValue()));
@@ -200,7 +202,7 @@ int main()
     }));
 
     // Image directly from file
-    auto vboximg = hbox->add(new sfw::VBoxLayout());
+    auto vboximg = main_hbox->add(new sfw::VBoxLayout());
     vboximg->add(new sfw::Label("Image:"));
     vboximg->add(new sfw::Image("demo/some image.png"));
 
@@ -210,17 +212,19 @@ int main()
     vboximg->add(new sfw::Label("Image crop varied:"));
     vboximg->add(imgCrop = new sfw::Image("demo/SFML logo.png"));
 
-    auto themeTXpanel = hbox->add(new sfw::VBoxLayout());
+    auto right_bar = main_hbox->add(new sfw::VBoxLayout());
 
     // For some insight/diagnostics:
-    themeTXpanel->add(new sfw::Label("Theme textures:"));
-    themeTXpanel->add(new sfw::Image())->setTexture(sfw::Theme::getTexture())->rescale(3); // note: e.g. the ARROW is at {{0, 42}, {6, 6}});
+    right_bar->add(new sfw::Label("Theme textures:"));
+    right_bar->add(new sfw::Image())->setTexture(sfw::Theme::getTexture())->rescale(3); // note: e.g. the ARROW is at {{0, 42}, {6, 6}});
 
 
     // Clear-background checkbox
     auto hbox4 = demo.add(new sfw::HBoxLayout());
     hbox4->add(new sfw::Label("Clear background"));
     hbox4->add(new sfw::CheckBox([&](auto* w) { clear_bgnd = w->isChecked(); }, true));
+
+    //form->add("This is just some text on its own."); // Shouldn't compile!
 
     // Exit button
     demo.add(new sfw::Button("Quit", [&] { window.close(); }));
