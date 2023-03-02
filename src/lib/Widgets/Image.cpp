@@ -69,6 +69,8 @@ Image* Image::setCropRect(const sf::IntRect& r)
     if (width  > m_texture.getSize().x) width  = (float)m_texture.getSize().x;
     if (height > m_texture.getSize().y) height = (float)m_texture.getSize().y;
 
+    m_baseSize = {width, height};
+
     // Set texture crop "window" rect
     m_vertices[0].texCoords = sf::Vector2f(left, top);
     m_vertices[1].texCoords = sf::Vector2f(left, top + height);
@@ -97,9 +99,19 @@ void Image::updateGeometry(float left, float top, float right, float bottom)
 }
 
 
+Image* Image::scale(float factor)
+{
+    m_scalingFactor = factor;
+    setSize(m_baseSize * m_scalingFactor);
+    updateGeometry(0, 0, getSize().x, getSize().y);
+    return this;
+}
+
+
 Image* Image::rescale(float factor)
 {
-    setSize(getSize() * factor);
+    m_scalingFactor *= factor;
+    setSize(getSize() * m_scalingFactor);
     updateGeometry(0, 0, getSize().x, getSize().y);
     return this;
 }

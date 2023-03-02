@@ -88,9 +88,9 @@ int main()
 
     // Slider + progress bars for rotating the text
     auto sliderForRotation = new sfw::Slider(1.f); // step = 1
-    auto pbarRotation1 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
-    auto pbarRotation2 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
-    auto pbarRotation3 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
+        auto pbarRotation1 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
+        auto pbarRotation2 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
+        auto pbarRotation3 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
     sliderForRotation->setCallback([&](auto* w) {
         text.setRotation(sf::degrees(w->getValue() * 360 / 100.f));
         pbarRotation1->setValue(w->getValue());
@@ -99,19 +99,17 @@ int main()
     });
     form->addRow("Rotation", sliderForRotation);
 
-    // Slider + progress bars for scaling the text
-    auto sliderForSize = new sfw::Slider();
+    // Slider + progress bars for scaling the text (in the denser, more "functional" code style)
     auto pbarScale1 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelNone);
     auto pbarScale2 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOver);
     auto pbarScale3 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
-    sliderForSize->setCallback([&](auto* w) {
+    form->addRow("Scale", (new sfw::Slider())->setCallback([&](auto* w) {
         float scale = 1 + w->getValue() * 2 / 100.f;
         text.setScale({scale, scale});
         pbarScale1->setValue(w->getValue());
         pbarScale2->setValue(w->getValue());
         pbarScale3->setValue(w->getValue());
-    });
-    form->addRow("Scale", sliderForSize);
+    }));
 
     // Options selector for color
     using OBColor = sfw::OptionsBox<sf::Color>;
@@ -193,7 +191,7 @@ int main()
     hbox3->add(pbar);
 
     // Slider for crop size (it shouldn't just be put here, kinda dangling on its own, but well...)
-    hbox3->add((new sfw::Slider(1.f, 100, sfw::Vertical))->setCallback([&](auto* w) {
+    hbox3->add((new sfw::Slider(1.f, 100.f, sfw::Vertical))->setCallback([&](auto* w) {
         pbar->setValue(w->getValue());
         // Show the slider value in a text box:
         textbox->setText(to_string((int)w->getValue()));
@@ -216,8 +214,14 @@ int main()
 
     // For some insight/diagnostics:
     right_bar->add(new sfw::Label("Theme textures:"));
-    right_bar->add(new sfw::Image())->setTexture(sfw::Theme::getTexture())->rescale(3); // note: e.g. the ARROW is at {{0, 42}, {6, 6}});
-
+    auto txbox = right_bar->add(new sfw::HBoxLayout());
+    auto tximg = new sfw::Image(sfw::Theme::getTexture()); // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
+    txbox->add((new sfw::Slider(1.f, 100.f, sfw::Vertical))
+                ->setCallback([&](auto* w) { tximg->scale(1 + (100.f - w->getValue()) / 25.f); })
+                ->setStep(25.f)->setValue(75.f)
+    );
+    tximg->scale(2);
+    txbox->add(tximg);
 
     // Clear-background checkbox
     auto hbox4 = demo.add(new sfw::HBoxLayout());

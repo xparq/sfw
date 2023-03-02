@@ -65,10 +65,11 @@ float Slider::getStep() const
 }
 
 
-void Slider::setStep(float step)
+Slider* Slider::setStep(float step)
 {
     if (step > 0 && step < 100)
         m_step = step;
+    return this;
 }
 
 
@@ -78,7 +79,7 @@ float Slider::getValue() const
 }
 
 
-void Slider::setValue(float value)
+Slider* Slider::setValue(float value)
 {
     // Ensure value is in bounds
     if (value < 0)
@@ -100,6 +101,7 @@ void Slider::setValue(float value)
         // Move the handle on the slider
         updateHandlePosition();
     }
+    return this;
 }
 
 

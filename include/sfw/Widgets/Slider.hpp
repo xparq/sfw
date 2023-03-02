@@ -23,15 +23,15 @@ public:
     /**
      * Define the amount of units to change the slider when adjusting by drag and drop
      */
-    void setStep(float step);
+    Slider* setStep(float step);
 
     float getValue() const;
 
-    void setValue(float value);
+    Slider* setValue(float value);
 
     // See Widget.hpp for the templates of these:
-    Slider* setCallback(std::function<void()> callback)         { return Widget::setCallback<Slider>(callback); }
     Slider* setCallback(std::function<void(Slider*)> callback);
+    Slider* setCallback(std::function<void()> callback)         { return Widget::setCallback<Slider>(callback); }
 
 protected:
     // Callbacks

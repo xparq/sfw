@@ -58,14 +58,14 @@ public:
     /**
      * Set a function to be called when this widget is triggered
      */
-    template <typename W> W* setCallback(std::function<void(W*)> callback)
+    template <class W> W* setCallback(std::function<void(W*)> callback)
         requires (std::is_base_of_v<Widget, W>)
     {
         m_callback = [this, callback]{ return callback(this); };
         return (W*)this;
     }
 
-    template <typename W> W* setCallback(std::function<void()> callback)
+    template <class W> W* setCallback(std::function<void()> callback)
         requires (std::is_base_of_v<Widget, W>)
     {
         m_callback = callback;

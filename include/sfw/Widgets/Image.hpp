@@ -33,6 +33,9 @@ public:
     Image* setCropRect(const sf::IntRect& r);
     sf::IntRect getCropRect() const;
 
+    Image* scale(float factor);
+    float  scale() const { return m_scalingFactor; }
+    // Relative scaling based on the current size, not the original
     Image* rescale(float factor);
 
     Image* setColor(const sf::Color& color);
@@ -44,6 +47,9 @@ private:
 
     sf::Vertex m_vertices[4];
     sf::Texture m_texture;
+
+    float m_scalingFactor = 1.f;
+    sf::Vector2f m_baseSize;
 };
 
 } // namespace
