@@ -1,6 +1,9 @@
 #include "sfw/Layouts/HBoxLayout.hpp"
 #include "sfw/Theme.hpp"
 
+#include <iostream>
+using namespace std;
+
 namespace sfw
 {
 
@@ -19,6 +22,12 @@ void HBoxLayout::recomputeGeometry()
     }
     size.x = pos.x - Theme::MARGIN;
     Widget::setSize(size);
+}
+
+
+void HBoxLayout::onThemeChanged()
+{
+cerr << "HB" << endl;
 }
 
 } // namespace

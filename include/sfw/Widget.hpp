@@ -3,7 +3,8 @@
 
 #include "sfw/WidgetState.hpp"
 #include "sfw/Gfx/Render.hpp"
-//!!#include "sfw/Layout.hpp" // See forw. decl. below instead...
+//!!#include "sfw/Layout.hpp"   // See forw. decl. below instead...
+//!!#include "sfw/GUI-main.hpp" // See forw. decl. below instead...
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -17,6 +18,7 @@
 namespace sfw
 {
 class Layout;
+class GUI;
 
 /**
  * Abstract base class for gui widgets
@@ -25,6 +27,7 @@ class Widget: public gfx::Drawable
 {
 public:
     Widget();
+    virtual ~Widget() {}
 
     /**
      * Widget's position
@@ -96,11 +99,13 @@ protected:
     virtual void onKeyPressed(const sf::Event::KeyEvent& key);
     virtual void onKeyReleased(const sf::Event::KeyEvent& key);
     virtual void onTextEntered(uint32_t unicode);
+    virtual void onThemeChanged();
 
     void setSize(const sf::Vector2f& size);
     void setSize(float width, float height);
 
 //----------------------
+friend class GUI;
 friend class Layout;
 friend class FormLayout;
 friend class HBoxLayout;
@@ -128,11 +133,11 @@ friend class VBoxLayout;
 
     void centerText(sf::Text& text);
 
-    virtual void recomputeGeometry() {};
+    virtual void recomputeGeometry() {}
 
     const sf::Transform& getTransform() const;
 
-    virtual void setMouseCursor(sf::Cursor::Type cursor);
+    virtual GUI* rootWidget();
 
 #ifdef DEBUG
     void draw_outline(const gfx::RenderContext& ctx) const;

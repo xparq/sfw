@@ -2,8 +2,15 @@
 
 #include "sfw/Theme.hpp"
 #include "sfw/util/shims.hpp"
+#include "sfw/GUI-main.hpp"
 
 #include "SFML/Graphics/RenderTarget.hpp"
+
+#include <cassert>
+#include <string>
+    using std::string, std::to_string;
+#include <iostream>
+using namespace std;
 
 namespace sfw
 {
@@ -44,6 +51,17 @@ Widget* Layout::add(Widget* widget)
         widget->m_previous = m_last;
         m_last = widget;
     }
+
+//cerr << (size_t)(void*)rootWidget() << endl;
+cerr << to_string((size_t)(void*)widget) << endl;
+cerr << (size_t)this << ": rootWidget == " << (size_t)rootWidget() << endl;
+//cerr << this << ": empty?" << rootWidget()->widgets.empty() << endl;
+//try {
+//    assert(rootWidget()->widgets.empty()); //->widgets["x"] = widget;
+//} catch (...) {
+//    cerr << "WTF?!\n";
+//}
+
     recomputeGeometry();
     return widget;
 }

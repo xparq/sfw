@@ -1,5 +1,7 @@
 #include "sfw/Widget.hpp"
 #include "sfw/Layout.hpp"
+#include "sfw/GUI-main.hpp"
+
 #include <cmath>
 
 #ifdef DEBUG
@@ -162,6 +164,15 @@ void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
 #endif
 
 
+GUI* Widget::rootWidget()
+{
+    if (m_parent)
+        return m_parent->rootWidget();
+    return dynamic_cast<GUI*>(this);
+}
+
+/*    virtual void setMouseCursor(sf::Cursor::Type cursor);
+
 void Widget::setMouseCursor(sf::Cursor::Type cursor)
 {
     // Propagate the request to the parent, until it reaches the top-level widget (Main),
@@ -169,7 +180,7 @@ void Widget::setMouseCursor(sf::Cursor::Type cursor)
     if (m_parent)
         m_parent->setMouseCursor(cursor);
 }
-
+*/
 
 void Widget::centerText(sf::Text& text)
 {
@@ -190,5 +201,7 @@ void Widget::onMouseWheelMoved(int) { }
 void Widget::onKeyPressed(const sf::Event::KeyEvent&) { }
 void Widget::onKeyReleased(const sf::Event::KeyEvent&) { }
 void Widget::onTextEntered(uint32_t) { }
+void Widget::onThemeChanged() { }
+
 
 } // namespace

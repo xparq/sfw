@@ -1,6 +1,7 @@
 #ifndef GUI_MAIN_HPP
 #define GUI_MAIN_HPP
 
+#include "sfw/Theme.hpp"
 #include "sfw/Gfx/Render.hpp"
 #include "sfw/Layouts/VBoxLayout.hpp"
 
@@ -8,6 +9,8 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Cursor.hpp>
+
+#include <map>
 
 namespace sfw
 {
@@ -19,12 +22,21 @@ namespace sfw
 class GUI: public VBoxLayout
 {
 public:
-    GUI(sf::RenderWindow& window);
+    GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg);
+
+    bool setTheme(const sfw::Theme::Cfg& themeCfg);
 
     void process(const sf::Event& event);
     void render();
 
+    /**
+     * Update the cursor type on the RenderWindow
+     */
+    void setMouseCursor(sf::Cursor::Type cursorType);
+
 private:
+    GUI* rootWidget() override { return this; }
+
     /**
      * Get mouse cursor relative position
      * @param x: absolute x position from the event
@@ -33,13 +45,13 @@ private:
      */
     sf::Vector2f convertMousePosition(int x, int y) const;
 
-    /**
-     * Update the cursor type on the RenderWindow
-     */
-    void setMouseCursor(sf::Cursor::Type cursorType) override;
-
     sf::RenderWindow& m_window;
-    sf::Cursor::Type m_cursorType;
+    sfw::Theme::Cfg m_themeCfg;
+
+    sf::Cursor::Type m_cursorType; // Current mouse pointer shape
+
+public:
+    std::map<std::string, Widget*> widgets;
 };
 
 } // namespace

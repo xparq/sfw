@@ -11,9 +11,9 @@ namespace sfw
  */
 class HBoxLayout: public Layout
 {
-public:
-private:
+protected:
     void recomputeGeometry() override;
+    void onThemeChanged() override;
 };
 
 } // namespace

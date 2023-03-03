@@ -3,6 +3,24 @@
 namespace sfw
 {
 
+const char* Theme::Cfg::basePath = "asset/";
+
+bool Theme::Cfg::apply() const
+{
+    if (!sfw::Theme::loadFont(std::string(basePath) + (!fontPath ? "verdana.ttf" : fontPath)))
+    {
+        return false; // SFML has already explained the situation...
+    }
+    if (!texturePath || !sfw::Theme::loadTexture(std::string(basePath) + texturePath))
+    {
+        return false; // SFML has already explained the situation...
+    }
+    sfw::Theme::windowBgColor = bgColor;
+    sfw::Theme::textSize = (textSize > 0 ? textSize : 11); // Set after loadTexture, as it would reset this.
+    return true;
+}
+
+
 static sf::Cursor& getDefaultCursor()
 {
     static sf::Cursor cursor;

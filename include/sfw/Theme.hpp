@@ -13,10 +13,30 @@
 
 namespace sfw
 {
-
 class Theme
 {
 public:
+
+    // Quick-And-Dirty Theme Config Pack
+    // -- will gradually encompass the entire Theme class,
+    //    by moving from static Theme data to config objects...
+    //    This is the initial version to support the Demo app.
+    struct Cfg
+    {
+        static const char* basePath; // default: "asset/"
+
+        const char* name = "(unnamed)";
+        sf::Color bgColor = sf::Color::Black;
+        const char* texturePath = nullptr;
+        const char* fontPath = nullptr;
+        size_t textSize = 0;
+
+    protected:
+        friend class GUI;
+	bool apply() const;
+    };
+
+
     /**
      * Load the GUI global font
      */
@@ -60,7 +80,7 @@ public:
 
     static sf::Color windowBgColor;
     static bool clearWindow;
-    static int borderSize;
+    static int borderSize; // Recalculated by applying a new theme (so no use setting it usually)
     static int minWidgetWidth;
 
     static float PADDING; // Spacing inside widget

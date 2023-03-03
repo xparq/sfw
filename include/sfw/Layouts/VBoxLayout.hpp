@@ -11,8 +11,9 @@ namespace sfw
  */
 class VBoxLayout: public Layout
 {
-private:
+protected:
     void recomputeGeometry() override;
+    void onThemeChanged() override;
 };
 
 } // namespace

@@ -21,8 +21,9 @@ public:
      */
     Widget* addRow(const sf::String& label, Widget* widget);
 
-private:
+protected:
     void recomputeGeometry() override;
+    void onThemeChanged() override;
 
     float m_labelWidth;
 };

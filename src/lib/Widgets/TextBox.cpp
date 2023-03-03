@@ -1,5 +1,6 @@
 #include "sfw/Widgets/TextBox.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/GUI-main.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/OpenGL.hpp>
@@ -343,13 +344,13 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void TextBox::onMouseEnter()
 {
-    setMouseCursor(sf::Cursor::Text);
+    rootWidget()->setMouseCursor(sf::Cursor::Text);
 }
 
 
 void TextBox::onMouseLeave()
 {
-    setMouseCursor(sf::Cursor::Arrow);
+    rootWidget()->setMouseCursor(sf::Cursor::Arrow);
 }
 
 

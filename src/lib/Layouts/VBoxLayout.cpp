@@ -1,6 +1,9 @@
 #include "sfw/Layouts/VBoxLayout.hpp"
 #include "sfw/Theme.hpp"
 
+#include <iostream>
+using namespace std;
+
 namespace sfw
 {
 
@@ -19,6 +22,12 @@ void VBoxLayout::recomputeGeometry()
     }
     size.y = pos.y - Theme::MARGIN;
     Widget::setSize(size);
+}
+
+
+void VBoxLayout::onThemeChanged()
+{
+cerr << "VB" << endl;
 }
 
 } // namespace

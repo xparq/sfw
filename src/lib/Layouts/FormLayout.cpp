@@ -2,12 +2,22 @@
 #include "sfw/Theme.hpp"
 #include "sfw/Widgets/Label.hpp"
 
+#include <iostream>
+using namespace std;
+
 namespace sfw
 {
 
 FormLayout::FormLayout():
     m_labelWidth(0.f)
 {
+}
+
+
+void FormLayout::onThemeChanged()
+{
+cerr << "Form" << endl;
+    m_labelWidth = 0;
 }
 
 
