@@ -5,6 +5,8 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/OpenGL.hpp>
 
+#include <algorithm>
+    //using std::max;
 #include <functional>
 
 //#include <iostream> //!DEBUG

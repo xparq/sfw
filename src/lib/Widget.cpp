@@ -166,21 +166,9 @@ void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
 
 GUI* Widget::rootWidget()
 {
-    if (m_parent)
-        return m_parent->rootWidget();
-    return dynamic_cast<GUI*>(this);
+    return m_parent ? m_parent->rootWidget() : (GUI*)this;
 }
 
-/*    virtual void setMouseCursor(sf::Cursor::Type cursor);
-
-void Widget::setMouseCursor(sf::Cursor::Type cursor)
-{
-    // Propagate the request to the parent, until it reaches the top-level widget (Main),
-    // which is the only one that can change the mouse cursor, via the SFML RenderWindow.
-    if (m_parent)
-        m_parent->setMouseCursor(cursor);
-}
-*/
 
 void Widget::centerText(sf::Text& text)
 {

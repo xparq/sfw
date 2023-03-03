@@ -1,6 +1,9 @@
 #include "sfw/Widgets/Button.hpp"
 #include "sfw/Theme.hpp"
 
+#include <algorithm>
+    //using std::max;
+
 namespace sfw
 {
 

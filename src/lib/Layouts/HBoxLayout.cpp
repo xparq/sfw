@@ -1,6 +1,8 @@
 #include "sfw/Layouts/HBoxLayout.hpp"
 #include "sfw/Theme.hpp"
 
+#include <algorithm>
+    using std::max;
 #include <iostream>
 using namespace std;
 
@@ -9,8 +11,8 @@ namespace sfw
 
 void HBoxLayout::recomputeGeometry()
 {
-    sf::Vector2f pos;
-    sf::Vector2f size;
+    sf::Vector2f pos{};
+    sf::Vector2f size{};
     for (Widget* w = getFirstWidget(); w != nullptr; w = w->m_next)
     {
         w->setPosition(pos);
@@ -20,7 +22,7 @@ void HBoxLayout::recomputeGeometry()
         if (w->getSize().y > size.y)
             size.y = w->getSize().y;
     }
-    size.x = pos.x - Theme::MARGIN;
+    size.x = max(0.f, pos.x - Theme::MARGIN);
     Widget::setSize(size);
 }
 

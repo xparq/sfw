@@ -137,7 +137,8 @@ friend class VBoxLayout;
 
     const sf::Transform& getTransform() const;
 
-    virtual GUI* rootWidget();
+    GUI* rootWidget();
+//!!??bad:    virtual GUI* rootWidget();
 
 #ifdef DEBUG
     void draw_outline(const gfx::RenderContext& ctx) const;

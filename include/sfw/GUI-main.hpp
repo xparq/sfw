@@ -35,7 +35,7 @@ public:
     void setMouseCursor(sf::Cursor::Type cursorType);
 
 private:
-    GUI* rootWidget() override { return this; }
+//!!DOESN'T HELP:    GUI* rootWidget() override { return this; }
 
     /**
      * Get mouse cursor relative position

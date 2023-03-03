@@ -14,6 +14,8 @@ GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg):
     m_cursorType(sf::Cursor::Arrow) //!! Might depend on the theme config in the future
 {
     widgets["/"] = this;
+cerr << (size_t)this << ": parent " << m_parent << endl; //->widgets.size() << endl;
+//cerr << (size_t)this << ": MAP INIT " << rootWidget() << endl; //->widgets.size() << endl;
 
     setTheme(m_themeCfg);
 }

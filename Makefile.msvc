@@ -93,7 +93,7 @@ CC_FLAGS_DEBUG_0=-MD -O2 -DNDEBUG
 # These -O...s below are taken from Dr. Memory's README/Quick start...:
 CC_FLAGS_DEBUG_1=-MDd -Zi -Oy- -Ob0 -DDEBUG
 LINK_FLAGS_DEBUG_0=
-LINK_FLAGS_DEBUG_1=-debug -ignore:4099
+LINK_FLAGS_DEBUG_1=-debug -incremental -editandcontinue -ignore:4099
 
 !if defined(DEBUG) && $(DEBUG) == 1
 CC_FLAGS_DEBUGMODE=$(CC_FLAGS_DEBUG_1)

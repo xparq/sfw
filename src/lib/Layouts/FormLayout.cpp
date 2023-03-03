@@ -2,6 +2,8 @@
 #include "sfw/Theme.hpp"
 #include "sfw/Widgets/Label.hpp"
 
+#include <algorithm>
+    //using std::max;
 #include <iostream>
 using namespace std;
 

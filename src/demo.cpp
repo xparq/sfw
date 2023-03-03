@@ -4,6 +4,7 @@
 
 #include <string> // to_string
 #include <iostream> // cerr, for errors
+#include <cassert>
 using namespace std;
 
 int main()
@@ -137,10 +138,14 @@ int main()
 
     // Attach the vert. progress bars (used for text scaling) to a new box
     auto layoutForVerticalProgressBars = new sfw::HBoxLayout();
+//!!FIXME:
+//!!UNowned layouts are dysfunctional!!!
+    form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
     layoutForVerticalProgressBars->add(pbarScale1);
     layoutForVerticalProgressBars->add(pbarScale2);
     layoutForVerticalProgressBars->add(pbarScale3);
-    form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
+
+//    form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
 
     form->addRow("Default button", new sfw::Button("button"));
 

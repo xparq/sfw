@@ -69,7 +69,7 @@ void Label::draw(const gfx::RenderContext& ctx) const
 
 void Label::onThemeChanged()
 {
-cerr << "Label" << endl;
+cerr << "Label" << endl;//!!
     m_text.setFont(Theme::getFont());
     m_text.setPosition({Theme::PADDING, Theme::PADDING});
     m_text.setFillColor(Theme::click.textColor);

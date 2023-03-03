@@ -6,10 +6,10 @@
 
 #include "SFML/Graphics/RenderTarget.hpp"
 
-#include <cassert>
 #include <string>
     using std::string, std::to_string;
 #include <iostream>
+#include <cassert>
 using namespace std;
 
 namespace sfw
@@ -52,10 +52,24 @@ Widget* Layout::add(Widget* widget)
         m_last = widget;
     }
 
+GUI* root = rootWidget();
+if (!root) root = (GUI*)this;
+
+    assert(this != nullptr);
+    assert(root != nullptr);
+    assert(widget != nullptr);
+
 //cerr << (size_t)(void*)rootWidget() << endl;
-cerr << to_string((size_t)(void*)widget) << endl;
-cerr << (size_t)this << ": rootWidget == " << (size_t)rootWidget() << endl;
-//cerr << this << ": empty?" << rootWidget()->widgets.empty() << endl;
+cerr << "add(widget* == " << to_string((size_t)(void*)widget) << ")" << endl;
+cerr << (size_t)this << ": root == " << (size_t)root << endl;
+cerr << (size_t)this << ": MAP CHK in generic Layout: " << root->widgets.size() << endl;
+cerr << "[\""<<to_string((size_t)(void*)widget) <<"\"]"<< " <- " <<(size_t)widget <<endl;
+
+//!!EXCEPTION!:
+//!!??root->widgets["x"] = nullptr;
+//!!??root->widgets.insert({to_string((size_t)(void*)widget), widget});
+root->widgets.insert({string{}, widget});
+
 //try {
 //    assert(rootWidget()->widgets.empty()); //->widgets["x"] = widget;
 //} catch (...) {
