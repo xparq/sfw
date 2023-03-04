@@ -51,12 +51,13 @@ Widget* Layout::add(Widget* widget, [[maybe_unused]] const std::string& name)
         m_last = widget;
     }
 
-//!! Not in this version just yet:
-//!!    GUI* Main = GUIMain();
-//!!    if (Main != nullptr)
-//!!        Main->remember(name.empty() ? to_string((size_t)(void*)widget) : name, widget);
+    if (GUI* Main = getMain(); Main != nullptr)
+    {
+        Main->remember(name.empty() ? to_string((size_t)(void*)widget) : name, widget);
+    }
 
     recomputeGeometry();
+
     return widget;
 }
 

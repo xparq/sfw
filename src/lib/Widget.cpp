@@ -1,5 +1,8 @@
 #include "sfw/Widget.hpp"
 #include "sfw/Layout.hpp"
+#include "sfw/GUI-main.hpp"
+
+#include <cassert>
 #include <cmath>
 
 #ifdef DEBUG
@@ -18,6 +21,32 @@ Widget::Widget():
 {
 }
 
+
+bool Widget::isRoot()
+{
+    return getParent() == nullptr || getParent() == this;
+}
+
+
+bool Widget::isMain()
+{
+    if (getParent() == this) assert(isRoot());
+    return getParent() == this;
+}
+
+
+Widget* Widget::getRoot()
+{
+    return !isMain() && getParent() ? getParent()->getRoot() : (GUI*)this;
+}
+
+
+GUI* Widget::getMain()
+{
+    // Well, it's halfway between "undefined" and "bug" to call this on free-standing widgets...
+    assert(       getParent() && getParent() != this ? getParent()->getRoot() : getParent());
+    return (GUI*)(getParent() && getParent() != this ? getParent()->getRoot() : getParent());
+}
 
 void Widget::setPosition(const sf::Vector2f& pos)
 {
@@ -49,6 +78,10 @@ sf::Vector2f Widget::getAbsolutePosition() const
     {
         position.x += parent->m_position.x;
         position.y += parent->m_position.y;
+
+        //! Must also check for isMain() now to avoid infinite looping on parent->parent == parent!
+        //! And we can't just add this to the for cond. either, as that would skip the last offset of the Main obj itself... :-/
+        if (parent->isMain()) break;
     }
     return position;
 }
@@ -57,10 +90,10 @@ sf::Vector2f Widget::getAbsolutePosition() const
 void Widget::setSize(const sf::Vector2f& size)
 {
     m_size = size;
-    if (m_parent != nullptr)
+    onResized();
+    if (!isRoot())
     {
-        Widget* parent = m_parent;
-        parent->recomputeGeometry();
+        m_parent->recomputeGeometry();
     }
 }
 
@@ -162,15 +195,6 @@ void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
 #endif
 
 
-void Widget::setMouseCursor(sf::Cursor::Type cursor)
-{
-    // Propagate the request to the parent, until it reaches the top-level widget (Main),
-    // which is the only one that can change the mouse cursor, via the SFML RenderWindow.
-    if (m_parent)
-        m_parent->setMouseCursor(cursor);
-}
-
-
 void Widget::centerText(sf::Text& text)
 {
     sf::FloatRect r = text.getLocalBounds();
@@ -191,5 +215,6 @@ void Widget::onKeyPressed(const sf::Event::KeyEvent&) { }
 void Widget::onKeyReleased(const sf::Event::KeyEvent&) { }
 void Widget::onTextEntered(uint32_t) { }
 void Widget::onThemeChanged() { }
+void Widget::onResized() { }
 
 } // namespace

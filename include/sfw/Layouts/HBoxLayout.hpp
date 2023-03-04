@@ -11,8 +11,6 @@ namespace sfw
  */
 class HBoxLayout: public Layout
 {
-public:
-private:
     void recomputeGeometry() override;
 };
 

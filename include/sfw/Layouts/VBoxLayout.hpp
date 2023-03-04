@@ -11,7 +11,6 @@ namespace sfw
  */
 class VBoxLayout: public Layout
 {
-private:
     void recomputeGeometry() override;
 };
 

@@ -4,6 +4,7 @@
 #include "sfw/WidgetState.hpp"
 #include "sfw/Gfx/Render.hpp"
 //!!#include "sfw/Layout.hpp" // See forw. decl. below instead...
+//!!#include "sfw/GUI-main.hpp" // See forw. decl. below instead...
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -17,6 +18,7 @@
 namespace sfw
 {
 class Layout;
+class GUI;
 
 /**
  * Abstract base class for gui widgets
@@ -28,17 +30,12 @@ public:
     virtual ~Widget() {}
 
     /**
-     * Widget's position
+     * Widget position
      */
     void setPosition(const sf::Vector2f& pos);
     void setPosition(float x, float y);
     const sf::Vector2f& getPosition() const;
 
-    sf::Vector2f getAbsolutePosition() const;
-
-    /**
-     * Get widget's dimensions
-     */
     const sf::Vector2f& getSize() const;
 
     /**
@@ -51,9 +48,6 @@ public:
      */
     bool isSelectable() const;
 
-    /**
-     * Check if the widget is currently focused
-     */
     bool isFocused() const;
 
     /**
@@ -98,9 +92,16 @@ protected:
     virtual void onKeyReleased(const sf::Event::KeyEvent& key);
     virtual void onTextEntered(uint32_t unicode);
     virtual void onThemeChanged();
+    virtual void onResized();
 
     void setSize(const sf::Vector2f& size);
     void setSize(float width, float height);
+
+    sf::Vector2f getAbsolutePosition() const;
+
+    const sf::Transform& getTransform() const;
+
+    void centerText(sf::Text& text);
 
 //----------------------
 friend class GUI;
@@ -110,33 +111,63 @@ friend class HBoxLayout;
 friend class VBoxLayout;
 //----------------------
 
-    void setSelectable(bool selectable);
+    virtual void recomputeGeometry() {} // Can be requested by friend widgets, too
 
     void triggerCallback();
 
     void setState(WidgetState state);
     WidgetState getState() const;
 
+    void setSelectable(bool selectable);
+
     /**
-     * Set the widget's container (parent)
+     * Get the widget typed as a Layout, if applicable
+     * Used to check if the widget is a container (Layout and its subclasses)
+     */
+    virtual Layout* toLayout() { return nullptr; }
+
+    /**
+     * Set the parent (container) of the widget
      */
     void setParent(Layout* parent);
     Layout* getParent() { return m_parent; }
 
     /**
-     * Get the widget typed as a Layout if applicable
-     * Used to check if the widget is a container (Layout and its subclasses)
+     * Is this a root widget?
+     * Root widgets are those that have no parent (e.g. newly created containers
+     * that have not yet been attached to the GUI).
      */
-    virtual Layout* toLayout() { return nullptr; }
+    bool isRoot();
 
-    void centerText(sf::Text& text);
+    /**
+     * The "root" of a widget is a parent that has no parent.
+     * It can also be the Main GUI object, if its parent is set to itself.
+     * Note: free-standing ("dangling") widgets (those that have been created
+     * but not yet attached to the GUI, have a root, but not a Main object.
+     */
+    Widget* getRoot();
 
-    const sf::Transform& getTransform() const;
+    /**
+     * Is this the main GUI widget?
+     */
+    bool isMain();
 
-    virtual void setMouseCursor(sf::Cursor::Type cursor);
+    /**
+     * Get the main GUI widget
+     * (or null for free-standing widgets that have not yet been attached
+     * to the GUI; but avoid that, as it will be considered invalid later!)
+     */
+    GUI* getMain();
 
 private:
-    virtual void recomputeGeometry() {};
+    /**
+     * Widgets that are also Layouts would iterate their children via this
+     * interface. The reason this is defined here in Widget, not there, is:
+     *   a) parents of Widgets & Layouts shouldn't care about the difference,
+     *   b) Widget types other than Layout may have children in the future.
+     * The traversal is recursive (not just a single-level iteration).
+     */
+    virtual void traverseChildren(std::function<void(Widget*)> f) { f(this); }
 
     Layout* m_parent;
     Widget* m_previous;

@@ -6,8 +6,8 @@ namespace sfw
 
 void VBoxLayout::recomputeGeometry()
 {
-    sf::Vector2f pos;
-    sf::Vector2f size;
+    sf::Vector2f pos{};
+    sf::Vector2f size{};
     for (Widget* w = getFirstWidget(); w != nullptr; w = w->m_next)
     {
         w->setPosition(pos);

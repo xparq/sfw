@@ -163,7 +163,7 @@ int main()
         const auto& themecfg = w->getSelectedValue();
         demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
     });
-    for (auto& t : themes) { themeselect->addItem(t.name, t); }
+    for (auto& t: themes) { themeselect->addItem(t.name, t); }
     themeselect->selectItem(DEFAULT_THEME);
     middle_panel->add(themeselect);
 

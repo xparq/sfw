@@ -9,18 +9,16 @@ namespace sfw
 
 GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg):
     m_window(window),
-    m_themeCfg(themeCfg),
-    m_cursorType(sf::Cursor::Arrow) //!! Might depend on the theme config in the future
+    m_themeCfg(themeCfg)
 {
-//!!Not in this version yet! It would break everything that assumes "parent==null is root"!
-//!!
-//!!    // "Officially" mark this object as the "Main" in the GUI Widget tree:
-//!!    m_parent = this;
+    // "Officially" mark this object as the "Main" in the GUI Widget tree:
+    m_parent = this;
 
     // Also register ourselves to our own widget registry, "just for completeness":
     widgets["/"] = this;
 
     setTheme(m_themeCfg);
+    m_cursorType = sf::Cursor::Arrow; //!! Should also be done by setTeheme the future
 }
 
 
@@ -90,12 +88,14 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
     {
         const_cast<Widget*>(w)->onThemeChanged();
     }
-    //!!This could be redundant, ideally: onThemeChanged would make widgets setSize() themselves
-    //!!(+ do their own recomputeGeometry) as needed, which (Widget::setSize) would in turn call
-    //!!the parent's recomputeGeometry)!
+    //!!This should be redundant: onThemeChanged would make widgets setSize() themselves
+    //!!(+ do their own onResized) as needed, which (Widget::setSize) would in turn also
+    //!!request the parent's recomputeGeometry)!
+    //!!(NOTE: there are ample chances of infinite looping here (some of which I have duly
+    //!!explored already...)!)
     //for (auto& [name, cw] : widgets)
     //{
-    //    const_cast<Widget*>(cw)->recomputeGeometry();
+    //    const_cast<Widget*>(cw)->onResized();
     //}
 
     return true;

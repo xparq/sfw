@@ -1,9 +1,13 @@
 #include "sfw/Widgets/TextBox.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/GUI-main.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/OpenGL.hpp>
 
+#include <cassert>
+#include <algorithm>
+    using std::min, std::max;
 #include <functional>
 
 //#include <iostream> //!DEBUG
@@ -343,13 +347,15 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void TextBox::onMouseEnter()
 {
-    setMouseCursor(sf::Cursor::Text);
+    assert(getMain());
+    getMain()->setMouseCursor(sf::Cursor::Text);
 }
 
 
 void TextBox::onMouseLeave()
 {
-    setMouseCursor(sf::Cursor::Arrow);
+    assert(getMain());
+    getMain()->setMouseCursor(sf::Cursor::Arrow);
 }
 
 
@@ -492,8 +498,8 @@ void TextBox::setSelectedText(size_t from, size_t to)
 {
     if (from != to)
     {
-        size_t selectionLast = std::max(from, to);
-        size_t selectionFirst = std::min(from, to);
+        size_t selectionLast = max(from, to);
+        size_t selectionFirst = min(from, to);
         if (selectionFirst != m_selectionFirst || selectionLast != m_selectionLast)
         {
             m_selectionFirst = selectionFirst;
