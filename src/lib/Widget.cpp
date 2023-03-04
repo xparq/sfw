@@ -190,5 +190,6 @@ void Widget::onMouseWheelMoved(int) { }
 void Widget::onKeyPressed(const sf::Event::KeyEvent&) { }
 void Widget::onKeyReleased(const sf::Event::KeyEvent&) { }
 void Widget::onTextEntered(uint32_t) { }
+void Widget::onThemeChanged() { }
 
 } // namespace

@@ -1,13 +1,26 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
 
+#include <iostream>
+using namespace std;
+
 namespace sfw
 {
 
-GUI::GUI(sf::RenderWindow& window):
+GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg):
     m_window(window),
-    m_cursorType(sf::Cursor::Arrow)
+    m_themeCfg(themeCfg),
+    m_cursorType(sf::Cursor::Arrow) //!! Might depend on the theme config in the future
 {
+//!!Not in this version yet! It would break everything that assumes "parent==null is root"!
+//!!
+//!!    // "Officially" mark this object as the "Main" in the GUI Widget tree:
+//!!    m_parent = this;
+
+    // Also register ourselves to our own widget registry, "just for completeness":
+    widgets["/"] = this;
+
+    setTheme(m_themeCfg);
 }
 
 
@@ -60,6 +73,59 @@ void GUI::process(const sf::Event& event)
 }
 
 
+bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
+{
+    if (&m_themeCfg != &themeCfg)
+    {
+        m_themeCfg = themeCfg;
+    }
+
+    if (!m_themeCfg.apply())
+    {
+        return false;
+    }
+
+    // Notify widgets of the change
+    for (auto& [name, w] : widgets) //! std::map reorders alphabetically, which is a disadvantage here
+    {
+        const_cast<Widget*>(w)->onThemeChanged();
+    }
+    //!!This could be redundant, ideally: onThemeChanged would make widgets setSize() themselves
+    //!!(+ do their own recomputeGeometry) as needed, which (Widget::setSize) would in turn call
+    //!!the parent's recomputeGeometry)!
+    //for (auto& [name, cw] : widgets)
+    //{
+    //    const_cast<Widget*>(cw)->recomputeGeometry();
+    //}
+
+    return true;
+}
+
+
+void GUI::render()
+{
+    if (sfw::Theme::clearWindow)
+    {
+        m_window.clear(sfw::Theme::windowBgColor);
+    }
+
+    // Draw whatever we have, via our a top-level widget container ancestor
+    draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! function-style RenderContext(...) failed with CLANG
+}
+
+
+void GUI::remember(const string& name, const Widget* widget)
+{
+    if (widgets.find(name) != widgets.end())
+    {
+        cerr << "- Warning: A widget with the name \"" << name << "\" has already been registered.\n"
+             << "  Overriding...\n";
+    }
+
+    widgets[name] = widget;
+}
+
+
 sf::Vector2f GUI::convertMousePosition(int x, int y) const
 {
     sf::Vector2f mouse = m_window.mapPixelToCoords(sf::Vector2i(x, y));
@@ -78,16 +144,6 @@ void GUI::setMouseCursor(sf::Cursor::Type cursorType)
             m_cursorType = cursorType;
         }
     }
-}
-
-
-void GUI::render()
-{
-    if (sfw::Theme::clearWindow)
-        m_window.clear(sfw::Theme::windowBgColor);
-
-    // Draw whatever we have (via our ancestor, a top-level VBoxLayout)
-    draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! RenderContext(...) failed with CLANG
 }
 
 } // namespace

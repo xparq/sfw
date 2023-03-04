@@ -4,28 +4,15 @@
 
 #include <string> // to_string
 #include <iostream> // cerr, for errors
+#include <cassert>
 using namespace std;
 
-//----------------------------------------------------------------------------
 int main()
 {
-    struct ThemeCfg
-    {
-        sf::Color backgroundColor;
-        std::string texturePath;
-    };
+    //------------------------------------------------------------------------
+    // Normal SFML app-specific setup....
 
-    ThemeCfg defaultTheme = {
-        hex2color("#e6e8e0"),
-        "demo/texture-default.png"
-    };
-
-    ThemeCfg win98Theme = {
-        hex2color("#d4d0c8"),
-        "demo/texture-win98.png"
-    };
-
-    // Create the main window
+    // Create the main window, as usual for any SFML app
     sf::RenderWindow window;
     window.create(sf::VideoMode({1024, 768}), "SFW Demo", sf::Style::Close|sf::Style::Resize);
     if (!window.isOpen()) {
@@ -34,10 +21,13 @@ int main()
     }
     window.setFramerateLimit(30);
 
+    //------------------------------------------------------------------------
     // Setting up the GUI...
 
-    sfw::Theme::borderSize = 99; // This will get recalculated by loadTexture, so no use with template textures!
-    sfw::Theme::textSize = 11;
+    // Customizing some global defaults (optional)
+    sfw::Theme::Cfg::DEFAULT_basePath = "demo/";
+
+    sfw::Theme::PADDING = 2.f;
     sfw::Theme::click.textColor      = hex2color("#191B18");
     sfw::Theme::click.textColorHover = hex2color("#191B18");
     sfw::Theme::click.textColorFocus = hex2color("#000");
@@ -46,18 +36,18 @@ int main()
     sfw::Theme::input.textColorFocus = hex2color("#000");
     sfw::Theme::input.textSelectionColor = hex2color("#8791AD");
     sfw::Theme::input.textPlaceholderColor = hex2color("#8791AD");
-    sfw::Theme::PADDING = 2.f;
-    sfw::Theme::windowBgColor = defaultTheme.backgroundColor;
 
-    if (!sfw::Theme::loadFont("demo/verdana.ttf")) {
-        return EXIT_FAILURE; // SFML has already explained the situation...
-    }
-    if (!sfw::Theme::loadTexture(defaultTheme.texturePath)) {
-        return EXIT_FAILURE; // SFML has already explained the situation...
-    }
+    // Some dynamically switcahble theme "quick config packs" to play with
+    sfw::Theme::Cfg themes[] = {
+        { "Default (\"Baseline\")", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11 },
+        { "Classic",                "texture-sfw-classic.png", hex2color("#e6e8e0"), 12 },
+        { "sfml-widgets's default", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
+        { "sfml-widgets's Win98",   "texture-sfmlwidgets-win98.png", hex2color("#d4d0c8"), },
+    };
+    const size_t DEFAULT_THEME = 0;
 
     // The main GUI controller:
-    sfw::GUI demo(window);
+    sfw::GUI demo(window, themes[DEFAULT_THEME]);
     demo.setPosition(10, 10);
 
     // A native SFML example Text object, to be manipulated via the GUI
@@ -141,17 +131,18 @@ int main()
         text.setStyle(style);
     }));
 
-    // Attach the horiz. progress bars (used for text rotation) to a layout
+    // Attach the horiz. progress bars (used for text rotation) to the form
     form->addRow("Progress bar (label = None)", pbarRotation1);
     form->addRow("Progress bar (label = Over)", pbarRotation2);
     form->addRow("Progress bar (label = Outside)", pbarRotation3);
 
-    // Setup a stacked layout for the vertical progress bars (used for text scaling)
+    // Attach the vert. progress bars (used for text scaling) to a new box
     auto layoutForVerticalProgressBars = new sfw::HBoxLayout();
+    //!! Issue #109: Document that manipulating unowned, free-standing layouts is UB!
+    form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
     layoutForVerticalProgressBars->add(pbarScale1);
     layoutForVerticalProgressBars->add(pbarScale2);
     layoutForVerticalProgressBars->add(pbarScale3);
-    form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
 
     form->addRow("Default button", new sfw::Button("button"));
 
@@ -168,13 +159,13 @@ int main()
 
     // Theme selection
     middle_panel->add(new sfw::Label("Change theme:"));
-    middle_panel->add(new sfw::OptionsBox<ThemeCfg>([&](auto* w) {
-        auto& theme = w->getSelectedValue();
-        sfw::Theme::loadTexture(theme.texturePath);
-        sfw::Theme::windowBgColor = theme.backgroundColor;
-    }))
-    ->addItem("Windows 98", win98Theme)
-    ->addItem("Default", defaultTheme);
+    auto themeselect = new sfw::OptionsBox<sfw::Theme::Cfg>([&](auto* w) {
+        const auto& themecfg = w->getSelectedValue();
+        demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
+    });
+    for (auto& t : themes) { themeselect->addItem(t.name, t); }
+    themeselect->selectItem(DEFAULT_THEME);
+    middle_panel->add(themeselect);
 
     // Static images (also a cropped one)
 
@@ -203,7 +194,7 @@ int main()
     vboximg->add(new sfw::Label("Image crop:"));
     vboximg->add(new sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
     vboximg->add(new sfw::Label("Image crop varied:"));
-    vboximg->add(imgCrop = new sfw::Image("demo/SFML logo.png"));
+    vboximg->add(imgCrop = new sfw::Image("demo/SFML logo.png")); // See imgCrop defined above!
 
     auto right_bar = main_hbox->add(new sfw::VBoxLayout());
 

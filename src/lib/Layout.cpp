@@ -1,9 +1,15 @@
 #include "sfw/Layout.hpp"
 
+#include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
 #include "sfw/util/shims.hpp"
 
 #include "SFML/Graphics/RenderTarget.hpp"
+
+#include <cassert>
+#include <string>
+    using std::string, std::to_string;
+#include <utility>
 
 namespace sfw
 {
@@ -30,7 +36,7 @@ Layout::~Layout()
 }
 
 
-Widget* Layout::add(Widget* widget)
+Widget* Layout::add(Widget* widget, [[maybe_unused]] const std::string& name)
 {
     widget->setParent(this);
 
@@ -44,6 +50,12 @@ Widget* Layout::add(Widget* widget)
         widget->m_previous = m_last;
         m_last = widget;
     }
+
+//!! Not in this version just yet:
+//!!    GUI* Main = GUIMain();
+//!!    if (Main != nullptr)
+//!!        Main->remember(name.empty() ? to_string((size_t)(void*)widget) : name, widget);
+
     recomputeGeometry();
     return widget;
 }

@@ -3,7 +3,9 @@
 
 #include "sfw/Widget.hpp"
 
+#include <string>
 #include <type_traits>
+#include <functional>
 
 namespace sfw
 {
@@ -19,13 +21,20 @@ public:
     ~Layout();
 
     /**
-     * Add a new widget in the container
-     * The container will take care of widget deallocation
+     * Add a new widget to the container
+     * The container will take care of widget deallocation.
+     * The optional name parameter facilitates widget lookup by name [!!in the future!!]
+     * (and also better diagnostics).
      * @return added widget
      */
-    Widget* add(Widget* widget);
-    template <class W> W* add(W* widget) requires (std::is_base_of_v<Widget, W>)
-        { return (W*) (Widget*) add((Widget*)widget); }
+    Widget* add(Widget* widget, const std::string& name = "");
+
+    /**
+     * Also for any Widget subclasses, without tedious casting in client code
+     */
+    template <class W> W* add(W* widget, const std::string& name = "")
+        requires (std::is_base_of_v<Widget, W>)
+        { return (W*) (Widget*) add((Widget*)widget, name); }
 
 protected:
     void draw(const gfx::RenderContext& ctx) const override;

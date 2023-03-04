@@ -25,6 +25,7 @@ class Widget: public gfx::Drawable
 {
 public:
     Widget();
+    virtual ~Widget() {}
 
     /**
      * Widget's position
@@ -96,11 +97,13 @@ protected:
     virtual void onKeyPressed(const sf::Event::KeyEvent& key);
     virtual void onKeyReleased(const sf::Event::KeyEvent& key);
     virtual void onTextEntered(uint32_t unicode);
+    virtual void onThemeChanged();
 
     void setSize(const sf::Vector2f& size);
     void setSize(float width, float height);
 
 //----------------------
+friend class GUI;
 friend class Layout;
 friend class FormLayout;
 friend class HBoxLayout;
@@ -128,17 +131,13 @@ friend class VBoxLayout;
 
     void centerText(sf::Text& text);
 
-    virtual void recomputeGeometry() {};
-
     const sf::Transform& getTransform() const;
 
     virtual void setMouseCursor(sf::Cursor::Type cursor);
 
-#ifdef DEBUG
-    void draw_outline(const gfx::RenderContext& ctx) const;
-#endif
-
 private:
+    virtual void recomputeGeometry() {};
+
     Layout* m_parent;
     Widget* m_previous;
     Widget* m_next;
@@ -149,6 +148,11 @@ private:
     bool m_selectable;
     std::function<void()> m_callback;
     sf::Transform m_transform;
+
+#ifdef DEBUG
+public:
+    void draw_outline(const gfx::RenderContext& ctx) const;
+#endif
 };
 
 } // namespace

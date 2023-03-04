@@ -3,6 +3,30 @@
 namespace sfw
 {
 
+//!!THESE ARE NOT YET ACTUALLY PACKAGED, but the code is already there, so...:
+const char* Theme::Cfg::DEFAULT_basePath = "asset/";
+const char* Theme::Cfg::DEFAULT_fontPath = "Vera.ttf";
+const char* Theme::Cfg::DEFAULT_texturePath = "texture-baseline.png";
+
+size_t      Theme::Cfg::DEFAULT_textSize = 12;
+sf::Color   Theme::Cfg::DEFAULT_bgColor = sf::Color::Black;
+
+bool Theme::Cfg::apply() const
+{
+    if (!sfw::Theme::loadFont(std::string(DEFAULT_basePath) + (!fontPath ? DEFAULT_fontPath : fontPath)))
+    {
+        return false; // SFML has already explained the situation...
+    }
+    if (!texturePath || !Theme::loadTexture(std::string(DEFAULT_basePath) + (!texturePath ? DEFAULT_texturePath : texturePath)))
+    {
+        return false; // SFML has already explained the situation...
+    }
+    Theme::windowBgColor = bgColor;
+    Theme::textSize = (textSize > 0 ? textSize : DEFAULT_textSize); // Set after loadTexture, as it would reset this.
+    return true;
+}
+
+
 static sf::Cursor& getDefaultCursor()
 {
     static sf::Cursor cursor;
@@ -13,10 +37,10 @@ static sf::Cursor& getDefaultCursor()
     return cursor;
 }
 
-size_t Theme::textSize = 12;
+size_t Theme::textSize = Theme::Cfg::DEFAULT_textSize;
 Theme::Style Theme::click;
 Theme::Style Theme::input;
-sf::Color Theme::windowBgColor;
+sf::Color Theme::windowBgColor = sf::Color::White;
 bool Theme::clearWindow = true;
 int Theme::borderSize = 1;
 int Theme::minWidgetWidth = 86;

@@ -19,7 +19,7 @@ Widget* FormLayout::addRow(const sf::String& str, Widget* widget)
         m_labelWidth = label->getSize().x;
     }
     Layout::add(label);
-    Layout::add(widget);
+    Layout::add(widget, str);
     return widget;
 }
 
@@ -27,8 +27,8 @@ Widget* FormLayout::addRow(const sf::String& str, Widget* widget)
 void FormLayout::recomputeGeometry()
 {
     size_t i = 0;
-    sf::Vector2f pos;
-    sf::Vector2f size;
+    sf::Vector2f pos{};
+    sf::Vector2f size{};
     for (Widget* widget = getFirstWidget(); widget != nullptr; widget = widget->m_next)
     {
         if (i % 2 == 0)
