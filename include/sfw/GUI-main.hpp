@@ -10,6 +10,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Cursor.hpp>
 
+#include <string>
 #include <map>
 
 namespace sfw
@@ -35,8 +36,6 @@ public:
     void setMouseCursor(sf::Cursor::Type cursorType);
 
 private:
-//!!DOESN'T HELP:    GUI* rootWidget() override { return this; }
-
     /**
      * Get mouse cursor relative position
      * @param x: absolute x position from the event
@@ -45,13 +44,17 @@ private:
      */
     sf::Vector2f convertMousePosition(int x, int y) const;
 
+    /**
+     * Keep track of widgets, for convenience & diagnostics
+     */
+    friend class Layout;
+    bool remember(const std::string& name, const Widget* widget);
+
     sf::RenderWindow& m_window;
     sfw::Theme::Cfg m_themeCfg;
 
     sf::Cursor::Type m_cursorType; // Current mouse pointer shape
-
-public:
-    std::map<std::string, Widget*> widgets;
+    std::map<std::string, const Widget*> widgets;
 };
 
 } // namespace

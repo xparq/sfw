@@ -6,10 +6,11 @@
 
 #include "SFML/Graphics/RenderTarget.hpp"
 
+#include <cassert>
 #include <string>
     using std::string, std::to_string;
+#include <utility>
 #include <iostream>
-#include <cassert>
 using namespace std;
 
 namespace sfw
@@ -37,7 +38,7 @@ Layout::~Layout()
 }
 
 
-Widget* Layout::add(Widget* widget)
+Widget* Layout::add(Widget* widget, const std::string& name)
 {
     widget->setParent(this);
 
@@ -52,13 +53,12 @@ Widget* Layout::add(Widget* widget)
         m_last = widget;
     }
 
-GUI* root = rootWidget();
-if (!root) root = (GUI*)this;
+    GUI* Main = GUIMain();
 
-    assert(this != nullptr);
-    assert(root != nullptr);
+    assert(Main != nullptr);
     assert(widget != nullptr);
-
+    assert(this != nullptr);
+/*
 //cerr << (size_t)(void*)rootWidget() << endl;
 cerr << "add(widget* == " << to_string((size_t)(void*)widget) << ")" << endl;
 cerr << (size_t)this << ": root == " << (size_t)root << endl;
@@ -69,12 +69,13 @@ cerr << "[\""<<to_string((size_t)(void*)widget) <<"\"]"<< " <- " <<(size_t)widge
 //!!??root->widgets["x"] = nullptr;
 //!!??root->widgets.insert({to_string((size_t)(void*)widget), widget});
 root->widgets.insert({string{}, widget});
-
+*/
 //try {
 //    assert(rootWidget()->widgets.empty()); //->widgets["x"] = widget;
 //} catch (...) {
 //    cerr << "WTF?!\n";
-//}
+//}    
+    Main->remember(name.empty() ? to_string((size_t)(void*)widget) : name, widget);
 
     recomputeGeometry();
     return widget;
@@ -84,6 +85,15 @@ root->widgets.insert({string{}, widget});
 Widget* Layout::getFirstWidget()
 {
     return m_first;
+}
+
+
+void Layout::traverseChildren(std::function<void(Widget*)> f)
+{
+    for (Widget* w = getFirstWidget(); w != nullptr; w = w->m_next)
+    {
+        w->traverseChildren(std::forward<function<void(Widget*)>>(f));
+    }
 }
 
 

@@ -26,10 +26,4 @@ void VBoxLayout::recomputeGeometry()
     Widget::setSize(size);
 }
 
-
-void VBoxLayout::onThemeChanged()
-{
-cerr << "VB" << endl;
-}
-
 } // namespace

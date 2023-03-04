@@ -23,13 +23,19 @@ public:
     //    This is the initial version to support the Demo app.
     struct Cfg
     {
-        static const char* basePath; // default: "asset/"
+        //!! These make no real sense until they get actually packaged:
+        static const char* DEFAULT_basePath; // "asset/"
+        static const char* DEFAULT_fontPath; // Bitstream Vera
+        static const char* DEFAULT_texturePath; 
+
+        static size_t      DEFAULT_textSize;
+        static sf::Color   DEFAULT_bgColor;
 
         const char* name = "(unnamed)";
-        sf::Color bgColor = sf::Color::Black;
         const char* texturePath = nullptr;
+        sf::Color bgColor = DEFAULT_bgColor;
+        size_t textSize = DEFAULT_textSize;
         const char* fontPath = nullptr;
-        size_t textSize = 0;
 
     protected:
         friend class GUI;

@@ -2,6 +2,7 @@
 #include "sfw/Layout.hpp"
 #include "sfw/GUI-main.hpp"
 
+#include <cassert>
 #include <cmath>
 
 #ifdef DEBUG
@@ -18,6 +19,18 @@ Widget::Widget():
     m_state(WidgetState::Default),
     m_selectable(true)
 {
+}
+
+
+bool Widget::isRoot()
+{
+    return m_parent == nullptr || m_parent == this;
+}
+
+
+bool Widget::isMain()
+{
+    return m_parent == this;
 }
 
 
@@ -51,6 +64,9 @@ sf::Vector2f Widget::getAbsolutePosition() const
     {
         position.x += parent->m_position.x;
         position.y += parent->m_position.y;
+        //!! Must also check for isMain() now to avoid infinite looping on its parent->parent == parent!... :-/
+        //!! And we can't just add this to the for cond. wither, as that would skip the last offset, of the Main obj itself! :-o
+        if (parent->isMain()) break;
     }
     return position;
 }
@@ -59,10 +75,10 @@ sf::Vector2f Widget::getAbsolutePosition() const
 void Widget::setSize(const sf::Vector2f& size)
 {
     m_size = size;
-    if (m_parent != nullptr)
+    onResized();
+    if (!isRoot())
     {
-        Widget* parent = m_parent;
-        parent->recomputeGeometry();
+        getParent()->recomputeGeometry();
     }
 }
 
@@ -102,14 +118,21 @@ void Widget::setSelectable(bool selectable)
     m_selectable = selectable;
 }
 
-// These two are template specializations now, see the header!
 
+void Widget::centerText(sf::Text& text)
+{
+    sf::FloatRect r = text.getLocalBounds();
+    text.setOrigin({r.left + std::round(r.width / 2.f), r.top + std::round(r.height / 2.f)});
+    text.setPosition({m_size.x / 2, m_size.y / 2});
+}
+
+
+// These two are template specializations; see the header!
 Widget* Widget::setCallback(std::function<void()> callback)
 {
     m_callback = callback;
     return this;
 }
-
 Widget* Widget::setCallback(std::function<void(Widget*)> callback)
 {
     m_callback = [this, callback]{ return callback(this); };
@@ -123,12 +146,6 @@ void Widget::triggerCallback()
     {
         m_callback();
     }
-}
-
-
-void Widget::setParent(Layout* parent)
-{
-    m_parent = parent;
 }
 
 
@@ -151,33 +168,26 @@ const sf::Transform& Widget::getTransform() const
 }
 
 
-#ifdef DEBUG
-void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
+void Widget::setParent(Layout* parent)
 {
-	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
-	r.setPosition(getAbsolutePosition());
-	r.setFillColor(sf::Color::Transparent);
-	r.setOutlineThickness(2);
-	r.setOutlineColor(sf::Color::Red);
-	ctx.target.draw(r);
-}
-#endif
-
-
-GUI* Widget::rootWidget()
-{
-    return m_parent ? m_parent->rootWidget() : (GUI*)this;
+    m_parent = parent;
 }
 
 
-void Widget::centerText(sf::Text& text)
+Widget* Widget::rootWidget()
 {
-    sf::FloatRect r = text.getLocalBounds();
-    text.setOrigin({r.left + std::round(r.width / 2.f), r.top + std::round(r.height / 2.f)});
-    text.setPosition({m_size.x / 2, m_size.y / 2});
+    return !isMain() && getParent() ? getParent()->rootWidget() : (GUI*)this;
 }
 
-// callbacks -------------------------------------------------------------------
+
+GUI* Widget::GUIMain()
+{
+    assert(getParent() && getParent() != this ? getParent()->rootWidget() : (GUI*)getParent());
+    return (GUI*)(getParent() && getParent() != this ? getParent()->rootWidget() : (GUI*)getParent());
+}
+
+
+// callbacks -----------------------------------------------------------------
 
 void Widget::onStateChanged(WidgetState) { }
 void Widget::onMouseEnter() { }
@@ -190,6 +200,21 @@ void Widget::onKeyPressed(const sf::Event::KeyEvent&) { }
 void Widget::onKeyReleased(const sf::Event::KeyEvent&) { }
 void Widget::onTextEntered(uint32_t) { }
 void Widget::onThemeChanged() { }
+void Widget::onResized() { }
 
+
+// diagnostics ---------------------------------------------------------------
+
+#ifdef DEBUG
+void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
+{
+	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
+	r.setPosition(getAbsolutePosition());
+	r.setFillColor(sf::Color::Transparent);
+	r.setOutlineThickness(2);
+	r.setOutlineColor(sf::Color::Red);
+	ctx.target.draw(r);
+}
+#endif
 
 } // namespace

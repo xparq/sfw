@@ -27,9 +27,4 @@ void HBoxLayout::recomputeGeometry()
 }
 
 
-void HBoxLayout::onThemeChanged()
-{
-cerr << "HB" << endl;
-}
-
 } // namespace

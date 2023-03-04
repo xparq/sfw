@@ -13,7 +13,6 @@ class HBoxLayout: public Layout
 {
 protected:
     void recomputeGeometry() override;
-    void onThemeChanged() override;
 };
 
 } // namespace

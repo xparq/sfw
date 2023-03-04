@@ -9,9 +9,7 @@ namespace sfw
 
 Button::Button(const sf::String& string)
 {
-    m_box.item().setFont(Theme::getFont());
-    m_box.item().setCharacterSize((int)Theme::textSize);
-    m_box.setSize((float)Theme::minWidgetWidth, Theme::getBoxHeight());
+    onThemeChanged(); //!!This is an artificial kludge yet to make sure it happens before the rest of the init!...
     setString(string);
     setSize(m_box.getSize());
 }
@@ -33,6 +31,25 @@ void Button::setString(const sf::String& string)
 {
     m_box.item().setString(string);
 
+    recomputeGeometry();
+}
+
+const sf::String& Button::getString() const
+{
+    return m_box.item().getString();
+}
+
+
+void Button::onThemeChanged()
+{
+    m_box.item().setFont(Theme::getFont());
+    m_box.item().setCharacterSize((int)Theme::textSize);
+    m_box.setSize((float)Theme::minWidgetWidth, Theme::getBoxHeight());
+}
+
+
+void Button::recomputeGeometry()
+{
     // Recompute widget width
     int fittingWidth = (int)(m_box.item().getLocalBounds().width + Theme::PADDING * 2 + Theme::borderSize * 2);
     int width = std::max(fittingWidth, Theme::minWidgetWidth);
@@ -41,11 +58,6 @@ void Button::setString(const sf::String& string)
     setSize(m_box.getSize());
 }
 
-
-const sf::String& Button::getString() const
-{
-    return m_box.item().getString();
-}
 
 void Button::draw(const gfx::RenderContext& ctx) const
 {

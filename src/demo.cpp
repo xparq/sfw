@@ -25,7 +25,7 @@ int main()
     // Setting up the GUI...
 
     // Customizing some global defaults (optional)
-    sfw::Theme::Cfg::basePath = "demo/";
+    sfw::Theme::Cfg::DEFAULT_basePath = "demo/";
 
     sfw::Theme::PADDING = 2.f;
     sfw::Theme::click.textColor      = hex2color("#191B18");
@@ -39,10 +39,10 @@ int main()
 
     // Some dynamically switcahble themes config packs to play with
     sfw::Theme::Cfg themes[] = {
-        { "Default (\"Baseline\")", hex2color("#e6e8e0"), "texture-sfw-baseline.png", },
-        { "Classic",                hex2color("#e6e8e0"), "texture-sfw-classic.png", "Candara.ttf", 13 },
-        { "sfml-widgets's default", hex2color("#dddbde"), "texture-sfmlwidgets-default.png", },
-        { "sfml-widgets's Win98",   hex2color("#d4d0c8"), "texture-sfmlwidgets-win98.png", },
+        { "Default (\"Baseline\")", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11 },
+        { "Classic",                "texture-sfw-classic.png", hex2color("#e6e8e0"), 12 },
+        { "sfml-widgets's default", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
+        { "sfml-widgets's Win98",   "texture-sfmlwidgets-win98.png", hex2color("#d4d0c8"), },
     };
     const size_t DEFAULT_THEME = 0;
 
@@ -59,7 +59,7 @@ int main()
     auto main_hbox = demo.add(new sfw::HBoxLayout());
 
     // A "form" panel on the left
-    auto form = main_hbox->add(new sfw::FormLayout());
+    auto form = main_hbox->add(new sfw::FormLayout(), "FORM");
 
     // A text box to set the text of the SFML Text object (created above)
     form->addRow("Text",
@@ -139,14 +139,13 @@ int main()
     // Attach the vert. progress bars (used for text scaling) to a new box
     auto layoutForVerticalProgressBars = new sfw::HBoxLayout();
 //!!FIXME:
-//!!UNowned layouts are dysfunctional!!!
+//!!Document that manipulating unowned (free-standing) layouts is UB!!
     form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
     layoutForVerticalProgressBars->add(pbarScale1);
     layoutForVerticalProgressBars->add(pbarScale2);
     layoutForVerticalProgressBars->add(pbarScale3);
-
+//!!FIXME: ->add(again) would crash:
 //    form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
-
     form->addRow("Default button", new sfw::Button("button"));
 
     // Custom bitmap button
@@ -158,7 +157,7 @@ int main()
     }
 
     // A panel in the middle
-    auto middle_panel = main_hbox->add(new sfw::VBoxLayout());
+    auto middle_panel = main_hbox->add(new sfw::VBoxLayout(), "MIDDLE PANEL");
 
     // Theme selection
     middle_panel->add(new sfw::Label("Change theme:"));
@@ -197,9 +196,9 @@ int main()
     vboximg->add(new sfw::Label("Image crop:"));
     vboximg->add(new sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
     vboximg->add(new sfw::Label("Image crop varied:"));
-    vboximg->add(imgCrop = new sfw::Image("demo/SFML logo.png"));
+    vboximg->add(imgCrop = new sfw::Image("demo/SFML logo.png")); // See imgCrop defined above!
 
-    auto right_bar = main_hbox->add(new sfw::VBoxLayout());
+    auto right_bar = main_hbox->add(new sfw::VBoxLayout(), "RIGHT PANEL");
 
     // Show the GUI textures, for some insight/diagnostics
     right_bar->add(new sfw::Label("Theme textures:"));

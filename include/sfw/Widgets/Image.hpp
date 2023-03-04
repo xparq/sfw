@@ -42,8 +42,7 @@ public:
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
-
-    void updateGeometry(float left, float top, float right, float bottom);
+    void onResized() override;
 
     sf::Vertex m_vertices[4];
     sf::Texture m_texture;

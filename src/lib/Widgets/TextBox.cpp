@@ -5,6 +5,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/OpenGL.hpp>
 
+#include <cassert>
 #include <algorithm>
     //using std::max;
 #include <functional>
@@ -346,13 +347,15 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void TextBox::onMouseEnter()
 {
-    rootWidget()->setMouseCursor(sf::Cursor::Text);
+    assert(GUIMain());
+    GUIMain()->setMouseCursor(sf::Cursor::Text);
 }
 
 
 void TextBox::onMouseLeave()
 {
-    rootWidget()->setMouseCursor(sf::Cursor::Arrow);
+    assert(GUIMain());
+    GUIMain()->setMouseCursor(sf::Cursor::Arrow);
 }
 
 

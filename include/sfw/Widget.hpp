@@ -100,6 +100,7 @@ protected:
     virtual void onKeyReleased(const sf::Event::KeyEvent& key);
     virtual void onTextEntered(uint32_t unicode);
     virtual void onThemeChanged();
+    virtual void onResized();
 
     void setSize(const sf::Vector2f& size);
     void setSize(float width, float height);
@@ -125,6 +126,9 @@ friend class VBoxLayout;
     void setParent(Layout* parent);
     Layout* getParent() { return m_parent; }
 
+    bool isRoot(); // Root widgets have no parent (they're containers themselves)
+    bool isMain(); // Root widget that's also the "Main widget"
+
     /**
      * Get the widget typed as a Layout if applicable
      * Used to check if the widget is a container (Layout and its subclasses)
@@ -133,18 +137,30 @@ friend class VBoxLayout;
 
     void centerText(sf::Text& text);
 
-    virtual void recomputeGeometry() {}
-
     const sf::Transform& getTransform() const;
 
-    GUI* rootWidget();
-//!!??bad:    virtual GUI* rootWidget();
+    /**
+     * The "root" of a widget is a parent that has no parent.
+     * It can also be the Main GUI object, if its parent is set to itself.
+     * Note: free-standing ("dangling") widgets (those that have been created
+     * but not yet attached to the GUI, have a root, but not a Main object.
+     */
+    Widget* rootWidget();
 
-#ifdef DEBUG
-    void draw_outline(const gfx::RenderContext& ctx) const;
-#endif
+    GUI* GUIMain(); // nullptr for free-standing widgets
 
 private:
+    /**
+     * Widgets that are also Layouts would iterate their children via this
+     * interface. The reason this is defined here in Widget, not there, is:
+     *   a) parents of Widgets & Layouts shouldn't care about the difference,
+     *   b) Widget types other than Layout may have children in the future.
+     * The traversal is recursive (not just a single-level iteration).
+     */
+    virtual void traverseChildren(std::function<void(Widget*)> f) { f(this); }
+
+    virtual void recomputeGeometry() {}
+
     Layout* m_parent;
     Widget* m_previous;
     Widget* m_next;
@@ -155,6 +171,11 @@ private:
     bool m_selectable;
     std::function<void()> m_callback;
     sf::Transform m_transform;
+
+#ifdef DEBUG
+public:
+    void draw_outline(const gfx::RenderContext& ctx) const;
+#endif
 };
 
 } // namespace

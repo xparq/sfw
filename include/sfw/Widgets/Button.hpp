@@ -41,6 +41,9 @@ protected:
 private:
     void draw(const gfx::RenderContext& ctx) const override;
 
+    void onThemeChanged() override;
+    void recomputeGeometry() override;
+
     ItemBox<sf::Text> m_box;
 };
 

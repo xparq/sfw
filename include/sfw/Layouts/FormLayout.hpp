@@ -23,7 +23,6 @@ public:
 
 protected:
     void recomputeGeometry() override;
-    void onThemeChanged() override;
 
     float m_labelWidth;
 };
