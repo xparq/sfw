@@ -147,10 +147,16 @@ void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
     switch (key.code)
     {
     case sf::Keyboard::Left:
-        setValue(m_value - m_step);
+        if (m_orientation == Horizontal) setValue(m_value - m_step);
         break;
     case sf::Keyboard::Right:
-        setValue(m_value + m_step);
+        if (m_orientation == Horizontal) setValue(m_value + m_step);
+        break;
+    case sf::Keyboard::Down:
+        if (m_orientation == Vertical) setValue(m_value - m_step);
+        break;
+    case sf::Keyboard::Up:
+        if (m_orientation == Vertical) setValue(m_value + m_step);
         break;
     case sf::Keyboard::Home:
         setValue(0);
