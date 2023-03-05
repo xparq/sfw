@@ -20,7 +20,7 @@ Label::Label(const sf::String& string)
 void Label::setText(const sf::String& string)
 {
     m_text.setString(string);
-    updateGeometry();
+    recomputeGeometry();
 }
 
 
@@ -45,7 +45,7 @@ const sf::Color& Label::getFillColor() const
 void Label::setTextSize(size_t size)
 {
     m_text.setCharacterSize((unsigned)size);
-    updateGeometry();
+    recomputeGeometry();
 }
 
 
@@ -66,7 +66,17 @@ void Label::draw(const gfx::RenderContext& ctx) const
 }
 
 
-void Label::updateGeometry()
+void Label::onThemeChanged()
+{
+    m_text.setFont(Theme::getFont());
+    m_text.setPosition({Theme::PADDING, Theme::PADDING});
+    m_text.setFillColor(Theme::click.textColor);
+    m_text.setCharacterSize((unsigned)Theme::textSize);
+    recomputeGeometry();
+}
+
+
+void Label::recomputeGeometry()
 {
     Widget::setSize(
         m_text.getLocalBounds().width + Theme::PADDING * 2, m_text.getLocalBounds().height + Theme::PADDING * 2

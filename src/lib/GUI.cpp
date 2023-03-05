@@ -86,19 +86,21 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
     // Notify widgets of the change
     for (auto& [name, w] : widgets) //! std::map reorders alphabetically, which is a disadvantage here
     {
-//cerr << name <<endl;
         const_cast<Widget*>(w)->onThemeChanged();
     }
-    //!!This should be redundant: onThemeChanged would make widgets setSize() themselves
-    //!!(+ do their own onResized) as needed, which (Widget::setSize) would in turn also
-    //!!request the parent's recomputeGeometry)!
-    //!!(NOTE: there are ample chances of infinite looping here (some of which I have duly
-    //!!explored already...)!)
-    //for (auto& [name, cw] : widgets)
-    //{
-    //    const_cast<Widget*>(cw)->onResized();
-    //}
-
+/*
+    //!!This is kinda redundant: onThemeChanged should make widgets recomputeGeometry(),
+    //!!including Widget::setSize, which would also request the parent's recomputeGeometry!
+    //!!(NOTE: there are ample chances of infinite looping here, some of which I have duly
+    //!!explored already...)
+    //!!However... A guarantee that recomputeGeometry() will always be called after
+    //!!onThemeChanged could save some typing (and amend some forgotten updates)
+    //!!-- at the cost of +1 rule (albeit optional) for widget authoring...
+    for (auto& [name, w] : widgets)
+    {
+        const_cast<Widget*>(w)->recomputeGeometry();
+    }
+*/
     return true;
 }
 

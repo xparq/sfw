@@ -1,6 +1,9 @@
 #include "sfw/Layouts/HBoxLayout.hpp"
 #include "sfw/Theme.hpp"
 
+#include <algorithm>
+    using std::max;
+
 namespace sfw
 {
 
@@ -13,11 +16,11 @@ void HBoxLayout::recomputeGeometry()
         w->setPosition(pos);
         pos.x += w->getSize().x + Theme::MARGIN;
 
-        // Layout's height is the tallest widget's height
+        // The layout height is the largest widget height
         if (w->getSize().y > size.y)
             size.y = w->getSize().y;
     }
-    size.x = pos.x - Theme::MARGIN;
+    size.x = max(0.f, pos.x - Theme::MARGIN); // 0 for an empty container
     Widget::setSize(size);
 }
 

@@ -33,7 +33,8 @@ public:
 private:
     void draw(const gfx::RenderContext& ctx) const override;
 
-    void updateGeometry();
+    void onThemeChanged() override;
+    void recomputeGeometry() override;
 
     sf::Text m_text;
 };

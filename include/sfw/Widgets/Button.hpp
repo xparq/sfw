@@ -9,7 +9,7 @@ namespace sfw
 
 /**
  * The Button widget is a simple press button.
- * The callback is triggered when the button is clicked/activated.
+ * The callback is triggered when the button is activated (e.g. clicked).
  */
 class Button: public Widget
 {
@@ -39,6 +39,9 @@ protected:
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
+
+    void onThemeChanged() override;
+    void recomputeGeometry() override;
 
     ItemBox<sf::Text> m_box;
 };

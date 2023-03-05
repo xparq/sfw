@@ -1,6 +1,9 @@
 #include "sfw/Widgets/Button.hpp"
 #include "sfw/Theme.hpp"
 
+#include <algorithm>
+    using std::max;
+
 namespace sfw
 {
 
@@ -29,13 +32,7 @@ Button::Button(const sf::String& string, std::function<void(Button*)> callback):
 void Button::setString(const sf::String& string)
 {
     m_box.item().setString(string);
-
-    // Recompute widget width
-    int fittingWidth = (int)(m_box.item().getLocalBounds().width + Theme::PADDING * 2 + Theme::borderSize * 2);
-    int width = std::max(fittingWidth, Theme::minWidgetWidth);
-    m_box.setSize((float)width, Theme::getBoxHeight());
-    m_box.centerTextHorizontally(m_box.item());
-    setSize(m_box.getSize());
+    recomputeGeometry();
 }
 
 
@@ -43,6 +40,26 @@ const sf::String& Button::getString() const
 {
     return m_box.item().getString();
 }
+
+
+void Button::onThemeChanged()
+{
+    m_box.item().setFont(Theme::getFont());
+    m_box.item().setCharacterSize((int)Theme::textSize);
+    m_box.setSize((float)Theme::minWidgetWidth, Theme::getBoxHeight());
+    recomputeGeometry();
+}
+
+
+void Button::recomputeGeometry()
+{
+    int fittingWidth = (int)(m_box.item().getLocalBounds().width + Theme::PADDING * 2 + Theme::borderSize * 2);
+    int width = std::max(fittingWidth, Theme::minWidgetWidth);
+    m_box.setSize((float)width, Theme::getBoxHeight());
+    m_box.centerTextHorizontally(m_box.item());
+    setSize(m_box.getSize());
+}
+
 
 void Button::draw(const gfx::RenderContext& ctx) const
 {

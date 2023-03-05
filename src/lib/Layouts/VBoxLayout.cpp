@@ -1,6 +1,9 @@
 #include "sfw/Layouts/VBoxLayout.hpp"
 #include "sfw/Theme.hpp"
 
+#include <algorithm>
+    using std::max;
+
 namespace sfw
 {
 
@@ -13,11 +16,11 @@ void VBoxLayout::recomputeGeometry()
         w->setPosition(pos);
         pos.y += w->getSize().y + Theme::MARGIN;
 
-        // Layout's width is the widest widget's width
+        // The layout width is the largest widget width
         if (w->getSize().x > size.x)
             size.x = w->getSize().x;
     }
-    size.y = pos.y - Theme::MARGIN;
+    size.y = max(0.f, pos.y - Theme::MARGIN); // 0 for an empty container
     Widget::setSize(size);
 }
 
