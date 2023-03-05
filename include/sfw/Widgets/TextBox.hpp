@@ -75,8 +75,7 @@ public:
      */
     const sf::String& getPlaceholder() const;
 
-    // See Widget.hpp for the templates of these:
-    TextBox* setCallback(std::function<void()> callback)         { return Widget::setCallback<TextBox>(callback); }
+    TextBox* setCallback(std::function<void()> callback)         { return (TextBox*) Widget::setCallback(callback); }
     TextBox* setCallback(std::function<void(TextBox*)> callback);
 
 protected:

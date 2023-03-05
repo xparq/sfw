@@ -29,9 +29,8 @@ public:
 
     Slider* setValue(float value);
 
-    // See Widget.hpp for the templates of these:
     Slider* setCallback(std::function<void(Slider*)> callback);
-    Slider* setCallback(std::function<void()> callback)         { return Widget::setCallback<Slider>(callback); }
+    Slider* setCallback(std::function<void()> callback)         { return (Slider*) Widget::setCallback(callback); }
 
 protected:
     // Callbacks

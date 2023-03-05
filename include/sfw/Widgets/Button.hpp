@@ -25,9 +25,8 @@ public:
 
     const sf::String& getString() const;
 
-    // See Widget.hpp for the templates of these:
-    Button* setCallback(std::function<void()> callback)         { return Widget::setCallback<Button>(callback); }
     Button* setCallback(std::function<void(Button*)> callback);
+    Button* setCallback(std::function<void()> callback)         { return (Button*) Widget::setCallback(callback); }
 
 protected:
     // Callbacks

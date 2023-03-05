@@ -37,6 +37,13 @@ public:
      */
     void render();
 
+
+    /**
+     * Implement a name->widget registry
+     */
+    void remember(const std::string& name, Widget* widget);
+    Widget* recall(const std::string& name);
+
     /**
      * Change the mouse pointer for the GUI window
      */
@@ -51,18 +58,12 @@ private:
      */
     sf::Vector2f convertMousePosition(int x, int y) const;
 
-    /**
-     * Keep a registry of widgets for name->widget lookups (later!) & diagnostics
-     */
-    friend class Layout;
-    void remember(const std::string& name, const Widget* widget);
-
     sf::RenderWindow& m_window;
     sfw::Theme::Cfg m_themeCfg;
 
     sf::Cursor::Type m_cursorType;
 
-    std::map<std::string, const Widget*> widgets;
+    std::map<std::string, Widget*> widgets;
 };
 
 } // namespace

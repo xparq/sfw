@@ -59,7 +59,7 @@ sfw_objs=\
 	$(sfw_out)/$(sfw_widgets_dirtag)/ProgressBar.obj\
 
 #-----------------------------------------------------------------------------
-CC_FLAGS=$(CC_FLAGS) -W4 -std:c++latest -EHsc
+CC_FLAGS=$(CC_FLAGS) -W4 -std:c++20 -EHsc
 CC_FLAGS=$(CC_FLAGS) -I./include
 
 CC_FLAGS=$(CC_FLAGS) -I$(sfml_include_dir)

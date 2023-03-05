@@ -27,8 +27,7 @@ public:
 
     SpriteButton* setTexture(const sf::Texture& texture);
 
-    // See Widget.hpp for the templates of these:
-    SpriteButton* setCallback(std::function<void()> callback)         { return Widget::setCallback<SpriteButton>(callback); }
+    SpriteButton* setCallback(std::function<void()> callback)         { return (SpriteButton*) Widget::setCallback(callback); }
     SpriteButton* setCallback(std::function<void(SpriteButton*)> callback);
 
 protected:

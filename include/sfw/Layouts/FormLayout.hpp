@@ -3,6 +3,8 @@
 
 #include "sfw/Layout.hpp"
 
+#include <string>
+
 namespace sfw
 {
 
@@ -19,7 +21,8 @@ public:
      * @param label: label displayed before the widget
      * @param widget: widget to be added
      */
-    Widget* addRow(const sf::String& label, Widget* widget);
+    Widget* addRow(const sf::String& label, Widget* widget,
+                   const std::string& widgetname_override = "");
 
 private:
     void recomputeGeometry() override;

@@ -229,7 +229,7 @@ OptionsBox<T>::Item::Item(const sf::String& string, const T& val):
 template <class T>
 OptionsBox<T>* OptionsBox<T>::setCallback(std::function<void(OptionsBox<T>*)> callback)
 {
-    return (OptionsBox<T>*) Widget::setCallback( [callback] (Widget* w) { callback( (OptionsBox*)w ); });
+    return (OptionsBox<T>*) Widget::setCallback( [callback](Widget* w) { callback( (OptionsBox*)w ); });
 }
 
 } // namespace

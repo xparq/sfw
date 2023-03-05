@@ -2,6 +2,8 @@
 #include "sfw/Theme.hpp"
 #include "sfw/Widgets/Label.hpp"
 
+#include <string>
+
 namespace sfw
 {
 
@@ -11,7 +13,7 @@ FormLayout::FormLayout():
 }
 
 
-Widget* FormLayout::addRow(const sf::String& str, Widget* widget)
+Widget* FormLayout::addRow(const sf::String& str, Widget* widget, const std::string& widgetname_override)
 {
     Label* label = new Label(str);
     if (label->getSize().x > m_labelWidth)
@@ -19,7 +21,7 @@ Widget* FormLayout::addRow(const sf::String& str, Widget* widget)
         m_labelWidth = label->getSize().x;
     }
     Layout::add(label);
-    Layout::add(widget, str);
+    Layout::add(widget, widgetname_override.empty() ? (std::string)str : widgetname_override);
     return widget;
 }
 

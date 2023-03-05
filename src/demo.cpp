@@ -61,23 +61,31 @@ int main()
     // A "form" panel on the left
     auto form = main_hbox->add(new sfw::FormLayout());
 
-    // A text box to set the text of the SFML Text object (created above)
-    form->addRow("Text",
-        (new sfw::TextBox())->setPlaceholder("Type something!")->setText("Hello world!")
-        ->setCallback([&](auto* w) {
+    // A text box to set the text of the example SFML object (created above)
+    auto textbox = (new sfw::TextBox())
+        ->setPlaceholder("Type something!")->setText("Hello world!")
+        ->setCallback([&](sfw::TextBox* w) {
             text.setString(w->getText());
             text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
-        })
-    );
+        });
+    form->addRow("Text", textbox);
 
-    // Another text edit box (with length limit & pulsating cursor)
-    // (Keeping the widget pointer for use by other widgets.)
-    auto textbox = new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE);
-    textbox->setText("Hello world!")->setMaxLength(5);
-    form->addRow("Text with limit (5)", textbox);
+    // Another text box, with length limit & pulsating cursor
+    // Creating it without a "junk" local variable now:
+    form->addRow("Text with limit (5)",
+                 (new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE))
+                     ->setMaxLength(5)
+                     ->setText("Hello world!")
+    );
+    // Note: the label above ("Text with limit (5)") will also become the name
+    // of the added widget (the TextBox), which can then be used for retrieving
+    // it later. (See it used by the crop slider somewhere below.)
+    // It can also be overridden (e.g. to avoid duplicates), like:
+    // form->addRow("repeated label or overly long text", widget, "widgetname");
+    // (Widget names are optional.)
 
     // Slider + progress bars for rotating the text
-    auto sliderForRotation = new sfw::Slider(1.f); // step = 1
+    auto sliderForRotation = new sfw::Slider(1.f); // granularity = 1%
         auto pbarRotation1 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
         auto pbarRotation2 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
         auto pbarRotation3 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
@@ -89,10 +97,11 @@ int main()
     });
     form->addRow("Rotation", sliderForRotation);
 
-    // Slider + progress bars for scaling the text (in the denser, more "functional" code style)
+    // Slider + progress bars for scaling the text
     auto pbarScale1 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelNone);
     auto pbarScale2 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOver);
     auto pbarScale3 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
+    // (Creating the slider in the denser code style again)
     form->addRow("Scale", (new sfw::Slider())->setCallback([&](auto* w) {
         float scale = 1 + w->getValue() * 2 / 100.f;
         text.setScale({scale, scale});
@@ -179,8 +188,10 @@ int main()
     // Slider for crop size (it shouldn't just be put here, kinda dangling on its own, but well...)
     middle_panel->add((new sfw::Slider(1.f, 100.f))->setCallback([&](auto* w) {
         pbar->setValue(w->getValue());
-        // Show the slider value in a text box:
-        textbox->setText(to_string((int)w->getValue()));
+        // Show the slider value in a text box retrieved by its name:
+        auto tbox = (sfw::TextBox*)w->get("Text with limit (5)");
+        if (!tbox) cerr << "Named TextBox not found! :-o\n";
+        else tbox->setText(to_string((int)w->getValue()));
         imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
                               {(int)w->getValue(), (int)w->getValue()}});
     }));

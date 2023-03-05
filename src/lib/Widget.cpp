@@ -37,7 +37,7 @@ bool Widget::isMain()
 
 Widget* Widget::getRoot()
 {
-    return !isMain() && getParent() ? getParent()->getRoot() : (GUI*)this;
+    return !isMain() && getParent() ? getParent()->getRoot() : this;
 }
 
 
@@ -47,6 +47,17 @@ GUI* Widget::getMain()
     assert(       getParent() && getParent() != this ? getParent()->getRoot() : getParent());
     return (GUI*)(getParent() && getParent() != this ? getParent()->getRoot() : getParent());
 }
+
+
+Widget* Widget::find(const std::string& name)
+{
+    if (GUI* Main = getMain(); Main != nullptr)
+    {
+        return Main->recall(name);
+    }
+    return nullptr;
+}
+
 
 void Widget::setPosition(const sf::Vector2f& pos)
 {
@@ -133,7 +144,6 @@ void Widget::setSelectable(bool selectable)
     m_selectable = selectable;
 }
 
-// These two are template specializations now, see the header!
 
 Widget* Widget::setCallback(std::function<void()> callback)
 {
@@ -146,7 +156,6 @@ Widget* Widget::setCallback(std::function<void(Widget*)> callback)
     m_callback = [this, callback]{ return callback(this); };
     return this;
 }
-
 
 void Widget::triggerCallback()
 {

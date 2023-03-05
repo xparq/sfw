@@ -86,6 +86,7 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
     // Notify widgets of the change
     for (auto& [name, w] : widgets) //! std::map reorders alphabetically, which is a disadvantage here
     {
+//cerr << name <<endl;
         const_cast<Widget*>(w)->onThemeChanged();
     }
     //!!This should be redundant: onThemeChanged would make widgets setSize() themselves
@@ -114,7 +115,7 @@ void GUI::render()
 }
 
 
-void GUI::remember(const string& name, const Widget* widget)
+void GUI::remember(const string& name, Widget* widget)
 {
     if (widgets.find(name) != widgets.end())
     {
@@ -123,6 +124,15 @@ void GUI::remember(const string& name, const Widget* widget)
     }
 
     widgets[name] = widget;
+}
+
+
+Widget* GUI::recall(const std::string& name)
+{
+    auto widget_iter = widgets.find(name);
+    if (widget_iter == widgets.end()) cerr << "- Warning: widget \"" << name << "\" not found!\n";
+//if (widget_iter != widgets.end()) cerr << "recall: found widget: \"" << widget_iter->first << "\" == "<< (void*)widget_iter->second <<"\n";
+    return widget_iter != widgets.end() ? widget_iter->second : (Widget*)nullptr;
 }
 
 
