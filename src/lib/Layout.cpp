@@ -8,7 +8,9 @@
 
 #include <cassert>
 #include <string>
-    using std::string, std::to_string;
+    using std::string, std::begin, std::end;
+#include <charconv>
+    using std::to_chars;
 #include <utility>
 
 namespace sfw
@@ -36,7 +38,7 @@ Layout::~Layout()
 }
 
 
-Widget* Layout::add(Widget* widget, [[maybe_unused]] const std::string& name)
+Widget* Layout::add(Widget* widget, const std::string& name)
 {
     widget->setParent(this);
 
@@ -53,7 +55,9 @@ Widget* Layout::add(Widget* widget, [[maybe_unused]] const std::string& name)
 
     if (GUI* Main = getMain(); Main != nullptr)
     {
-        Main->remember(name.empty() ? to_string((size_t)(void*)widget) : name, widget);
+        // Make the default hex for a more climactic debug experience...
+        char abuf[17] = {0}; to_chars(abuf, end(abuf), (size_t)(void*)widget, 16);
+        Main->remember(name.empty() ? string(abuf) : name, widget);
     }
 
     recomputeGeometry();

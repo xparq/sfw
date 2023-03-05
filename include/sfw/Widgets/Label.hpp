@@ -19,14 +19,16 @@ class Label: public Widget
 public:
     explicit Label(const std::string& text = "");
 
-    void setText(const std::string& text);
+    Label* setText(const std::string& text);
     std::string getText() const;
 
-    void setFillColor(const sf::Color& color);
+    Label* setFillColor(const sf::Color& color);
     const sf::Color& getFillColor() const;
 
-    void setTextSize(size_t size);
+    Label* setTextSize(size_t size);
     size_t getTextSize() const;
+
+    Label* setStyle(sf::Text::Style style);
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;

@@ -15,10 +15,11 @@ Label::Label(const std::string& text)
 }
 
 
-void Label::setText(const std::string& text)
+Label* Label::setText(const std::string& text)
 {
     m_text.setString(/*sfw::*/stdstring_to_SFMLString(text));
     recomputeGeometry();
+    return this;
 }
 
 std::string Label::getText() const
@@ -27,9 +28,10 @@ std::string Label::getText() const
 }
 
 
-void Label::setFillColor(const sf::Color& color)
+Label* Label::setFillColor(const sf::Color& color)
 {
     m_text.setFillColor(color);
+    return this;
 }
 
 const sf::Color& Label::getFillColor() const
@@ -38,10 +40,11 @@ const sf::Color& Label::getFillColor() const
 }
 
 
-void Label::setTextSize(size_t size)
+Label* Label::setTextSize(size_t size)
 {
     m_text.setCharacterSize((unsigned)size);
     recomputeGeometry();
+    return this;
 }
 
 size_t Label::getTextSize() const
@@ -49,6 +52,12 @@ size_t Label::getTextSize() const
     return m_text.getCharacterSize();
 }
 
+
+Label* Label::setStyle(sf::Text::Style style)
+{
+    m_text.setStyle(style);
+    return this;
+}
 
 void Label::draw(const gfx::RenderContext& ctx) const
 {

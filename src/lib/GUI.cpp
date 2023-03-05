@@ -86,6 +86,7 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
     // Notify widgets of the change
     for (auto& [name, w] : widgets) //! std::map reorders alphabetically, which is a disadvantage here
     {
+//cerr << name << "\n";
         const_cast<Widget*>(w)->onThemeChanged();
     }
 /*

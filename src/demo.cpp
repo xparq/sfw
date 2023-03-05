@@ -214,7 +214,7 @@ int main()
     vboximg->add(new sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
     vboximg->add(new sfw::Label("Image crop varied:"));
     vboximg->add(imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg")); // See imgCrop defined above!
-    vboximg->add(new sfw::Label("(Art: © Édouard Martinet)"));
+    vboximg->add(new sfw::Label("(Art: © Édouard Martinet)"))->setStyle(sf::Text::Style::Italic);
 
     auto right_bar = main_hbox->add(new sfw::VBoxLayout());
 
