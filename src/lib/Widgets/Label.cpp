@@ -8,10 +8,7 @@ namespace sfw
 
 Label::Label(const sf::String& string)
 {
-    m_text.setFont(Theme::getFont());
-    m_text.setPosition({Theme::PADDING, Theme::PADDING});
-    m_text.setFillColor(Theme::click.textColor);
-    m_text.setCharacterSize((unsigned)Theme::textSize);
+    onThemeChanged(); //!!Calling it this way is a temp. kludge (for DRY). Also: it has to happen before the rest of the init.
     setSelectable(false);
     setText(string);
 }

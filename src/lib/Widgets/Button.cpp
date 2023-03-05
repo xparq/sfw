@@ -9,11 +9,8 @@ namespace sfw
 
 Button::Button(const sf::String& string)
 {
-    m_box.item().setFont(Theme::getFont());
-    m_box.item().setCharacterSize((int)Theme::textSize);
-    m_box.setSize((float)Theme::minWidgetWidth, Theme::getBoxHeight());
-    setString(string);
-    setSize(m_box.getSize());
+    onThemeChanged(); //!!Calling it this way is a temp. kludge (for DRY). Also: it has to happen before the rest of the init.
+    setText(string); // Will resize, too
 }
 
 Button::Button(const sf::String& string, std::function<void()> callback):
@@ -29,14 +26,14 @@ Button::Button(const sf::String& string, std::function<void(Button*)> callback):
 }
 
 
-void Button::setString(const sf::String& string)
+void Button::setText(const sf::String& string)
 {
     m_box.item().setString(string);
     recomputeGeometry();
 }
 
 
-const sf::String& Button::getString() const
+const sf::String& Button::getText() const
 {
     return m_box.item().getString();
 }
@@ -54,9 +51,11 @@ void Button::onThemeChanged()
 void Button::recomputeGeometry()
 {
     int fittingWidth = (int)(m_box.item().getLocalBounds().width + Theme::PADDING * 2 + Theme::borderSize * 2);
-    int width = std::max(fittingWidth, Theme::minWidgetWidth);
+    int width = max(fittingWidth, Theme::minWidgetWidth);
+
     m_box.setSize((float)width, Theme::getBoxHeight());
     m_box.centerTextHorizontally(m_box.item());
+
     setSize(m_box.getSize());
 }
 

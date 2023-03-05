@@ -54,7 +54,8 @@ Image* Image::setTexture(const sf::Texture& texture, const sf::IntRect& r)
         m_texture = texture;
     }
 
-    setCropRect(r == NullRect ? sf::IntRect{{0, 0}, {(int)m_texture.getSize().x, (int)m_texture.getSize().y}} : r);
+    setCropRect(r == NullRect ? sf::IntRect{{0, 0}, {(int)m_texture.getSize().x, (int)m_texture.getSize().y}}
+                              : r);
     return this;
 }
 
@@ -78,7 +79,6 @@ Image* Image::setCropRect(const sf::IntRect& r)
     m_vertices[3].texCoords = sf::Vector2f(left + width, top + height);
 
     // Set widget geometry
-    updateGeometry(0, 0, width, height);
     setSize(width, height);
     return this;
 }
@@ -90,20 +90,10 @@ sf::IntRect Image::getCropRect() const
 }
 
 
-void Image::updateGeometry(float left, float top, float right, float bottom)
-{
-    m_vertices[0].position = {left, top};
-    m_vertices[1].position = {left, bottom};
-    m_vertices[2].position = {right, top};
-    m_vertices[3].position = {right, bottom};
-}
-
-
 Image* Image::scale(float factor)
 {
     m_scalingFactor = factor;
     setSize(m_baseSize * m_scalingFactor);
-    updateGeometry(0, 0, getSize().x, getSize().y);
     return this;
 }
 
@@ -112,7 +102,6 @@ Image* Image::rescale(float factor)
 {
     m_scalingFactor *= factor;
     setSize(getSize() * m_scalingFactor);
-    updateGeometry(0, 0, getSize().x, getSize().y);
     return this;
 }
 
@@ -122,6 +111,16 @@ Image* Image::setColor(const sf::Color& color)
     for (int i = 0; i < 4; ++i)
         m_vertices[i].color = color;
     return this;
+}
+
+
+void Image::onResized()
+{
+    auto [right, bottom] = getSize();
+    m_vertices[0].position = {0, 0};
+    m_vertices[1].position = {0, bottom};
+    m_vertices[2].position = {right, 0};
+    m_vertices[3].position = {right, bottom};
 }
 
 

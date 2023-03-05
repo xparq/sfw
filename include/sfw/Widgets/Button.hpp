@@ -18,12 +18,8 @@ public:
     Button(const sf::String& string, std::function<void()> callback);
     Button(const sf::String& string, std::function<void(Button*)> callback);
 
-    /**
-     * Set the displayed button label
-     */
-    void setString(const sf::String& string);
-
-    const sf::String& getString() const;
+    void setText(const sf::String& string);
+    const sf::String& getText() const;
 
     Button* setCallback(std::function<void(Button*)> callback);
     Button* setCallback(std::function<void()> callback)         { return (Button*) Widget::setCallback(callback); }

@@ -30,7 +30,9 @@ bool Widget::isRoot()
 
 bool Widget::isMain()
 {
+#ifndef NDEBUG
     if (getParent() == this) assert(isRoot());
+#endif
     return getParent() == this;
 }
 
@@ -104,7 +106,7 @@ void Widget::setSize(const sf::Vector2f& size)
     onResized();
     if (!isRoot())
     {
-        m_parent->recomputeGeometry();
+        getParent()->recomputeGeometry();
     }
 }
 
@@ -191,19 +193,6 @@ const sf::Transform& Widget::getTransform() const
 }
 
 
-#ifdef DEBUG
-void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
-{
-	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
-	r.setPosition(getAbsolutePosition());
-	r.setFillColor(sf::Color::Transparent);
-	r.setOutlineThickness(2);
-	r.setOutlineColor(sf::Color::Red);
-	ctx.target.draw(r);
-}
-#endif
-
-
 void Widget::centerText(sf::Text& text)
 {
     sf::FloatRect r = text.getLocalBounds();
@@ -211,7 +200,7 @@ void Widget::centerText(sf::Text& text)
     text.setPosition({m_size.x / 2, m_size.y / 2});
 }
 
-// callbacks -------------------------------------------------------------------
+// callbacks -----------------------------------------------------------------
 
 void Widget::onStateChanged(WidgetState) { }
 void Widget::onMouseEnter() { }
@@ -225,5 +214,20 @@ void Widget::onKeyReleased(const sf::Event::KeyEvent&) { }
 void Widget::onTextEntered(uint32_t) { }
 void Widget::onThemeChanged() { }
 void Widget::onResized() { }
+
+
+// diagnostics ---------------------------------------------------------------
+
+#ifdef DEBUG
+void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
+{
+	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
+	r.setPosition(getAbsolutePosition());
+	r.setFillColor(sf::Color::Transparent);
+	r.setOutlineThickness(2);
+	r.setOutlineColor(sf::Color::Red);
+	ctx.target.draw(r);
+}
+#endif
 
 } // namespace
