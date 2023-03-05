@@ -9,12 +9,12 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 
 ## Changes to the original:
 
-- Adapted to the pre-3.0 SFML _("master")_ API.
-- Windows/MSVC build added.
-- Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already).
-- Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow).
-- Cleaner API, improvements to existing widgets etc.
-- Reshuffled source tree (to help integrating into other projects, to allow growth, to "host" SFML locally).
+- Adapted to the pre-3.0 ("master") SFML API
+- Windows/MSVC build added
+- Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already)
+- Cleaner, richer API, improvements to existing widgets etc.
+- Reshuffled source tree (to help integrating into other projects, to allow growth, to allow embedding SFML directly)
+- Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow)
 
 _For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
 
@@ -23,13 +23,14 @@ _For other (both planned and completed) changes see the [issues](https://github.
 - Small package with no external dependencies (beyond SFML & `std::`)
 - Simple, straightforward API
 - Spritesheet-based visuals: a single, small image file to customize widget styles (like box borders/corners etc.)
-- Simple callbacks: optional lambdas (or `std::function`s) triggered on _important_ user actions (only).
+- Simple callbacks: optional lambdas (or `std::function`s) triggered on _important_ user actions (only)
   _(You can still derive from the widgets to override the other event handlers, too, of course.)_
 - Easy layouts: automatically align content without the need to precalculate positions/sizes
-- No CMake. (Well, that's considered a feature here; use e.g. TGUI if you can't build without CMake.)
+- No CMake. (Well, since I never got to learn it, now I just consider this a feature. ;)
+  Use e.g. TGUI if you don't feel warm and cozy without CMake.)
 
 
-![screenshot](doc/media/demo-screenshot-4.png)
+![screenshot](doc/media/demo-screenshot-5.png)
 
 
 ## Build

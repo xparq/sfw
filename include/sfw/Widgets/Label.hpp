@@ -2,6 +2,7 @@
 #define GUI_LABEL_HPP
 
 #include "sfw/Widget.hpp"
+#include <string>
 
 namespace sfw
 {
@@ -13,17 +14,11 @@ namespace sfw
 class Label: public Widget
 {
 public:
-    explicit Label(const sf::String& string = "");
+    explicit Label(const std::string& text = "");
 
-    /**
-     * Label's text
-     */
-    void setText(const sf::String& string);
-    const sf::String& getText() const;
+    void setText(const std::string& text);
+    std::string getText() const;
 
-    /**
-     * Label's color
-     */
     void setFillColor(const sf::Color& color);
     const sf::Color& getFillColor() const;
 

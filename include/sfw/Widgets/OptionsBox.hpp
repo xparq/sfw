@@ -2,6 +2,9 @@
 #define GUI_OPTIONSBOX_HPP
 
 #include "sfw/Widget.hpp"
+#include <string>
+
+// For the implementation:
 #include "sfw/Gfx/Shapes/Arrow.hpp"
 #include "sfw/Gfx/Shapes/ItemBox.hpp"
 
@@ -24,7 +27,7 @@ public:
      * @param label: displayed label when selected
      * @param value: value associated
      */
-    auto addItem(const sf::String& label, const T& value);
+    auto addItem(const std::string& label, const T& value);
 
     /**
      * Make an item the current one
@@ -67,9 +70,9 @@ private:
 
     struct Item
     {
-        Item(const sf::String& string, const T& value);
+        Item(const std::string& text, const T& value);
 
-        sf::String label;
+        std::string label;
         T value;
     };
 

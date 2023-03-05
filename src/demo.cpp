@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <string> // to_string
-#include <iostream> // cerr, for errors
+#include <iostream> // cerr, for errors, cout for some "demo" info
 #include <cassert>
 using namespace std;
 
@@ -26,6 +26,7 @@ int main()
 
     // Customizing some global defaults (optional)
     sfw::Theme::Cfg::DEFAULT_basePath = "demo/";
+    sfw::Theme::Cfg::DEFAULT_fontPath = "font/Vera.ttf";
 
     sfw::Theme::PADDING = 2.f;
     sfw::Theme::click.textColor      = hex2color("#191B18");
@@ -39,10 +40,10 @@ int main()
 
     // Some dynamically switcahble theme "quick config packs" to play with
     sfw::Theme::Cfg themes[] = {
-        { "Default (\"Baseline\")", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11 },
-        { "Classic",                "texture-sfw-classic.png", hex2color("#e6e8e0"), 12 },
+        { "Default (\"Baseline\")", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11, "font/Liberation/LiberationSans-Regular.ttf" },
+        { "Classic ☺",              "texture-sfw-classic.png",  hex2color("#e6e8e0"), 12, "font/Liberation/LiberationSans-Regular.ttf" },
         { "sfml-widgets's default", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
-        { "sfml-widgets's Win98",   "texture-sfmlwidgets-win98.png", hex2color("#d4d0c8"), },
+        { "sfml-widgets's Win98",   "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
     };
     const size_t DEFAULT_THEME = 0;
 
@@ -63,7 +64,8 @@ int main()
 
     // A text box to set the text of the example SFML object (created above)
     auto textbox = (new sfw::TextBox())
-        ->setPlaceholder("Type something!")->setText("Hello world!")
+        ->setPlaceholder("Type something!")
+        ->setText("Hello world!")
         ->setCallback([&](sfw::TextBox* w) {
             text.setString(w->getText());
             text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
@@ -101,7 +103,7 @@ int main()
     auto pbarScale1 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelNone);
     auto pbarScale2 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOver);
     auto pbarScale3 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
-    // (Creating the slider in the denser code style again)
+    // (Using the denser, "functional" code style again)
     form->addRow("Scale", (new sfw::Slider())->setCallback([&](auto* w) {
         float scale = 1 + w->getValue() * 2 / 100.f;
         text.setScale({scale, scale});
@@ -110,10 +112,13 @@ int main()
         pbarScale3->setValue(w->getValue());
     }));
 
-    // Options selector for color
+    // Text color selector
     using OBColor = sfw::OptionsBox<sf::Color>;
     // (Keeping in a var only to clone it later.)
-    auto opt = (new OBColor([&](auto* w) { text.setFillColor(w->getSelectedValue()); }))
+    auto opt = (new OBColor([&](auto* w) {
+            text.setFillColor(w->getSelectedValue());
+            w->setColor(w->getSelectedValue());
+        }))
         ->addItem("Red", sf::Color::Red)
         ->addItem("Blue", sf::Color::Blue)
         ->addItem("Green", sf::Color::Green)
@@ -121,7 +126,7 @@ int main()
         ->addItem("White", sf::Color::White);
     form->addRow("Text color", opt);
 
-    // A cloned options selector (for backgroud color)
+    // A cloned selector, for background color
     form->addRow("Screen bgnd. (copied widget)", (new OBColor(*static_cast<OBColor*>(opt)))
         ->addItem("Default", hex2color("#e6e8e0"))
         ->setCallback([&](auto* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
@@ -154,10 +159,14 @@ int main()
     layoutForVerticalProgressBars->add(pbarScale3);
 
     form->addRow("Default button", new sfw::Button("button"));
+    cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.get("Default button"))->getText() << "\"" <<endl;
+
+    form->addRow("UTF-8 test", new sfw::Button("VÍZ- GÁZ- ÉS HÓTŰRŐ")); // Note: this source is already UTF-8 encoded (supposedly...)!
+    cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get("UTF-8 test"))->getText() << "\"" <<endl;
 
     // Custom bitmap button
     sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
-    if (buttonimg.loadFromFile("demo/themed-button.png")) // SFML would print an error if failed
+    if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
     {
         form->addRow("Custom button", (new sfw::SpriteButton(buttonimg, "Play"))->setTextSize(20)
                                       ->setCallback([]/*(sfw::SpriteButton* w)*/ { /*compilation test*/ }));
@@ -185,7 +194,6 @@ int main()
     auto pbar = new sfw::ProgressBar(40);
     hbox3->add(pbar);
 
-    // Slider for crop size (it shouldn't just be put here, kinda dangling on its own, but well...)
     middle_panel->add((new sfw::Slider(1.f, 100.f))->setCallback([&](auto* w) {
         pbar->setValue(w->getValue());
         // Show the slider value in a text box retrieved by its name:
@@ -193,19 +201,19 @@ int main()
         if (!tbox) cerr << "Named TextBox not found! :-o\n";
         else tbox->setText(to_string((int)w->getValue()));
         imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
-                              {(int)w->getValue(), (int)w->getValue()}});
+                              {(int)(w->getValue() * 1.4), (int)w->getValue()}});
     }));
 
     // Image directly from file
     auto vboximg = main_hbox->add(new sfw::VBoxLayout());
-    vboximg->add(new sfw::Label("Image:"));
+    vboximg->add(new sfw::Label("Image, directly from file:"));
     vboximg->add(new sfw::Image("demo/some image.png"));
 
-    // Images from file, cropped
-    vboximg->add(new sfw::Label("Image crop:"));
+    // Image from file, cropped
+    vboximg->add(new sfw::Label("Image, cropped:"));
     vboximg->add(new sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
-    vboximg->add(new sfw::Label("Image crop varied:"));
-    vboximg->add(imgCrop = new sfw::Image("demo/SFML logo.png")); // See imgCrop defined above!
+    vboximg->add(new sfw::Label("(Art: © Édouard Martinet)"));
+    vboximg->add(imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg")); // See imgCrop defined above!
 
     auto right_bar = main_hbox->add(new sfw::VBoxLayout());
 

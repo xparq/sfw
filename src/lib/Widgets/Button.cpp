@@ -1,5 +1,6 @@
 #include "sfw/Widgets/Button.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/util/shims.hpp"
 
 #include <algorithm>
     using std::max;
@@ -7,35 +8,34 @@
 namespace sfw
 {
 
-Button::Button(const sf::String& string)
+Button::Button(const std::string& text)
 {
     onThemeChanged(); //!!Calling it this way is a temp. kludge (for DRY). Also: it has to happen before the rest of the init.
-    setText(string); // Will resize, too
+    setText(text); // Will resize, too
 }
 
-Button::Button(const sf::String& string, std::function<void()> callback):
-    Button(string)
+Button::Button(const std::string& text, std::function<void()> callback):
+    Button(text)
 {
     setCallback(callback);
 }
 
-Button::Button(const sf::String& string, std::function<void(Button*)> callback):
-    Button(string)
+Button::Button(const std::string& text, std::function<void(Button*)> callback):
+    Button(text)
 {
     setCallback(callback);
 }
 
 
-void Button::setText(const sf::String& string)
+void Button::setText(const std::string& text)
 {
-    m_box.item().setString(string);
+    m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(text));
     recomputeGeometry();
 }
 
-
-const sf::String& Button::getText() const
+std::string Button::getText() const
 {
-    return m_box.item().getString();
+    return /*sfw::*/SFMLString_to_stdstring(m_box.item().getString());
 }
 
 

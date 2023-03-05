@@ -1,29 +1,29 @@
 #include "sfw/Widgets/Label.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/util/shims.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
 namespace sfw
 {
 
-Label::Label(const sf::String& string)
+Label::Label(const std::string& text)
 {
     onThemeChanged(); //!!Calling it this way is a temp. kludge (for DRY). Also: it has to happen before the rest of the init.
     setSelectable(false);
-    setText(string);
+    setText(text);
 }
 
 
-void Label::setText(const sf::String& string)
+void Label::setText(const std::string& text)
 {
-    m_text.setString(string);
+    m_text.setString(/*sfw::*/stdstring_to_SFMLString(text));
     recomputeGeometry();
 }
 
-
-const sf::String& Label::getText() const
+std::string Label::getText() const
 {
-    return m_text.getString();
+    return /*sfw::*/SFMLString_to_stdstring(m_text.getString());
 }
 
 
@@ -31,7 +31,6 @@ void Label::setFillColor(const sf::Color& color)
 {
     m_text.setFillColor(color);
 }
-
 
 const sf::Color& Label::getFillColor() const
 {
@@ -44,7 +43,6 @@ void Label::setTextSize(size_t size)
     m_text.setCharacterSize((unsigned)size);
     recomputeGeometry();
 }
-
 
 size_t Label::getTextSize() const
 {

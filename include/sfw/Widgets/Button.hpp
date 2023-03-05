@@ -4,6 +4,10 @@
 #include "sfw/Widget.hpp"
 #include "sfw/Gfx/Shapes/ItemBox.hpp"
 
+#include <SFML/Graphics/Text.hpp>
+
+#include <string>
+
 namespace sfw
 {
 
@@ -14,12 +18,12 @@ namespace sfw
 class Button: public Widget
 {
 public:
-    explicit Button(const sf::String& string);
-    Button(const sf::String& string, std::function<void()> callback);
-    Button(const sf::String& string, std::function<void(Button*)> callback);
+    explicit Button(const std::string& text);
+    Button(const std::string& text, std::function<void()> callback);
+    Button(const std::string& text, std::function<void(Button*)> callback);
 
-    void setText(const sf::String& string);
-    const sf::String& getText() const;
+    void setText(const std::string& text);
+    std::string getText() const;
 
     Button* setCallback(std::function<void(Button*)> callback);
     Button* setCallback(std::function<void()> callback)         { return (Button*) Widget::setCallback(callback); }

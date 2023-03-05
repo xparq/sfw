@@ -1,4 +1,5 @@
 #include "sfw/Theme.hpp"
+#include "sfw/util/shims.hpp"
 
 namespace sfw
 {
@@ -37,11 +38,11 @@ OptionsBox<T>::OptionsBox(std::function<void(OptionsBox<T>*)> callback):
 
 
 template <class T>
-auto OptionsBox<T>::addItem(const sf::String& label, const T& value)
+auto OptionsBox<T>::addItem(const std::string& label, const T& value)
 {
     m_items.push_back(Item(label, value));
 
-    m_box.item().setString(label);
+    m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(label));
     float width = m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2;
     // Check if box needs to be resized
     if (width > getSize().x)
@@ -63,7 +64,7 @@ auto OptionsBox<T>::selectItem(size_t item_index)
     if (item_index < m_items.size())
     {
         m_currentIndex = item_index;
-        m_box.item().setString(m_items[item_index].label);
+        m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(m_items[item_index].label));
         m_box.centerTextHorizontally(m_box.item());
     }
     return this;
@@ -226,8 +227,8 @@ void OptionsBox<T>::onKeyReleased(const sf::Event::KeyEvent& key)
 
 
 template <class T>
-OptionsBox<T>::Item::Item(const sf::String& string, const T& val):
-    label(string),
+OptionsBox<T>::Item::Item(const std::string& text, const T& val):
+    label(text),
     value(val)
 {
 }
