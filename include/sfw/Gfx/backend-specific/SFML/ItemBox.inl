@@ -20,11 +20,23 @@ ItemBox<T>::ItemBox(const T& item, Box::Type type):
     applyState(WidgetState::Default);
 }
 
+
+template <class T>
+void ItemBox<T>::setItemColor(sf::Color color)
+{
+    m_itemColor = color;
+}
+
+
 template <class T>
 void ItemBox<T>::applyState(WidgetState state)
 {
     Box::applyState(state);
-    switch (state)
+    if (m_itemColor)
+    {
+        m_item.setFillColor(*m_itemColor);
+    }
+    else switch (state)
     {
     case WidgetState::Default:
         m_item.setFillColor(m_type == Click ? Theme::click.textColor : Theme::input.textColor);

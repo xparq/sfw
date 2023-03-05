@@ -110,6 +110,13 @@ auto OptionsBox<T>::selectPrevious()
 
 
 template <class T>
+OptionsBox<T>* OptionsBox<T>::setColor(const sf::Color& color)
+{
+    m_box.setItemColor(color);
+    return this;
+}
+
+template <class T>
 void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
 {
     auto sfml_renderstates = ctx.props;

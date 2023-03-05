@@ -2,6 +2,7 @@
 #define GUI_ITEMBOX_SFML_HPP
 
 #include "sfw/Gfx/Shapes/Box.hpp"
+#include <optional>
 
 namespace sfw
 {
@@ -16,6 +17,8 @@ public:
     ItemBox(Box::Type type = Box::Click);
     ItemBox(const T& item, Box::Type type = Box::Click);
 
+    void setItemColor(sf::Color color);
+
     void applyState(WidgetState state);
 
     inline T& item() { return m_item; }
@@ -27,6 +30,7 @@ private:
     void onRelease() override;
 
     T m_item;
+    std::optional<sf::Color> m_itemColor;
 };
 
 } // namespace

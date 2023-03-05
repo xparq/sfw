@@ -43,15 +43,10 @@ public:
      */
     size_t getSelectedIndex() const;
 
-    /**
-     * Select next item in the list
-     */
     auto selectNext();
-
-    /**
-     * Select previous item in the list
-     */
     auto selectPrevious();
+
+    OptionsBox<T>* setColor(const sf::Color& color);
 
     // See Widget.hpp for the templates of these:
     OptionsBox<T>* setCallback(std::function<void(OptionsBox<T>*)> callback);
