@@ -78,7 +78,9 @@ public:
     TextBox* setCallback(std::function<void()> callback)         { return (TextBox*) Widget::setCallback(callback); }
     TextBox* setCallback(std::function<void(TextBox*)> callback);
 
-protected:
+private:
+    void draw(const gfx::RenderContext& ctx) const override;
+
     // Callbacks
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onMouseEnter() override;
@@ -88,9 +90,6 @@ protected:
     void onMouseMoved(float x, float y) override;
     void onTextEntered(uint32_t unicode) override;
     void onStateChanged(WidgetState state) override;
-
-private:
-    void draw(const gfx::RenderContext& ctx) const override;
 
     /**
      * Delete selected text if any

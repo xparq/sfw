@@ -72,19 +72,13 @@ public:
     Widget* get(const std::string& name) { return find(name); }
 
 protected:
-    // Callbacks
-    virtual void onStateChanged(WidgetState state);
-    virtual void onMouseEnter();
-    virtual void onMouseLeave();
-    virtual void onMouseMoved(float x, float y);
-    virtual void onMousePressed(float x, float y);
-    virtual void onMouseReleased(float x, float y);
-    virtual void onMouseWheelMoved(int delta);
-    virtual void onKeyPressed(const sf::Event::KeyEvent& key);
-    virtual void onKeyReleased(const sf::Event::KeyEvent& key);
-    virtual void onTextEntered(uint32_t unicode);
-    virtual void onThemeChanged();
-    virtual void onResized();
+//----------------------
+friend class GUI;
+friend class Layout;
+friend class FormLayout;
+friend class HBoxLayout;
+friend class VBoxLayout;
+//----------------------
 
     void setSize(const sf::Vector2f& size);
     void setSize(float width, float height);
@@ -95,22 +89,12 @@ protected:
 
     void centerText(sf::Text& text);
 
-//----------------------
-friend class GUI;
-friend class Layout;
-friend class FormLayout;
-friend class HBoxLayout;
-friend class VBoxLayout;
-//----------------------
-
-    virtual void recomputeGeometry() {} // Can be requested by friend widgets, too
-
-    void triggerCallback();
-
     void setState(WidgetState state);
     WidgetState getState() const;
 
     void setSelectable(bool selectable);
+
+    void triggerCallback();
 
     /**
      * Get the widget typed as a Layout, if applicable
@@ -151,8 +135,9 @@ friend class VBoxLayout;
      */
     GUI* getMain();
 
-
 private:
+    virtual void recomputeGeometry() {} // Can be requested by friend widgets, too
+
     /**
      * Widgets that are also Layouts would iterate their children via this
      * interface. The reason this is defined here in Widget, not there, is:
@@ -166,6 +151,20 @@ private:
      * name->widget lookup (implemented in GUI::Main)
      */
     Widget* find(const std::string& name);
+
+    // Callbacks
+    virtual void onStateChanged(WidgetState state);
+    virtual void onMouseEnter();
+    virtual void onMouseLeave();
+    virtual void onMouseMoved(float x, float y);
+    virtual void onMousePressed(float x, float y);
+    virtual void onMouseReleased(float x, float y);
+    virtual void onMouseWheelMoved(int delta);
+    virtual void onKeyPressed(const sf::Event::KeyEvent& key);
+    virtual void onKeyReleased(const sf::Event::KeyEvent& key);
+    virtual void onTextEntered(uint32_t unicode);
+    virtual void onThemeChanged();
+    virtual void onResized();
 
 
     Layout* m_parent;

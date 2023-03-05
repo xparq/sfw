@@ -32,7 +32,11 @@ public:
     Slider* setCallback(std::function<void(Slider*)> callback);
     Slider* setCallback(std::function<void()> callback)         { return (Slider*) Widget::setCallback(callback); }
 
-protected:
+private:
+    void draw(const gfx::RenderContext& ctx) const override;
+
+    void updateHandlePosition();
+
     // Callbacks
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onMousePressed(float x, float y) override;
@@ -40,11 +44,6 @@ protected:
     void onMouseReleased(float x, float y) override;
     void onMouseWheelMoved(int delta) override;
     void onStateChanged(WidgetState state) override;
-
-private:
-    void updateHandlePosition();
-
-    void draw(const gfx::RenderContext& ctx) const override;
 
     Orientation m_orientation;
     float m_step;

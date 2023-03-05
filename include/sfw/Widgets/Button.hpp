@@ -28,7 +28,11 @@ public:
     Button* setCallback(std::function<void(Button*)> callback);
     Button* setCallback(std::function<void()> callback)         { return (Button*) Widget::setCallback(callback); }
 
-protected:
+private:
+    void draw(const gfx::RenderContext& ctx) const override;
+
+    void recomputeGeometry() override;
+
     // Callbacks
     void onStateChanged(WidgetState state) override;
     void onMouseMoved(float x, float y) override;
@@ -36,12 +40,7 @@ protected:
     void onMouseReleased(float x, float y) override;
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onKeyReleased(const sf::Event::KeyEvent& key) override;
-
-private:
-    void draw(const gfx::RenderContext& ctx) const override;
-
     void onThemeChanged() override;
-    void recomputeGeometry() override;
 
     ItemBox<sf::Text> m_box;
 };

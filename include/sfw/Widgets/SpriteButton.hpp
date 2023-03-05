@@ -30,16 +30,15 @@ public:
     SpriteButton* setCallback(std::function<void()> callback)         { return (SpriteButton*) Widget::setCallback(callback); }
     SpriteButton* setCallback(std::function<void(SpriteButton*)> callback);
 
-protected:
+private:
+    void draw(const gfx::RenderContext& ctx) const override;
+
     void onStateChanged(WidgetState state) override;
     void onMouseMoved(float x, float y) override;
     void onMousePressed(float x, float y) override;
     void onMouseReleased(float x, float y) override;
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onKeyReleased(const sf::Event::KeyEvent& key) override;
-
-private:
-    void draw(const gfx::RenderContext& ctx) const override;
 
     void press();
     void release();

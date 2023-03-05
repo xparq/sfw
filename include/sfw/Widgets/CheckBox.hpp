@@ -25,14 +25,13 @@ public:
     CheckBox* setCallback(std::function<void(CheckBox*)> callback);
     CheckBox* setCallback(std::function<void()> callback)         { return (CheckBox*) Widget::setCallback(callback); }
 
-protected:
+private:
+    void draw(const gfx::RenderContext& ctx) const override;
+
     // Callbacks
     void onStateChanged(WidgetState state) override;
     void onMouseReleased(float x, float y) override;
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
-
-private:
-    void draw(const gfx::RenderContext& ctx) const override;
 
     Box m_box;
     CheckMark m_checkmark;
