@@ -4,6 +4,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 
 #include <cassert>
+#include <cmath>
 
 namespace sfw
 {
@@ -150,7 +151,7 @@ void Box::centerTextHorizontally(sf::Text& text)
 {
     sf::Vector2f size = getSize();
     sf::FloatRect textSize = text.getLocalBounds();
-    float x = getPosition().x + (size.x - textSize.width) / 2;
+    float x = floor(getPosition().x + (size.x - textSize.width) / 2);
     text.setPosition({x, Theme::borderSize + Theme::PADDING});
 }
 
@@ -159,7 +160,7 @@ void Box::centerTextVertically(sf::Text& text)
 {
     sf::Vector2f size = getSize();
     sf::FloatRect textSize = text.getLocalBounds();
-    float y = getPosition().y + (size.y - textSize.width) / 2;
+    float y = floor(getPosition().y + (size.y - textSize.width) / 2);
     text.setPosition({Theme::getBoxHeight() - Theme::PADDING, y});
 }
 
