@@ -193,13 +193,6 @@ const sf::Transform& Widget::getTransform() const
 }
 
 
-void Widget::centerText(sf::Text& text)
-{
-    sf::FloatRect r = text.getLocalBounds();
-    text.setOrigin({r.left + std::round(r.width / 2.f), r.top + std::round(r.height / 2.f)});
-    text.setPosition({m_size.x / 2, m_size.y / 2});
-}
-
 // callbacks -----------------------------------------------------------------
 
 void Widget::onStateChanged(WidgetState) { }

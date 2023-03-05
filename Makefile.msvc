@@ -49,13 +49,13 @@ sfw_objs=\
 	$(sfw_out)/$(sfw_layouts_dirtag)/FormLayout.obj\
 	$(sfw_out)/$(sfw_layouts_dirtag)/HBoxLayout.obj\
 	$(sfw_out)/$(sfw_layouts_dirtag)/VBoxLayout.obj\
-	$(sfw_out)/$(sfw_widgets_dirtag)/Button.obj\
-	$(sfw_out)/$(sfw_widgets_dirtag)/CheckBox.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/Label.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/Button.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/Image.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/ImageButton.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/CheckBox.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/Slider.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/TextBox.obj\
-	$(sfw_out)/$(sfw_widgets_dirtag)/SpriteButton.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/ProgressBar.obj\
 
 #-----------------------------------------------------------------------------

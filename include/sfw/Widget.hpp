@@ -6,14 +6,12 @@
 //!!#include "sfw/Layout.hpp" // See forw. decl. below instead...
 //!!#include "sfw/GUI-main.hpp" // See forw. decl. below instead...
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/Cursor.hpp>
-
 #include <functional>
-#include <type_traits>
+#include <string>
+
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Transform.hpp>
+#include <SFML/Window/Event.hpp>
 
 namespace sfw
 {
@@ -86,8 +84,6 @@ friend class VBoxLayout;
     sf::Vector2f getAbsolutePosition() const;
 
     const sf::Transform& getTransform() const;
-
-    void centerText(sf::Text& text);
 
     void setState(WidgetState state);
     WidgetState getState() const;

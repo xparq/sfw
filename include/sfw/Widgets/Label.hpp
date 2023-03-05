@@ -2,7 +2,10 @@
 #define GUI_LABEL_HPP
 
 #include "sfw/Widget.hpp"
+
 #include <string>
+
+#include <SFML/Graphics/Text.hpp>
 
 namespace sfw
 {

@@ -1,10 +1,12 @@
-#ifndef GUI_SPRITEBUTTON_HPP
-#define GUI_SPRITEBUTTON_HPP
+#ifndef GUI_IMAGEBUTTON_HPP
+#define GUI_IMAGEBUTTON_HPP
 
 #include "sfw/Widget.hpp"
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 namespace sfw
 {
@@ -12,23 +14,23 @@ namespace sfw
 /**
  * Push button linked to a sprite sheet
  */
-class SpriteButton: public Widget
+class ImageButton: public Widget
 {
 public:
-    SpriteButton(const sf::Texture& texture, const sf::String& label = "");
+    ImageButton(const sf::Texture& texture, const sf::String& label = "");
 
-    SpriteButton* setString(const sf::String& string);
+    ImageButton* setString(const sf::String& string);
     const sf::String& getString() const;
 
-    SpriteButton* setFont(const sf::Font& font);
+    ImageButton* setFont(const sf::Font& font);
     const sf::Font& getFont() const;
 
-    SpriteButton* setTextSize(size_t size);
+    ImageButton* setTextSize(size_t size);
 
-    SpriteButton* setTexture(const sf::Texture& texture);
+    ImageButton* setTexture(const sf::Texture& texture);
 
-    SpriteButton* setCallback(std::function<void()> callback)         { return (SpriteButton*) Widget::setCallback(callback); }
-    SpriteButton* setCallback(std::function<void(SpriteButton*)> callback);
+    ImageButton* setCallback(std::function<void()> callback)         { return (ImageButton*) Widget::setCallback(callback); }
+    ImageButton* setCallback(std::function<void(ImageButton*)> callback);
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
@@ -40,6 +42,7 @@ private:
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onKeyReleased(const sf::Event::KeyEvent& key) override;
 
+    void centerText();
     void press();
     void release();
 
@@ -50,4 +53,4 @@ private:
 
 } // namespace
 
-#endif // GUI_SPRITEBUTTON_HPP
+#endif // GUI_IMAGEBUTTON_HPP

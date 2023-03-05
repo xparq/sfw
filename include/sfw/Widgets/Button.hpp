@@ -4,9 +4,9 @@
 #include "sfw/Widget.hpp"
 #include "sfw/Gfx/Shapes/ItemBox.hpp"
 
-#include <SFML/Graphics/Text.hpp>
-
 #include <string>
+
+#include <SFML/Graphics/Text.hpp>
 
 namespace sfw
 {

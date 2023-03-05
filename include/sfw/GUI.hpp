@@ -14,7 +14,7 @@
 #include "sfw/Widgets/OptionsBox.hpp"
 #include "sfw/Widgets/ProgressBar.hpp"
 #include "sfw/Widgets/Slider.hpp"
-#include "sfw/Widgets/SpriteButton.hpp"
+#include "sfw/Widgets/ImageButton.hpp"
 #include "sfw/Widgets/TextBox.hpp"
 
 // Layouts

@@ -168,8 +168,8 @@ int main()
     sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
     if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
     {
-        form->addRow("Custom button", (new sfw::SpriteButton(buttonimg, "Play"))->setTextSize(20)
-                                      ->setCallback([]/*(sfw::SpriteButton* w)*/ { /*compilation test*/ }));
+        form->addRow("Custom button", (new sfw::ImageButton(buttonimg, "Play"))->setTextSize(20)
+                                      ->setCallback([]/*(sfw::ImageButton* w)*/ { /*compilation test*/ }));
     }
 
     // A panel in the middle
@@ -206,14 +206,15 @@ int main()
 
     // Image directly from file
     auto vboximg = main_hbox->add(new sfw::VBoxLayout());
-    vboximg->add(new sfw::Label("Image, directly from file:"));
+    vboximg->add(new sfw::Label("Image (from file):"));
     vboximg->add(new sfw::Image("demo/some image.png"));
 
     // Image from file, cropped
-    vboximg->add(new sfw::Label("Image, cropped:"));
+    vboximg->add(new sfw::Label("Image crop:"));
     vboximg->add(new sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
-    vboximg->add(new sfw::Label("(Art: © Édouard Martinet)"));
+    vboximg->add(new sfw::Label("Image crop varied:"));
     vboximg->add(imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg")); // See imgCrop defined above!
+    vboximg->add(new sfw::Label("(Art: © Édouard Martinet)"));
 
     auto right_bar = main_hbox->add(new sfw::VBoxLayout());
 

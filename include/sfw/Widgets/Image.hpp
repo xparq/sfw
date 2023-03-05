@@ -3,8 +3,11 @@
 
 #include "sfw/Widget.hpp"
 
-#include <SFML/Graphics/Texture.hpp>
 #include <string>
+
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 namespace sfw
 {

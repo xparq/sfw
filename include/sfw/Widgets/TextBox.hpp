@@ -4,6 +4,9 @@
 #include "sfw/Widget.hpp"
 #include "sfw/Gfx/Shapes/Box.hpp"
 
+#include <string>
+
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/System/Clock.hpp>
 

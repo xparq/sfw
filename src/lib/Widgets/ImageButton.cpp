@@ -1,12 +1,16 @@
-#include "sfw/Widgets/SpriteButton.hpp"
+#include "sfw/Widgets/ImageButton.hpp"
 #include "sfw/Theme.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Text.hpp>
+
+#include <cmath>
+    using std::round;
 
 namespace sfw
 {
 
-SpriteButton::SpriteButton(const sf::Texture& texture, const sf::String& string):
+ImageButton::ImageButton(const sf::Texture& texture, const sf::String& string):
     Widget(),
     m_pressed(false)
 {
@@ -19,7 +23,7 @@ SpriteButton::SpriteButton(const sf::Texture& texture, const sf::String& string)
 }
 
 
-SpriteButton* SpriteButton::setTexture(const sf::Texture& texture)
+ImageButton* ImageButton::setTexture(const sf::Texture& texture)
 {
     int width = texture.getSize().x;
     int height = texture.getSize().y / 3; // default, hover, focus
@@ -32,43 +36,43 @@ SpriteButton* SpriteButton::setTexture(const sf::Texture& texture)
 }
 
 
-SpriteButton* SpriteButton::setString(const sf::String& string)
+ImageButton* ImageButton::setString(const sf::String& string)
 {
     m_text.setString(string);
-    centerText(m_text);
+    centerText();
     return this;
 }
 
 
-const sf::String& SpriteButton::getString() const
+const sf::String& ImageButton::getString() const
 {
     return m_text.getString();
 }
 
 
-SpriteButton* SpriteButton::setFont(const sf::Font& font)
+ImageButton* ImageButton::setFont(const sf::Font& font)
 {
     m_text.setFont(font);
-    centerText(m_text);
+    centerText();
     return this;
 }
 
 
-const sf::Font& SpriteButton::getFont() const
+const sf::Font& ImageButton::getFont() const
 {
     return *m_text.getFont();
 }
 
 
-SpriteButton* SpriteButton::setTextSize(size_t size)
+ImageButton* ImageButton::setTextSize(size_t size)
 {
     m_text.setCharacterSize((unsigned)size);
-    centerText(m_text);
+    centerText();
     return this;
 }
 
 
-void SpriteButton::draw(const gfx::RenderContext& ctx) const
+void ImageButton::draw(const gfx::RenderContext& ctx) const
 {
     auto sfml_renderstates = ctx.props;
     sfml_renderstates.transform *= getTransform();
@@ -79,7 +83,7 @@ void SpriteButton::draw(const gfx::RenderContext& ctx) const
 
 // Callbacks -------------------------------------------------------------------
 
-void SpriteButton::onStateChanged(WidgetState state)
+void ImageButton::onStateChanged(WidgetState state)
 {
     sf::Vector2i size({(int)getSize().x, (int)getSize().y});
     switch (state)
@@ -98,7 +102,7 @@ void SpriteButton::onStateChanged(WidgetState state)
 }
 
 
-void SpriteButton::onMouseMoved(float x, float y)
+void ImageButton::onMouseMoved(float x, float y)
 {
     if (isFocused())
     {
@@ -110,13 +114,13 @@ void SpriteButton::onMouseMoved(float x, float y)
 }
 
 
-void SpriteButton::onMousePressed(float, float)
+void ImageButton::onMousePressed(float, float)
 {
     press();
 }
 
 
-void SpriteButton::onMouseReleased(float x, float y)
+void ImageButton::onMouseReleased(float x, float y)
 {
 
     release();
@@ -127,7 +131,7 @@ void SpriteButton::onMouseReleased(float x, float y)
 }
 
 
-void SpriteButton::onKeyPressed(const sf::Event::KeyEvent& key)
+void ImageButton::onKeyPressed(const sf::Event::KeyEvent& key)
 {
     if (key.code == sf::Keyboard::Enter)
     {
@@ -137,14 +141,14 @@ void SpriteButton::onKeyPressed(const sf::Event::KeyEvent& key)
 }
 
 
-void SpriteButton::onKeyReleased(const sf::Event::KeyEvent& key)
+void ImageButton::onKeyReleased(const sf::Event::KeyEvent& key)
 {
     if (key.code == sf::Keyboard::Enter)
         release();
 }
 
 
-void SpriteButton::press()
+void ImageButton::press()
 {
     if (!m_pressed)
     {
@@ -154,7 +158,7 @@ void SpriteButton::press()
 }
 
 
-void SpriteButton::release()
+void ImageButton::release()
 {
     if (m_pressed)
     {
@@ -164,9 +168,18 @@ void SpriteButton::release()
 }
 
 
-SpriteButton* SpriteButton::setCallback(std::function<void(SpriteButton*)> callback)
+void ImageButton::centerText()
 {
-    return (SpriteButton*) Widget::setCallback( [callback] (Widget* w) { callback( (SpriteButton*)w ); });
+    auto [boxwidth, boxheight] = getSize();
+    sf::FloatRect t = m_text.getLocalBounds();
+    m_text.setOrigin({t.left + round(t.width / 2.f), t.top + round(t.height / 2.f)});
+    m_text.setPosition({boxwidth / 2, boxheight / 2});
+}
+
+
+ImageButton* ImageButton::setCallback(std::function<void(ImageButton*)> callback)
+{
+    return (ImageButton*) Widget::setCallback( [callback] (Widget* w) { callback( (ImageButton*)w ); });
 }
 
 } // namespace
