@@ -4,6 +4,8 @@
 #include <SFML/Graphics/Color.hpp>
 #include <string>
 
+namespace sfw {
+
 sf::Color hex2color(const std::string& hexcolor)
 {
     sf::Color color = sf::Color::Black;
@@ -21,5 +23,7 @@ sf::Color hex2color(const std::string& hexcolor)
     }
     return color;
 }
+
+} // namespace
 
 #endif // SFW_HEX2COLOR_HPP

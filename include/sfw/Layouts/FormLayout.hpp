@@ -17,12 +17,23 @@ public:
     FormLayout();
 
     /**
-     * Add a new label/widget row in the form
-     * @param label: label displayed before the widget
-     * @param widget: widget to be added
+     * Add a label + an already existing widget to the form
+     * @param label: Label for the widget
+     * @param widget: Pointer to the widget created (with new) by the caller
+     * @return Pointer to the new widget
      */
-    Widget* addRow(const sf::String& label, Widget* widget,
-                   const std::string& widgetname_override = "");
+    Widget* add(const sf::String& label, Widget* widget,
+                const std::string& widgetname_override = "");
+
+    /**
+     * Add a label + newly created widget to the form
+     * @param label: Label for the widget
+     * @param widget: Temporary "template" instance the "real" widget will be created from
+     * @return Pointer to the new widget
+     */
+    template <class W> W* add(const sf::String& label, W&& tmp_widget, const std::string& name = "")
+        requires (std::is_base_of_v<Widget, W>)
+        { return (W*)(Widget*)add(label, (Widget*)new W(std::move(tmp_widget)), name); }
 
 private:
     void recomputeGeometry() override;

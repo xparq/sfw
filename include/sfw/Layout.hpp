@@ -5,6 +5,7 @@
 
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <functional>
 
 namespace sfw
@@ -21,11 +22,20 @@ public:
     ~Layout();
 
     /**
-     * Add a new widget to the container
-     * The container will take care of widget deallocation.
-     * The optional name parameter facilitates widget lookup by name [!!in the future!!]
-     * (and also better diagnostics).
-     * @return added widget
+     * Create new widget (from a temporary template instance) and append it
+     * to the container
+     * The optional `name` param. facilitates widget lookup by mnemonic.
+     * @return Pointer to the new widget
+     */
+    template <class W> W* add(W&& tmp_widget, const std::string& name = "")
+        requires (std::is_base_of_v<Widget, W>)
+        { return (W*)(Widget*)add((Widget*)new W(std::move(tmp_widget)), name); }
+
+    /**
+     * Attach already existing widget created by the client (with new) to the container
+     * The container will take care of deleting it.
+     * The optional `name` param. facilitates widget lookup by mnemonic.
+     * @return Pointer to the attached widget
      */
     Widget* add(Widget* widget, const std::string& name = "");
 

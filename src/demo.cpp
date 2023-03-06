@@ -24,22 +24,24 @@ int main()
     //------------------------------------------------------------------------
     // Setting up the GUI...
 
-    // Customizing some global defaults (optional)
-    sfw::Theme::Cfg::DEFAULT_basePath = "demo/";
-    sfw::Theme::Cfg::DEFAULT_fontPath = "font/Vera.ttf";
+    using sfw::Theme, sfw::hex2color; // Just to spare some noise + typing...
 
-    sfw::Theme::PADDING = 2.f;
-    sfw::Theme::click.textColor      = hex2color("#191B18");
-    sfw::Theme::click.textColorHover = hex2color("#191B18");
-    sfw::Theme::click.textColorFocus = hex2color("#000");
-    sfw::Theme::input.textColor = hex2color("#000");
-    sfw::Theme::input.textColorHover = hex2color("#000");
-    sfw::Theme::input.textColorFocus = hex2color("#000");
-    sfw::Theme::input.textSelectionColor = hex2color("#8791AD");
-    sfw::Theme::input.textPlaceholderColor = hex2color("#8791AD");
+    // Customizing some global defaults (optional)
+    Theme::Cfg::DEFAULT_basePath = "demo/";
+    Theme::Cfg::DEFAULT_fontPath = "font/Vera.ttf";
+
+    Theme::PADDING = 2.f;
+    Theme::click.textColor      = hex2color("#191B18");
+    Theme::click.textColorHover = hex2color("#191B18");
+    Theme::click.textColorFocus = hex2color("#000");
+    Theme::input.textColor = hex2color("#000");
+    Theme::input.textColorHover = hex2color("#000");
+    Theme::input.textColorFocus = hex2color("#000");
+    Theme::input.textSelectionColor = hex2color("#8791AD");
+    Theme::input.textPlaceholderColor = hex2color("#8791AD");
 
     // Some dynamically switcahble theme "quick config packs" to play with
-    sfw::Theme::Cfg themes[] = {
+    Theme::Cfg themes[] = {
         { "Default (\"Baseline\")", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11, "font/Liberation/LiberationSans-Regular.ttf" },
         { "Classic ☺",              "texture-sfw-classic.png",  hex2color("#e6e8e0"), 12, "font/Liberation/LiberationSans-Regular.ttf" },
         { "sfml-widgets's default", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
@@ -52,29 +54,29 @@ int main()
     demo.setPosition(10, 10);
 
     // A native SFML example Text object, to be manipulated via the GUI
-    sf::Text text("Hello world!", sfw::Theme::getFont());
+    sf::Text text("Hello world!", Theme::getFont());
     text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
     text.setPosition({480, 240});
 
     // A horizontal layout for multiple panels side-by-side
-    auto main_hbox = demo.add(new sfw::HBoxLayout());
+    auto main_hbox = demo.Layout::add(sfw::HBoxLayout());
 
     // A "form" panel on the left
-    auto form = main_hbox->add(new sfw::FormLayout());
+    auto form = main_hbox->add(sfw::FormLayout());
 
     // A text box to set the text of the example SFML object (created above)
-    auto textbox = (new sfw::TextBox())
+    form->add("Text", (new sfw::TextBox())
         ->setPlaceholder("Type something!")
         ->setText("Hello world!")
         ->setCallback([&](sfw::TextBox* w) {
             text.setString(w->getText());
             text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
-        });
-    form->addRow("Text", textbox);
+        })
+    );
 
     // Another text box, with length limit & pulsating cursor
     // Creating it without a "junk" local variable now:
-    form->addRow("Text with limit (5)",
+    form->add("Text with limit (5)",
                  (new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE))
                      ->setMaxLength(5)
                      ->setText("Hello world!")
@@ -83,7 +85,7 @@ int main()
     // of the added widget (the TextBox), which can then be used for retrieving
     // it later. (See it used by the crop slider somewhere below.)
     // It can also be overridden (e.g. to avoid duplicates), like:
-    // form->addRow("repeated label or overly long text", widget, "widgetname");
+    // form->add("repeated label or overly long text", widget, "widgetname");
     // (Widget names are optional.)
 
     // Slider + progress bars for rotating the text
@@ -97,14 +99,14 @@ int main()
         pbarRotation2->setValue(w->getValue());
         pbarRotation3->setValue(w->getValue());
     });
-    form->addRow("Rotation", sliderForRotation);
+    form->add("Rotation", sliderForRotation);
 
     // Slider + progress bars for scaling the text
     auto pbarScale1 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelNone);
     auto pbarScale2 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOver);
     auto pbarScale3 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
     // (Using the denser, "functional" code style again)
-    form->addRow("Scale", (new sfw::Slider())->setCallback([&](auto* w) {
+    form->add("Scale", (new sfw::Slider())->setCallback([&](auto* w) {
         float scale = 1 + w->getValue() * 2 / 100.f;
         text.setScale({scale, scale});
         pbarScale1->setValue(w->getValue());
@@ -124,21 +126,22 @@ int main()
         ->addItem("Green", sf::Color::Green)
         ->addItem("Yellow", sf::Color::Yellow)
         ->addItem("White", sf::Color::White);
-    form->addRow("Text color", opt);
+    form->add("Text color", opt);
 
     // A cloned selector, for background color
-    form->addRow("Screen bgnd. (copied widget)", (new OBColor(*static_cast<OBColor*>(opt)))
+    form->add("Screen bgnd. (copied widget)", (new OBColor(*opt))
         ->addItem("Default", hex2color("#e6e8e0"))
-        ->setCallback([&](auto* w) { sfw::Theme::windowBgColor = w->getSelectedValue(); }));
+        ->setCallback([&](auto* w) { Theme::windowBgColor = w->getSelectedValue(); })
+    );
 
-    // Checbkoxes (to set text properties)
-    form->addRow("Bold text", new sfw::CheckBox([&](auto* w) {
+    // Checkboxes to set text properties
+    form->add("Bold text", sfw::CheckBox())->setCallback([&](auto* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Bold;
         else                style &= ~sf::Text::Bold;
         text.setStyle(style);
-    }));
-    form->addRow("Underlined text", new sfw::CheckBox([&](auto* w) {
+    });
+    form->add("Underlined text", new sfw::CheckBox([&](auto* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Underlined;
         else                style &= ~sf::Text::Underlined;
@@ -146,38 +149,38 @@ int main()
     }));
 
     // Attach the horiz. progress bars (used for text rotation) to the form
-    form->addRow("Progress bar (label = None)", pbarRotation1);
-    form->addRow("Progress bar (label = Over)", pbarRotation2);
-    form->addRow("Progress bar (label = Outside)", pbarRotation3);
+    form->add("Progress bar (label = None)",    pbarRotation1);
+    form->add("Progress bar (label = Over)",    pbarRotation2);
+    form->add("Progress bar (label = Outside)", pbarRotation3);
 
     // Attach the vert. progress bars (used for text scaling) to a new box
     auto layoutForVerticalProgressBars = new sfw::HBoxLayout();
     //!! Issue #109: Document that manipulating unowned, free-standing layouts is UB!
-    form->addRow("Vertical progress bars", layoutForVerticalProgressBars);
+    form->add("Vertical progress bars", layoutForVerticalProgressBars);
     layoutForVerticalProgressBars->add(pbarScale1);
     layoutForVerticalProgressBars->add(pbarScale2);
     layoutForVerticalProgressBars->add(pbarScale3);
 
-    form->addRow("Default button", new sfw::Button("button"));
-    cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.get("Default button"))->getText() << "\"" <<endl;
+    form->add("Default button", sfw::Button("button"));
+    cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.get("Default button"))->getText() << "\"\n";
 
-    form->addRow("UTF-8 test", new sfw::Button("VÍZ- GÁZ- ÉS HÓTŰRŐ")); // Note: this source is already UTF-8 encoded (supposedly...)!
-    cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get("UTF-8 test"))->getText() << "\"" <<endl;
+    form->add("UTF-8 test", sfw::Button("VÍZ- GÁZ- ÉS HÓTŰRŐ")); // Note: this source is already UTF-8 encoded.
+    cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get("UTF-8 test"))->getText() << "\"\n";
 
     // Custom bitmap button
     sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
     if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
     {
-        form->addRow("Custom button", (new sfw::ImageButton(buttonimg, "Play"))->setTextSize(20)
+        form->add("Custom button", (new sfw::ImageButton(buttonimg, "Play"))->setTextSize(20)
                                       ->setCallback([]/*(sfw::ImageButton* w)*/ { /*compilation test*/ }));
     }
 
     // A panel in the middle
-    auto middle_panel = main_hbox->add(new sfw::VBoxLayout());
+    auto middle_panel = main_hbox->add(sfw::VBoxLayout());
 
     // Theme selection
-    middle_panel->add(new sfw::Label("Change theme:"));
-    auto themeselect = new sfw::OptionsBox<sfw::Theme::Cfg>([&](auto* w) {
+    middle_panel->add(sfw::Label("Change theme:"));
+    auto themeselect = new sfw::OptionsBox<Theme::Cfg>([&](auto* w) {
         const auto& themecfg = w->getSelectedValue();
         demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
     });
@@ -188,61 +191,61 @@ int main()
     // Static images (also a cropped one)
 
     // Slider & progress bar for crop size
-    sfw::Image* imgCrop = nullptr; // Hold your breath, see it created below!
-    auto hbox3 = middle_panel->add(new sfw::HBoxLayout());
-    hbox3->add(new sfw::Label("Crop square size:"));
-    auto pbar = new sfw::ProgressBar(40);
-    hbox3->add(pbar);
+    sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg"); // Will be attached later below!
+    auto hbox3 = middle_panel->add(sfw::HBoxLayout());
+    hbox3->add(sfw::Label("Crop square size:"));
+    hbox3->add(sfw::ProgressBar(40), "cropbar");
 
-    middle_panel->add((new sfw::Slider(1.f, 100.f))->setCallback([&](auto* w) {
-        pbar->setValue(w->getValue());
-        // Show the slider value in a text box retrieved by its name:
-        auto tbox = (sfw::TextBox*)w->get("Text with limit (5)");
-        if (!tbox) cerr << "Named TextBox not found! :-o\n";
-        else tbox->setText(to_string((int)w->getValue()));
-        imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
-                              {(int)(w->getValue() * 1.4), (int)w->getValue()}});
-    }));
+    middle_panel->add(sfw::Slider(1.f, 100.f))
+        ->setCallback([&](auto* w) {
+            ((sfw::ProgressBar*)w->get("cropbar"))->setValue(w->getValue());
+            // Show the slider value in a text box retrieved by its name:
+            auto tbox = (sfw::TextBox*)w->get("Text with limit (5)");
+            if (!tbox) cerr << "Named TextBox not found! :-o\n";
+            else tbox->setText(to_string((int)w->getValue()));
+            imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
+                                  {(int)(w->getValue() * 1.4), (int)w->getValue()}});
+        });
 
     // Image directly from file
-    auto vboximg = main_hbox->add(new sfw::VBoxLayout());
-    vboximg->add(new sfw::Label("Image (from file):"));
-    vboximg->add(new sfw::Image("demo/some image.png"));
+    auto vboximg = main_hbox->add(sfw::VBoxLayout());
+    vboximg->add(sfw::Label("Image (from file):"));
+    vboximg->add(sfw::Image("demo/some image.png"));
 
     // Image from file, cropped
-    vboximg->add(new sfw::Label("Image crop:"));
-    vboximg->add(new sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
-    vboximg->add(new sfw::Label("Image crop varied:"));
-    vboximg->add(imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg")); // See imgCrop defined above!
-    vboximg->add(new sfw::Label("(Art: © Édouard Martinet)"))->setStyle(sf::Text::Style::Italic);
+    vboximg->add(sfw::Label("Image crop:"));
+    vboximg->add(sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
+    vboximg->add(sfw::Label("Image crop varied:"));
+    vboximg->add(imgCrop); // See imgCrop created above!
+    vboximg->add(sfw::Label("(Art: © Édouard Martinet)"))->setStyle(sf::Text::Style::Italic);
 
-    auto right_bar = main_hbox->add(new sfw::VBoxLayout());
+    auto right_bar = main_hbox->add(sfw::VBoxLayout());
 
     // Show the GUI textures, for some insight/diagnostics
-    right_bar->add(new sfw::Label("Theme textures:"));
-    auto txbox = right_bar->add(new sfw::HBoxLayout());
-    auto tximg = (new sfw::Image(sfw::Theme::getTexture())) // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
+    right_bar->add(sfw::Label("Theme textures:"));
+    auto txbox = right_bar->add(sfw::HBoxLayout());
+    auto tximg = (new sfw::Image(Theme::getTexture())) // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
         ->scale(2);
-    txbox->add((new sfw::Slider(1.f, 100.f, sfw::Vertical))
+    txbox->add(sfw::Slider(1.f, 100.f, sfw::Vertical))
         ->setCallback([&](auto* w) { tximg->scale(1 + (100.f - w->getValue()) / 25.f); })
-        ->setStep(25.f)->setValue(75.f)
-    );
+        ->setStep(25.f)
+        ->setValue(75.f);
     txbox->add(tximg);
 
     // Textbox for new button labels & button-factory button...
-    auto hbox2 = middle_panel->add(new sfw::HBoxLayout());
-    auto tbButtName = hbox2->add(new sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-    hbox2->add(new sfw::Button("Create button", [&] { middle_panel->add(new sfw::Button(tbButtName->getText())); }));
+    auto hbox2 = middle_panel->add(sfw::HBoxLayout());
+    auto tbButtName = hbox2->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+    hbox2->add(sfw::Button("Create button", [&] { middle_panel->add(sfw::Button(tbButtName->getText())); }));
 
     // Clear-background checkbox
-    auto hbox4 = demo.add(new sfw::HBoxLayout());
-    hbox4->add(new sfw::Label("Clear background"));
-    hbox4->add(new sfw::CheckBox([&](auto* w) { sfw::Theme::clearWindow = w->isChecked(); }, true));
+    auto hbox4 = demo.add(sfw::HBoxLayout());
+    hbox4->add(sfw::Label("Clear background"));
+    hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = w->isChecked(); }, true));
 
     //form->add("This is just some text on its own."); // Shouldn't compile!
 
     // Exit button
-    demo.add(new sfw::Button("Quit", [&] { window.close(); }));
+    demo.add(sfw::Button("Quit", [&] { window.close(); }));
 
 
     // Start the event loop
