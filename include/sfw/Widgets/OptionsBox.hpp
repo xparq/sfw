@@ -65,8 +65,9 @@ private:
     void onMouseReleased(float x, float y) override;
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onKeyReleased(const sf::Event::KeyEvent& key) override;
+    void onThemeChanged() override;
 
-    void updateArrow(ItemBox<Arrow>& arrow, float x, float y);
+    void updateArrowState(ItemBox<Arrow>& arrow, float x, float y);
 
     struct Item
     {

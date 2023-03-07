@@ -1,5 +1,7 @@
 #include "sfw/Theme.hpp"
-#include "sfw/util/shims.hpp"
+#include "sfw/util/shims.hpp" // std::string <-> sf::String conv.
+
+#include <algorithm> // max
 
 namespace sfw
 {
@@ -11,22 +13,7 @@ OptionsBox<T>::OptionsBox():
     m_arrowLeft(Arrow(Arrow::Left)),
     m_arrowRight(Arrow(Arrow::Right))
 {
-    // Build visual components
-    m_box.item().setFont(Theme::getFont());
-    m_box.item().setCharacterSize((unsigned)Theme::textSize);
-    m_box.setSize((float)Theme::minWidgetWidth, (float)Theme::getBoxHeight());
-
-    // Pack left arrow
-    m_arrowLeft.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
-    m_arrowLeft.centerItem(m_arrowLeft.item());
-
-    // Pack right arrow
-    m_arrowRight.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
-    m_arrowRight.setPosition(m_box.getSize().x - Theme::getBoxHeight(), 0);
-    m_arrowRight.centerItem(m_arrowRight.item());
-
-    // Widget local bounds
-    setSize(m_box.getSize());
+    onThemeChanged();
 }
 
 template <class T>
@@ -44,7 +31,7 @@ auto OptionsBox<T>::addItem(const std::string& label, const T& value)
 
     m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(label));
     float width = m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2;
-    // Check if box needs to be resized
+    // Check if the box needs to be resized
     if (width > getSize().x)
     {
         m_box.setSize(width, (float)Theme::getBoxHeight());
@@ -117,6 +104,7 @@ OptionsBox<T>* OptionsBox<T>::setColor(const sf::Color& color)
     return this;
 }
 
+
 template <class T>
 void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
 {
@@ -130,7 +118,7 @@ void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
 
 
 template <class T>
-void OptionsBox<T>::updateArrow(ItemBox<Arrow>& arrow, float x, float y)
+void OptionsBox<T>::updateArrowState(ItemBox<Arrow>& arrow, float x, float y)
 {
     if (arrow.containsPoint(x, y))
     {
@@ -149,6 +137,41 @@ void OptionsBox<T>::updateArrow(ItemBox<Arrow>& arrow, float x, float y)
 // callbacks -------------------------------------------------------------------
 
 template <class T>
+void OptionsBox<T>::onThemeChanged()
+{
+    m_box.item().setFont(Theme::getFont());
+    m_box.item().setCharacterSize((unsigned)Theme::textSize);
+
+    // Update width to accomodate the widest element
+    auto width = (float)Theme::minWidgetWidth;
+    for (size_t i = 0; i < m_items.size(); ++i)
+    {
+        m_box.item().setString(stdstring_to_SFMLString(m_items[i].label));
+        width = std::max(width, m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2);
+    }
+    m_box.setSize(width, (float)Theme::getBoxHeight());
+    setSize(m_box.getSize());
+
+    // Reset the current selection rolled all over in the loop above
+    // (This will also center it, so the widget had to have been resized first!)
+    selectItem(getSelectedIndex());
+
+    // Left arrow
+    m_arrowLeft.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
+    m_arrowLeft.centerItem(m_arrowLeft.item());
+
+    // Right arrow
+    m_arrowRight.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
+    m_arrowRight.setPosition(m_box.getSize().x - Theme::getBoxHeight(), 0);
+    //!!WOW! Doing the same in reverse would make it fall apart spectacularly!! :-ooo
+    //!!m_arrowRight.setPosition(m_box.getSize().x - Theme::getBoxHeight(), 0);
+    //!!m_arrowRight.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
+
+    m_arrowRight.centerItem(m_arrowRight.item());
+}
+
+
+template <class T>
 void OptionsBox<T>::onStateChanged(WidgetState state)
 {
     // Hovered state is handled in the onMouseMoved callback
@@ -164,8 +187,8 @@ void OptionsBox<T>::onStateChanged(WidgetState state)
 template <class T>
 void OptionsBox<T>::onMouseMoved(float x, float y)
 {
-    updateArrow(m_arrowLeft, x, y);
-    updateArrow(m_arrowRight, x, y);
+    updateArrowState(m_arrowLeft, x, y);
+    updateArrowState(m_arrowRight, x, y);
 }
 
 
@@ -185,13 +208,13 @@ void OptionsBox<T>::onMouseReleased(float x, float y)
 {
     if (m_arrowLeft.containsPoint(x, y))
     {
-        selectPrevious();
         m_arrowLeft.release();
+        selectPrevious();
     }
     else if (m_arrowRight.containsPoint(x, y))
     {
-        selectNext();
         m_arrowRight.release();
+        selectNext();
     }
 }
 
