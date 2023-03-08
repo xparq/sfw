@@ -40,8 +40,9 @@ sfw_shapes_dirtag=Gfx/Shapes
 sfw_out=$(out_dir)/$(libsrc_dirtag)
 sfw_objs=\
 	$(sfw_out)/GUI.obj\
-	$(sfw_out)/Widget.obj\
 	$(sfw_out)/Theme.obj\
+	$(sfw_out)/Widget.obj\
+	$(sfw_out)/WidgetContainer.obj\
 	$(sfw_out)/Layout.obj\
 	$(sfw_out)/$(sfw_shapes_dirtag)/CheckMark.obj\
 	$(sfw_out)/$(sfw_shapes_dirtag)/Box.obj\

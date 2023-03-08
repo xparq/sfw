@@ -12,8 +12,9 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 - Adapted to the pre-3.0 ("master") SFML API
 - Windows/MSVC build added
 - Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already)
-- Cleaner, richer API, improvements to existing widgets etc.
+- Richer, more flexible API, improvements to existing widgets etc.
 - Reshuffled source tree (to help integrating into other projects, to allow growth, to allow embedding SFML directly)
+- Default quick-start assets included
 - Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow)
 
 _For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
@@ -48,19 +49,21 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 ## Use
 
-0. `#include "sfw/GUI.hpp"`
-1. Load resources (the styling template image, font etc.) via the static `sfw::Theme` class,
-   customize the style properties etc.
-2. Create the top-level GUI manager object, connecting it to the SFML window, like: `sfw::GUI my_GUI(window);`.
-3. Create widgets with `new`, set their properties, add callbacks etc.
-   (Note: the `Main` object's destructor will take care of deleting them.)
-4. Add widgets to various containers (layouts, incl. the root object) like: `someplace.add(my_widget)`).
-5. In your app's event loop pass events to the GUI: `my_GUI.process(event);`.
-6. Draw the GUI in your frame refresh loop: `my_GUI.render();`.
+0. Integrate (via env. vars, or just copy) the `include` & `lib` dirs to your project.
+   (Copy the `asset` dir, too, if you want to use the stock defaults.)
+1. `#include "sfw/GUI.hpp"`.
+2. Setup theme config resources (like the styling texture image, default font etc.),
+   customize default style properties etc.
+3. Create the top-level GUI manager object, connecting it to your SFML window, like: `sfw::GUI myGUI(window);`
+   (or, typically with a customized config.: `sfw::GUI myGUI(window, myConfig);`)
+4. Add containers, widgets with `...->add(sfw::SomeWidget(...))` calls, set their properties (like callbacks) etc.
+   (Note: widget objects will be created and deleted implicitly.)
+5. Pass events to the GUI (in your app's event loop): `my_GUI.process(event);`.
+6. Draw the GUI (in your frame refresh loop; or the event loop, in single-treaded apps): `myGUI.render();`.
 7. Have fun!
 
 ## More...
 
-* a [minimal example](doc/minimal_example.cpp)
+* a [minimal example](doc/minimal_example.cpp) (or [another](doc/minimal_example-polling.cpp), with a polling event loop)
 * a fairly comprehensive example: [`demo.cpp`](src/demo.cpp)
 * the headers in the [`include`](include/sfw) dir, for an authoritative reference (they are easy to read)

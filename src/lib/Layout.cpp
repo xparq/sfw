@@ -1,77 +1,22 @@
 #include "sfw/Layout.hpp"
-
-#include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/util/shims.hpp"
-
-#include "SFML/Graphics/RenderTarget.hpp"
-
-#include <string>
-    using std::string, std::begin, std::end;
-#include <charconv>
-    using std::to_chars;
-#include <utility>
+#include "sfw/Gfx/Render.hpp"
 
 namespace sfw
 {
 
-Layout::Layout():
-    m_first(nullptr),
-    m_last(nullptr),
-    m_hover(nullptr),
-    m_focus(nullptr)
-{
-}
+// Overrides -----------------------------------------------------------------
 
-
-Layout::~Layout()
+void Layout::draw(const gfx::RenderContext& ctx) const
 {
-    // Deallocate all widgets
-    const Widget* widget = m_first;
-    while (widget != nullptr)
+    auto sfml_renderstates = ctx.props;
+    sfml_renderstates.transform *= getTransform();
+    for (const Widget* widget = m_first; widget != nullptr; widget = widget->m_next)
     {
-        const Widget* next = widget->m_next;
-        delete widget;
-        widget = next;
+        widget->draw(gfx::RenderContext{ctx.target, sfml_renderstates});
     }
 }
 
-
-Widget* Layout::add(Widget* widget, const std::string& name)
-{
-    widget->setParent(this);
-
-    if (m_first == nullptr)
-    {
-        m_first = m_last = widget;
-    }
-    else
-    {
-        m_last->m_next = widget;
-        widget->m_previous = m_last;
-        m_last = widget;
-    }
-
-    if (GUI* Main = getMain(); Main != nullptr)
-    {
-        // Make the default hex for a more climactic debug experience...
-        char abuf[17] = {0}; to_chars(abuf, end(abuf), (size_t)(void*)widget, 16);
-        Main->remember(name.empty() ? string(abuf) : name, widget);
-    }
-
-    recomputeGeometry();
-
-    return widget;
-}
-
-
-Widget* Layout::getFirstWidget()
-{
-    return m_first;
-}
-
-
-// Callbacks -------------------------------------------------------------------
 
 void Layout::onStateChanged(WidgetState state)
 {
@@ -222,17 +167,6 @@ void Layout::onTextEntered(uint32_t unicode)
     if (m_focus != nullptr)
     {
         m_focus->onTextEntered(unicode);
-    }
-}
-
-
-void Layout::draw(const gfx::RenderContext& ctx) const
-{
-    auto sfml_renderstates = ctx.props;
-    sfml_renderstates.transform *= getTransform();
-    for (const Widget* widget = m_first; widget != nullptr; widget = widget->m_next)
-    {
-        widget->draw(gfx::RenderContext{ctx.target, sfml_renderstates});
     }
 }
 

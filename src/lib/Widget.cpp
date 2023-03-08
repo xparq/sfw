@@ -1,5 +1,5 @@
 #include "sfw/Widget.hpp"
-#include "sfw/Layout.hpp"
+#include "sfw/WidgetContainer.hpp"
 #include "sfw/GUI-main.hpp"
 
 #include <cassert>
@@ -177,7 +177,7 @@ void Widget::triggerCallback()
 }
 
 
-void Widget::setParent(Layout* parent)
+void Widget::setParent(WidgetContainer* parent)
 {
     m_parent = parent;
 }

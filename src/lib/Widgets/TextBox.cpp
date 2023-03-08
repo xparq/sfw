@@ -194,12 +194,9 @@ void TextBox::setCursorPos(size_t index)
 
 void TextBox::onKeyReleased(const sf::Event::KeyEvent& key)
 {
-    switch (key.code)
+    if (key.code == sf::Keyboard::LShift || key.code == sf::Keyboard::RShift)
     {
-    case sf::Keyboard::LShift:
-    case sf::Keyboard::RShift:
         m_selection.stop();
-        break;
     }
 }
 

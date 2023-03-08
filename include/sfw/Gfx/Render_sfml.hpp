@@ -2,6 +2,8 @@
 #define SFW_RENDER_SFML_HPP
 
 #include <SFML/Graphics/Drawable.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
 
 namespace sfw
 {

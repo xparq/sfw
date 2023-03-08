@@ -3,6 +3,7 @@
 
 #include "sfw/WidgetState.hpp"
 #include "sfw/Gfx/Render.hpp"
+//!!#include "sfw/WidgetContainer.hpp" // See forw. decl. below instead...
 //!!#include "sfw/Layout.hpp" // See forw. decl. below instead...
 //!!#include "sfw/GUI-main.hpp" // See forw. decl. below instead...
 
@@ -15,6 +16,7 @@
 
 namespace sfw
 {
+class WidgetContainer;
 class Layout;
 class GUI;
 
@@ -79,6 +81,7 @@ public:
 protected:
 //----------------------
 friend class GUI;
+friend class WidgetContainer;
 friend class Layout;
 friend class VBox;
 friend class HBox;
@@ -101,15 +104,14 @@ friend class Form;
 
     /**
      * Get the widget typed as a Layout, if applicable
-     * Used to check if the widget is a container (Layout and its subclasses)
      */
     virtual Layout* toLayout() { return nullptr; }
 
     /**
      * Set the parent (container) of the widget
      */
-    void setParent(Layout* parent);
-    Layout* getParent() const { return m_parent; }
+    void setParent(WidgetContainer* parent);
+    WidgetContainer* getParent() const { return m_parent; }
 
     /**
      * Is this a root widget?
@@ -142,15 +144,6 @@ private:
     virtual void recomputeGeometry() {} // Can be requested by friend widgets, too
 
     /**
-     * Widgets that are also Layouts would iterate their children via this
-     * interface. The reason this is defined here in Widget, not there, is:
-     *   a) parents of Widgets & Layouts shouldn't care about the difference,
-     *   b) Widget types other than Layout may have children in the future.
-     * The traversal is recursive (not just a single-level iteration).
-     */
-    virtual void traverseChildren(std::function<void(Widget*)> f) { f(this); }
-
-    /**
      * name->widget lookup (implemented in GUI::Main)
      */
     Widget* find(const std::string& name) const;
@@ -170,7 +163,7 @@ private:
     virtual void onResized();
 
 
-    Layout* m_parent;
+    WidgetContainer* m_parent;
     Widget* m_previous;
     Widget* m_next;
 

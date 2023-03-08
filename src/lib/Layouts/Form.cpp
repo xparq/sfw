@@ -36,7 +36,7 @@ void Form::recomputeGeometry()
     sf::Vector2f size{};
     m_labelWidth = 0;
     size_t i = 0;
-    for (Widget* widget = getFirstWidget(); widget != nullptr; widget = widget->m_next)
+    for (Widget* widget = m_first; widget != nullptr; widget = widget->m_next)
     {
         if (i % 2 == 0)
         {
@@ -63,7 +63,7 @@ void Form::recomputeGeometry()
     //
     sf::Vector2f pos{};
     i = 0;
-    for (Widget* widget = getFirstWidget(); widget != nullptr; widget = widget->m_next)
+    for (Widget* widget = m_first; widget != nullptr; widget = widget->m_next)
     {
         if (i % 2 == 0)
         {
