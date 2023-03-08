@@ -22,28 +22,28 @@ Widget::Widget():
 }
 
 
-bool Widget::isRoot()
+bool Widget::isRoot() const
 {
     return getParent() == nullptr || getParent() == this;
 }
 
 
-bool Widget::isMain()
+bool Widget::isMain() const
 {
 #ifndef NDEBUG
-    if (getParent() == this) assert(isRoot());
+    if (getParent() == this) assert(isRoot()); // not there in my MSVC yet: [[ assert: isRoot() ]]
 #endif
     return getParent() == this;
 }
 
 
-Widget* Widget::getRoot()
+Widget* Widget::getRoot() const
 {
-    return !isMain() && getParent() ? getParent()->getRoot() : this;
+    return !isMain() && getParent() ? getParent()->getRoot() : const_cast<Widget*>(this); // Not const when returning itself...
 }
 
 
-GUI* Widget::getMain()
+GUI* Widget::getMain() const
 {
     // Well, it's halfway between "undefined" and "bug" to call this on free-standing widgets...
     assert(       getParent() && getParent() != this ? getParent()->getRoot() : getParent());
@@ -51,13 +51,22 @@ GUI* Widget::getMain()
 }
 
 
-Widget* Widget::find(const std::string& name)
+Widget* Widget::find(const std::string& name) const
 {
     if (GUI* Main = getMain(); Main != nullptr)
     {
         return Main->recall(name);
     }
     return nullptr;
+}
+
+std::string Widget::getName() const
+{
+    if (GUI* Main = getMain(); Main != nullptr)
+    {
+        return Main->recall(this);
+    }
+    return "";
 }
 
 

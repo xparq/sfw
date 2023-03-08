@@ -23,25 +23,26 @@ public:
     //    This is the initial version to support the Demo app.
     struct Cfg
     {
-        //!! These make no real sense until they get actually packaged:
-        static const char* DEFAULT_basePath; // "asset/"
-        static const char* DEFAULT_fontPath; // Bitstream Vera
-        static const char* DEFAULT_texturePath;
-
-        static size_t      DEFAULT_textSize;
-        static sf::Color   DEFAULT_bgColor;
-
-        const char* name = "(unnamed)";
-        const char* texturePath = nullptr;
-        sf::Color bgColor = DEFAULT_bgColor;
-        size_t textSize = DEFAULT_textSize;
-        const char* fontPath = nullptr;
+        // Note: the ordering is optimized for init lists like
+        //
+        //  { "asset/custom", "MyClassic", "mytextures.png", hex2color("#e6e8e0"), 12, "font/MyFont.ttf" }
+        //
+        const char* name = nullptr;
+        const char* basePath = nullptr;
+        const char* textureFile = nullptr;
+        sf::Color bgColor;
+        size_t textSize;
+        const char* fontFile = nullptr;
 
     protected:
         friend class GUI;
-        bool apply() const;
+        bool apply();
     };
 
+    /**
+     * The default configuration (see Theme.cpp for details!)
+     */
+    static Cfg DEFAULT;
 
     /**
      * Load the GUI global font

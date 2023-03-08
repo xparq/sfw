@@ -12,6 +12,7 @@
 
 #include <string>
 #include <map>
+#include <system_error>
 
 namespace sfw
 {
@@ -23,7 +24,13 @@ namespace sfw
 class GUI: public VBoxLayout
 {
 public:
-    GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg);
+    GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg = Theme::DEFAULT);
+
+    /**
+     * Return true if no errors.
+     */
+    operator bool();
+
 
     bool setTheme(const sfw::Theme::Cfg& themeCfg);
 
@@ -42,7 +49,8 @@ public:
      * Implement a name->widget registry
      */
     void remember(const std::string& name, Widget* widget);
-    Widget* recall(const std::string& name);
+    Widget* recall(const std::string& name) const;
+    std::string recall(const Widget*) const;
 
     /**
      * Change the mouse pointer for the GUI window
@@ -50,6 +58,15 @@ public:
     void setMouseCursor(sf::Cursor::Type cursorType);
 
 private:
+
+    /**
+     * "Soft-reset" the GUI state, keeping the current config & widgets
+     * Clears the error state, too.
+     * NOTE: It would fall back to erring if the config itself is invalid!
+     * @return true if no errors
+     */
+    bool reset();
+
     /**
      * Get mouse cursor relative position
      * @param x: absolute x position from the event
@@ -58,11 +75,10 @@ private:
      */
     sf::Vector2f convertMousePosition(int x, int y) const;
 
+    std::error_code m_error;
     sf::RenderWindow& m_window;
     sfw::Theme::Cfg m_themeCfg;
-
     sf::Cursor::Type m_cursorType;
-
     std::map<std::string, Widget*> widgets;
 };
 

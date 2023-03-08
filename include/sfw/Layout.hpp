@@ -27,8 +27,8 @@ public:
      * The optional `name` param. facilitates widget lookup by mnemonic.
      * @return Pointer to the new widget
      */
-    template <class W> W* add(W&& tmp_widget, const std::string& name = "")
-        requires (std::is_base_of_v<Widget, W>)
+    template <class W> requires std::is_base_of_v<Widget, W>
+    W* add(W&& tmp_widget, const std::string& name = "")
         { return (W*)(Widget*)add((Widget*)new W(std::move(tmp_widget)), name); }
 
     /**
@@ -42,8 +42,8 @@ public:
     /**
      * Also for any Widget subclasses, without tedious casting in client code
      */
-    template <class W> W* add(W* widget, const std::string& name = "")
-        requires (std::is_base_of_v<Widget, W>)
+    template <class W> requires std::is_base_of_v<Widget, W>
+    W* add(W* widget, const std::string& name = "")
         { return (W*) (Widget*) add((Widget*)widget, name); }
 
 protected:

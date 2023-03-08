@@ -1,28 +1,44 @@
 #include "sfw/Theme.hpp"
 
+#include <string>
+using std::string;
+
 namespace sfw
 {
 
 //!!THESE ARE NOT YET ACTUALLY PACKAGED, but the code is already there, so...:
-const char* Theme::Cfg::DEFAULT_basePath = "asset/";
-const char* Theme::Cfg::DEFAULT_fontPath = "Vera.ttf";
-const char* Theme::Cfg::DEFAULT_texturePath = "texture-baseline.png";
-
-size_t      Theme::Cfg::DEFAULT_textSize = 12;
-sf::Color   Theme::Cfg::DEFAULT_bgColor = sf::Color::Black;
-
-bool Theme::Cfg::apply() const
+Theme::Cfg Theme::DEFAULT =
 {
-    if (!sfw::Theme::loadFont(std::string(DEFAULT_basePath) + (!fontPath ? DEFAULT_fontPath : fontPath)))
+	.name = "",
+	.basePath = "asset/",
+	.textureFile = "texture/default.png",
+	.bgColor = sf::Color::Black,
+	.textSize = 12,
+	.fontFile = "font/default.ttf",
+};
+
+
+bool Theme::Cfg::apply()
+{
+    // Pick up the defaults first...
+    // (This really should be a constructor, but that would kill the designated inits... :-/ )
+    if (!name)         name        = Theme::DEFAULT.name;
+    if (!basePath)     basePath    = Theme::DEFAULT.basePath;
+    if (!fontFile)     fontFile    = Theme::DEFAULT.fontFile;
+    if (!textureFile)  textureFile = Theme::DEFAULT.textureFile;
+    if (textSize <= 1) textSize    = Theme::DEFAULT.textSize;
+
+    // Update the global (`static`) Theme data...
+    if (!Theme::loadFont(string(basePath) + fontFile))
     {
         return false; // SFML has already explained the situation...
     }
-    if (!texturePath || !Theme::loadTexture(std::string(DEFAULT_basePath) + (!texturePath ? DEFAULT_texturePath : texturePath)))
+    if (!Theme::loadTexture(string(basePath) + textureFile))
     {
         return false; // SFML has already explained the situation...
     }
     Theme::windowBgColor = bgColor;
-    Theme::textSize = (textSize > 0 ? textSize : DEFAULT_textSize); // Set after loadTexture, as it would reset this.
+    Theme::textSize = textSize;
     return true;
 }
 
@@ -37,12 +53,12 @@ static sf::Cursor& getDefaultCursor()
     return cursor;
 }
 
-size_t Theme::textSize = Theme::Cfg::DEFAULT_textSize;
+size_t Theme::textSize = Theme::DEFAULT.textSize;
 Theme::Style Theme::click;
 Theme::Style Theme::input;
 sf::Color Theme::windowBgColor = sf::Color::White;
 bool Theme::clearWindow = true;
-int Theme::borderSize = 1;
+int Theme::borderSize = 1; //! Will get reset based on the loaded texture, so no use setting it here!
 int Theme::minWidgetWidth = 86;
 float Theme::PADDING = 1.f;
 float Theme::MARGIN = 7.f;

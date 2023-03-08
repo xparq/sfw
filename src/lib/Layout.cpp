@@ -6,7 +6,6 @@
 
 #include "SFML/Graphics/RenderTarget.hpp"
 
-#include <cassert>
 #include <string>
     using std::string, std::begin, std::end;
 #include <charconv>

@@ -65,9 +65,16 @@ public:
     // }
 
     /**
-      * Retrieve widget by name, if previously registered (or null if not)
+      * Get the name of the widget (or "" if unnamed)
+      * (This may be a slow operation, intended mainly for diagnostic use.)
       */
-    Widget* get(const std::string& name) { return find(name); }
+    std::string getName() const;
+
+    /**
+      * Find (some other) widget by name, if previously registered (or null if not)
+      */
+    Widget* get(const std::string& name) const { return find(name); }
+
 
 protected:
 //----------------------
@@ -102,14 +109,14 @@ friend class VBoxLayout;
      * Set the parent (container) of the widget
      */
     void setParent(Layout* parent);
-    Layout* getParent() { return m_parent; }
+    Layout* getParent() const { return m_parent; }
 
     /**
      * Is this a root widget?
      * Root widgets are those that have no parent (e.g. newly created containers
      * that have not yet been attached to the GUI).
      */
-    bool isRoot();
+    bool isRoot() const;
 
     /**
      * The "root" of a widget is a parent that has no parent.
@@ -117,19 +124,19 @@ friend class VBoxLayout;
      * Note: free-standing ("dangling") widgets (those that have been created
      * but not yet attached to the GUI, have a root, but not a Main object.
      */
-    Widget* getRoot();
+    Widget* getRoot() const;
 
     /**
      * Is this the main GUI widget?
      */
-    bool isMain();
+    bool isMain() const;
 
     /**
      * Get the main GUI widget
      * (or null for free-standing widgets that have not yet been attached
      * to the GUI; but avoid that, as it will be considered invalid later!)
      */
-    GUI* getMain();
+    GUI* getMain() const;
 
 private:
     virtual void recomputeGeometry() {} // Can be requested by friend widgets, too
@@ -146,7 +153,7 @@ private:
     /**
      * name->widget lookup (implemented in GUI::Main)
      */
-    Widget* find(const std::string& name);
+    Widget* find(const std::string& name) const;
 
     // Callbacks
     virtual void onStateChanged(WidgetState state);
