@@ -14,7 +14,7 @@ int main()
     //
     sfw::GUI gui(window);
 
-    // The config. is optional if assets are packaged according to the defaults:
+    // The config. is optional if your assets are packaged according to the defaults:
     // sfw::GUI gui(window, { .basePath = "asset/",
     //                        .textureFile = "texture/default.png",
     //                        .fontFile = "font/default.ttf",

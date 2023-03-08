@@ -58,8 +58,8 @@ _For other (both planned and completed) changes see the [issues](https://github.
    (or, typically with a customized config.: `sfw::GUI myGUI(window, myConfig);`)
 4. Add containers, widgets with `...->add(sfw::SomeWidget(...))` calls, set their properties (like callbacks) etc.
    (Note: widget objects will be created and deleted implicitly.)
-5. Pass events to the GUI (in your app's event loop): `my_GUI.process(event);`.
-6. Draw the GUI (in your frame refresh loop; or the event loop, in single-treaded apps): `myGUI.render();`.
+5. Pass events to the GUI (in your app's event loop): `myGUI.process(event);`.
+6. Draw the GUI (in your frame refresh loop; or the event loop in single-treaded apps): `myGUI.render();`.
 7. Have fun!
 
 ## More...
