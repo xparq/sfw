@@ -6,7 +6,7 @@ int main()
     //
     // Normal SFML app init...
     //
-    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal", sf::Style::Titlebar);
 
     //
     // GUI Setup...
@@ -36,9 +36,6 @@ int main()
         {
             // Pass events to the GUI
             gui.process(event);
-
-            if (event.type == sf::Event::Closed)
-                window.close();
         }
     }
 

@@ -202,7 +202,7 @@ int main()
     // Theme font size slider
     // (Changes the font size directly of the cfg. data stored in "theme-selector",
     // so it will remember the new size(s)!)
-    middle_panel->add(sfw::Label("Theme font size (use <-/->):"));
+    middle_panel->add(sfw::Label("Theme font size (use the m. wheel):"));
     middle_panel->add(sfw::Slider(10, 100))
         ->setValue(30)
         ->setCallback([&] (auto* w){
@@ -283,7 +283,10 @@ int main()
             // Send events to the demo GUI
             demo.process(event);
 
-            if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+            if (event.type == sf::Event::Closed)
+                break;
+
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
                 window.close();
         }
 

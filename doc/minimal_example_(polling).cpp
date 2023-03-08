@@ -6,7 +6,7 @@ int main()
     //
     // Normal SFML app init...
     //
-    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal (polling loop)", sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal (polling loop)", sf::Style::Titlebar);
     window.setFramerateLimit(30);
 
     //
@@ -33,13 +33,10 @@ int main()
         window.display();
 
         // Process events in the queue (each one, to avoid possible congestion)
-        while (sf::Event event; window.pollEvent(event))
+        for (sf::Event event; window.pollEvent(event) && event.type != sf::Event::Closed; )
         {
             // Pass events to the GUI
             gui.process(event);
-
-            if (event.type == sf::Event::Closed)
-                window.close();
         }
     }
 
