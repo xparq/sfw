@@ -14,6 +14,38 @@ namespace sfw
 {
 
 /**
+ * Generalized text selection abstraction, independent from the internals
+ * of the text editor using it. The editor should hook up various selection
+ * methods in its event handlers and operations (most importantly `follow(pos)`
+ * into its cursor updating proc.) to achieve the desired selection behavior.
+ * (This implementation is optimized for volatile selections, but can easily
+ * support persistent modes, too... I guess... Never actually tried. ;) )
+ */
+struct TextSelection
+{
+    size_t anchor_pos = 0;
+    size_t active_pos = 0;
+    bool following = false;
+
+    operator bool() const { return !empty(); }
+    size_t empty() const { return active_pos == anchor_pos; }
+    size_t length() const { return right() - left(); }
+    // These're about *appearance*, so should be OK even with right-to-left scripts:
+    size_t left() const;
+    size_t right() const;
+
+    void start(size_t pos);
+    void set(size_t pos, size_t len = 0);
+    void set_from_to(size_t anchor_pos, size_t active_pos);
+    void resize(size_t len);
+    void follow(size_t pos);
+    void stop();
+    void resume();
+    void reset();
+};
+
+
+/**
  * The TextBox widget is a one-line text editor.
  * It allows the user to enter and edit a single line of plain text.
  */
@@ -46,27 +78,32 @@ public:
     /**
      * Set the cursor position
      */
-    void setCursor(size_t index, bool extend_selection = false);
+    void setCursorPos(size_t index);
 
     /**
      * Get the cursor position
      */
-    size_t getCursor() const;
+    size_t getCursorPos() const { return m_cursorPos; }
 
     /**
-     * Set selected text
+     * Set the selection to a specific range
      */
-    void setSelectedText(size_t from, size_t to);
+    void setSelection(size_t from, size_t to);
 
     /**
      * Get selected text
      */
-    const sf::String& getSelectedText() const;
+    sf::String getSelectedText() const;
 
     /**
-     * Cancel the text selection range, if any
+     * Delete selected text, if any
      */
-    void clearSelectedText();
+    void deleteSelectedText();
+
+    /**
+     * Cancel the text selection, if any
+     */
+    void clearSelection();
 
     /**
      * Set placeholder text
@@ -86,6 +123,7 @@ private:
 
     // Callbacks
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
+    void onKeyReleased(const sf::Event::KeyEvent& key) override;
     void onMouseEnter() override;
     void onMouseLeave() override;
     void onMousePressed(float x, float y) override;
@@ -93,11 +131,6 @@ private:
     void onMouseMoved(float x, float y) override;
     void onTextEntered(uint32_t unicode) override;
     void onStateChanged(WidgetState state) override;
-
-    /**
-     * Delete selected text if any
-     */
-    void deleteSelectedText();
 
     sf::Text m_text;
     sf::Text m_placeholder;
@@ -107,9 +140,7 @@ private:
     mutable sf::Clock m_cursorTimer;
     size_t m_cursorPos;
     size_t m_maxLength;
-    size_t m_selectionFirst;
-    size_t m_selectionLast;
-    sf::String m_selectedText;
+    TextSelection m_selection;
 };
 
 } // namespace

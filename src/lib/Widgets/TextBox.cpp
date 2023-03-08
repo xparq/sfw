@@ -10,21 +10,83 @@
     using std::min, std::max;
 #include <functional>
 
-//#include <iostream> //!DEBUG
-//using namespace std;
+#include <iostream> //!DEBUG
+using namespace std;
 
 #define BLINK_PERIOD 1.f
 
 namespace sfw
 {
 
+//----------------------------------------------------------------------------
+//!! These should take into account the writing direction,
+//!! and flip the min/max selection accordingly!
+size_t TextSelection::left()  const { return min(anchor_pos, active_pos); }
+size_t TextSelection::right() const { return max(anchor_pos, active_pos); }
+
+void TextSelection::start(size_t pos)
+// Just blatantly overrides any pending selection proc.
+{
+	anchor_pos = active_pos = pos;
+	following = true;
+}
+
+void TextSelection::set(size_t pos, size_t len)
+// Disregard the follow mode! (Should be orhogonal to that.)
+{
+	anchor_pos = pos;
+	resize(len);
+}
+
+void TextSelection::set_from_to(size_t anchor_pos_, size_t active_pos_)
+// Disregard the follow mode! (Should be orhogonal to that.)
+{
+	anchor_pos = anchor_pos_;
+	active_pos = active_pos_;
+}
+
+void TextSelection::stop()
+{
+        following = false;
+}
+
+void TextSelection::resume()
+{
+        following = true;
+}
+
+void TextSelection::reset()
+{
+        following = false;
+	anchor_pos = 0;
+	active_pos = 0;
+}
+
+void TextSelection::follow(size_t pos)
+{
+	if (following) active_pos = pos;
+        else reset();
+}
+
+void TextSelection::resize(size_t len)
+//!! NOTE: This may also change the anchor position! Not sure if that's always OK!
+//!! At a quick glance it may just be mostly coincidence that it's in sync with the
+//!! most common editing operations and it actually does what's expected... :)
+//!!
+//!! Anywhow, it violates the idea that Selection updates move the active pos and
+//!! leave the anchor intact, unless *explicitly* requested otherwise!
+{
+	if (active_pos > anchor_pos) active_pos = anchor_pos + len;
+	else                         anchor_pos = active_pos + len;
+}
+
+
+//----------------------------------------------------------------------------
 TextBox::TextBox(float width, CursorStyle style):
     m_box(Box::Input),
     m_cursorStyle(style),
     m_cursorPos(0),
-    m_maxLength(256),
-    m_selectionFirst(0),
-    m_selectionLast(0)
+    m_maxLength(256)
 {
     m_box.setSize(width, Theme::getBoxHeight());
 
@@ -42,7 +104,7 @@ TextBox::TextBox(float width, CursorStyle style):
     m_cursor.setPosition({offset, offset});
     m_cursor.setSize(sf::Vector2f(1.f, (float)Theme::getLineSpacing()));
     m_cursor.setFillColor(Theme::input.textColor);
-    setCursor(0);
+    setCursorPos(0);
 
     setSize(m_box.getSize());
 }
@@ -51,7 +113,7 @@ TextBox::TextBox(float width, CursorStyle style):
 TextBox* TextBox::setText(const sf::String& string)
 {
     m_text.setString(string.substring(0, m_maxLength)); // Limit the length
-    setCursor(getText().getSize());
+    setCursorPos(getText().getSize());
 
     return this;
 }
@@ -70,77 +132,75 @@ TextBox* TextBox::setMaxLength(size_t maxLength)
     if (m_text.getString().getSize() > m_maxLength)
     {
         m_text.setString(m_text.getString().substring(0, m_maxLength));
-        setCursor(m_maxLength);
+        setCursorPos(m_maxLength);
     }
 
     return this;
 }
 
 
-void TextBox::setCursor(size_t index, bool extend_selection)
+void TextBox::setCursorPos(size_t index)
 {
-    if (index <= m_text.getString().getSize())
+    if (index > m_text.getString().getSize()) // NOTE: a) The cursor pos. is unsigned.
+                                              //       b) The pos. right after the end (technic'ly: at EOS) is OK.
     {
-        m_cursorPos = index;
-        if (extend_selection)
-        {
-            // Alas, can't just preset m_selectionFirst/Last directly, because
-            // setSelectedText() would then think: nothing to do. Must use copies:
-            auto selfirst = m_selectionFirst;
-            auto sellast  = m_selectionLast;
-            //!!This is a crude quick addition only for #51 yet, that only works *sometimes*!
-            //!!(E.g. it can only extend, but not shrink; etc.)
-            if (index < selfirst) selfirst = index;
-            if (index > sellast)  sellast  = index;
-//cerr << selfirst << " - " << sellast << endl;
-            setSelectedText(selfirst, sellast);
-        }
-        else
-        {
-            m_selectionFirst = index;
-            m_selectionLast = index;
-        }
+        // This "no-move" update kludge is to ensure the selection can update
+        // its state on any navigation action, even when the cursor won't move!
+        //!!Should instead call a generalized selection.onNavigation() here!
+        m_selection.follow(getCursorPos());
+        return;
+    }
 
-        float padding = Theme::borderSize + Theme::PADDING;
-        m_cursor.setPosition({m_text.findCharacterPos(index).x, padding});
-        m_cursorTimer.restart();
+    m_cursorPos = index;
+    m_selection.follow(index); // The selection itself will decide if and how exactly...
 
-        if (m_cursor.getPosition().x > getSize().x - padding)
+    // The rest is all about adjusting the view (presentation/appearance)...
+
+    float padding = Theme::borderSize + Theme::PADDING;
+    m_cursor.setPosition({m_text.findCharacterPos(index).x, padding});
+    m_cursorTimer.restart();
+
+    if (m_cursor.getPosition().x > getSize().x - padding)
+    {
+        // Shift text on left
+        float diff = m_cursor.getPosition().x - getSize().x + padding;
+        m_text.move({-diff, 0});
+        m_cursor.move({-diff, 0});
+    }
+    else if (m_cursor.getPosition().x < padding)
+    {
+        // Shift text on right
+        float diff = padding - m_cursor.getPosition().x;
+        m_text.move({diff, 0});
+        m_cursor.move({diff, 0});
+    }
+
+    float textWidth = m_text.getLocalBounds().width;
+    if (m_text.getPosition().x < padding && m_text.getPosition().x + textWidth < getSize().x - padding)
+    {
+        float diff = (getSize().x - padding) - (m_text.getPosition().x + textWidth);
+        m_text.move({diff, 0});
+        m_cursor.move({diff, 0});
+        // If text is smaller than the textbox, force align on left
+        if (textWidth < (getSize().x - padding * 2))
         {
-            // Shift text on left
-            float diff = m_cursor.getPosition().x - getSize().x + padding;
-            m_text.move({-diff, 0});
-            m_cursor.move({-diff, 0});
-        }
-        else if (m_cursor.getPosition().x < padding)
-        {
-            // Shift text on right
-            float diff = padding - m_cursor.getPosition().x;
+            diff = padding - m_text.getPosition().x;
             m_text.move({diff, 0});
             m_cursor.move({diff, 0});
-        }
-
-        float textWidth = m_text.getLocalBounds().width;
-        if (m_text.getPosition().x < padding && m_text.getPosition().x + textWidth < getSize().x - padding)
-        {
-            float diff = (getSize().x - padding) - (m_text.getPosition().x + textWidth);
-            m_text.move({diff, 0});
-            m_cursor.move({diff, 0});
-            // If text is smaller than the textbox, force align on left
-            if (textWidth < (getSize().x - padding * 2))
-            {
-                diff = padding - m_text.getPosition().x;
-                m_text.move({diff, 0});
-                m_cursor.move({diff, 0});
-            }
         }
     }
 }
 
 
-size_t TextBox::getCursor() const
+void TextBox::onKeyReleased(const sf::Event::KeyEvent& key)
 {
-    return m_cursorPos;
+    switch (key.code)
+    {
+    case sf::Keyboard::LShift:
+    case sf::Keyboard::RShift:
+        m_selection.stop();
+        break;
+    }
 }
 
 
@@ -148,42 +208,42 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 {
     switch (key.code)
     {
+    case sf::Keyboard::LShift:
+    case sf::Keyboard::RShift:
+        // If there's a selection, that means it's just been stopped.
+        // Pressing Shift again in that case very likely means an intent to
+        // resume it (probably for adjusting its size etc.), so allow that:
+        if (m_selection) m_selection.resume();
+        else m_selection.start(m_cursorPos);
+        break;
+
     case sf::Keyboard::Left:
         if (key.control)
         {
             // NOTE: assuming getString()[size] is a valid ref. (of the trailing \0)!
 
-            setCursor(m_cursorPos - 1, key.shift);
+            setCursorPos(m_cursorPos - 1);
             auto what_to_skip = m_text.getString()[m_cursorPos]; //! == ' ' will be checked to decide
             while (m_cursorPos > 0 &&
                    ((what_to_skip == ' ' && m_text.getString()[m_cursorPos - 1] == ' ')
                  || (what_to_skip != ' ' && m_text.getString()[m_cursorPos - 1] != ' '))) // sorry, the extra () noise is to shut GCC up (-Wparentheses)
-                setCursor(m_cursorPos - 1, key.shift);
+                setCursorPos(m_cursorPos - 1);
         }
-        else if (key.shift)
+        else if (!key.shift && m_selection && getCursorPos() == m_selection.right())
         {
-            if (m_cursorPos == m_selectionLast)
-            {
-                // Extend selection to left
-                if (m_selectionFirst > 0)
-                    setSelectedText(m_selectionFirst - 1, m_selectionLast);
-            }
-            else
-            {
-                // Shrink selection to right
-                setSelectedText(m_selectionFirst, m_selectionLast - 1);
-            }
-        }
-        else if (m_selectedText.isEmpty())
-        {
-            // Move cursor to the left
-            setCursor(m_cursorPos - 1, key.shift);
+            // This is a special case for better ergonomics:
+            // Resume the disappearing selection, and move the cursor to the left of it,
+            // because what's actually desired is almost never to finish a selection,
+            // do nothing with it, and then move the cursor a bit just to kill it...
+            m_selection.resume();
+            m_selection.set_from_to(getCursorPos(), m_selection.left());
+            setCursorPos(m_selection.left());
+            m_selection.stop();
         }
         else
         {
-            // Clear selection, move cursor to the left
-            setCursor(m_selectionFirst);
-            clearSelectedText();
+            // Just move the cursor normally
+            setCursorPos(m_cursorPos - 1);
         }
         break;
 
@@ -194,40 +254,31 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
             auto what_to_skip = m_text.getString()[m_cursorPos]; //! == ' ' will be checked to decide
             do {
-                setCursor(m_cursorPos + 1, key.shift);
+                setCursorPos(m_cursorPos + 1);
             } while (m_cursorPos < m_text.getString().getSize() &&
                      ((what_to_skip == ' ' && m_text.getString()[m_cursorPos] == ' ')
                    || (what_to_skip != ' ' && m_text.getString()[m_cursorPos] != ' '))); // sorry, the extra () noise is to shut GCC up (-Wparentheses)
         }
-        else if (key.shift)
+        else if (!key.shift && m_selection && getCursorPos() == m_selection.left())
         {
-            if (m_cursorPos == m_selectionFirst)
-            {
-                // Extend selection to right
-                if (m_selectionLast < m_text.getString().getSize())
-                    setSelectedText(m_selectionFirst, m_selectionLast + 1);
-            }
-            else
-            {
-                // Shrink selection to left
-                setSelectedText(m_selectionFirst + 1, m_selectionLast);
-            }
-        }
-        else if (m_selectedText.isEmpty())
-        {
-            // Move cursor to the right
-            setCursor(m_cursorPos + 1, key.shift);
+            // This is a special case for better ergonomics:
+            // Resume the disappearing selection, and move the cursor to the right of it,
+            // because what's actually desired is almost never to finish a selection,
+            // do nothing with it, and then move the cursor a bit just to kill it...
+            m_selection.resume();
+            m_selection.set_from_to(getCursorPos(), m_selection.right());
+            setCursorPos(m_selection.right());
+            m_selection.stop();
         }
         else
         {
-            // Clear selection, move cursor to the right
-            setCursor(m_selectionLast);
-            clearSelectedText();
+            // Just move the cursor normally
+            setCursorPos(m_cursorPos + 1);
         }
         break;
 
     case sf::Keyboard::Backspace:
-        if (!m_selectedText.isEmpty())
+        if (m_selection)
         {
             deleteSelectedText();
             break;
@@ -239,12 +290,12 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
             string.erase(m_cursorPos - 1);
             m_text.setString(string);
 
-            setCursor(m_cursorPos - 1);
+            setCursorPos(m_cursorPos - 1);
         }
         break;
 
     case sf::Keyboard::Delete:
-        if (!m_selectedText.isEmpty())
+        if (m_selection)
         {
             deleteSelectedText();
             break;
@@ -256,32 +307,16 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
             string.erase(m_cursorPos);
             m_text.setString(string);
 
-            setCursor(m_cursorPos);
+            setCursorPos(m_cursorPos);
         }
         break;
 
     case sf::Keyboard::Home:
-        if (key.shift)
-        {
-            // Shift+Home: select from start to cursor
-            setSelectedText(0, m_cursorPos);
-        }
-        else
-        {
-            setCursor(0);
-        }
+        setCursorPos(0);
         break;
 
     case sf::Keyboard::End:
-        if (key.shift)
-        {
-            // Shift+End: select from cursor to end
-            setSelectedText(m_cursorPos, m_text.getString().getSize());
-        }
-        else
-        {
-            setCursor(m_text.getString().getSize());
-        }
+        setCursorPos(m_text.getString().getSize());
         break;
 
     case sf::Keyboard::Enter:
@@ -292,7 +327,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
     case sf::Keyboard::A:
         if (key.control)
         {
-            setSelectedText(0, m_text.getString().getSize());
+            setSelection(0, m_text.getString().getSize());
         }
         break;
 
@@ -312,7 +347,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
             // Insert string at cursor position
             string.insert(m_cursorPos, clipboardString);
             m_text.setString(string);
-            setCursor(m_cursorPos + clipboardString.getSize());
+            setCursorPos(m_cursorPos + clipboardString.getSize());
         }
         break;
 
@@ -320,9 +355,9 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
     case sf::Keyboard::C:
         if (key.control)
         {
-            if (!m_selectedText.isEmpty())
+            if (m_selection)
             {
-                sf::Clipboard::setString(m_selectedText);
+                sf::Clipboard::setString(getSelectedText());
             }
         }
         break;
@@ -331,9 +366,9 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
     case sf::Keyboard::X:
         if (key.control)
         {
-            if (!m_selectedText.isEmpty())
+            if (m_selection)
             {
-                sf::Clipboard::setString(m_selectedText);
+                sf::Clipboard::setString(getSelectedText());
                 deleteSelectedText();
             }
         }
@@ -367,7 +402,8 @@ void TextBox::onMousePressed(float x, float)
         sf::Vector2f glyphPos = m_text.findCharacterPos(i);
         if (glyphPos.x <= x)
         {
-            setCursor(i);
+            m_selection.start(i);
+            setCursorPos(i);
             break;
         }
     }
@@ -382,7 +418,7 @@ void TextBox::onMouseReleased(float x, float)
         sf::Vector2f glyphPos = m_text.findCharacterPos(i);
         if (glyphPos.x <= x)
         {
-            setSelectedText(m_cursorPos, i);
+            setCursorPos(i);
             break;
         }
     }
@@ -399,7 +435,7 @@ void TextBox::onMouseMoved(float x, float)
             sf::Vector2f glyphPos = m_text.findCharacterPos(i);
             if (glyphPos.x <= x)
             {
-                setSelectedText(m_cursorPos, i);
+                setCursorPos(i);
                 break;
             }
         }
@@ -419,7 +455,7 @@ void TextBox::onTextEntered(uint32_t unicode)
             // Insert character in string at cursor position
             string.insert(m_cursorPos, unicode);
             m_text.setString(string);
-            setCursor(m_cursorPos + 1);
+            setCursorPos(m_cursorPos + 1);
         }
     }
 }
@@ -432,7 +468,7 @@ void TextBox::onStateChanged(WidgetState state)
     // Discard selection when focus is lost
     if (state != WidgetState::Focused)
     {
-        clearSelectedText();
+        clearSelection();
     }
 }
 
@@ -460,13 +496,13 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
     }
     else
     {
-        // Draw selection indicator
-        if (!m_selectedText.isEmpty())
+        // Draw the selection indicator
+        if (m_selection)
         {
             sf::RectangleShape selRect;
-            const sf::Vector2f& startPos = m_text.findCharacterPos(m_selectionFirst);
+            const sf::Vector2f& startPos = m_text.findCharacterPos(m_selection.left());
             selRect.setPosition(startPos);
-            selRect.setSize({m_text.findCharacterPos(m_selectionLast).x - startPos.x, m_cursor.getSize().y});
+            selRect.setSize({m_text.findCharacterPos(m_selection.right()).x - startPos.x, m_cursor.getSize().y});
             selRect.setFillColor(Theme::input.textSelectionColor);
             ctx.target.draw(selRect, sfml_renderstates);
         }
@@ -483,7 +519,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
         if (timer >= BLINK_PERIOD)
             m_cursorTimer.restart();
 
-        // Hijacking draw() as a timer tick callback... (Hi five to Alexandre! ;) )
+        // Hijacking draw() as a timer tick callback... :) Hi five to Alexandre@upstream for the brilliant idea!
         sf::Color color = Theme::input.textColor;
         color.a = (m_cursorStyle == PULSE ? uint8_t(255 - (255 * timer / BLINK_PERIOD))
                                           : uint8_t(255 - (255 * timer / BLINK_PERIOD)) & 128 ? 255 : 0);
@@ -494,48 +530,32 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 }
 
 
-void TextBox::setSelectedText(size_t from, size_t to)
+void TextBox::setSelection(size_t from, size_t to)
 {
-    if (from != to)
-    {
-        size_t selectionLast = max(from, to);
-        size_t selectionFirst = min(from, to);
-        if (selectionFirst != m_selectionFirst || selectionLast != m_selectionLast)
-        {
-            m_selectionFirst = selectionFirst;
-            m_selectionLast = selectionLast;
-            m_selectedText = m_text.getString().substring(m_selectionFirst, m_selectionLast - m_selectionFirst);
-        }
-    }
-    else
-    {
-        clearSelectedText();
-    }
+    m_selection.set(from, to - from);
+}
+
+void TextBox::clearSelection()
+{
+    m_selection.reset();
 }
 
 
-void TextBox::clearSelectedText()
+sf::String TextBox::getSelectedText() const
 {
-    m_selectionFirst = m_selectionLast = m_cursorPos;
-    m_selectedText.clear();
-}
-
-
-const sf::String& TextBox::getSelectedText() const
-{
-    return m_selectedText;
+    return m_text.getString().substring(m_selection.left(), m_selection.length());
 }
 
 
 void TextBox::deleteSelectedText()
 {
     // Delete if any selected text
-    if (!m_selectedText.isEmpty())
+    if (!m_selection.empty())
     {
         sf::String str = m_text.getString();
-        str.erase(m_selectionFirst, m_selectionLast - m_selectionFirst);
-        setCursor(m_selectionFirst);
-        clearSelectedText();
+        str.erase(m_selection.left(), m_selection.length());
+        setCursorPos(m_selection.left());
+        clearSelection();
         m_text.setString(str);
     }
 }
