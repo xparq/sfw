@@ -3,19 +3,20 @@ DEMO    := $(LIBNAME)-demo
 LIBDIR  := lib
 LIBFILE := $(LIBDIR)/lib$(LIBNAME).a
 SRCDIR  := src
-SRC     := $(shell find $(SRCDIR) -name "*.cpp" -type f)
+SRC     := $(shell cd "$(SRCDIR)"; find . -name "*.cpp" -type f)
 OUTDIR  := tmp/build
 OBJDIR  := $(OUTDIR)
 OBJ     := $(SRC:%.cpp=$(OBJDIR)/%.o)
+DEMO_OBJ:= demo
 ifndef SFML_DIR
-SFML_DIR := extern/sfml
+SFML_DIR:= extern/sfml
 endif
 CC      := g++
 CFLAGS  := -I$(SFML_DIR)/include -I./include -std=c++20 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
 LDFLAGS := -L$(SFML_DIR)/lib -lsfml-graphics -lsfml-window -lsfml-system -lGL
 
 # Demo
-$(DEMO): src/demo.cpp $(LIBFILE)
+$(DEMO): $(OBJDIR)/$(DEMO_OBJ).o $(LIBFILE)
 	@echo "\033[1;33mlinking executable\033[0m $@"
 	@$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 	@echo "\033[1;32mDone!\033[0m"
@@ -26,8 +27,8 @@ $(LIBFILE): $(OBJ)
 	@echo "\033[1;33mlinking library\033[0m $@"
 	@ar crvf $@ $(OBJ)
 
-# Library objects
-$(OBJDIR)/%.o: %.cpp
+# Library, test, demo etc. object modules
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@echo "\033[1;33mcompiling\033[0m $<"
 	@mkdir -p $(shell dirname $@)
 	@$(CC) $(CFLAGS) -c $< -o $@
