@@ -241,10 +241,14 @@ void OptionsBox<T>::onKeyReleased(const sf::Event::KeyEvent& key)
     if (key.code == sf::Keyboard::Left)
     {
         m_arrowLeft.release();
+        // Without this the focus rect would be lost on the arrow (#137):
+        updateArrowState(m_arrowLeft, -1, -1); // -1,-1 to avoid the "hover" state
     }
     else if (key.code == sf::Keyboard::Right)
     {
         m_arrowRight.release();
+        // Without this the focus rect would be lost on the arrow (#137):
+        updateArrowState(m_arrowRight, -1, -1); // -1,-1 to avoid the "hover" state
     }
 }
 

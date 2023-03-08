@@ -7,6 +7,7 @@
 // For the implementation:
 #include "sfw/Gfx/Shapes/Arrow.hpp"
 #include "sfw/Gfx/Shapes/ItemBox.hpp"
+#include <SFML/Graphics/Text.hpp>
 
 namespace sfw
 {
@@ -71,10 +72,10 @@ private:
 
     struct Item
     {
-        Item(const std::string& text, const T& value);
-
         std::string label;
         T value;
+
+        Item(const std::string& text, const T& value);
     };
 
     typedef std::vector<Item> ItemVector;
@@ -82,9 +83,9 @@ private:
     size_t m_currentIndex;
 
     // Visual components
-    ItemBox<sf::Text> m_box;
-    ItemBox<Arrow> m_arrowLeft;
-    ItemBox<Arrow> m_arrowRight;
+    ItemBox<sf::Text> m_box;     // The entire widget
+    ItemBox<Arrow> m_arrowLeft;  // Control for "Select Prev."
+    ItemBox<Arrow> m_arrowRight; // Control for "Select Next"
 };
 
 } // namespace
