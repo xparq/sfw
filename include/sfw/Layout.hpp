@@ -13,7 +13,7 @@ namespace sfw
 
 /**
  * Base class for layouts. Layouts are special widgets which act as containers
- * See FormLayout, HBoxLayout and VBoxLayout
+ * See Form, HBox and VBox
  */
 class Layout: public Widget
 {

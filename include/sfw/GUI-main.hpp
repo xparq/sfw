@@ -3,7 +3,7 @@
 
 #include "sfw/Theme.hpp"
 #include "sfw/Gfx/Render.hpp"
-#include "sfw/Layouts/VBoxLayout.hpp"
+#include "sfw/Layouts/VBox.hpp"
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -19,9 +19,10 @@ namespace sfw
 
 /**
  * Entry point for the GUI.
- * The Main object is actually a VBoxLayout, with a catch-all event handler.
+ * The Main object is actually a VBox, with a catch-all event handler
+ * and a bunch of "administrative" duties.
  */
-class GUI: public VBoxLayout
+class GUI: public VBox
 {
 public:
     GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg = Theme::DEFAULT);

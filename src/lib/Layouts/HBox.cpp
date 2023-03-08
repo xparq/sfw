@@ -1,4 +1,4 @@
-#include "sfw/Layouts/HBoxLayout.hpp"
+#include "sfw/Layouts/HBox.hpp"
 #include "sfw/Theme.hpp"
 
 #include <algorithm>
@@ -7,7 +7,7 @@
 namespace sfw
 {
 
-void HBoxLayout::recomputeGeometry()
+void HBox::recomputeGeometry()
 {
     sf::Vector2f pos{};
     sf::Vector2f size{};

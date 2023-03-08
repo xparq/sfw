@@ -1,4 +1,4 @@
-#include "sfw/Layouts/VBoxLayout.hpp"
+#include "sfw/Layouts/VBox.hpp"
 #include "sfw/Theme.hpp"
 
 #include <algorithm>
@@ -7,7 +7,7 @@
 namespace sfw
 {
 
-void VBoxLayout::recomputeGeometry()
+void VBox::recomputeGeometry()
 {
     sf::Vector2f pos{};
     sf::Vector2f size{};

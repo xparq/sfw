@@ -9,7 +9,7 @@ namespace sfw
 /**
  * Vertically stacked layout
  */
-class VBoxLayout: public Layout
+class VBox: public Layout
 {
     void recomputeGeometry() override;
 };

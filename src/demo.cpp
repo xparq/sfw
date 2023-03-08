@@ -63,10 +63,10 @@ int main()
     text.setPosition({480, 240});
 
     // A horizontal layout for multiple panels side-by-side
-    auto main_hbox = demo.Layout::add(sfw::HBoxLayout());
+    auto main_hbox = demo.add(sfw::HBox());
 
     // A "form" panel on the left
-    auto form = main_hbox->add(sfw::FormLayout());
+    auto form = main_hbox->add(sfw::Form());
 
     // A text box to set the text of the example SFML object (created above)
     form->add("Text", (new sfw::TextBox())
@@ -164,7 +164,7 @@ int main()
     form->add("Progress bar (label = Outside)", pbarRotation3);
 
     // Attach the vert. progress bars (used for text scaling) to a new box
-    auto layoutForVerticalProgressBars = new sfw::HBoxLayout();
+    auto layoutForVerticalProgressBars = new sfw::HBox();
     //!! Issue #109: Document that manipulating unowned, free-standing layouts is UB!
     form->add("Vertical progress bars", layoutForVerticalProgressBars);
     layoutForVerticalProgressBars->add(pbarScale1);
@@ -186,7 +186,7 @@ int main()
     }
 
     // A panel in the middle
-    auto middle_panel = main_hbox->add(sfw::VBoxLayout());
+    auto middle_panel = main_hbox->add(sfw::VBox());
 
     // Theme selection
     using OBTheme = sfw::OptionsBox<Theme::Cfg>;
@@ -217,7 +217,7 @@ int main()
 
     // Slider & progress bar for crop size
     sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg"); // Will be attached later below!
-    auto hbox3 = middle_panel->add(sfw::HBoxLayout());
+    auto hbox3 = middle_panel->add(sfw::HBox());
     hbox3->add(sfw::Label("Crop square size:"));
     hbox3->add(sfw::ProgressBar(40), "cropbar");
 
@@ -233,7 +233,7 @@ int main()
         });
 
     // Image directly from file
-    auto vboximg = main_hbox->add(sfw::VBoxLayout());
+    auto vboximg = main_hbox->add(sfw::VBox());
     vboximg->add(sfw::Label("Image (from file):"));
     vboximg->add(sfw::Image("demo/some image.png"));
 
@@ -244,11 +244,11 @@ int main()
     vboximg->add(imgCrop); // See imgCrop created above!
     vboximg->add(sfw::Label("(Art: © Édouard Martinet)"))->setStyle(sf::Text::Style::Italic);
 
-    auto right_bar = main_hbox->add(sfw::VBoxLayout());
+    auto right_bar = main_hbox->add(sfw::VBox());
 
     // Show the GUI textures, for some insight/diagnostics
     right_bar->add(sfw::Label("Theme textures:"));
-    auto txbox = right_bar->add(sfw::HBoxLayout());
+    auto txbox = right_bar->add(sfw::HBox());
     auto tximg = (new sfw::Image(Theme::getTexture())) // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
         ->scale(2);
     txbox->add(sfw::Slider(1.f, 100.f, sfw::Vertical))
@@ -257,13 +257,13 @@ int main()
         ->setValue(75.f);
     txbox->add(tximg);
 
-    // Textbox for new button labels & button-factory button...
-    auto hbox2 = middle_panel->add(sfw::HBoxLayout());
-    auto tbButtName = hbox2->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-    hbox2->add(sfw::Button("Create button", [&] { middle_panel->add(sfw::Button(tbButtName->getText())); }));
+    // Textbox for the labels of new buttons created by the button-factory button...
+    auto hbox2 = middle_panel->add(sfw::HBox());
+    auto tbNewButtonLabel = hbox2->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+    hbox2->add(sfw::Button("Create button", [&] { middle_panel->add(sfw::Button(tbNewButtonLabel->getText())); }));
 
     // Clear-background checkbox
-    auto hbox4 = demo.add(sfw::HBoxLayout());
+    auto hbox4 = demo.add(sfw::HBox());
     hbox4->add(sfw::Label("Clear background"));
     hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = w->isChecked(); }, true));
 

@@ -46,9 +46,9 @@ sfw_objs=\
 	$(sfw_out)/$(sfw_shapes_dirtag)/CheckMark.obj\
 	$(sfw_out)/$(sfw_shapes_dirtag)/Box.obj\
 	$(sfw_out)/$(sfw_shapes_dirtag)/Arrow.obj\
-	$(sfw_out)/$(sfw_layouts_dirtag)/FormLayout.obj\
-	$(sfw_out)/$(sfw_layouts_dirtag)/HBoxLayout.obj\
-	$(sfw_out)/$(sfw_layouts_dirtag)/VBoxLayout.obj\
+	$(sfw_out)/$(sfw_layouts_dirtag)/VBox.obj\
+	$(sfw_out)/$(sfw_layouts_dirtag)/HBox.obj\
+	$(sfw_out)/$(sfw_layouts_dirtag)/Form.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/Label.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/Button.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/Image.obj\

@@ -80,9 +80,9 @@ protected:
 //----------------------
 friend class GUI;
 friend class Layout;
-friend class FormLayout;
-friend class HBoxLayout;
-friend class VBoxLayout;
+friend class VBox;
+friend class HBox;
+friend class Form;
 //----------------------
 
     void setSize(const sf::Vector2f& size);

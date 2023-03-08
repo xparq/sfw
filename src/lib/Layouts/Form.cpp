@@ -1,4 +1,4 @@
-#include "sfw/Layouts/FormLayout.hpp"
+#include "sfw/Layouts/Form.hpp"
 #include "sfw/Theme.hpp"
 #include "sfw/Widgets/Label.hpp"
 
@@ -9,13 +9,13 @@
 namespace sfw
 {
 
-FormLayout::FormLayout():
+Form::Form():
     m_labelWidth(0.f)
 {
 }
 
 
-Widget* FormLayout::add(const std::string& str, Widget* widget, const std::string& widgetname_override)
+Widget* Form::add(const std::string& str, Widget* widget, const std::string& widgetname_override)
 {
     Label* label = new Label(str);
     if (label->getSize().x > m_labelWidth)
@@ -28,7 +28,7 @@ Widget* FormLayout::add(const std::string& str, Widget* widget, const std::strin
 }
 
 
-void FormLayout::recomputeGeometry()
+void Form::recomputeGeometry()
 {
     //
     // Determine panel size...

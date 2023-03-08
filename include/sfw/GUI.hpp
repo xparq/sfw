@@ -17,10 +17,10 @@
 #include "sfw/Widgets/ImageButton.hpp"
 #include "sfw/Widgets/TextBox.hpp"
 
-// Layouts
-#include "sfw/Layouts/FormLayout.hpp"
-#include "sfw/Layouts/HBoxLayout.hpp"
-#include "sfw/Layouts/VBoxLayout.hpp"
+// Layout containers
+#include "sfw/Layouts/VBox.hpp"
+#include "sfw/Layouts/HBox.hpp"
+#include "sfw/Layouts/Form.hpp"
 
 // Misc
 #include "sfw/util/hex2color.hpp"

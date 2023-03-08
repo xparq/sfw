@@ -11,10 +11,10 @@ namespace sfw
 /**
  * Horizontally stacked layout with a label before each widget
  */
-class FormLayout: public Layout
+class Form: public Layout
 {
 public:
-    FormLayout();
+    Form();
 
     /**
      * Add a label + an already existing widget to the form

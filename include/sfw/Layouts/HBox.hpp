@@ -9,7 +9,7 @@ namespace sfw
 /**
  * Horizontally stacked layout
  */
-class HBoxLayout: public Layout
+class HBox: public Layout
 {
     void recomputeGeometry() override;
 };
