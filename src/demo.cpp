@@ -44,7 +44,7 @@ int main()
     // Some dynamically switcahble theme "quick config packs" to play with
     Theme::Cfg themes[] = {
         { "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11, "font/Liberation/LiberationSans-Regular.ttf" },
-        { "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), 14, "font/Liberation/LiberationSans-Regular.ttf" },
+        { "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), 12, "font/Liberation/LiberationSans-Regular.ttf" },
         { "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
         { "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
     };
@@ -93,7 +93,7 @@ int main()
     // (Widget names are optional.)
 
     // Slider + progress bars for rotating the text
-    auto sliderForRotation = new sfw::Slider(1.f); // granularity = 1%
+    auto sliderForRotation = new sfw::Slider(1); // granularity = 1%
         auto pbarRotation1 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
         auto pbarRotation2 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
         auto pbarRotation3 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
@@ -189,16 +189,31 @@ int main()
     auto middle_panel = main_hbox->add(sfw::VBoxLayout());
 
     // Theme selection
+    using OBTheme = sfw::OptionsBox<Theme::Cfg>;
     middle_panel->add(sfw::Label("Change theme:"));
-    auto themeselect = new sfw::OptionsBox<Theme::Cfg>([&](auto* w) {
+    auto themeselect = new OBTheme([&](auto* w) {
         const auto& themecfg = w->getSelectedValue();
         demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
     });
     for (auto& t: themes) { themeselect->addItem(t.name, t); }
     themeselect->selectItem(DEFAULT_THEME);
-    middle_panel->add(themeselect);
+    middle_panel->add(themeselect, "theme-selector");
 
-    // Static images (also a cropped one)
+    // Theme font size slider
+    // (Changes the font size directly of the cfg. data stored in "theme-selector",
+    // so it will remember the new size(s)!)
+    middle_panel->add(sfw::Label("Theme font size (use <-/->):"));
+    middle_panel->add(sfw::Slider(10, 100))
+        ->setValue(30)
+        ->setCallback([&] (auto* w){
+            assert(w->get("theme-selector"));
+            auto& themecfg = ((OBTheme*)(w->get("theme-selector")))->getSelectedValueRef();
+            themecfg.textSize = 8 + size_t(w->getValue() / 10);
+            demo.setTheme(themecfg);
+        });
+
+
+    // Image views...
 
     // Slider & progress bar for crop size
     sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg"); // Will be attached later below!
@@ -206,7 +221,7 @@ int main()
     hbox3->add(sfw::Label("Crop square size:"));
     hbox3->add(sfw::ProgressBar(40), "cropbar");
 
-    middle_panel->add(sfw::Slider(1.f, 100.f))
+    middle_panel->add(sfw::Slider(1, 100))
         ->setCallback([&](auto* w) {
             ((sfw::ProgressBar*)w->get("cropbar"))->setValue(w->getValue());
             // Show the slider value in a text box retrieved by its name:

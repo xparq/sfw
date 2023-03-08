@@ -38,9 +38,10 @@ public:
 
     /**
      * Get the value of the selected item
-     * @return associated value
+     * @return associated value/reference
      */
     const T& getSelectedValue() const;
+          T& getSelectedValueRef();
 
     /**
      * Get the index of the selected item

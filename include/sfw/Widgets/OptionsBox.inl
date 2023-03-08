@@ -66,6 +66,13 @@ const T& OptionsBox<T>::getSelectedValue() const
 
 
 template <class T>
+T& OptionsBox<T>::getSelectedValueRef()
+{
+    return m_items[m_currentIndex].value;
+}
+
+
+template <class T>
 size_t OptionsBox<T>::getSelectedIndex() const
 {
     return m_currentIndex;
