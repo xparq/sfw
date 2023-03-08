@@ -15,7 +15,7 @@ FormLayout::FormLayout():
 }
 
 
-Widget* FormLayout::add(const sf::String& str, Widget* widget, const std::string& widgetname_override)
+Widget* FormLayout::add(const std::string& str, Widget* widget, const std::string& widgetname_override)
 {
     Label* label = new Label(str);
     if (label->getSize().x > m_labelWidth)
