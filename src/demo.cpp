@@ -26,9 +26,10 @@ int main()
 
     using sfw::Theme, sfw::hex2color; // Just to spare some noise + typing...
 
-    // Customizing some global defaults (optional)
-    Theme::Cfg::DEFAULT_basePath = "demo/";
-    Theme::Cfg::DEFAULT_fontPath = "font/Vera.ttf";
+    // Customizing some theme props. (optional)
+
+    Theme::DEFAULT.basePath = "demo/";
+    Theme::DEFAULT.fontFile = "font/Vera.ttf";
 
     Theme::PADDING = 2.f;
     Theme::click.textColor      = hex2color("#191B18");
@@ -42,15 +43,18 @@ int main()
 
     // Some dynamically switcahble theme "quick config packs" to play with
     Theme::Cfg themes[] = {
-        { "Default (\"Baseline\")", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11, "font/Liberation/LiberationSans-Regular.ttf" },
-        { "Classic ☺",              "texture-sfw-classic.png",  hex2color("#e6e8e0"), 12, "font/Liberation/LiberationSans-Regular.ttf" },
-        { "sfml-widgets's default", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
-        { "sfml-widgets's Win98",   "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
+        { "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11, "font/Liberation/LiberationSans-Regular.ttf" },
+        { "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), 14, "font/Liberation/LiberationSans-Regular.ttf" },
+        { "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
+        { "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
     };
     const size_t DEFAULT_THEME = 0;
 
     // The main GUI controller:
     sfw::GUI demo(window, themes[DEFAULT_THEME]);
+    if (!demo) {
+        return EXIT_FAILURE; // Errors have already been printed to cerr.
+    }
     demo.setPosition(10, 10);
 
     // A native SFML example Text object, to be manipulated via the GUI
@@ -130,23 +134,29 @@ int main()
 
     // A cloned selector, for background color
     form->add("Screen bgnd. (copied widget)", (new OBColor(*opt))
-        ->addItem("Default", hex2color("#e6e8e0"))
+        ->addItem("Default", themes[DEFAULT_THEME].bgColor)
         ->setCallback([&](auto* w) { Theme::windowBgColor = w->getSelectedValue(); })
     );
 
     // Checkboxes to set text properties
-    form->add("Bold text", sfw::CheckBox())->setCallback([&](auto* w) {
-        int style = text.getStyle();
-        if (w->isChecked()) style |= sf::Text::Bold;
-        else                style &= ~sf::Text::Bold;
-        text.setStyle(style);
-    });
+    // ..."classic" `add(new Widget(...))` style, setting properties in the ctor.
+    // NOTE: It's generally unsafe to set the properties of a free-standing
+    //       (newly created, but not-yet-added) widget!
+    //       Only those supported by the constructor are guaranteed to work.
     form->add("Underlined text", new sfw::CheckBox([&](auto* w) {
         int style = text.getStyle();
         if (w->isChecked()) style |= sf::Text::Underlined;
         else                style &= ~sf::Text::Underlined;
         text.setStyle(style);
     }));
+    // ..."templated" add(Widget())->set...() style, setting properties
+    // on the "real" (added) widget:
+    form->add("Bold text", sfw::CheckBox())->setCallback([&](auto* w) {
+                int style = text.getStyle();
+                if (w->isChecked()) style |= sf::Text::Bold;
+                else                style &= ~sf::Text::Bold;
+                text.setStyle(style);
+            });
 
     // Attach the horiz. progress bars (used for text rotation) to the form
     form->add("Progress bar (label = None)",    pbarRotation1);

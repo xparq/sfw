@@ -3,39 +3,43 @@
 
 int main()
 {
+    //
+    // Normal SFML app init...
+    //
     sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal", sf::Style::Close);
 
-    // The main GUI manager object
+    //
+    // GUI Setup...
+    //
     sfw::GUI gui(window);
 
-    // Load the visual styling template (sprite-sheet) image, and some font
-    sfw::Theme::loadTexture("demo/texture-default.png");
-    sfw::Theme::loadFont("demo/tahoma.ttf");
+    // The config. is optional if assets are packaged according to the defaults:
+    // sfw::GUI gui(window, { .basePath = "asset/",
+    //                        .textureFile = "texture/default.png",
+    //                        .fontFile = "font/default.ttf",
+    //                        /* ... */ };
 
-    // Create a button
-    gui.add(new sfw::Button("Close!"))->setCallback([&] { window.close(); });
-    // Or, verbosely:
-    // auto button = new sfw::Button("Close!");
-    // button->setCallback([&] { window.close(); });
-    // gui.add(button);
+    // Add a button
+    gui.add(sfw::Button("Close!", [&] { window.close(); }));
 
-    // Event loop (blocking variant, with waitEvent)
+    // Event loop (blocking variant)
     while (window.isOpen())
     {
-        // Show content anew, or as updated in the previous cycle
+        // Render the GUI
+        gui.render();
+
+        // Actually show the (updated) window content
         window.display();
 
+        // Process events, one by one, waiting until the next one comes
         if (sf::Event event; window.waitEvent(event))
         {
-            // Send events to the GUI!
+            // Pass events to the GUI
             gui.process(event);
 
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-
-        // Render the GUI (will clear the window first, by default)
-        gui.render();
     }
 
     return 0;
