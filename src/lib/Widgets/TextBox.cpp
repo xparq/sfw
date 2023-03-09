@@ -141,6 +141,8 @@ TextBox* TextBox::setMaxLength(size_t maxLength)
 
 void TextBox::setCursorPos(size_t index)
 {
+//cerr << "setCursorPos-> cpos: " << index <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << ", follow: " << m_selection.following <<endl;
+
     if (index > m_text.getString().getSize()) // NOTE: a) The cursor pos. is unsigned.
                                               //       b) The pos. right after the end (technic'ly: at EOS) is OK.
     {
@@ -153,6 +155,8 @@ void TextBox::setCursorPos(size_t index)
 
     m_cursorPos = index;
     m_selection.follow(index); // The selection itself will decide if and how exactly...
+
+//cerr << "                     " << index <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << ", follow: " << m_selection.following <<endl;
 
     // The rest is all about adjusting the view (presentation/appearance)...
 
@@ -399,8 +403,15 @@ void TextBox::onMousePressed(float x, float)
         sf::Vector2f glyphPos = m_text.findCharacterPos(i);
         if (glyphPos.x <= x)
         {
-            m_selection.start(i);
+//cerr << "onPeress-> i: " << i <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << ", follow: " << m_selection.following <<endl;
+
             setCursorPos(i);
+//cerr << "              " << i <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << endl;
+
+            // Must do this hackery after setCursorPos(), as follow() there would clean up an inactive selection!
+            m_selection.reset(); //! This is a bit too eager, shouldn't start selecting just on a click,
+                                  //! ...but must record the starting pos somehow, nonetheless! :-o
+            m_selection.set_from_to(i,i);
             break;
         }
     }
@@ -424,6 +435,9 @@ void TextBox::onMouseReleased(float x, float)
 
 void TextBox::onMouseMoved(float x, float)
 {
+    if (getState() != WidgetState::Focused)
+        return;
+
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
     {
         for (int i = (int)m_text.getString().getSize(); i >= 0; --i)
@@ -432,7 +446,10 @@ void TextBox::onMouseMoved(float x, float)
             sf::Vector2f glyphPos = m_text.findCharacterPos(i);
             if (glyphPos.x <= x)
             {
+//cerr << "onMove-> anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << endl;
+                m_selection.resume();
                 setCursorPos(i);
+//cerr << "         anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << endl;
                 break;
             }
         }
@@ -546,15 +563,15 @@ sf::String TextBox::getSelectedText() const
 
 void TextBox::deleteSelectedText()
 {
-    // Delete if any selected text
+    // Delete the selected text, if any
     if (!m_selection.empty())
     {
         sf::String str = m_text.getString();
         str.erase(m_selection.left(), m_selection.length());
         setCursorPos(m_selection.left());
-        clearSelection();
         m_text.setString(str);
     }
+    clearSelection(); //! Must clear it even if empty, so it won't start growing "out of nothing"! (-> #159)
 }
 
 
