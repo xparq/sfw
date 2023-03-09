@@ -21,3 +21,6 @@ lib/
 # Code::Blocks
 sfml-widgets.layout
 sfml-widgets.depend
+
+# VS "solution" file occasionally used for debugging:
+*.sln
