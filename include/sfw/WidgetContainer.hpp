@@ -34,10 +34,6 @@ public:
      * @return Pointer to the attached widget
      */
     Widget* add(Widget* widget, const std::string& name = "");
-    Widget* addBefore(const Widget* anchor, Widget* widget, const std::string& name = "");
-    Widget* addBefore(const std::string& anchor, Widget* widget, const std::string& name = "");
-    Widget* addAfter(const Widget* anchor, Widget* widget, const std::string& name = "");
-    Widget* addAfter(const std::string& anchor, Widget* widget, const std::string& name = "");
 
     /**
      * Also for any Widget subclasses, without tedious casting in client code
@@ -46,29 +42,38 @@ public:
     W* add(W* widget, const std::string& name = "")
         { return (W*) (Widget*) add((Widget*)widget, name); }
 
+    /**
+     * If the `anchor` is `nullptr`, that means "add before first", or "add
+     * after last", respectively.
+     * In case the anchor can't be found, the widget will be appended as if
+     * appending it with a vanilla add() call.
+     * Note: the anchor widgets can't be `const` because their next/prev
+     * pointers will need to be updated.
+     */
+    Widget* addBefore(Widget* anchor, Widget* widget, const std::string& name = "");
+    Widget* addBefore(const std::string& anchor_name, Widget* widget, const std::string& name = "");
+    Widget* addAfter(Widget* anchor, Widget* widget, const std::string& name = "");
+    Widget* addAfter(const std::string& anchor_name, Widget* widget, const std::string& name = "");
+
+    // Helpers ---------------------------------------------------------------
+    bool empty() const { return !m_first; }
+    Widget* begin() const { return m_first; }
+    Widget* end() const { return nullptr; }
+    Widget* next(const Widget* w) const { return w ? w->m_next : end(); }
+    //!! Make it std-compatible, so that all the std:: algorithms can be used on it! (#162)
 
 protected:
 
-    // Callbacks ---------------------------------------------------------------
+    // Helpers ---------------------------------------------------------------
+    bool isChild(const Widget*);
+    Widget* insertAfter(Widget* anchor, Widget* widget, const std::string& name);
 
-    // Helpoers ---------------------------------------------------------------
-    /**
-     * Widgets that are also widget containers can iterate their children via
-     * this interface. The reason this is defined here in Widget, not there, is:
-     *   a) parents of Widgets & Layouts shouldn't care about the difference,
-     *   b) Widget types other than Layout may have children in the future.
-     * The traversal is recursive (not just a single-level iteration).
-     */
-//!!    virtual void iterateChildren(std::function<void(Widget*)> f);
+    //!!This may also need to be defined in Widget instead, because client
+    //!!code shouldn't really care whether some widgets can or cannot have
+    //!!children! A pure tree structure in this regard too could be preferable.
+    void iterateChildren(const std::function<void(Widget*)>& f);
 
-    /**
-     * Widgets that are also widget containers can iterate their children via
-     * this interface. The reason this is defined here in Widget, not there, is:
-     *   a) parents of Widgets & Layouts shouldn't care about the difference,
-     *   b) Widget types other than Layout may have children in the future.
-     * The traversal is recursive (not just a single-level iteration).
-     */
-//!!    virtual void traverseChildren(std::function<void(Widget*)> f);
+    void traverseChildren(const std::function<void(Widget*)>& f) override;
 
 protected:
     Widget* m_first;

@@ -2,7 +2,7 @@
 #include "sfw/Theme.hpp"
 
 #include <system_error>
-#include <iostream>
+#include <iostream> // for printing errors
 using namespace std;
 
 namespace sfw
@@ -93,6 +93,8 @@ void GUI::process(const sf::Event& event)
 
 bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 {
+//traverseChildren([&](Widget* w) { cerr << w->getName() << "\n"; } );
+
     //!!Should be transactional, with no side-effects if failed!
 
     if (&m_themeCfg != &themeCfg)
@@ -109,24 +111,19 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
     }
 
     // Notify widgets of the change
-    for (auto& [name, w] : widgets) //! std::map reorders alphabetically, which is a disadvantage here
-    {
-//cerr << name << "\n";
-        const_cast<Widget*>(w)->onThemeChanged();
-    }
-/*
-    //!!This is kinda redundant: onThemeChanged should make widgets recomputeGeometry(),
-    //!!including Widget::setSize, which would also request the parent's recomputeGeometry!
-    //!!(NOTE: there are ample chances of infinite looping here, some of which I have duly
-    //!!explored already...)
-    //!!However... A guarantee that recomputeGeometry() will always be called after
-    //!!onThemeChanged could save some typing (and amend some forgotten updates)
-    //!!-- at the cost of +1 rule (albeit optional) for widget authoring...
-    for (auto& [name, w] : widgets)
-    {
-        const_cast<Widget*>(w)->recomputeGeometry();
-    }
-*/
+    traverseChildren([](Widget* w) { w->onThemeChanged(); } );
+        // Another reason to not use the widget registry map (besides minimalism
+        // and that it's not even intended for this (i.e. it may not even contain
+        // every widget!) that, and ) is that std::map reorders its content
+        // alphabetically, which is pretty awkward here (e.g. for diagnostics).
+
+    //! This would be redundant in the current model:
+    //!traverseChildren([](Widget* w) { w->recomputeGeometry(); } );
+    //! The onThemeChanged() call typically involves setSize() too, which
+    //! in turn also calls parent->recomputeGeometry() (via Widget::setSize)!
+    //! (NOTE: there are ample chances of infinite looping here too, some of
+    //! which I've duly explored already...)
+
     return true;
 }
 

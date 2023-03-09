@@ -121,7 +121,7 @@ int main()
     // Text color selector
     using OBColor = sfw::OptionsBox<sf::Color>;
     // (Keeping in a var only to clone it later.)
-    auto opt = (new OBColor([&](auto* w) {
+    auto optTxtColor = (new OBColor([&](auto* w) {
             text.setFillColor(w->getSelectedValue());
             w->setColor(w->getSelectedValue());
         }))
@@ -130,13 +130,15 @@ int main()
         ->addItem("Green", sf::Color::Green)
         ->addItem("Yellow", sf::Color::Yellow)
         ->addItem("White", sf::Color::White);
-    form->add("Text color", opt);
 
-    // A cloned selector, for background color
-    form->add("Screen bgnd. (copied widget)", (new OBColor(*opt))
+    // Cloning it for selecting the window bg. color, too...
+    //!NOTE: MUST BE COPIED BEFORE ADDING IT (optTxtColor) TO A CONTAINER!
+    auto optClone = (new OBColor(*optTxtColor))
         ->addItem("Default", themes[DEFAULT_THEME].bgColor)
-        ->setCallback([&](auto* w) { Theme::windowBgColor = w->getSelectedValue(); })
-    );
+        ->setCallback([&](auto* w) { Theme::windowBgColor = w->getSelectedValue(); });
+
+    form->add("Text color", optTxtColor);
+    form->add("Screen bgnd. (copied widget)", optClone);
 
     // Checkboxes to set text properties
     // ..."classic" `add(new Widget(...))` style, setting properties in the ctor.
@@ -215,33 +217,19 @@ int main()
 
     // Image views...
 
-    // Slider & progress bar for crop size
-    sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg"); // Will be attached later below!
-    auto hbox3 = middle_panel->add(sfw::HBox());
-    hbox3->add(sfw::Label("Crop square size:"));
-    hbox3->add(sfw::ProgressBar(40), "cropbar");
-
-    middle_panel->add(sfw::Slider(1, 100))
-        ->setCallback([&](auto* w) {
-            ((sfw::ProgressBar*)w->get("cropbar"))->setValue(w->getValue());
-            // Show the slider value in a text box retrieved by its name:
-            auto tbox = (sfw::TextBox*)w->get("Text with limit (5)");
-            if (!tbox) cerr << "Named TextBox not found! :-o\n";
-            else tbox->setText(to_string((int)w->getValue()));
-            imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
-                                  {(int)(w->getValue() * 1.4), (int)w->getValue()}});
-        });
-
     // Image directly from file
     auto vboximg = main_hbox->add(sfw::VBox());
     vboximg->add(sfw::Label("Image (from file):"));
     vboximg->add(sfw::Image("demo/some image.png"));
 
-    // Image from file, cropped
+    // Image crop from file
     vboximg->add(sfw::Label("Image crop:"));
     vboximg->add(sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
     vboximg->add(sfw::Label("Image crop varied:"));
-    vboximg->add(imgCrop); // See imgCrop created above!
+
+    // Image from file, cropped dynamically
+    sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg");
+    vboximg->add(imgCrop);
     vboximg->add(sfw::Label("(Art: © Édouard Martinet)"))->setStyle(sf::Text::Style::Italic);
 
     auto right_bar = main_hbox->add(sfw::VBox());
@@ -258,9 +246,27 @@ int main()
     txbox->add(tximg);
 
     // Textbox for the labels of new buttons created by the button-factory button...
-    auto hbox2 = middle_panel->add(sfw::HBox());
-    auto tbNewButtonLabel = hbox2->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-    hbox2->add(sfw::Button("Create button", [&] { middle_panel->add(sfw::Button(tbNewButtonLabel->getText())); }));
+    auto boxfactory = middle_panel->add(sfw::HBox());
+    auto labeller = boxfactory->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+    boxfactory->add(sfw::Button("Create button", [&] {
+        middle_panel->addAfter(boxfactory, new sfw::Button(labeller->getText()));
+    }));
+
+    // Slider & progress bar for cropping an Image widget
+    auto boxcrop = middle_panel->add(sfw::HBox());
+        boxcrop->add(sfw::Label("Crop square size:"));
+        boxcrop->add(sfw::ProgressBar(40), "cropbar");
+    middle_panel
+        ->add(sfw::Slider(1, 100))
+            ->setCallback([&](auto* w) {
+                ((sfw::ProgressBar*)w->get("cropbar"))->setValue(w->getValue());
+                // Show the slider value in a text box retrieved by its name:
+                auto tbox = (sfw::TextBox*)w->get("Text with limit (5)");
+                if (!tbox) cerr << "Named TextBox not found! :-o\n";
+                else tbox->setText(to_string((int)w->getValue()));
+                imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
+                                  {(int)(w->getValue() * 1.4), (int)w->getValue()}});
+            });
 
     // Clear-background checkbox
     auto hbox4 = demo.add(sfw::HBox());

@@ -67,8 +67,9 @@ public:
     // }
 
     /**
-      * Get the name of the widget (or "" if unnamed)
-      * (This may be a slow operation, intended mainly for diagnostic use.)
+      * The internal name of the widget (or its hex address if it wasn't named)
+      * (This may be a slow operation, intended mainly for diagnostic use!
+      * Basically that's why it's not just called `name()`. ;) )
       */
     std::string getName() const;
 
@@ -139,6 +140,10 @@ friend class Form;
      * to the GUI; but avoid that, as it will be considered invalid later!)
      */
     GUI* getMain() const;
+
+    // Uniform node-level interface for recursive traversal of the widget tree
+    virtual void traverseChildren(const std::function<void(Widget*)>&) {}
+
 
 private:
     virtual void recomputeGeometry() {} // Can be requested by friend widgets, too
