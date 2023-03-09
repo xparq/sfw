@@ -8,6 +8,8 @@
 //!!#include "sfw/GUI-main.hpp" // See forw. decl. below instead...
 
 #include <functional>
+#include <optional>
+#include <variant>
 #include <string>
 
 #include <SFML/System/Vector2.hpp>
@@ -53,8 +55,12 @@ public:
     /**
      * Set a function to be called when this widget is triggered
      */
-    Widget* setCallback(std::function<void(Widget*)> callback);
-    Widget* setCallback(std::function<void()> callback);
+private:
+    using Callback_void = std::optional<std::function<void()>>;
+    using Callback_w    = std::optional<std::function<void(Widget*)>>;
+public:
+    using Callback  = std::variant<Callback_w, Callback_void>;
+    Widget* setCallback(Callback callback);
 
     // The actual (derived) widgets should then provide specific overloads, as:
     // InterestingWidget* setCallback(std::function<void(InterestingWidget*)> callback)
@@ -167,7 +173,6 @@ private:
     virtual void onThemeChanged();
     virtual void onResized();
 
-
     WidgetContainer* m_parent;
     Widget* m_previous;
     Widget* m_next;
@@ -176,7 +181,7 @@ private:
     sf::Vector2f m_position;
     sf::Vector2f m_size;
     bool m_selectable;
-    std::function<void()> m_callback;
+    Callback m_callback;
     sf::Transform m_transform;
 
 #ifdef DEBUG

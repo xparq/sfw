@@ -156,23 +156,23 @@ void Widget::setSelectable(bool selectable)
 }
 
 
-Widget* Widget::setCallback(std::function<void()> callback)
+Widget* Widget::setCallback(Callback callback)
 {
     m_callback = callback;
     return this;
 }
 
-Widget* Widget::setCallback(std::function<void(Widget*)> callback)
-{
-    m_callback = [this, callback]{ return callback(this); };
-    return this;
-}
-
 void Widget::triggerCallback()
 {
-    if (m_callback)
+    assert( std::holds_alternative<Callback_w>(m_callback) || std::holds_alternative<Callback_void>(m_callback) );
+
+    if (std::holds_alternative<Callback_w>(m_callback) && std::get<Callback_w>(m_callback))
     {
-        m_callback();
+        return (std::get<Callback_w>(m_callback).value()) (this);
+    }
+    else if (std::holds_alternative<Callback_void>(m_callback) && std::get<Callback_void>(m_callback))
+    {
+        return (std::get<Callback_void>(m_callback).value()) ();
     }
 }
 
