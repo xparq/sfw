@@ -4,6 +4,7 @@
 # Main targets:
 sfw_libname=sfw
 sfw_demo=$(sfw_libname)-demo.exe
+sfw_test=$(sfw_libname)-test.exe
 sfw_lib=$(libdir)/$(sfw_libname).lib
 
 # External deps.:
@@ -58,6 +59,7 @@ sfw_objs=\
 	$(sfw_out)/$(sfw_widgets_dirtag)/Slider.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/TextBox.obj\
 	$(sfw_out)/$(sfw_widgets_dirtag)/ProgressBar.obj\
+	$(sfw_out)/$(sfw_widgets_dirtag)/DrawHost.obj\
 
 #-----------------------------------------------------------------------------
 CC_FLAGS=$(CC_FLAGS) -W4 -std:c++20 -EHsc
@@ -134,6 +136,7 @@ MAIN::
 !endif
 #!! Make this hamfisted subdir creation less atrocious:
 #!! (Not that the rest of the "tree management" is any less lame!)
+	@$(MKDIR) $(out_dir)/test
 	@$(MKDIR) $(sfw_out)
 	@$(MKDIR) $(sfw_out)/Gfx/Shapes
 	@$(MKDIR) $(sfw_out)/Widgets
@@ -141,7 +144,7 @@ MAIN::
 
 MAIN:: $(sfw_lib)
 
-MAIN:: $(sfw_demo)
+MAIN:: $(sfw_test) $(sfw_demo)
 
 #-----------------------------------------------------------------------------
 clean:
@@ -171,7 +174,11 @@ clean:
 {$(libsrc_dir)/}.cpp{$(sfw_out)/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(sfw_out)/ $<
 
-# For the demo:
+# For the tests:
+{$(src_dir)/test}.cpp{$(out_dir)/test}.obj::
+	$(CC_CMD) $(CC_FLAGS) -c -Fo$(out_dir)/test/ $<
+
+# For the demo, or other "top-level" objects:
 {$(src_dir)/}.cpp{$(out_dir)/}.obj::
 	$(CC_CMD) $(CC_FLAGS) -c -Fo$(out_dir)/ $<
 
@@ -184,7 +191,7 @@ $(sfw_lib): $(sfw_objs)
 
 
 #=============================================================================
-# The demo
+# The executables
 #=============================================================================
 sfml_libs_static=sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib
 sfml_libs_dll=sfml-graphics.lib sfml-window.lib sfml-system.lib
@@ -204,7 +211,16 @@ sfml_libs=$(substi .lib,-d.lib,$(sfml_libs))
 !endif
 
 #-----------------------------------------------------------------------------
+# Demo
+#-----------------------------------------------------------------------------
 $(sfw_demo): $(out_dir)/demo.obj $(sfw_lib)
+#!!?? The SFML libs must come first?! :-o Got a silent launch failure otherwise!... :-/
+	$(LINK_CMD) $(LINK_FLAGS) $(libs) $** -out:$@
+
+#-----------------------------------------------------------------------------
+# Test
+#-----------------------------------------------------------------------------
+$(sfw_test): $(out_dir)/test/main.obj $(sfw_lib)
 #!!?? The SFML libs must come first?! :-o Got a silent launch failure otherwise!... :-/
 	$(LINK_CMD) $(LINK_FLAGS) $(libs) $** -out:$@
 

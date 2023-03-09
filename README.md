@@ -56,7 +56,8 @@ _For other (both planned and completed) changes see the [issues](https://github.
    customize default style properties etc.
 3. Create the top-level GUI manager object, connecting it to your SFML window, like: `sfw::GUI myGUI(window);`
    (or, typically with a customized config.: `sfw::GUI myGUI(window, myConfig);`)
-4. Add containers, widgets with `...->add(sfw::SomeWidget(...))` calls, set their properties (like callbacks) etc.
+4. Add containers, widgets with `...->add(sfw::SomeWidget(...))`, or if you prefer: `...->add(new sfw::OtherWidget)` calls,
+   set their properties (like callbacks) etc.
    (Note: widget objects will be created and deleted implicitly.)
 5. Pass events to the GUI (in your app's event loop): `myGUI.process(event);`.
 6. Draw the GUI (in your frame refresh loop; or the event loop in single-treaded apps): `myGUI.render();`.
