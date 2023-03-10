@@ -39,15 +39,15 @@ void Form::recomputeGeometry()
     if (empty()) return;
 
     //
-    // Calc. column sizes...
+    // Calc. column & widget sizes...
     //
     sf::Vector2f size{};
     m_labelWidth = 0;
-    auto minLineHeight = Theme::getBoxHeight() + Theme::MARGIN;
+    const auto minLineHeight = Theme::getBoxHeight();
 
     for (Widget *label = m_first, *content = m_first->m_next; //!!?? is label->m_next UB?
          label != end() && content != end();
-         label = next(content), content = next(label))
+         label = next(content), content = next(label)) //!!?? and this?! GCC didn't warn...
     {
         auto lineHeight = minLineHeight;
         // Check the "label" widget
@@ -57,7 +57,7 @@ void Form::recomputeGeometry()
         lineHeight = max(lineHeight, content->getSize().y);
         size.x = max(size.x, content->getSize().x);
 
-        size.y += lineHeight;
+        size.y += lineHeight + Theme::MARGIN;
     }
     size.x += m_labelWidth + Theme::MARGIN;
     setSize(size);
@@ -76,8 +76,9 @@ void Form::recomputeGeometry()
         auto lineHeight = minLineHeight;
         lineHeight = max(lineHeight, label->getSize().y);
         lineHeight = max(lineHeight, content->getSize().y);
-        y += lineHeight;
+        y += lineHeight + Theme::MARGIN;
     }
 }
+
 
 } // namespace

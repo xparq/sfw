@@ -131,7 +131,7 @@ void Image::draw(const gfx::RenderContext& ctx) const
     sfml_renderstates.texture = &m_texture;
     ctx.target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
 #ifdef DEBUG
-//    Widget::draw_outline({ctx.target, sfml_renderstates}); // Not the original, untransformed ctx.props!
+//    Widget::draw_outline(ctx);
 #endif
 }
 

@@ -135,7 +135,7 @@ void Slider::draw(const gfx::RenderContext& ctx) const
     ctx.target.draw(m_progression, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
     ctx.target.draw(m_handle, sfml_renderstates);
 #ifdef DEBUG
-//    Widget::draw_outline({ctx.target, sfml_renderstates}); // Not the original, untransformed ctx.props!
+//    Widget::draw_outline(ctx);
 #endif
 }
 

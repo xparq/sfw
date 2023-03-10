@@ -45,7 +45,7 @@ void CheckBox::draw(const gfx::RenderContext& ctx) const
     if (m_checked)
         ctx.target.draw(m_checkmark, sfml_renderstates);
 #ifdef DEBUG
-//    Widget::draw_outline({ctx.target, sfml_renderstates}); // Not the original, untransformed ctx.props!
+//    Widget::draw_outline(ctx);
 #endif
 }
 
