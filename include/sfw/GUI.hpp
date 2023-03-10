@@ -16,6 +16,7 @@
 #include "sfw/Widgets/Slider.hpp"
 #include "sfw/Widgets/ImageButton.hpp"
 #include "sfw/Widgets/TextBox.hpp"
+#include "sfw/Widgets/DrawHost.hpp"
 
 // Layout containers
 #include "sfw/Layouts/VBox.hpp"

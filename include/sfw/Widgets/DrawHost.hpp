@@ -1,0 +1,33 @@
+#ifndef GUI_DRAWHOST_HPP
+#define GUI_DRAWHOST_HPP
+
+#include "sfw/Widget.hpp"
+
+#include <functional>
+
+namespace sfw
+{
+
+/**
+ * Widget with a draw "hook" that can be set dynamically at runtime
+ */
+class DrawHost: public Widget
+{
+public:
+    using DrawHook = std::function<void(Widget*, const gfx::RenderContext&)>;
+
+    DrawHost(const DrawHook& drawHook);
+    Widget* setDrawHook(const DrawHook& drawHook);
+
+    void setSize(const sf::Vector2f& size)  { Widget::setSize(size); }
+    void setSize(float width, float height) { Widget::setSize(width, height); }
+
+private:
+    void draw(const gfx::RenderContext& ctx) const override;
+
+    DrawHook m_drawHook;
+};
+
+} // namespace
+
+#endif // GUI_DRAWHOST_HPP

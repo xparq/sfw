@@ -40,6 +40,8 @@ public:
 
     const sf::Vector2f& getSize() const;
 
+    const sf::Transform& getTransform() const;
+
     /**
      * Check if a point is inside the widget
      */
@@ -99,8 +101,6 @@ friend class Form;
     void setSize(float width, float height);
 
     sf::Vector2f getAbsolutePosition() const;
-
-    const sf::Transform& getTransform() const;
 
     void setState(WidgetState state);
     WidgetState getState() const;

@@ -45,8 +45,9 @@ Widget* Widget::getRoot() const
 
 GUI* Widget::getMain() const
 {
-    // Well, it's halfway between "undefined" and "bug" to call this on free-standing widgets...
-    assert(       getParent() && getParent() != this ? getParent()->getRoot() : getParent());
+    //!! Well, it's halfway between "undefined" and "bug" to call this on free-standing widgets...
+    //!! But forbidding it would prevent adding children to them, criplling usability too much!
+    //!!   assert(getParent() && getParent() != this ? getParent()->getRoot() : getParent());
     return (GUI*)(getParent() && getParent() != this ? getParent()->getRoot() : getParent());
 }
 
