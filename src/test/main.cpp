@@ -10,11 +10,9 @@ using namespace std;
 int main()
 {
     //------------------------------------------------------------------------
-    // Normal SFML app-specific setup....
-
-    // Create the main window, as usual for any SFML app
+    // SFML app frame....
     sf::RenderWindow window;
-    window.create(sf::VideoMode({1024, 768}), "SFW Demo", sf::Style::Close|sf::Style::Resize);
+    window.create(sf::VideoMode({1024, 768}), "SFW TEST: main", sf::Style::Close|sf::Style::Resize);
     if (!window.isOpen()) {
         cerr << "- Failed to create the SFML window!\n";
         return EXIT_FAILURE;
@@ -22,11 +20,9 @@ int main()
     window.setFramerateLimit(30);
 
     //------------------------------------------------------------------------
-    // Setting up the GUI...
+    // Test GUI setuo...
 
-    using sfw::Theme, sfw::hex2color; // Just to spare some noise + typing...
-
-    // Customizing some theme props. (optional)
+    using namespace sfw;
 
     Theme::DEFAULT.basePath = "demo/";
     Theme::DEFAULT.fontFile = "font/Vera.ttf";
@@ -56,6 +52,29 @@ int main()
         return EXIT_FAILURE; // Errors have already been printed to cerr.
     }
     demo.setPosition(10, 10);
+/*
+	auto circlevista = new DrawHost([&](auto* w, auto ctx) {
+		sf::CircleShape circ(50);
+		sf::Texture backdrop;
+                if (!backdrop.loadFromFile("test/thumbnail.jpg")) return;
+		circ.setTexture(&backdrop);
+		circ.setTextureRect({{10, 10}, {100, 100}});
+
+		auto sfml_renderstates = ctx.props;
+		sfml_renderstates.transform *= w->getTransform();
+		ctx.target.draw(circ, sfml_renderstates);
+#ifdef DEBUG
+		w->draw_outline(ctx);
+#endif
+	});
+	circlevista->setSize(100,100);
+*/
+	auto promptbox = new VBox;
+		promptbox->add(Label("Label X"));
+//		promptbox->add(circlevista);
+		promptbox->add(Image("test/thumbnail.jpg"))->rescale(0.5);
+
+	demo.add(new Form)->add(promptbox, new Label("OK!"));
 
     // A native SFML example Text object, to be manipulated via the GUI
     sf::Text text("Hello world!", Theme::getFont());

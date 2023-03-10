@@ -36,6 +36,13 @@ public:
         requires (std::is_base_of_v<Widget, W>)
         { return (W*)(Widget*)add(label, (Widget*)new W(std::move(tmp_widget)), name); }
 
+    /**
+     * Same as above, but use any (already existing) widget as "label"
+     */
+    Widget* add(Widget* label, Widget* widget,
+                const std::string& widgetName = "", const std::string& labelWidgetName = "");
+
+
 private:
     void recomputeGeometry() override;
 
