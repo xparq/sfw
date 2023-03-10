@@ -78,10 +78,27 @@ int main()
 
 	demo.add(new Form)->add(labelbox, new Label("OK!"));
 
+
 	// A raw sf::Text object to be manipulated via the GUI
 	sf::Text text("Hello world!", Theme::getFont());
-	text.setOrigin({text.getLocalBounds().width / 2, text.getLocalBounds().height / 2});
-	text.setPosition({480, 240});
+	// + a DrawHost for boxing it:
+	auto sfText = new DrawHost([&](auto* raw_w, auto ctx) {
+		auto* w = (DrawHost*)raw_w;
+		auto boundRect = text.getLocalBounds();
+
+		w->setSize((boundRect.width + 2*Theme::PADDING) * text.getScale().x,
+		           (boundRect.height + 2 * Theme::PADDING) * text.getScale().y); //!! This is gross, in every frame! :-o
+
+		text.setOrigin({boundRect.width / 2, boundRect.height /*/ 2*/}); //!!?? :-o WTF?!
+		text.setPosition({w->getSize().x / 2, w->getSize().y / 2});
+
+		auto sfml_renderstates = ctx.props;
+		sfml_renderstates.transform *= w->getTransform();
+		ctx.target.draw(text, sfml_renderstates);
+#ifdef DEBUG
+		w->draw_outline(ctx);
+#endif
+	});
 
 	// A horizontal layout for multiple panels side-by-side
 	auto main_hbox = demo.add(sfw::HBox());
@@ -285,6 +302,11 @@ int main()
 			                      {(int)(w->getValue() * 1.4), (int)w->getValue()}});
 		});
 
+
+	// Finally add the SFML test text adapter widget
+	middle_panel->add(sfText);
+
+
 	// Clear-background checkbox
 	auto hbox4 = demo.add(new sfw::HBox);
 	hbox4->add(sfw::Label("Clear background"));
@@ -302,26 +324,19 @@ int main()
 	// The event loop
 	while (window.isOpen())
 	{
-		// Process events
+		demo.render();
+		window.display();
+
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-		// Send events to the demo GUI
-		demo.process(event);
+			demo.process(event);
 
-		if (event.type == sf::Event::Closed ||
-		    event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
-			window.close();
+			if (event.type == sf::Event::Closed ||
+			   (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+				window.close();
 		}
 
-		// Render the GUI
-		demo.render();
-
-		// Draw the example SFML text
-		window.draw(text);
-
-		// Show the updated window
-		window.display();
 	}
 
 	return EXIT_SUCCESS;

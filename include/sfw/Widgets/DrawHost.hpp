@@ -19,8 +19,10 @@ public:
     DrawHost(const DrawHook& drawHook);
     Widget* setDrawHook(const DrawHook& drawHook);
 
+    // Proxying some protected members:
     void setSize(const sf::Vector2f& size)  { Widget::setSize(size); }
     void setSize(float width, float height) { Widget::setSize(width, height); }
+    sf::Vector2f getPosition() const { return Widget::getAbsolutePosition(); }
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
