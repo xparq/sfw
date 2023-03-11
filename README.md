@@ -1,4 +1,4 @@
-![workflow](https://github.com/xparq/sfw/actions/workflows/ci.yml/badge.svg)
+[![Build](https://github.com/xparq/sfw/actions/workflows/ci.yml/badge.svg)](https://github.com/xparq/sfw/actions/workflows/ci.yml)
 
 sfw::GUI - A fork of "SFML Widgets", a small & simple SFML-based GUI
 ====================================================================
@@ -31,7 +31,7 @@ _For other (both planned and completed) changes see the [issues](https://github.
   Use e.g. TGUI if you don't feel warm and cozy without CMake.)
 
 
-![screenshot](doc/media/demo-screenshot-5.png)
+![screenshot](doc/media/demo-screenshot.png)
 
 
 ## Build
