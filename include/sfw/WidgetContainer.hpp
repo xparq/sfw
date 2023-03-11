@@ -60,6 +60,9 @@ public:
     Widget* begin() const { return m_first; }
     Widget* end() const { return nullptr; }
     Widget* next(const Widget* w) const { return w ? w->m_next : end(); }
+    Widget* prev(const Widget* w) const { return w ? w->m_previous : end(); }
+    Widget* rend() const { return nullptr; }
+    Widget* rbegin() const { return m_last; }
     //!! Make it std-compatible, so that all the std:: algorithms can be used on it! (#162)
 
 protected:

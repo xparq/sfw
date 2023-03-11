@@ -61,11 +61,11 @@ Widget* Widget::find(const std::string& name) const
     return nullptr;
 }
 
-std::string Widget::getName() const
+std::string Widget::getName(Widget* widget) const
 {
     if (GUI* Main = getMain(); Main != nullptr)
     {
-        return Main->recall(this);
+        return Main->recall(widget ? widget : this);
     }
     return "";
 }

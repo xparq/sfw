@@ -26,6 +26,7 @@ protected:
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onKeyReleased(const sf::Event::KeyEvent& key) override;
     void onTextEntered(uint32_t unicode) override;
+    void onMouseLeave() override;
 
     inline Layout* toLayout() override { return this; }
 

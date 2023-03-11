@@ -75,11 +75,12 @@ public:
     // }
 
     /**
-      * The internal name of the widget (or its hex address if it wasn't named)
+      * Get the internal name of a widget (or its hex address if it wasn't named)
       * (This may be a slow operation, intended mainly for diagnostic use!
       * Basically that's why it's not just called `name()`. ;) )
+      * No widget (address) means this widget.
       */
-    std::string getName() const;
+    std::string getName(Widget* widget = nullptr) const;
 
     /**
       * Find (some other) widget by name, if previously registered (or null if not)
