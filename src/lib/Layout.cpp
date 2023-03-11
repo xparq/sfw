@@ -58,7 +58,7 @@ void Layout::onMouseMoved(float x, float y)
                     // A new widget is hovered
                     if (m_hover != nullptr)
                     {
-                        m_hover->setState(WidgetState::Default);
+                        m_hover->setState(m_focus == m_hover ? WidgetState::Focused : WidgetState::Default);
                         m_hover->onMouseLeave();
                     }
 
