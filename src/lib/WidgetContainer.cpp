@@ -44,7 +44,7 @@ Widget* WidgetContainer::insertAfter(Widget* anchor, Widget* widget, const std::
 {
     assert(widget);
     // Only freestanding widgets are to be attached:
-    assert(widget->m_parent == nullptr);
+    assert(widget->m_parent == nullptr && "Don't copy an already added widget!");
     assert(widget->m_next == nullptr);
     assert(widget->m_previous == nullptr);
 
