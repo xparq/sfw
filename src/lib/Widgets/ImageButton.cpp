@@ -10,7 +10,7 @@
 namespace sfw
 {
 
-ImageButton::ImageButton(const sf::Texture& texture, const sf::String& string):
+ImageButton::ImageButton(const sf::Texture& texture, const sf::String& text):
     Widget(),
     m_pressed(false)
 {
@@ -19,7 +19,7 @@ ImageButton::ImageButton(const sf::Texture& texture, const sf::String& string):
     m_text.setFont(Theme::getFont());
     m_text.setCharacterSize((unsigned)Theme::textSize);
 
-    setString(string);
+    setText(text);
 }
 
 
@@ -31,24 +31,31 @@ ImageButton* ImageButton::setTexture(const sf::Texture& texture)
     m_background.setTexture(texture);
     m_background.setTextureRect(sf::IntRect({0, 0}, {width, height}));
 
-    setSize((float)width, (float)height);
+    Widget::setSize((float)width, (float)height);
     return this;
 }
 
 
-ImageButton* ImageButton::setString(const sf::String& string)
+ImageButton* ImageButton::setText(const sf::String& text)
 {
-    m_text.setString(string);
+    m_text.setString(text);
     centerText();
     return this;
 }
 
 
-const sf::String& ImageButton::getString() const
+const sf::String& ImageButton::getText() const
 {
     return m_text.getString();
 }
 
+
+ImageButton* ImageButton::setSize(sf::Vector2f size)
+{
+    m_background.setScale({size.x / m_background.getTexture()->getSize().x,
+                           size.y / m_background.getTexture()->getSize().y * 3}); // see the ctor for that 3! ;)
+    return this;
+}
 
 ImageButton* ImageButton::setFont(const sf::Font& font)
 {
@@ -72,11 +79,26 @@ ImageButton* ImageButton::setTextSize(size_t size)
 }
 
 
+ImageButton* ImageButton::setTextStyle(sf::Text::Style style)
+{
+    m_text.setStyle(style);
+    return this;
+}
+
+
+ImageButton* ImageButton::setTextColor(sf::Color color)
+{
+    m_text.setFillColor(color);
+    return this;
+}
+
+
 void ImageButton::draw(const gfx::RenderContext& ctx) const
 {
     auto sfml_renderstates = ctx.props;
     sfml_renderstates.transform *= getTransform();
     ctx.target.draw(m_background, sfml_renderstates);
+    sfml_renderstates.transform *= m_background.getTransform();
     ctx.target.draw(m_text, sfml_renderstates);
 }
 

@@ -19,13 +19,17 @@ class ImageButton: public Widget
 public:
     ImageButton(const sf::Texture& texture, const sf::String& label = "");
 
-    ImageButton* setString(const sf::String& string);
-    const sf::String& getString() const;
+    ImageButton* setText(const sf::String& text);
+    const sf::String& getText() const;
+
+    ImageButton* setSize(sf::Vector2f size);
 
     ImageButton* setFont(const sf::Font& font);
     const sf::Font& getFont() const;
 
     ImageButton* setTextSize(size_t size);
+    ImageButton* setTextStyle(sf::Text::Style style);
+    ImageButton* setTextColor(sf::Color color);
 
     ImageButton* setTexture(const sf::Texture& texture);
 
