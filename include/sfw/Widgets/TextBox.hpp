@@ -8,6 +8,7 @@
 
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Clock.hpp>
 
 namespace sfw
@@ -131,16 +132,24 @@ private:
     void onMouseMoved(float x, float y) override;
     void onTextEntered(uint32_t unicode) override;
     void onStateChanged(WidgetState state) override;
+    void onThemeChanged() override;
 
+    // Config:
+    size_t m_maxLength;
+    float m_width;
+    CursorStyle m_cursorStyle;
+    float m_cursorBlinkPeriod = 1.f;
+    // Editor inrernal state:
     sf::Text m_text;
     sf::Text m_placeholder;
-    Box m_box;
-    CursorStyle m_cursorStyle;
-    mutable sf::RectangleShape m_cursor;
-    mutable sf::Clock m_cursorTimer;
-    size_t m_cursorPos;
-    size_t m_maxLength;
+    size_t m_cursorPos; // Despite the name, this isn't a property of the visual cursor representation
     TextSelection m_selection;
+    // Cursor visual state:
+    mutable sf::RectangleShape m_cursorRect;
+    mutable sf::Color m_cursorColor;
+    mutable sf::Clock m_cursorTimer;
+    // Widget state:
+    Box m_box;
 };
 
 } // namespace

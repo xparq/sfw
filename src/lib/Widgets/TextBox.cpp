@@ -1,26 +1,25 @@
 #include "sfw/Widgets/TextBox.hpp"
+
 #include "sfw/Theme.hpp"
 #include "sfw/GUI-main.hpp"
+#include <sfw/util/diagnostics.hpp>
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/OpenGL.hpp>
 
 #include <cassert>
 #include <algorithm>
     using std::min, std::max;
-#include <functional>
-
-#include <iostream> //!DEBUG
-using namespace std;
-
-#define BLINK_PERIOD 1.f
 
 namespace sfw
 {
 
 //----------------------------------------------------------------------------
-//!! These should take into account the writing direction,
-//!! and flip the min/max selection accordingly!
+// TextSelection
+//----------------------------------------------------------------------------
+
+//!! These should depend on writing direction, and flip min/max accordingly!
 size_t TextSelection::left()  const { return min(anchor_pos, active_pos); }
 size_t TextSelection::right() const { return max(anchor_pos, active_pos); }
 
@@ -82,31 +81,20 @@ void TextSelection::resize(size_t len)
 
 
 //----------------------------------------------------------------------------
+// TextBox
+//----------------------------------------------------------------------------
+
 TextBox::TextBox(float width, CursorStyle style):
-    m_box(Box::Input),
-    m_cursorStyle(style),
-    m_cursorPos(0),
-    m_maxLength(256)
+    m_maxLength(256),
+    m_width(width),
+    m_box(Box::Input)
 {
-    m_box.setSize(width, Theme::getBoxHeight());
-
-    float offset = Theme::borderSize + Theme::PADDING;
-    m_text.setFont(Theme::getFont());
-    m_text.setPosition({offset, offset});
-    m_text.setFillColor(Theme::input.textColor);
-    m_text.setCharacterSize((unsigned)Theme::textSize);
-
-    m_placeholder.setFont(Theme::getFont());
-    m_placeholder.setPosition({offset, offset});
-    m_placeholder.setFillColor(Theme::input.textPlaceholderColor);
-    m_placeholder.setCharacterSize((unsigned)Theme::textSize);
-
-    m_cursor.setPosition({offset, offset});
-    m_cursor.setSize(sf::Vector2f(1.f, (float)Theme::getLineSpacing()));
-    m_cursor.setFillColor(Theme::input.textColor);
+    // Internal mechanics
     setCursorPos(0);
 
-    setSize(m_box.getSize());
+    // Visuals
+    m_cursorStyle = style;
+    onThemeChanged();
 }
 
 
@@ -155,28 +143,27 @@ void TextBox::setCursorPos(size_t index)
 
     m_cursorPos = index;
     m_selection.follow(index); // The selection itself will decide if and how exactly...
-
 //cerr << "                     " << index <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << ", follow: " << m_selection.following <<endl;
 
-    // The rest is all about adjusting the view (presentation/appearance)...
+    // Adjust the visuals...
 
     float padding = Theme::borderSize + Theme::PADDING;
-    m_cursor.setPosition({m_text.findCharacterPos(index).x, padding});
+    m_cursorRect.setPosition({m_text.findCharacterPos(index).x, padding});
     m_cursorTimer.restart();
 
-    if (m_cursor.getPosition().x > getSize().x - padding)
+    if (m_cursorRect.getPosition().x > getSize().x - padding)
     {
         // Shift text on left
-        float diff = m_cursor.getPosition().x - getSize().x + padding;
+        float diff = m_cursorRect.getPosition().x - getSize().x + padding;
         m_text.move({-diff, 0});
-        m_cursor.move({-diff, 0});
+        m_cursorRect.move({-diff, 0});
     }
-    else if (m_cursor.getPosition().x < padding)
+    else if (m_cursorRect.getPosition().x < padding)
     {
         // Shift text on right
-        float diff = padding - m_cursor.getPosition().x;
+        float diff = padding - m_cursorRect.getPosition().x;
         m_text.move({diff, 0});
-        m_cursor.move({diff, 0});
+        m_cursorRect.move({diff, 0});
     }
 
     float textWidth = m_text.getLocalBounds().width;
@@ -184,17 +171,19 @@ void TextBox::setCursorPos(size_t index)
     {
         float diff = (getSize().x - padding) - (m_text.getPosition().x + textWidth);
         m_text.move({diff, 0});
-        m_cursor.move({diff, 0});
+        m_cursorRect.move({diff, 0});
         // If text is smaller than the textbox, force align on left
         if (textWidth < (getSize().x - padding * 2))
         {
             diff = padding - m_text.getPosition().x;
             m_text.move({diff, 0});
-            m_cursor.move({diff, 0});
+            m_cursorRect.move({diff, 0});
         }
     }
 }
 
+
+//--- callbacks --------------------------------------------------------------
 
 void TextBox::onKeyReleased(const sf::Event::KeyEvent& key)
 {
@@ -487,6 +476,32 @@ void TextBox::onStateChanged(WidgetState state)
 }
 
 
+void TextBox::onThemeChanged()
+{
+    float offset = Theme::borderSize + Theme::PADDING;
+
+    m_text.setFont(Theme::getFont());
+    m_text.setPosition({offset, offset});
+    m_text.setFillColor(Theme::input.textColor);
+    m_text.setCharacterSize((unsigned)Theme::textSize);
+
+    m_placeholder.setFont(Theme::getFont());
+    m_placeholder.setPosition({offset, offset});
+    m_placeholder.setFillColor(Theme::input.textPlaceholderColor);
+    m_placeholder.setCharacterSize((unsigned)Theme::textSize);
+
+    m_cursorColor = Theme::input.textColor;
+    m_cursorRect.setPosition({offset, offset});
+    m_cursorRect.setSize(sf::Vector2f(1.f, (float)Theme::getLineSpacing()));
+    m_cursorRect.setFillColor(Theme::input.textColor);
+
+    m_box.setSize(m_width, Theme::getBoxHeight());
+
+    setSize(m_box.getSize());
+}
+
+
+//----------------------------------------------------------------------------
 void TextBox::draw(const gfx::RenderContext& ctx) const
 {
     auto sfml_renderstates = ctx.props;
@@ -516,7 +531,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
             sf::RectangleShape selRect;
             const sf::Vector2f& startPos = m_text.findCharacterPos(m_selection.left());
             selRect.setPosition(startPos);
-            selRect.setSize({m_text.findCharacterPos(m_selection.right()).x - startPos.x, m_cursor.getSize().y});
+            selRect.setSize({m_text.findCharacterPos(m_selection.right()).x - startPos.x, m_cursorRect.getSize().y});
             selRect.setFillColor(Theme::input.textSelectionColor);
             ctx.target.draw(selRect, sfml_renderstates);
         }
@@ -529,17 +544,15 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
     if (isFocused())
     {
         // Make it blink
+        // Hijacking draw() as a timer tick callback... :) Hi five to Alexandre@upstream for the brilliant idea!
         float timer = m_cursorTimer.getElapsedTime().asSeconds();
-        if (timer >= BLINK_PERIOD)
+        if (timer >= m_cursorBlinkPeriod)
             m_cursorTimer.restart();
 
-        // Hijacking draw() as a timer tick callback... :) Hi five to Alexandre@upstream for the brilliant idea!
-        sf::Color color = Theme::input.textColor;
-        color.a = (m_cursorStyle == PULSE ? uint8_t(255 - (255 * timer / BLINK_PERIOD))
-                                          : uint8_t(255 - (255 * timer / BLINK_PERIOD)) & 128 ? 255 : 0);
-        m_cursor.setFillColor(color);
-
-        ctx.target.draw(m_cursor, sfml_renderstates);
+        m_cursorColor.a = (m_cursorStyle == PULSE ? uint8_t(255 - (255 * timer / m_cursorBlinkPeriod))
+                                                  : uint8_t(255 - (255 * timer / m_cursorBlinkPeriod)) & 128 ? 255 : 0);
+        m_cursorRect.setFillColor(m_cursorColor);
+        ctx.target.draw(m_cursorRect, sfml_renderstates);
     }
 }
 
