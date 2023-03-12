@@ -12,8 +12,8 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 - Adapted to the pre-3.0 ("master") SFML API
 - Windows/MSVC build added
 - Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already)
-- Richer, more flexible API, improvements to existing widgets etc.
-- Reshuffled source tree (to help integrating into other projects, to allow growth, to allow embedding SFML directly)
+- Richer, more flexible API, bugfixes, improvements to existing widgets etc.
+- Reshuffled source tree (to allow growth & to help integrating into other projects)
 - Default quick-start assets included
 - Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow)
 
