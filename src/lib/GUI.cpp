@@ -112,10 +112,10 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 
     // Notify widgets of the change
     traverseChildren([](Widget* w) { w->onThemeChanged(); } );
-        // Another reason to not use the widget registry map (besides minimalism
+        // Another reason to not use the widget registry map (besides "frugalism"
         // and that it's not even intended for this (i.e. it may not even contain
-        // every widget!) that, and ) is that std::map reorders its content
-        // alphabetically, which is pretty awkward here (e.g. for diagnostics).
+        // every widget!) that std::map reorders its content alphabetically,
+        // which is pretty awkward here (e.g. for diagnostics).
 
     //! This would be redundant in the current model:
     //!traverseChildren([](Widget* w) { w->recomputeGeometry(); } );
