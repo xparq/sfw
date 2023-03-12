@@ -17,7 +17,7 @@
 
 #define STR_IMPL(A) #A
 #define STR(A) STR_IMPL(A)
-#define GFX_BACKEND_SPECIFIC(filename) STR(sfw/Gfx/backend-specific/SFW_GFX_BACKEND/filename)
+#define GFX_BACKEND_SPECIFIC(filename) STR(sfw/Gfx/_backend-specific/SFW_GFX_BACKEND/filename)
 // Usage: #include GFX_BACKEND_SPECIFIC(headername.h)
 
 
@@ -57,7 +57,7 @@ inline sf::String stdstring_to_SFMLString(const std::string& stdstr)
 {
     return sf::String::fromUtf8(stdstr.c_str(), stdstr.c_str() + stdstr.length());
     //! Wow, OK, it didn't crash, and even seems to work fine! :-o
-    //! So they do to need plain "byte iterators" for this then?! Phew...
+    //! So they do need plain "byte iterators" for this then?! Phew...
 }   //! (Can't quite make sense of that, but whatever -- let's celebrate! :) )
 
 //!!See above about not trying to be too utf8-smart for nothing...
