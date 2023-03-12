@@ -302,10 +302,12 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
         break;
 
     case sf::Keyboard::Home:
+    case sf::Keyboard::Up:
         setCursorPos(0);
         break;
 
     case sf::Keyboard::End:
+    case sf::Keyboard::Down:
         setCursorPos(m_text.getString().getSize());
         break;
 
