@@ -130,17 +130,10 @@ int main()
 		->setCallback([&](auto* w) { text.setString(w->getText()); })
 	);
 	// Another text box, with length limit & pulsating cursor
-	// Creating it without a "junk" local variable now:
 	form->add("Text with limit (5)", (new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
 		->setText("Hello world!")
 	);
-	// Note: the label above ("Text with limit (5)") will also become the name
-	// of the added widget (the TextBox), which can then be used for retrieving
-	// it later. (See it used by the crop slider somewhere below.)
-	// It can also be overridden (e.g. to avoid duplicates), like:
-	// form->add("repeated label or overly long text", widget, "widgetname");
-	// (Widget names are optional.)
 
 	// Slider + progress bars for rotating
 	auto sliderForRotation = new sfw::Slider(1); // granularity = 1%
@@ -200,7 +193,7 @@ int main()
 	// (See also another one for window bg. color selection!)
 
 	form->add("Text color", optTxtColor);
-	form->add("Text bg.", optTxtBg);
+	form->add("Box color", optTxtBg);
 
 	// Checkboxes to set text properties
 	// (Note the use of the "new-less" (copying) add() style, for a change.)
@@ -217,33 +210,17 @@ int main()
 		text.setStyle(style);
 	}));
 
-	// Attach the horiz. progress bars (used for text rotation) to the form
-	form->add("Progress bar (label = None)",    pbarRotation1);
-	form->add("Progress bar (label = Over)",    pbarRotation2);
-	form->add("Progress bar (label = Outside)", pbarRotation3);
+	// Attach the horiz. progress bars (used for rotation)
+	auto hbars = form->add("Horiz. progress bars", VBox());
+	hbars->add(pbarRotation1);
+	hbars->add(pbarRotation2);
+//	hbars->add(pbarRotation3);
+	// Attach the vert. progress bars (used for scaling)
+	auto vbars = form->add("Vert. progress bars", HBox());
+	vbars->add(pbarScale1);
+	vbars->add(pbarScale2);
+//	vbars->add(pbarScale3);
 
-	// Attach the vert. progress bars (used for text scaling) to a new box
-	auto layoutForVerticalProgressBars = new HBox;
-	//!! Issue #109: Document that manipulating unowned, free-standing layouts is UB!
-	form->add("Vertical progress bars", layoutForVerticalProgressBars);
-	layoutForVerticalProgressBars->add(pbarScale1);
-	layoutForVerticalProgressBars->add(pbarScale2);
-	layoutForVerticalProgressBars->add(pbarScale3);
-
-	form->add("Default button", sfw::Button("button"));
-	cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.get("Default button"))->getText() << "\"\n";
-
-	auto utf8button_tag = "UTF-8"; // Will also use it to recall the button!
-	form->add(utf8button_tag, sfw::Button("Ψ ≠ 99° ± β")); // Note: this source is already UTF-8 encoded.
-	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get(utf8button_tag))->getText() << "\"\n";
-
-	// Custom bitmap button
-	sf::Texture buttonimg; //! DON'T put this texture inside the if () as local temporary!... ;)
-	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
-	{
-		form->add("Custom button", (new sfw::ImageButton(buttonimg, "Play"))->setTextSize(20)
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
-	}
 
 	//--------------------------------------------------------------------
 	// A panel in the middle
@@ -252,12 +229,38 @@ int main()
 	// OK, add the SFML test shapes + adapter widget here
 	middle_panel->add(sfText);
 
-	// Textbox for the labels of new buttons created by the button-factory button...
-	auto boxfactory = middle_panel->add(new HBox);
-	auto labeller = boxfactory->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
-	boxfactory->add(sfw::Button("Create button", [&] {
-		middle_panel->addAfter(boxfactory, new sfw::Button(labeller->getText()));
+	middle_panel->add(sfw::Label(" "));
+
+	//--------------------------------------------------------------------
+	// "Button factory" labeller textbox + creat button...
+	auto buttfactory = middle_panel->add(new HBox);
+	auto labeller = buttfactory->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+	buttfactory->add(sfw::Button("Create button", [&] {
+		middle_panel->addAfter(buttfactory, new sfw::Button(labeller->getText()));
 	}));
+
+	// More buttons...
+	auto buttons_form = middle_panel->add(new Form);
+
+	auto utf8button_tag = "UTF-8 by default"; // Will also use it to recall the button!
+	buttons_form->add(utf8button_tag, sfw::Button("Ψ ≠ 99° ± β")); // Note: this source is already UTF-8 encoded.
+	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get(utf8button_tag))->getText() << "\"\n";
+
+	// Bitmap buttons
+	buttons_form->add("Bitmap button:", sfw::Label(""));
+	sf::Texture buttonimg; //! DON'T put this texture inside the if () as local temporary!... ;)
+	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
+	{
+		buttons_form->add("- native size", (new sfw::ImageButton(buttonimg, "All defaults"))->setTextSize(20)
+			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
+
+		buttons_form->add("- resized (etc.)", (new sfw::ImageButton(buttonimg, "Bold"))
+			->setTextSize(20)
+			->setTextStyle(sf::Text::Style::Bold)
+			->setSize({180, 35})
+			->setTextColor(hex2color("#d0e0c0"))
+			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
+	}
 
 
 	//--------------------------------------------------------------------
@@ -265,31 +268,35 @@ int main()
 
 	// Image directly from file
 	auto vboximg = main_hbox->add(new VBox);
-	vboximg->add(sfw::Label("Image from file:"));
-	vboximg->add(sfw::Image("demo/some image.png"));
+	vboximg->add(sfw::Label("Image directly from file:"));
+	vboximg->add(sfw::Image("demo/thumbnail.jpg"));
 
-	// Image crop from file
-	vboximg->add(sfw::Label("Crop from file:"));
-	vboximg->add(sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
-	vboximg->add(sfw::Label("Image crop varied:"));
+	// Image crop + scaling directly from file
+	vboximg->add(sfw::Label("Image crop + zoom:"));
+	vboximg->add(sfw::Image("demo/thumbnail.jpg", {{100, 110}, {30, 20}}))->scale(3);
 
 	// Image from file, cropped dynamically
-	sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg");
+	vboximg->add(sfw::Label("Dynamic cropping:"));
 
+	sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg");
 	// Slider & progress bar for cropping an Image widget
-	vboximg->add(sfw::Slider(1, 100))->setCallback([&](auto* w) {
+	auto cropslider = (new sfw::Slider(1, 100))->setCallback([&](auto* w) {
 		((sfw::ProgressBar*)w->get("cropbar"))->setValue(w->getValue());
 		// Show the slider value in a text box retrieved by its name:
-		auto tbox = (sfw::TextBox*)w->get("Text with limit (5)");
+		auto tbox = (sfw::TextBox*)w->get("crop%");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
-		else tbox->setText(to_string((int)w->getValue()));
+		else tbox->setText(w->getValue() ? to_string((int)w->getValue()) : "");
 		imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
 		                      {(int)(w->getValue() * 1.4), (int)w->getValue()}});
 	});
 
+	vboximg->add(cropslider);
 	auto boxcrop = vboximg->add(new HBox);
 		boxcrop->add(sfw::Label("Crop square size:"));
 		boxcrop->add(sfw::ProgressBar(40), "cropbar");
+		boxcrop->add((new sfw::TextBox(36.f))->setMaxLength(3), "crop%")->setCallback([&](auto* w) {
+			cropslider->setValue(stof(SFMLString_to_stdstring(w->getText())));
+		});
 
 	vboximg->add(imgCrop);
 	vboximg->add(sfw::Label("(Art: © Édouard Martinet)"))->setStyle(sf::Text::Style::Italic);
@@ -363,7 +370,7 @@ int main()
 	// OK, GUI Setup done, set some "high-level" defaults
 	// (after setup, as these may trigger callbacks etc.)
 	//
-	sliderForRotation->setValue(27);
+	sliderForRotation->setValue(29);
 	sliderForScale->setValue(20);
 	// Colors of the example text + rect:
 	optTxtColor->selectItem(2); //!! 3rd item; selectItem fails to trigger the callback...

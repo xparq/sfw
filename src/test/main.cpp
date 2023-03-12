@@ -180,7 +180,7 @@ int main()
 
 	//--------------------------------------------------------------------
 	// A "form" panel on the left
-	auto form = main_hbox->add(Form());
+	auto form = main_hbox->add(Form(), "left form");
 
 	// A text box to set the text of the example SFML object (created above)
 	/*!! #171: this won't compile yet:
@@ -189,14 +189,18 @@ int main()
 		->setText("Hello world!")
 		->setCallback([&](auto* w) { text.setString(w->getText()); });
 	*/
-	// Another text box, with length limit & pulsating cursor
-	// Creating it without a "junk" local variable now:
+	form->add("Text", (new sfw::TextBox())
+		->setPlaceholder("Type something!")
+		->setText("Hello world!")
+		->setCallback([&](auto* w) { text.setString(w->getText()); })
+	);
+	// Length limit & pulsating cursor
 	form->add("Text with limit (5)", (new TextBox(50.f, TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
 		->setText("Hello world!")
 	);
-	// The label above ("Text with limit (5)") will be used for retrieving
-	// the widget later by the crop slider (somewhere below)!
+	//! The label above ("Text with limit (5)") will be used for retrieving
+	//! the widget later by the crop slider (somewhere below)!
 
 	// Slider + progress bars for rotating
 	auto sliderForRotation = new sfw::Slider(1); // granularity = 1%
@@ -279,31 +283,17 @@ int main()
 	});
 
 	// Attach the horiz. progress bars (used for text rotation) to the form
-	form->add("Progress bar (label = None)",    pbarRotation1);
-	form->add("Progress bar (label = Over)",    pbarRotation2);
-	form->add("Progress bar (label = Outside)", pbarRotation3);
+	form->add("H. p.bars", pbarRotation1);
+	form->add("", pbarRotation2);
+	form->add("", pbarRotation3);
 
 	// Attach the vert. progress bars (used for text scaling) to a new box
-	auto layoutForVerticalProgressBars = new sfw::HBox();
+	auto vbars = new sfw::HBox();
 	//!! Issue #109: Document that manipulating unowned, free-standing layouts is UB!
-	form->add("Vertical progress bars", layoutForVerticalProgressBars);
-	layoutForVerticalProgressBars->add(pbarScale1);
-	layoutForVerticalProgressBars->add(pbarScale2);
-	layoutForVerticalProgressBars->add(pbarScale3);
-
-	form->add("Default button", sfw::Button("button"));
-	cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.get("Default button"))->getText() << "\"\n";
-
-	form->add("UTF-8 test", sfw::Button("VÍZ- GÁZ- ÉS HÓTŰRŐ")); // Note: this source is already UTF-8 encoded.
-	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get("UTF-8 test"))->getText() << "\"\n";
-
-	// Custom bitmap button
-	sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
-	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
-	{
-		form->add("Custom button", (new sfw::ImageButton(buttonimg, "Play"))->setTextSize(20)
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
-	}
+	form->add("V. p.bars", vbars);
+	vbars->add(pbarScale1);
+	vbars->add(pbarScale2);
+	vbars->add(pbarScale3);
 
 
 	//--------------------------------------------------------------------
@@ -313,12 +303,37 @@ int main()
 	// OK, add the SFML test shapes + adapter widget here
 	middle_panel->add(sfText);
 
-	// Textbox for the labels of new buttons created by the button-factory button...
+	// Button factory...
 	auto boxfactory = middle_panel->add(sfw::HBox());
 	auto labeller = boxfactory->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
 	boxfactory->add(sfw::Button("Create button", [&] {
 		middle_panel->addAfter(boxfactory, new sfw::Button(labeller->getText()));
 	}));
+
+	// More buttons...
+	auto buttons_form = middle_panel->add(new Form);
+
+//	buttons_form->add("Default button", sfw::Button("button"));
+//	cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.get("Default button"))->getText() << "\"\n";
+
+	auto utf8button_tag = "UTF-8 test"; // Will also use it to recall the button!
+	buttons_form->add(utf8button_tag, sfw::Button("hőtűrő LÓTÚRÓ")); // Note: this source is already UTF-8 encoded.
+	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get(utf8button_tag))->getText() << "\"\n";
+
+	// Bitmap button
+	sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
+	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
+	{
+		buttons_form->add("Native size", (new sfw::ImageButton(buttonimg, "All defaults"))->setTextSize(20)
+			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
+
+		buttons_form->add("Customized", (new sfw::ImageButton(buttonimg, "Bold"))
+			->setTextSize(20)
+			->setTextStyle(sf::Text::Style::Bold)
+			->setSize({180, 35})
+			->setTextColor(hex2color("#d0e0c0"))
+			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
+	}
 
 
 	//--------------------------------------------------------------------
