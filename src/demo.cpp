@@ -121,10 +121,12 @@ int main()
 
 	//--------------------------------------------------------------------
 	// A "form" panel on the left
-	auto form = main_hbox->add(new Form);
+	auto left_panel = main_hbox->add(new VBox);
+
+	auto form = left_panel->add(new Form);
 
 	// A text box to set the text of the example SFML object (created above)
-	form->add("Text", (new sfw::TextBox())
+	form->add("Text", (new sfw::TextBox(175)) // <- width (pixels)
 		->setPlaceholder("Type something!")
 		->setText("Hello world!")
 		->setCallback([&](auto* w) { text.setString(w->getText()); })
@@ -135,32 +137,55 @@ int main()
 		->setText("Hello world!")
 	);
 
-	// Slider + progress bars for rotating
-	auto sliderForRotation = new sfw::Slider(1); // granularity = 1%
-	auto pbarRotation1 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
-	auto pbarRotation2 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
-	auto pbarRotation3 = new sfw::ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
-	sliderForRotation->setCallback([&](auto* w) {
-		text.setRotation(sf::degrees(w->getValue() * 360 / 100.f));
-		pbarRotation1->setValue(w->getValue());
-		pbarRotation2->setValue(w->getValue());
-		pbarRotation3->setValue(w->getValue());
-	});
-	// Slider + progress bars for scaling
-	auto sliderForScale = new sfw::Slider(); // default granularity: 10%
-	auto pbarScale1 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelNone);
-	auto pbarScale2 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOver);
-	auto pbarScale3 = new sfw::ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
+	// Slider + progress bar for scaling
+	auto sliderForScale = new sfw::Slider(10, 175); // granularity (%), width (pixel)
+	auto pbarScale = new sfw::ProgressBar(175, sfw::Horizontal, sfw::LabelOver);
 	sliderForScale->setCallback([&](auto* w) {
 		float scale = 1 + w->getValue() * 2 / 100.f;
 		text.setScale({scale, scale});
-		pbarScale1->setValue(w->getValue());
-		pbarScale2->setValue(w->getValue());
-		pbarScale3->setValue(w->getValue());
+		pbarScale->setValue(w->getValue());
+	});
+	// Slider + progress bar for rotating
+	auto sliderForRotation = new sfw::Slider(1, 75, sfw::Vertical); // granularity: 1%
+	auto pbarRotation = new sfw::ProgressBar(75.f, sfw::Vertical, sfw::LabelOver);
+	sliderForRotation->setCallback([&](auto* w) {
+		text.setRotation(sf::degrees(w->getValue() * 360 / 100.f));
+		pbarRotation->setValue(w->getValue());
 	});
 
-	form->add("Rotation", sliderForRotation);
+	// Add the scaling slider + its horizontal progress bar
 	form->add("Scale", sliderForScale);
+	form->add("", HBox())->add(pbarScale);
+
+	// Add the rotation slider + its vertical progress bar
+        // ...And, since there would be too much wasted space next to the p.bar,
+	// put some text-styling checkboxes there. :)
+	// (Note the use of the "new-less" (move-constructing) add(...) style, for a change!)
+	auto rot_and_chkboxes = form->add("Rotation", HBox());
+	     rot_and_chkboxes->add(sliderForRotation);
+	     rot_and_chkboxes->add(pbarRotation);
+	     rot_and_chkboxes->add(sfw::Label("         ")); // Just a (vert.) spacer...
+
+		auto styleboxes = rot_and_chkboxes->add(Form());
+		// Checkboxes to set text properties
+		styleboxes->add("Bold text", sfw::CheckBox([&](auto* w) {
+			int style = text.getStyle();
+			if (w->isChecked()) style |=  sf::Text::Bold;
+			else                style &= ~sf::Text::Bold;
+			text.setStyle(style);
+		}));
+		styleboxes->add("Italic", sfw::CheckBox([&](auto* w) {
+			int style = text.getStyle();
+			if (w->isChecked()) style |=  sf::Text::Italic;
+			else                style &= ~sf::Text::Italic;
+			text.setStyle(style);
+		}));
+		styleboxes->add("Underlined", sfw::CheckBox([&](auto* w) {
+			int style = text.getStyle();
+			if (w->isChecked()) style |=  sf::Text::Underlined;
+			else                style &= ~sf::Text::Underlined;
+			text.setStyle(style);
+		}));
 
 	// Color selectors
 	// -- Creating one as a template to clone it later, because
@@ -195,66 +220,39 @@ int main()
 	form->add("Text color", optTxtColor);
 	form->add("Box color", optTxtBg);
 
-	// Checkboxes to set text properties
-	// (Note the use of the "new-less" (copying) add() style, for a change.)
-	form->add("Underlined text", sfw::CheckBox([&](auto* w) {
-		int style = text.getStyle();
-		if (w->isChecked()) style |=  sf::Text::Underlined;
-		else                style &= ~sf::Text::Underlined;
-		text.setStyle(style);
-	}));
-	form->add("Bold text", sfw::CheckBox([&](auto* w) {
-		int style = text.getStyle();
-		if (w->isChecked()) style |=  sf::Text::Bold;
-		else                style &= ~sf::Text::Bold;
-		text.setStyle(style);
-	}));
-
-	// Attach the horiz. progress bars (used for rotation)
-	auto hbars = form->add("Horiz. progress bars", VBox());
-	hbars->add(pbarRotation1);
-	hbars->add(pbarRotation2);
-//	hbars->add(pbarRotation3);
-	// Attach the vert. progress bars (used for scaling)
-	auto vbars = form->add("Vert. progress bars", HBox());
-	vbars->add(pbarScale1);
-	vbars->add(pbarScale2);
-//	vbars->add(pbarScale3);
 
 
 	//--------------------------------------------------------------------
-	// A panel in the middle
-	auto middle_panel = main_hbox->add(new VBox);
+	// Buttons...
+	auto buttons_vbox = form->add("Buttons", sfw::VBox());
 
-	// OK, add the SFML test shapes + adapter widget here
-	middle_panel->add(sfText);
-
-	middle_panel->add(sfw::Label(" "));
-
-	//--------------------------------------------------------------------
 	// "Button factory" labeller textbox + creat button...
-	auto buttfactory = middle_panel->add(new HBox);
+	auto buttfactory = buttons_vbox->add(new HBox);
 	auto labeller = buttfactory->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
 	buttfactory->add(sfw::Button("Create button", [&] {
-		middle_panel->addAfter(buttfactory, new sfw::Button(labeller->getText()));
+		buttons_vbox->addAfter(buttfactory, new sfw::Button(labeller->getText()));
 	}));
 
 	// More buttons...
-	auto buttons_form = middle_panel->add(new Form);
+	auto buttons_form = buttons_vbox->add(sfw::Form());
 
-	auto utf8button_tag = "UTF-8 by default"; // Will also use it to recall the button!
-	buttons_form->add(utf8button_tag, sfw::Button("Ψ ≠ 99° ± β")); // Note: this source is already UTF-8 encoded.
+	auto utf8button_tag = "UTF-8 by default:"; // We'll also use this text to find the button.
+	buttons_form->add(utf8button_tag, sfw::Button("Ψ ≠ 99° ± β")); // Note: this source is already UTF-8 encoded!
 	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get(utf8button_tag))->getText() << "\"\n";
 
 	// Bitmap buttons
-	buttons_form->add("Bitmap button:", sfw::Label(""));
+	auto imgbuttons_form = left_panel->add(sfw::Form());
 	sf::Texture buttonimg; //! DON'T put this texture inside the if () as local temporary!... ;)
 	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
-		buttons_form->add("- native size", (new sfw::ImageButton(buttonimg, "All defaults"))->setTextSize(20)
+		auto combined_labels = new VBox();
+		combined_labels->add(sfw::Label("Img. button"));
+		combined_labels->add(sfw::Label("- native size"));		
+
+		imgbuttons_form->add(combined_labels, (new sfw::ImageButton(buttonimg, "All defaults"))->setTextSize(20)
 			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
 
-		buttons_form->add("- resized (etc.)", (new sfw::ImageButton(buttonimg, "Bold"))
+		imgbuttons_form->add("- resized (etc.)", (new sfw::ImageButton(buttonimg, "Bold"))
 			->setTextSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
@@ -264,11 +262,19 @@ int main()
 
 
 	//--------------------------------------------------------------------
+	// A panel in the middle
+	auto middle_panel = main_hbox->add(new VBox);
+
+	// OK, add the SFML test shapes + adapter widget here
+	middle_panel->add(sfText);
+
+
+	//--------------------------------------------------------------------
 	// Image views...
 
 	// Image directly from file
 	auto vboximg = main_hbox->add(new VBox);
-	vboximg->add(sfw::Label("Image directly from file:"));
+	vboximg->add(sfw::Label("Image (directly from file):"));
 	vboximg->add(sfw::Image("demo/thumbnail.jpg"));
 
 	// Image crop + scaling directly from file

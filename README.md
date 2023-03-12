@@ -14,7 +14,7 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 - Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already)
 - Richer, more flexible API, bugfixes, improvements to existing widgets etc.
 - Reshuffled source tree (to allow growth & to help integrating into other projects)
-- Default quick-start assets included
+- Default quick-start assets included (and removed the non-free ones from the demo)
 - Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow)
 
 _For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
@@ -31,7 +31,7 @@ _For other (both planned and completed) changes see the [issues](https://github.
   Use e.g. TGUI if you don't feel warm and cozy without CMake.)
 
 
-![screenshot](doc/media/demo-screenshot.png)
+![screenshot](doc/media/demo-screenshot-3.jpg)
 
 
 ## Build
