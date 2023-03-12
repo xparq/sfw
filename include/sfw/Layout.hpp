@@ -32,10 +32,13 @@ protected:
 
     inline Layout* toLayout() override { return this; }
 
+    /**
+     * Set the focus on a widget, if applicable
+     * @return true if the widget took the focus, otherwise false
+     */
+    bool focusWidget(Widget* widget);
     bool focusNextWidget();
     bool focusPreviousWidget();
-    // Returns true if `widget` has the focus, otherwise false
-    bool focusWidget(Widget* widget);
 
 private:
     Widget* m_hover;

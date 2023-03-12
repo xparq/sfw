@@ -160,12 +160,13 @@ void Layout::onKeyPressed(const sf::Event::KeyEvent& key)
     if (key == Theme::nextWidgetKey)
     {
         if (!focusNextWidget())
-            // Try to focus first widget if possible
+            // Try to wrap around to the first widget then
             focusNextWidget();
     }
     else if (key == Theme::previousWidgetKey)
     {
         if (!focusPreviousWidget())
+            // Try to wrap around to the last widget then
             focusPreviousWidget();
     }
     else if (m_focus)
