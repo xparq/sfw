@@ -15,6 +15,8 @@ namespace sfw
 class Layout: public WidgetContainer
 {
 protected:
+    Layout();
+
     void draw(const gfx::RenderContext& ctx) const override;
 
     // Callbacks ---------------------------------------------------------------
@@ -34,6 +36,10 @@ protected:
     bool focusPreviousWidget();
     // Returns true if `widget` has the focus, otherwise false
     bool focusWidget(Widget* widget);
+
+private:
+    Widget* m_hover;
+    Widget* m_focus;
 };
 
 } // namespace

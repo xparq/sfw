@@ -18,9 +18,7 @@ namespace sfw
 
 WidgetContainer::WidgetContainer():
     m_first(nullptr),
-    m_last(nullptr),
-    m_hover(nullptr),
-    m_focus(nullptr)
+    m_last(nullptr)
 {
 }
 

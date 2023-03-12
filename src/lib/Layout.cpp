@@ -10,6 +10,12 @@
 namespace sfw
 {
 
+Layout::Layout():
+    m_hover(nullptr),
+    m_focus(nullptr)
+{
+}
+
 // Overrides -----------------------------------------------------------------
 
 void Layout::draw(const gfx::RenderContext& ctx) const

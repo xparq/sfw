@@ -28,9 +28,6 @@ class GUI;
 class Widget: public gfx::Drawable
 {
 public:
-    Widget();
-    virtual ~Widget() {}
-
     /**
      * Widget position
      */
@@ -97,6 +94,9 @@ friend class VBox;
 friend class HBox;
 friend class Form;
 //----------------------
+
+    Widget();
+    virtual ~Widget() {}
 
     void setSize(const sf::Vector2f& size);
     void setSize(float width, float height);

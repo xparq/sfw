@@ -81,8 +81,6 @@ protected:
 protected:
     Widget* m_first;
     Widget* m_last;
-    Widget* m_hover;
-    Widget* m_focus;
 };
 
 } // namespace
