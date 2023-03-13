@@ -6,7 +6,9 @@
 #include <cmath>
 
 #ifdef DEBUG
-#include <SFML/Graphics.hpp>
+#
+#  include <SFML/Graphics.hpp>
+#
 #endif
 
 namespace sfw
@@ -75,12 +77,11 @@ void Widget::setPosition(const sf::Vector2f& pos)
 {
     m_position = pos;
     m_transform = sf::Transform(
-        1, 0, pos.x, // translate x
-        0, 1, pos.y, // translate y
+        1, 0, roundf(pos.x), // translate x
+        0, 1, roundf(pos.y), // translate y
         0, 0, 1
     );
 }
-
 
 void Widget::setPosition(float x, float y)
 {
@@ -112,12 +113,10 @@ sf::Vector2f Widget::getAbsolutePosition() const
 
 void Widget::setSize(const sf::Vector2f& size)
 {
-    m_size = size;
+    m_size = sf::Vector2f(roundf(size.x), roundf(size.y));
+
     onResized();
-    if (!isRoot())
-    {
-        getParent()->recomputeGeometry();
-    }
+    if (!isRoot()) getParent()->recomputeGeometry();
 }
 
 
