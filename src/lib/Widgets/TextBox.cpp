@@ -130,7 +130,6 @@ TextBox* TextBox::setMaxLength(size_t maxLength)
 void TextBox::setCursorPos(size_t index)
 {
 //cerr << "setCursorPos-> cpos: " << index <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << ", follow: " << m_selection.following <<endl;
-
     if (index > m_text.getString().getSize()) // NOTE: a) The cursor pos. is unsigned.
                                               //       b) The pos. right after the end (technic'ly: at EOS) is OK.
     {
@@ -151,17 +150,18 @@ void TextBox::setCursorPos(size_t index)
     m_cursorRect.setPosition({m_text.findCharacterPos(index).x, padding});
     m_cursorTimer.restart();
 
-    if (m_cursorRect.getPosition().x > getSize().x - padding)
+    auto pixel_cur_pos =  m_cursorRect.getPosition().x;
+    if (pixel_cur_pos > getSize().x - padding)
     {
-        // Shift text on left
-        float diff = m_cursorRect.getPosition().x - getSize().x + padding;
+        // Shift left
+        float diff = pixel_cur_pos - getSize().x + padding;
         m_text.move({-diff, 0});
         m_cursorRect.move({-diff, 0});
     }
-    else if (m_cursorRect.getPosition().x < padding)
+    else if (pixel_cur_pos < padding)
     {
-        // Shift text on right
-        float diff = padding - m_cursorRect.getPosition().x;
+        // Shift right
+        float diff = padding - pixel_cur_pos;
         m_text.move({diff, 0});
         m_cursorRect.move({diff, 0});
     }
@@ -172,7 +172,7 @@ void TextBox::setCursorPos(size_t index)
         float diff = (getSize().x - padding) - (m_text.getPosition().x + textWidth);
         m_text.move({diff, 0});
         m_cursorRect.move({diff, 0});
-        // If text is smaller than the textbox, force align on left
+        // If the text is smaller than the box, align left
         if (textWidth < (getSize().x - padding * 2))
         {
             diff = padding - m_text.getPosition().x;
@@ -482,24 +482,41 @@ void TextBox::onThemeChanged()
 {
     float offset = Theme::borderSize + Theme::PADDING;
 
+//!! The repositionings below are incomplete alone! x needs readjusting, too!
+//!! Ideally no repos. should even be needed, but a clean, net inner rect
+//!! should be used instead for all the text + cursor drawing, but... later.
+//!!
+//!! Alternatively, before draw() (or latest: right there, but that
+//!! should of course be avoided for perf. reasons) there should be an
+//!! internal update_view() call to iron out any possible inconsistencies
+//!! (irrespective of what has caused it)! And it would be called from
+//!! onResize, too, in case that becomes a thing (likely for a multi-line
+//!! TextBox in the future).
+
     m_text.setFont(Theme::getFont());
-    m_text.setPosition({offset, offset});
     m_text.setFillColor(Theme::input.textColor);
     m_text.setCharacterSize((unsigned)Theme::textSize);
 
     m_placeholder.setFont(Theme::getFont());
-    m_placeholder.setPosition({offset, offset});
     m_placeholder.setFillColor(Theme::input.textPlaceholderColor);
     m_placeholder.setCharacterSize((unsigned)Theme::textSize);
+    //!! This is a "static fixture", can't move, so it's *probably* OK to
+    //!! reposition it only once per theme change:
+    m_placeholder.setPosition({offset, offset});
 
     m_cursorColor = Theme::input.textColor;
-    m_cursorRect.setPosition({offset, offset});
-    m_cursorRect.setSize(sf::Vector2f(1.f, (float)Theme::getLineSpacing()));
     m_cursorRect.setFillColor(Theme::input.textColor);
+    //!! Insert/Overwrite would change it too, so this is not future-proof here at all:
+    m_cursorRect.setSize(sf::Vector2f(1.f, (float)Theme::getLineSpacing()));
 
     m_box.setSize(m_width, Theme::getBoxHeight());
 
     setSize(m_box.getSize());
+
+//!!update_view():
+    //!!And then this should adjust the x offset, too (later)!
+    m_text.setPosition({m_text.getPosition().x, offset});
+    m_cursorRect.setPosition({m_cursorRect.getPosition().x, offset});
 }
 
 
@@ -515,7 +532,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 
     sf::Vector2f pos = getAbsolutePosition();
     glScissor(
-        (GLint)(pos.x + Theme::borderSize),
+        (GLint)(pos.x + Theme::borderSize + Theme::PADDING),
         (GLint)(ctx.target.getSize().y - (pos.y + getSize().y)),
         (GLsizei)getSize().x,
         (GLsizei)getSize().y
