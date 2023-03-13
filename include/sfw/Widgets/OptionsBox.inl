@@ -1,7 +1,9 @@
 #include "sfw/Theme.hpp"
 #include "sfw/util/shims.hpp" // std::string <-> sf::String conv.
+#include "sfw/util/diagnostics.hpp"
 
-#include <algorithm> // max
+#include <algorithm>
+    using std::max;
 
 namespace sfw
 {
@@ -25,7 +27,7 @@ OptionsBox<T>::OptionsBox(std::function<void(OptionsBox<T>*)> callback):
 
 
 template <class T>
-auto OptionsBox<T>::addItem(const std::string& label, const T& value)
+auto OptionsBox<T>::add(const std::string& label, const T& value)
 {
     m_items.push_back(Item(label, value));
 
@@ -40,42 +42,58 @@ auto OptionsBox<T>::addItem(const std::string& label, const T& value)
         setSize(m_box.getSize());
     }
 
-    selectItem(m_items.size() - 1);
+    update_selection(m_items.size() - 1, false);
     return this;
 }
 
 
 template <class T>
-auto OptionsBox<T>::selectItem(size_t item_index)
+auto OptionsBox<T>::select(size_t index)
 {
-    if (item_index < m_items.size())
+    return update_selection(index);
+}
+
+
+template <class T>
+auto OptionsBox<T>::select(const std::string& label)
+{
+    for (size_t i = 0; i < m_items.size(); ++i)
     {
-        m_currentIndex = item_index;
-        m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(m_items[item_index].label));
-        m_box.centerTextHorizontally(m_box.item());
+        if (label == m_items[i].label)
+        {
+            update_selection(i);
+            break;
+        }
     }
     return this;
 }
 
 
 template <class T>
-const T& OptionsBox<T>::getSelectedValue() const
+const T& OptionsBox<T>::current() const
 {
     return m_items[m_currentIndex].value;
 }
 
 
 template <class T>
-T& OptionsBox<T>::getSelectedValueRef()
+T& OptionsBox<T>::currentRef()
 {
     return m_items[m_currentIndex].value;
 }
 
 
 template <class T>
-size_t OptionsBox<T>::getSelectedIndex() const
+size_t OptionsBox<T>::currentIndex() const
 {
     return m_currentIndex;
+}
+
+
+template <class T>
+const std::string& OptionsBox<T>::currentLabel() const
+{
+    return m_items[m_currentIndex].label;
 }
 
 
@@ -85,8 +103,7 @@ auto OptionsBox<T>::selectNext()
     if (m_items.size() > 1)
     {
         // Get next item index
-        selectItem(m_currentIndex == (m_items.size() - 1) ? 0 : m_currentIndex + 1);
-        triggerCallback();
+        update_selection(m_currentIndex == (m_items.size() - 1) ? 0 : m_currentIndex + 1);
     }
     return this;
 }
@@ -98,16 +115,42 @@ auto OptionsBox<T>::selectPrevious()
     if (m_items.size() > 1)
     {
         // Get previous item index
-        selectItem(m_currentIndex == 0 ? m_items.size() - 1 : m_currentIndex - 1);
-        triggerCallback();
+        update_selection(m_currentIndex == 0 ? m_items.size() - 1 : m_currentIndex - 1);
     }
 }
 
 
 template <class T>
-OptionsBox<T>* OptionsBox<T>::setColor(const sf::Color& color)
+OptionsBox<T>* OptionsBox<T>::setTextColor(const sf::Color& color)
 {
     m_box.setItemColor(color);
+    return this;
+}
+
+template <class T>
+OptionsBox<T>* OptionsBox<T>::setFillColor(const sf::Color& color)
+{
+    m_box.setFillColor(color);
+    m_arrowLeft.setTintColor(color);
+    m_arrowRight.setTintColor(color);
+    return this;
+}
+
+
+template <class T>
+auto OptionsBox<T>::update_selection(size_t index, bool callTheCallback)
+{
+    //! No check for index != m_currentIndex, because this may also be called from
+    //! onThemeChanged, where "updating" would mean resetting the current label +
+    //! re-centering it, without having the current index changed.
+    if (index < m_items.size())
+    {
+        m_currentIndex = index;
+        m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(m_items[index].label));
+        m_box.centerTextHorizontally(m_box.item());
+
+        if (callTheCallback) triggerCallback();
+    }
     return this;
 }
 
@@ -154,14 +197,14 @@ void OptionsBox<T>::onThemeChanged()
     for (size_t i = 0; i < m_items.size(); ++i)
     {
         m_box.item().setString(stdstring_to_SFMLString(m_items[i].label));
-        width = std::max(width, m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2);
+        width = max(width, m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2);
     }
     m_box.setSize(width, (float)Theme::getBoxHeight());
     setSize(m_box.getSize());
 
-    // Reset the current selection rolled all over in the loop above
-    // (This will also center it, so the widget had to have been resized first!)
-    selectItem(getSelectedIndex());
+    //! Reset the current selection rolled all over in the loop above.
+    //! This will also re-center it, so the widget had to have been resized first!
+    update_selection(m_currentIndex, false);
 
     // Left arrow
     m_arrowLeft.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());

@@ -31,7 +31,7 @@ _For other (both planned and completed) changes see the [issues](https://github.
   Use e.g. TGUI if you don't feel warm and cozy without CMake.)
 
 
-![screenshot](doc/media/demo-screenshot-3.jpg)
+![screenshot](doc/media/demo-screenshot.png)
 
 
 ## Build

@@ -233,28 +233,28 @@ int main()
 	// -- Creating one as a template to clone it later, because
 	//    WIDGETS MUSTN'T BE COPIED AFTER HAVING BEEN ADDED TO THE GUI!
 	OBColor ColorSelect_TEMPLATE; (&ColorSelect_TEMPLATE)
-		->addItem("Black", sf::Color::Black)
-		->addItem("Red", sf::Color::Red)
-		->addItem("Green", sf::Color::Green)
-		->addItem("Blue", sf::Color::Blue)
-		->addItem("Cyan", sf::Color::Cyan)
-		->addItem("Yellow", sf::Color::Yellow)
-		->addItem("White", sf::Color::White)
+		->add("Black", sf::Color::Black)
+		->add("Red", sf::Color::Red)
+		->add("Green", sf::Color::Green)
+		->add("Blue", sf::Color::Blue)
+		->add("Cyan", sf::Color::Cyan)
+		->add("Yellow", sf::Color::Yellow)
+		->add("White", sf::Color::White)
 	;
 
 	// Text color selector
 	auto optTxtColor = (new OBColor(ColorSelect_TEMPLATE))
 		->setCallback([&](auto* w) {
-			text.setFillColor(w->getSelectedValue());
-			w->setColor(w->getSelectedValue());
+			text.setFillColor(w->current());
+			w->setTextColor(w->current());
 		});
 
 	// Text backgorund rect color
 	auto optTxtBg = (new OBColor(ColorSelect_TEMPLATE))
-		->addItem("Default", themes[DEFAULT_THEME].bgColor)
+		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
-			textrect.setFillColor(w->getSelectedValue());
-			w->setColor(w->getSelectedValue());
+			textrect.setFillColor(w->current());
+			w->setFillColor(w->current());
 		});
 
 	// See also another one for window background color selection!
@@ -379,11 +379,11 @@ int main()
 	using OBTheme = sfw::OptionsBox<Theme::Cfg>;
 	right_bar->add(sfw::Label("Change theme:"));
 	auto themeselect = new OBTheme([&](auto* w) {
-		const auto& themecfg = w->getSelectedValue();
+		const auto& themecfg = w->current();
 		demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
 	});
-	for (auto& t: themes) { themeselect->addItem(t.name, t); }
-	themeselect->selectItem(DEFAULT_THEME);
+	for (auto& t: themes) { themeselect->add(t.name, t); }
+	themeselect->select(DEFAULT_THEME);
 	right_bar->add(themeselect, "theme-selector");
 
 	// Theme font size slider
@@ -394,7 +394,7 @@ int main()
 		->setValue(30)
 		->setCallback([&] (auto* w){
 			assert(w->get("theme-selector"));
-			auto& themecfg = ((OBTheme*)(w->get("theme-selector")))->getSelectedValueRef();
+			auto& themecfg = ((OBTheme*)(w->get("theme-selector")))->currentRef();
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
 			demo.setTheme(themecfg);
 		});
@@ -420,10 +420,9 @@ int main()
 
 	// Window background color selector
 	right_bar->add(new Form)->add("Window bg.", (new OBColor(ColorSelect_TEMPLATE))
-		->addItem("Default", themes[DEFAULT_THEME].bgColor)
+		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
-			Theme::windowBgColor = w->getSelectedValue();
-//			w->setColor(w->getSelectedValue());
+			Theme::windowBgColor = w->current();
 		})
 	);
 
@@ -444,13 +443,8 @@ int main()
 	sliderForRotation->setValue(27);
 	sliderForScale->setValue(20);
 	//!!#160, too:
-	optTxtColor->selectItem(2); // 3rd item; selectItem fails to trigger the callback!
-	optTxtColor->selectPrevious(); // this one doesn't... ;)
-		//!! Wow, but then it still fails to update the color, if triggered this way! :-o
-		//!! Even though the code is there, and is apparently fine!... :-o WTF?!
-		//!! (That's also part of #160 now...)
-
-	optTxtBg->selectItem(1); optTxtBg->selectPrevious();
+	optTxtColor->select("Red");
+	optTxtBg->select("Black");
 
 	//--------------------------------------------------------------------
 	// The event loop

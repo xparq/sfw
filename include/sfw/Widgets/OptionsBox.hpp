@@ -28,34 +28,50 @@ public:
      * @param label: displayed label when selected
      * @param value: value associated
      */
-    auto addItem(const std::string& label, const T& value);
+    auto add(const std::string& label, const T& value);
 
     /**
-     * Make an item the current one
-     * @param item_index: position of the item in the list
+     * Make an item at the specified index the current one
+     * (The indexing starts with 0.)
      */
-    auto selectItem(size_t item_index);
+    auto select(size_t index);
+
+    /**
+     * Make the item with the specified label the current one
+     */
+    auto select(const std::string& label);
 
     /**
      * Get the value of the selected item
      * @return associated value/reference
      */
-    const T& getSelectedValue() const;
-          T& getSelectedValueRef();
+    const T& current() const;
+          T& currentRef();
 
     /**
      * Get the index of the selected item
      */
-    size_t getSelectedIndex() const;
+    size_t currentIndex() const;
+
+    const std::string& currentLabel() const;
 
     auto selectNext();
     auto selectPrevious();
 
-    OptionsBox<T>* setColor(const sf::Color& color);
+    OptionsBox<T>* setTextColor(const sf::Color& color);
+    OptionsBox<T>* setFillColor(const sf::Color& color);
 
     // See Widget.hpp for the templates of these:
     OptionsBox<T>* setCallback(std::function<void(OptionsBox<T>*)> callback);
     OptionsBox<T>* setCallback(std::function<void()> callback) { return Widget::setCallback(callback); }
+
+protected:
+    /**
+     * Update the selection to show the item at the specified index.
+     * Also trigger the action callback, if the selection has changed,
+     * and the callTheCallback parametere is true.
+     */
+    auto update_selection(size_t index, bool callTheCallback = true);
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
