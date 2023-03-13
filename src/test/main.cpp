@@ -399,6 +399,7 @@ int main()
 		->setCallback([&] (auto* w){
 			assert(w->get("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->get("theme-selector")))->currentRef();
+cerr << themecfg.textSize << endl; //!!#196
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
 			demo.setTheme(themecfg);
 		});
@@ -410,7 +411,7 @@ int main()
 		ThemeBitmap(float zoom) : Image(Theme::getTexture()) { scale(zoom); }
 		void onThemeChanged() override {
 			setTexture(Theme::getTexture()); // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
-			scale(scale()); //!!Should do this itself!
+			//scale(scale()); //!!Should do this itself! #198
 		}
 	};
 	auto themeBitmap = new ThemeBitmap(2); // start with 2x zoom

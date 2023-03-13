@@ -342,7 +342,6 @@ int main()
 		ThemeBitmap(float zoom) : Image(Theme::getTexture()) { scale(zoom); }
 		void onThemeChanged() override {
 			setTexture(Theme::getTexture()); // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
-			scale(scale()); //!!Should do this itself!
 		}
 	};
 	auto themeBitmap = new ThemeBitmap(2); // start with 2x zoom

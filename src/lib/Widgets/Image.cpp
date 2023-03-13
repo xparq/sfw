@@ -46,7 +46,7 @@ Image* Image::setTexture(const sf::Image& image, const sf::IntRect& r)
     return this;
 }
 
-Image* Image::setTexture(const sf::Texture& texture, const sf::IntRect& r)
+Image* Image::setTexture(const sf::Texture& texture, const sf::IntRect& crop)
 {
     // Don't copy over itself (but still alow cropping even then)
     if (&m_texture != &texture)
@@ -54,8 +54,9 @@ Image* Image::setTexture(const sf::Texture& texture, const sf::IntRect& r)
         m_texture = texture;
     }
 
-    setCropRect(r == NullRect ? sf::IntRect{{0, 0}, {(int)m_texture.getSize().x, (int)m_texture.getSize().y}}
-                              : r);
+    // Set the "crop window" to the full native texture size if crop == Null
+    setCropRect(crop == NullRect ? sf::IntRect{{0, 0}, {(int)m_texture.getSize().x, (int)m_texture.getSize().y}}
+                                 : crop);
     return this;
 }
 
@@ -72,14 +73,13 @@ Image* Image::setCropRect(const sf::IntRect& r)
 
     m_baseSize = {width, height};
 
-    // Set texture crop "window" rect
+    // Update texture "crop window"
     m_vertices[0].texCoords = sf::Vector2f(left, top);
     m_vertices[1].texCoords = sf::Vector2f(left, top + height);
     m_vertices[2].texCoords = sf::Vector2f(left + width, top);
     m_vertices[3].texCoords = sf::Vector2f(left + width, top + height);
 
-    // Set widget geometry
-    setSize(width, height);
+    setSize(m_baseSize * m_scalingFactor);
     return this;
 }
 
