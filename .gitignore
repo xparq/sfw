@@ -1,7 +1,7 @@
 tmp/
 
-# External dependencies (but keep their parent dir)
-extern/**/
+# External deps. (e.g. SFML could be auto-downloaded here)
+extern/
 
 # Build artifacts etc.
 #tmp/build/

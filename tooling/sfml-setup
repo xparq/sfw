@@ -3,9 +3,20 @@
 # that seems to be the case when being run from a GH Action...
 
 main(){
-	#! Alas, just not setting -e was not enough... (Both (mostly?) complementary
-	#! options (-e and -m) exist, so who knows what the default is...)
 	SFML_LIBROOT=`realpath -Lms ${SFML_DIR:-extern/sfml}`
+		#! Alas, just omitting -e was not enough... (Two (mostly) complementary
+		#! options (-e and -m) exist, and --help doesn't say what the default is.)
+
+
+	# If $LIBROOT doesn't exist, then just go ahead and create it, YOLO! ;)
+	if [ ! -d "$SFML_LIBROOT" ]; then
+		echo "- NOTE: '$SFML_LIBROOT' doesn't exist. Creating it & dl'ing SFML there..."
+		mkdir -p "$SFML_LIBROOT"
+		if [ ! -d "$SFML_LIBROOT" ]; then
+			echo "- ERROR: Hmm. Couldn't create '$SFML_LIBROOT'!"
+			return 1
+		fi
+	fi
 
 	# If the sfml symlink is NOT broken, then assume we are good...
 	#...which would be utterly bizarre on GHA runner, so check for that, tho!
@@ -21,7 +32,7 @@ main(){
 		retc=$?
 		[ ! $retc -eq 0 ] && return $retc
 	elif [ -L "$SFML_LIBROOT" ] && [ -e "$SFML_LIBROOT" ] && [ "$GITHUB_ACTIONS" != "" ]; then
-		echo "- Woah, where has this `readlink ${SFML_LIBROOT}` come from?! :-o"
+		echo "- Woah, where did this `readlink ${SFML_LIBROOT}` come from?! :-o"
 #	elif [...]; then
 #		echo "- ERROR: Inconsistent prj. tree layout; aborting!"
 #		return 111
