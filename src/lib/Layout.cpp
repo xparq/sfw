@@ -3,8 +3,15 @@
 #include "sfw/Gfx/Render.hpp"
 
 #ifdef DEBUG
-#include <iostream>
+#   include "sfw/GUI-main.hpp"
+#   include <iostream>
     using std::cerr, std::endl;
+
+    namespace {
+        static auto DEBUG_INSIGHT_KEY = sf::Keyboard::LAlt;
+        static auto DEBUG_INSIGHT_KEY_PRESSED = false;
+    }
+#
 #endif
 
 namespace sfw
@@ -22,9 +29,25 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 {
     auto sfml_renderstates = ctx.props;
     sfml_renderstates.transform *= getTransform();
+
+#ifdef DEBUG
+	if (DEBUG_INSIGHT_KEY_PRESSED && m_state == WidgetState::Hovered) {
+		if (auto* root = getMain(); root) root->draw_outline(ctx, sf::Color::Yellow);
+		draw_outline(ctx, sf::Color::White);
+	}
+#endif
+
     for (const Widget* widget = begin(); widget != end(); widget = next(widget))
     {
         widget->draw(gfx::RenderContext{ctx.target, sfml_renderstates});
+#ifdef DEBUG
+	if (DEBUG_INSIGHT_KEY_PRESSED && widget->m_state == WidgetState::Hovered) {
+		if (auto* root = getMain(); root) {
+			widget->draw_outline(ctx,
+				const_cast<Widget*>(widget)->toLayout() ? sf::Color::White : sf::Color::Blue);
+		}
+	}
+#endif
     }
 }
 
@@ -82,7 +105,6 @@ void Layout::onMouseMoved(float x, float y)
                 }
                 else
                 {
-                    // Hovered widget was already hovered
                     widget->onMouseMoved(mouse.x, mouse.y);
                 }
                 return;
@@ -173,6 +195,10 @@ void Layout::onKeyPressed(const sf::Event::KeyEvent& key)
     {
         m_focus->onKeyPressed(key);
     }
+
+#ifdef DEBUG
+    if (key.code == DEBUG_INSIGHT_KEY) DEBUG_INSIGHT_KEY_PRESSED = true;
+#endif
 }
 
 
@@ -182,6 +208,10 @@ void Layout::onKeyReleased(const sf::Event::KeyEvent& key)
     {
         m_focus->onKeyReleased(key);
     }
+
+#ifdef DEBUG
+    if (key.code == DEBUG_INSIGHT_KEY) DEBUG_INSIGHT_KEY_PRESSED = false;
+#endif
 }
 
 

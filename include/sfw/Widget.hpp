@@ -16,6 +16,13 @@
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Window/Event.hpp>
 
+#ifdef DEBUG
+#
+#  include <SFML/Graphics/Color.hpp>
+#
+#endif
+
+
 namespace sfw
 {
 class WidgetContainer;
@@ -187,7 +194,7 @@ private:
 
 #ifdef DEBUG
 public:
-    void draw_outline(const gfx::RenderContext& ctx) const;
+	void draw_outline(const gfx::RenderContext& ctx, sf::Color color = sf::Color::Red) const;
 #endif
 };
 

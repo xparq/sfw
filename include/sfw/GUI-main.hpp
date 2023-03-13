@@ -81,6 +81,10 @@ private:
     sfw::Theme::Cfg m_themeCfg;
     sf::Cursor::Type m_cursorType;
     std::map<std::string, Widget*> widgets;
+
+#ifdef DEBUG
+    friend class Layout;
+#endif
 };
 
 } // namespace

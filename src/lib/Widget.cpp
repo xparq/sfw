@@ -1,6 +1,7 @@
 #include "sfw/Widget.hpp"
 #include "sfw/WidgetContainer.hpp"
 #include "sfw/GUI-main.hpp"
+#include "sfw/util/diagnostics.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -221,13 +222,13 @@ void Widget::onResized() { }
 // diagnostics ---------------------------------------------------------------
 
 #ifdef DEBUG
-void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx) const
+void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx, sf::Color color) const
 {
 	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
 	r.setPosition(getAbsolutePosition());
 	r.setFillColor(sf::Color::Transparent);
 	r.setOutlineThickness(2);
-	r.setOutlineColor(sf::Color::Red);
+	r.setOutlineColor(color);
 	ctx.target.draw(r);
 }
 #endif
