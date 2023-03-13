@@ -1,4 +1,4 @@
-﻿#ifdef SFW_DIAGNOSTICS_HPP
+﻿#ifndef SFW_DIAGNOSTICS_HPP
 #define SFW_DIAGNOSTICS_HPP
 #ifdef DEBUG
 
@@ -6,6 +6,8 @@
 	using std::cerr, std::endl;
 
 #else
+
+	// ...
 
 #endif
 #endif // SFW_DIAGNOSTICS_HPP

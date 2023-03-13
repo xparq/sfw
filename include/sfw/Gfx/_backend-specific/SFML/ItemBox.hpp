@@ -2,6 +2,9 @@
 #define GUI_ITEMBOX_SFML_HPP
 
 #include "sfw/Gfx/Shapes/Box.hpp"
+
+#include <SFML/Graphics/Color.hpp>
+
 #include <optional>
 
 namespace sfw
@@ -17,7 +20,11 @@ public:
     ItemBox(Box::Type type = Box::Click);
     ItemBox(const T& item, Box::Type type = Box::Click);
 
+    void setFillColor(sf::Color color);
     void setItemColor(sf::Color color);
+    // This would draw a filled rect *over* the "item" of ItemBox, so `color`
+    // would usually need an alpha value set accordingly to be practical:
+    void setTintColor(sf::Color color);
 
     void applyState(WidgetState state);
 
@@ -31,6 +38,7 @@ private:
 
     T m_item;
     std::optional<sf::Color> m_itemColor;
+    std::optional<sf::Color> m_tintColor;
 };
 
 } // namespace

@@ -2,6 +2,7 @@
 #include "sfw/Theme.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include <cassert>
 #include <cmath>
@@ -60,6 +61,12 @@ sf::Vector2f Box::getSize() const
 {
     // Bottom right corner - top left corner
     return m_vertices[BOTTOM_RIGHT].position - getPosition();
+}
+
+
+void Box::setFillColor(sf::Color color)
+{
+    m_fillColor = color;
 }
 
 
@@ -144,6 +151,16 @@ void Box::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
     auto lstates = states;
     lstates.texture = &Theme::getTexture();
     target.draw(m_vertices, VERTEX_COUNT, sf::PrimitiveType::TriangleStrip, lstates);
+    // Override the texture with a filled rect (presumably with some alpha) if fillColor was set:
+    if (m_fillColor)
+    {
+        sf::RectangleShape r(sf::Vector2f(getSize().x - 2 * (float)Theme::borderSize,
+                                          getSize().y - 2 * (float)Theme::borderSize));
+	r.setPosition(getPosition()); r.move({(float)Theme::borderSize, (float)Theme::borderSize});
+	r.setFillColor(m_fillColor.value());
+	r.setOutlineThickness(0);
+	target.draw(r, lstates);
+    }
 }
 
 
@@ -151,16 +168,16 @@ void Box::centerTextHorizontally(sf::Text& text)
 {
     sf::Vector2f size = getSize();
     sf::FloatRect textSize = text.getLocalBounds();
-    float x = floor(getPosition().x + (size.x - textSize.width) / 2);
+    float x = roundf(getPosition().x + (size.x - textSize.width) / 2);
     text.setPosition({x, Theme::borderSize + Theme::PADDING});
 }
 
 
-void Box::centerTextVertically(sf::Text& text)
+void Box::centerVerticalTextVertically(sf::Text& text)
 {
     sf::Vector2f size = getSize();
     sf::FloatRect textSize = text.getLocalBounds();
-    float y = floor(getPosition().y + (size.y - textSize.width) / 2);
+    float y = roundf(getPosition().y + (size.y - textSize.width) / 2);
     text.setPosition({Theme::getBoxHeight() - Theme::PADDING, y});
 }
 

@@ -89,7 +89,7 @@ void ProgressBar::setValue(float value)
         m_bar[0].position.y = m_bar[2].position.y = (fullHeight - y) + Theme::PADDING;
         if (m_labelPlacement == LabelOver)
         {
-            m_box.centerTextVertically(m_label);
+            m_box.centerVerticalTextVertically(m_label);
         }
         else if (m_labelPlacement == LabelOutside)
         {

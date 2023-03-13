@@ -4,9 +4,13 @@
 #include "sfw/WidgetState.hpp"
 
 #include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Text.hpp>
+
+#include <cmath>
+#include <optional>
 
 namespace sfw
 {
@@ -42,8 +46,13 @@ public:
      */
     sf::Vector2f getSize() const;
 
-    void press();
+    /**
+     * Fill the box with this color, overriding the texture
+     * (The borders will be left unchanged.)
+     */
+    void setFillColor(sf::Color color);
 
+    void press();
     void release();
 
     /**
@@ -60,16 +69,13 @@ public:
         sf::Vector2f itemSize = item.getSize();
         // Center item
         item.setPosition(
-            {(float)int(getPosition().x + (size.x - itemSize.x) / 2),
-             (float)int(getPosition().y + (size.y - itemSize.y) / 2)}
-             //! The weird back-and-forth casting is floor() without <cmath>
-             //! (see issue #97), and also to shut up int->float warnings
+            {roundf(getPosition().x + (size.x - itemSize.x) / 2),
+             roundf(getPosition().y + (size.y - itemSize.y) / 2)}
         );
     }
 
-    void centerTextHorizontally(sf::Text& item);
-
-    void centerTextVertically(sf::Text& item);
+    void centerTextHorizontally(sf::Text& text);
+    void centerVerticalTextVertically(sf::Text& text);
 
 protected:
     void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
@@ -123,8 +129,8 @@ private:
 
 
     WidgetState m_state;
-
     sf::Vertex m_vertices[VERTEX_COUNT];
+    std::optional<sf::Color> m_fillColor;
 };
 
 } // namespace
