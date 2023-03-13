@@ -126,16 +126,14 @@ int main()
 	auto form = left_panel->add(new Form);
 
 	// A text box to set the text of the example SFML object (created above)
-	form->add("Text", (new sfw::TextBox(175)) // <- width (pixels)
+	form->add("Text", new sfw::TextBox(175)) // <- width (pixels)
 		->setPlaceholder("Type something!")
 		->setText("Hello world!")
-		->setCallback([&](auto* w) { text.setString(w->getText()); })
-	);
+		->setCallback([&](auto* w) { text.setString(w->getText()); });
 	// Another text box, with length limit & pulsating cursor
-	form->add("Text with limit (5)", (new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE))
+	form->add("Text with limit (5)", new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
-		->setText("Hello world!")
-	);
+		->setText("Hello world!");
 
 	// Slider + progress bar for scaling
 	auto sliderForScale = new sfw::Slider(10, 175); // granularity (%), width (pixel)
@@ -155,16 +153,16 @@ int main()
 
 	// Add the scaling slider + its horizontal progress bar
 	form->add("Scale", sliderForScale);
-	form->add("", HBox())->add(pbarScale);
+	form->add("", HBox())->add(pbarScale); // BTW: add(Stuff()) is also OK, not just add(new Stuff)!
 
 	// Add the rotation slider + its vertical progress bar
         // ...And, since there would be too much wasted space next to the p.bar,
 	// put some text-styling checkboxes there. :)
 	// (Note the use of the "new-less" (move-constructing) add(...) style, for a change!)
 	auto rot_and_chkboxes = form->add("Rotation", HBox());
-	     rot_and_chkboxes->add(sliderForRotation);
-	     rot_and_chkboxes->add(pbarRotation);
-	     rot_and_chkboxes->add(sfw::Label("         ")); // Just a (vert.) spacer...
+		rot_and_chkboxes->add(sliderForRotation);
+		rot_and_chkboxes->add(pbarRotation);
+		rot_and_chkboxes->add(sfw::Label("         ")); // Just a (vert.) spacer...
 
 		auto styleboxes = rot_and_chkboxes->add(Form());
 		// Checkboxes to set text properties
@@ -242,22 +240,23 @@ int main()
 
 	// Bitmap buttons
 	auto imgbuttons_form = left_panel->add(sfw::Form());
-	sf::Texture buttonimg; //! DON'T put this texture inside the if () as local temporary!... ;)
+	sf::Texture buttonimg; //! DON'T put this texture inside the if() as a local temporary!... ;)
 	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
 		auto combined_labels = new VBox();
 		combined_labels->add(sfw::Label("Img. button"));
 		combined_labels->add(sfw::Label("- native size"));		
 
-		imgbuttons_form->add(combined_labels, (new sfw::ImageButton(buttonimg, "All defaults"))->setTextSize(20)
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
+		imgbuttons_form->add(combined_labels, new sfw::ImageButton(buttonimg, "All defaults"))
+			->setTextSize(20)
+			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ });
 
-		imgbuttons_form->add("- resized (etc.)", (new sfw::ImageButton(buttonimg, "Bold"))
+		imgbuttons_form->add("- resized (etc.)", new sfw::ImageButton(buttonimg, "Bold"))
 			->setTextSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
 			->setTextColor(hex2color("#d0e0c0"))
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
+			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ });
 	}
 
 

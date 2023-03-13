@@ -16,32 +16,38 @@ class Form: public Layout
 public:
     Form();
 
+
     /**
-     * Add a label + an already existing widget to the form
-     * @param label: Label for the widget. (It will also be used as its internal name.)
-     * @param widget: Pointer to the widget created (with new) by the caller
-     * @param widgetname_override: Widget name to use if the label is not appropriate
-     * @return Pointer to the new widget
+     * Add a label + a widget to the form
+     * @param label: Label for the widget. (Will also become its internal name.)
+     * @param widget: Pointer to the widget created by the caller (with new)
+     * @param widgetname_override: Widget name to use instead of the label
+     * @return Pointer to the added widget
      */
     Widget* add(const std::string& label, Widget* widget,
                 const std::string& widgetname_override = "");
 
     /**
-     * Add a label + newly created widget to the form
-     * @param label: Label for the widget
-     * @param widget: Temporary "template" instance the "real" widget will be created from
-     * @return Pointer to the new widget
+     * As above, but allow any (already existing) widget as "label"
+     * Now the widget can't be automatically named, so...
+     * @param widgetname_override allows assigning a name explicitly
+     * @param labelwidgetname_override allows assigning a name also to the "label" widget
      */
-    template <class W> W* add(const std::string& label, W&& tmp_widget, const std::string& name = "")
-        requires (std::is_base_of_v<Widget, W>)
-        { return (W*)(Widget*)add(label, (Widget*)new W(std::move(tmp_widget)), name); }
+    Widget* add(Widget* labelwidget, Widget* widget,
+                const std::string& widgetname_override = "", const std::string& labelwidgetname_override = "");
 
-    /**
-     * Same as above, but use any (already existing) widget as "label"
-     */
-    Widget* add(Widget* label, Widget* widget,
-                const std::string& widgetName = "", const std::string& labelWidgetName = "");
-
+    /*************************************************************************
+     * Various convenience helper templates are also defined to spare all the
+     * upcasting from Widget*, so this would work as expected:
+     *
+     *     add("label", new TextBox)->setText("OK")
+     *
+     * and to also allow "new-less" forms like:
+     *
+     *     add("label", W())
+     *     add(LabelWidget(), W())
+     *************************************************************************/
+    #include "Form.tpl"
 
 private:
     void recomputeGeometry() override;

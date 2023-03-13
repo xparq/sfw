@@ -56,9 +56,11 @@ int main()
 	}
 	demo.setPosition(10, 10);
 
-	demo.add((new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+	demo.add(new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
 	                   " MOST RECENT TEST CASES: "
-	                   "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")));//->setStyle(sf::Text::Style::Bold));
+	                   "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"));//->setStyle(sf::Text::Style::Bold);
+	auto test_hbox = demo.add(new HBox);
+
 	//--------------------------------------------------------------------
 	// Part of #167: Add a generic "SFML container" widget, and put the demo text into one
 	// (See the rest of #167 later below, at the other DrawHost widget!)
@@ -82,13 +84,17 @@ int main()
 	auto labelbox = new VBox;
 		labelbox->add(Label("Issue #168"));
 		labelbox->add(circlevista);
-
-	auto test_hbox = demo.add(new HBox);
 	test_hbox->add(new Form)->add(labelbox, new Label("OK!"));
-	//!!#171, more of #168 (now with Image*):
-	//!!test_hbox->add(new Form)->add((new Image("test/thumbnail.jpg"))->rescale(0.5), Label("#171 OK, too!"));
-	//!!#171, template-move also for the "label":
-	//!!test_hbox->add(new Form)->add(Image("test/thumbnail.jpg").rescale(0.5), Label("#171 OK, too!"));
+
+	// #171
+	auto gh171form = test_hbox->add(new Form);
+	gh171form->add("#171 autocast", new sfw::TextBox(50))->setText("OK!");
+	//#171 + #168 (with an Image*):
+	gh171form->add((new Image("test/thumbnail.jpg"))->rescale(0.25), new sfw::TextBox(50))->setText("171 + 168 OK!");
+	//#171 + #168 + template widget + move
+	gh171form->add(new Label("tempWidget"), sfw::TextBox(70))->setText("171/tmp + 168 OK!");
+	//#171, template-move also for the "label":
+	gh171form->add(Label("tmpLabel"), Label("#171(tmp,tmp) OK too!"));
 
 	//!! This is not yet supported (nor separators...):
 	//!!test_hbox->add(new Form)->add("This is just some text on its own.");
@@ -102,10 +108,9 @@ int main()
 		((sfw::Button*)(w->get("test #127/w")))->setText("Found itself!");
 	}), "test #127/w");
 
-
-	demo.add((new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
+	demo.add(new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
 	                   "(proper separators are not yet supported...)"
-	                   "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"))->setStyle(sf::Text::Style::Italic));
+	                   "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"))->setStyle(sf::Text::Style::Italic);
 
 	//--------------------------------------------------------------------
 	// Some raw SFML shapes (sf::Text + a rect) to be manipulated via the GUI
@@ -189,16 +194,14 @@ int main()
 		->setText("Hello world!")
 		->setCallback([&](auto* w) { text.setString(w->getText()); });
 	*/
-	form->add("Text", (new sfw::TextBox())
+	form->add("Text", new sfw::TextBox())
 		->setPlaceholder("Type something!")
 		->setText("Hello world!")
-		->setCallback([&](auto* w) { text.setString(w->getText()); })
-	);
+		->setCallback([&](auto* w) { text.setString(w->getText()); });
 	// Length limit & pulsating cursor
-	form->add("Text with limit (5)", (new TextBox(50.f, TextBox::CursorStyle::PULSE))
+	form->add("Text with limit (5)", new TextBox(50.f, TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
-		->setText("Hello world!")
-	);
+		->setText("Hello world!");
 	//! The label above ("Text with limit (5)") will be used for retrieving
 	//! the widget later by the crop slider (somewhere below)!
 
@@ -324,15 +327,16 @@ int main()
 	sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
 	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
-		buttons_form->add("Native size", (new sfw::ImageButton(buttonimg, "All defaults"))->setTextSize(20)
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
+		buttons_form->add("Native size", new sfw::ImageButton(buttonimg, "All defaults"))
+			->setTextSize(20)
+			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ });
 
-		buttons_form->add("Customized", (new sfw::ImageButton(buttonimg, "Bold"))
+		buttons_form->add("Customized", new sfw::ImageButton(buttonimg, "Bold"))
 			->setTextSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
 			->setTextColor(hex2color("#d0e0c0"))
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ }));
+			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ });
 	}
 
 
