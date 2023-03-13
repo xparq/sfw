@@ -531,10 +531,11 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
     glEnable(GL_SCISSOR_TEST);
 
     sf::Vector2f pos = getAbsolutePosition();
+    auto width = max(0.f, getSize().x - 2 * Theme::borderSize - 2 * Theme::PADDING); // glScissor will fail if < 0!
     glScissor(
         (GLint)(pos.x + Theme::borderSize + Theme::PADDING),
         (GLint)(ctx.target.getSize().y - (pos.y + getSize().y)),
-        (GLsizei)getSize().x,
+        (GLsizei)width,
         (GLsizei)getSize().y
     );
 
