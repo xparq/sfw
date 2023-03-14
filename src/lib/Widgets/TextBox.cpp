@@ -52,7 +52,7 @@ TextBox* TextBox::setMaxLength(size_t maxLength)
 {
     m_maxLength = maxLength;
     // Trim current text if needed
-    if (m_text.getString().getSize() > m_maxLength)
+    if (getTextLength() > m_maxLength)
     {
         m_text.setString(m_text.getString().substring(0, m_maxLength));
         setCursorPos(m_maxLength);
@@ -64,20 +64,19 @@ TextBox* TextBox::setMaxLength(size_t maxLength)
 
 void TextBox::setCursorPos(size_t index)
 {
-//cerr << "setCursorPos-> cpos: " << index <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << ", follow: " << m_selection.following <<endl;
-    if (index > m_text.getString().getSize()) // NOTE: a) The cursor pos. is unsigned.
-                                              //       b) The pos. right after the end (technic'ly: at EOS) is OK.
+
+    if (index > getTextLength()) // NOTE: a) The cursor pos. is unsigned.
+                                 //       b) The pos. right after the end (at EOS) is OK.
     {
-        // This "no-move" update kludge is to ensure the selection can update
-        // its state on any navigation action, even when the cursor won't move!
-        //!!Should instead call a generalized selection.onNavigation() here!
+        // Since a previously stopped (volatile) selection would need to be cancelled on
+        // the next action -- even if it won't do anything (like move the cursor) --,
+        // here we need to make sure a "null" navigation event also reaches the selection:
         m_selection.follow(getCursorPos());
         return;
     }
 
     m_cursorPos = index;
     m_selection.follow(index); // The selection itself will decide if and how exactly...
-//cerr << "                     " << index <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << ", follow: " << m_selection.following <<endl;
 
     // Adjust the visuals...
 
@@ -137,9 +136,14 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
     case sf::Keyboard::RShift:
         // If there's a selection, that means it's just been stopped.
         // Pressing Shift again in that case very likely means an intent to
-        // resume it (probably for adjusting its size etc.), so allow that:
-        if (m_selection) m_selection.resume();
-        else m_selection.start(m_cursorPos);
+        // resume it (probably for adjusting its size etc.), so allow that.
+        // (It'd feel like a hybrid volatile x pers. sel.)
+        //
+        // But... What if it's a mistaken selection and the user just wants
+        // to start right over?! So, perhaps no...
+        //if (m_selection) m_selection.resume();
+        //else m_selection.start(m_cursorPos);
+        m_selection.start(m_cursorPos);
         break;
 
     case sf::Keyboard::Left:
@@ -180,7 +184,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
             auto what_to_skip = m_text.getString()[m_cursorPos]; //! == ' ' will be checked to decide
             do {
                 setCursorPos(m_cursorPos + 1);
-            } while (m_cursorPos < m_text.getString().getSize() &&
+            } while (m_cursorPos < getTextLength() &&
                      ((what_to_skip == ' ' && m_text.getString()[m_cursorPos] == ' ')
                    || (what_to_skip != ' ' && m_text.getString()[m_cursorPos] != ' '))); // sorry, the extra () noise is to shut GCC up (-Wparentheses)
         }
@@ -226,7 +230,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
             break;
         }
         // Erase character after cursor
-        if (m_cursorPos < m_text.getString().getSize())
+        if (m_cursorPos < getTextLength())
         {
             sf::String string = m_text.getString();
             string.erase(m_cursorPos);
@@ -243,7 +247,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
     case sf::Keyboard::End:
     case sf::Keyboard::Down:
-        setCursorPos(m_text.getString().getSize());
+        setCursorPos(getTextLength());
         break;
 
     case sf::Keyboard::Enter:
@@ -254,7 +258,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
     case sf::Keyboard::A:
         if (key.control)
         {
-            setSelection(0, m_text.getString().getSize());
+            setSelection(0, getTextLength());
         }
         break;
 
@@ -326,7 +330,7 @@ void TextBox::onMousePressed(float x, float)
     size_t pos;
     for (pos = getTextLength(); pos > 0; --pos)
     {
-        // Place cursor after the character under the mouse
+        // Place the cursor after the character under the mouse
         sf::Vector2f glyphPos = m_text.findCharacterPos(pos);
         if (glyphPos.x <= x)
         {
@@ -334,27 +338,18 @@ void TextBox::onMousePressed(float x, float)
         }
     }
     setCursorPos(pos);
-
-    // Must do this hackery after setCursorPos(), as follow() there would clean up an inactive selection!
-    m_selection.start(pos); //! This is a bit too eager, shouldn't start selecting just on a click,
-                            //! ...but must record the starting pos somehow, nonetheless! :-o
-
-//cerr << "onPeress-> pos: " << pos <<", anchor: " <<m_selection.anchor_pos << ", head: "<< m_selection.active_pos << ", state: " << m_selection.state <<endl;
+    m_selection.start(pos); // This looks a bit too eager here: shouldn't
+                            // start selecting just by a click, but
+                            // a) must record the start pos in case it's
+                            //    indeed gonna be a selection, and
+                            // b) mouse-release will stop it later anyway
+                            //    (as empty if not moved), so no harm done...
 }
 
 
-void TextBox::onMouseReleased(float x, float)
+void TextBox::onMouseReleased(float, float)
 {
-    for (int i = (int)m_text.getString().getSize(); i >= 0; --i)
-    {
-        // Place cursor after the character under the mouse
-        sf::Vector2f glyphPos = m_text.findCharacterPos(i);
-        if (glyphPos.x <= x)
-        {
-            setCursorPos(i);
-            break;
-        }
-    }
+    m_selection.stop();
 }
 
 
@@ -380,9 +375,7 @@ void TextBox::onMouseMoved(float x, float)
             }
         }
         setCursorPos(pos);
-        m_selection.follow(pos);
     }
-//cerr << "onMove-> pos: " << pos <<", anchor: " <<m_selection.anchor_pos << ", head: "<< m_selection.active_pos << ", state: " << m_selection.state <<endl;
 }
 
 

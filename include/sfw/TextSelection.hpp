@@ -10,14 +10,17 @@ namespace sfw
 /*****************************************************************************
   Generalized text selection abstraction, independent from the internals
   of the text editor using it. The editor should hook up various selection
-  methods in its event handlers and operations (most importantly `follow(pos)`
-  into its cursor updating proc.) to achieve the desired selection behavior.
-  (This implementation is optimized for volatile selections, but can easily
-  support persistent modes, too... I guess... Never actually tried. ;) )
+  methods in its event handlers and operations (most importantly calling
+  `follow(pos)` in its cursor updating proc.) to achieve the desired
+  selection behavior.
 
-  Rules (-- defined to implicitly support volatile (non-persistent) selections,
-  in the hope that support for persitent selections would also just pop out
-  trivially at the end):
+  (This implementation is optimized and tested for volatile selections, but
+  can easily support persistent modes, too... I guess... Never tried. ;)
+  But added at least a persistence flag, and the update proc. does take it
+  into account. However, the owner (editor) must behave somewhat differently
+  with a pers. selection, so it's not just a matter of flipping a flag.)
+
+  Rules (-- defined for volatile (non-persistent) selections):
 
   * A selection represents a sequence of cells (of some actual text) stored
     elsewhere. The sequence is defined by a lower and an upper bound, both
@@ -106,6 +109,7 @@ struct TextSelection
     size_t anchor_pos = 0;
     size_t active_pos = 0;
     enum { CANCELLED, ACTIVE, STOPPED } state = CANCELLED;
+    bool persistent = false;
 
     //------------------------------------------------------------------------
     // Queries
@@ -135,13 +139,13 @@ struct TextSelection
     //------------------------------------------------------------------------
     // Operations
     //------------------------------------------------------------------------
-    void start(size_t pos) { set_empty(pos); resume(); }
+    void start(size_t pos, bool persistent = false);
     void stop() { state = STOPPED; }
     void resume() { state = ACTIVE; }
     void cancel() { state = CANCELLED; }
     void reset() { cancel(); set_empty(0); }
 
-    void follow(size_t pos)	{ if (active()) set(pos); }
+    void follow(size_t pos);
 };
 
 
@@ -156,6 +160,19 @@ inline void TextSelection::set_span(size_t anchor, int offset)
 {
     anchor_pos = anchor;
     if (int(anchor_pos) + offset < 0) active_pos = 0; else active_pos += offset;
+}
+
+//----------------------------------------------------------------------------
+inline void TextSelection::start(size_t pos, bool persistent_)
+{
+    persistent = persistent_; set_empty(pos); resume();
+}
+
+//----------------------------------------------------------------------------
+inline void TextSelection::follow(size_t pos)
+{
+    if (active()) set(pos);
+    else if (!persistent) cancel();
 }
 
 } // namespace
