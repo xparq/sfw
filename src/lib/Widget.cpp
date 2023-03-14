@@ -76,10 +76,10 @@ std::string Widget::getName(Widget* widget) const
 
 void Widget::setPosition(const sf::Vector2f& pos)
 {
-    m_position = pos;
+    m_position = {roundf(pos.x), roundf(pos.y)};
     m_transform = sf::Transform(
-        1, 0, roundf(pos.x), // translate x
-        0, 1, roundf(pos.y), // translate y
+        1, 0, m_position.x, // translate x
+        0, 1, m_position.y, // translate y
         0, 0, 1
     );
 }
