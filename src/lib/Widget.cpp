@@ -99,15 +99,14 @@ const sf::Vector2f& Widget::getPosition() const
 sf::Vector2f Widget::getAbsolutePosition() const
 {
     sf::Vector2f position = m_position;
-    for (Widget* parent = m_parent; parent != nullptr; parent = parent->m_parent)
-    {
-        position.x += parent->m_position.x;
-        position.y += parent->m_position.y;
 
-        //! Must also check for isMain() now to avoid infinite looping on parent->parent == parent!
-        //! And we can't just add this to the for cond. either, as that would skip the last offset of the Main obj itself... :-/
-        if (parent->isMain()) break;
+    for (const Widget* base = this; !base->isRoot();)
+    {
+	base = base->getParent();
+        position.x += base->m_position.x;
+        position.y += base->m_position.y;
     }
+
     return position;
 }
 
