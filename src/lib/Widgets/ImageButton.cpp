@@ -54,6 +54,7 @@ ImageButton* ImageButton::setSize(sf::Vector2f size)
 {
     m_background.setScale({size.x / m_background.getTexture()->getSize().x,
                            size.y / m_background.getTexture()->getSize().y * 3}); // see the ctor for that 3! ;)
+    Widget::setSize(size);
     return this;
 }
 
@@ -98,7 +99,7 @@ void ImageButton::draw(const gfx::RenderContext& ctx) const
     auto sfml_renderstates = ctx.props;
     sfml_renderstates.transform *= getTransform();
     ctx.target.draw(m_background, sfml_renderstates);
-    sfml_renderstates.transform *= m_background.getTransform();
+    sfml_renderstates.transform *= m_background.getTransform(); // Follow the scaling (etc.) of the image!
     ctx.target.draw(m_text, sfml_renderstates);
 }
 
@@ -107,7 +108,8 @@ void ImageButton::draw(const gfx::RenderContext& ctx) const
 
 void ImageButton::onStateChanged(WidgetState state)
 {
-    sf::Vector2i size({(int)getSize().x, (int)getSize().y});
+    sf::Vector2i size(m_background.getTexture()->getSize().x,
+                      m_background.getTexture()->getSize().y / 3);
     switch (state)
     {
     case WidgetState::Default:
