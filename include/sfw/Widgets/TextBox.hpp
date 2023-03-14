@@ -3,6 +3,7 @@
 
 #include "sfw/Widget.hpp"
 #include "sfw/Gfx/Shapes/Box.hpp"
+#include "sfw/TextSelection.hpp"
 
 #include <string>
 
@@ -14,42 +15,9 @@
 namespace sfw
 {
 
-/**
- * Generalized text selection abstraction, independent from the internals
- * of the text editor using it. The editor should hook up various selection
- * methods in its event handlers and operations (most importantly `follow(pos)`
- * into its cursor updating proc.) to achieve the desired selection behavior.
- * (This implementation is optimized for volatile selections, but can easily
- * support persistent modes, too... I guess... Never actually tried. ;) )
- */
-struct TextSelection
-{
-    size_t anchor_pos = 0;
-    size_t active_pos = 0;
-    bool following = false;
-
-    operator bool() const { return !empty(); }
-    size_t empty() const { return active_pos == anchor_pos; }
-    size_t length() const { return right() - left(); }
-    // These're about *appearance*, so should be OK even with right-to-left scripts:
-    size_t left() const;
-    size_t right() const;
-
-    void start(size_t pos);
-    void set(size_t pos, size_t len = 0);
-    void set_from_to(size_t anchor_pos, size_t active_pos);
-    void resize(size_t len);
-    void follow(size_t pos);
-    void stop();
-    void resume();
-    void reset();
-};
-
-
-/**
- * The TextBox widget is a one-line text editor.
- * It allows the user to enter and edit a single line of plain text.
- */
+/*****************************************************************************
+  The TextBox widget is a one-line plain-text editor, with selection support.
+ *****************************************************************************/
 class TextBox: public Widget
 {
 public:
@@ -70,6 +38,8 @@ public:
      * Get textbox content
      */
     const sf::String& getText() const;
+
+    size_t getTextLength() const { return m_text.getString().getSize(); }
 
     /**
      * Define max length of textbox content (default is 256 characters)

@@ -16,71 +16,6 @@ namespace sfw
 {
 
 //----------------------------------------------------------------------------
-// TextSelection
-//----------------------------------------------------------------------------
-
-//!! These should depend on writing direction, and flip min/max accordingly!
-size_t TextSelection::left()  const { return min(anchor_pos, active_pos); }
-size_t TextSelection::right() const { return max(anchor_pos, active_pos); }
-
-void TextSelection::start(size_t pos)
-// Just blatantly overrides any pending selection proc.
-{
-	anchor_pos = active_pos = pos;
-	following = true;
-}
-
-void TextSelection::set(size_t pos, size_t len)
-// Disregard the follow mode! (Should be orhogonal to that.)
-{
-	anchor_pos = pos;
-	resize(len);
-}
-
-void TextSelection::set_from_to(size_t anchor_pos_, size_t active_pos_)
-// Disregard the follow mode! (Should be orhogonal to that.)
-{
-	anchor_pos = anchor_pos_;
-	active_pos = active_pos_;
-}
-
-void TextSelection::stop()
-{
-        following = false;
-}
-
-void TextSelection::resume()
-{
-        following = true;
-}
-
-void TextSelection::reset()
-{
-        following = false;
-	anchor_pos = 0;
-	active_pos = 0;
-}
-
-void TextSelection::follow(size_t pos)
-{
-	if (following) active_pos = pos;
-        else reset();
-}
-
-void TextSelection::resize(size_t len)
-//!! NOTE: This may also change the anchor position! Not sure if that's always OK!
-//!! At a quick glance it may just be mostly coincidence that it's in sync with the
-//!! most common editing operations and it actually does what's expected... :)
-//!!
-//!! Anywhow, it violates the idea that Selection updates move the active pos and
-//!! leave the anchor intact, unless *explicitly* requested otherwise!
-{
-	if (active_pos > anchor_pos) active_pos = anchor_pos + len;
-	else                         anchor_pos = active_pos + len;
-}
-
-
-//----------------------------------------------------------------------------
 // TextBox
 //----------------------------------------------------------------------------
 
@@ -219,15 +154,15 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
                  || (what_to_skip != ' ' && m_text.getString()[m_cursorPos - 1] != ' '))) // sorry, the extra () noise is to shut GCC up (-Wparentheses)
                 setCursorPos(m_cursorPos - 1);
         }
-        else if (!key.shift && m_selection && getCursorPos() == m_selection.right())
+        else if (!key.shift && m_selection && getCursorPos() == m_selection.upper())
         {
             // This is a special case for better ergonomics:
             // Resume the disappearing selection, and move the cursor to the left of it,
             // because what's actually desired is almost never to finish a selection,
             // do nothing with it, and then move the cursor a bit just to kill it...
             m_selection.resume();
-            m_selection.set_from_to(getCursorPos(), m_selection.left());
-            setCursorPos(m_selection.left());
+            m_selection.set_from_to(getCursorPos(), m_selection.lower());
+            setCursorPos(m_selection.lower());
             m_selection.stop();
         }
         else
@@ -249,15 +184,15 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
                      ((what_to_skip == ' ' && m_text.getString()[m_cursorPos] == ' ')
                    || (what_to_skip != ' ' && m_text.getString()[m_cursorPos] != ' '))); // sorry, the extra () noise is to shut GCC up (-Wparentheses)
         }
-        else if (!key.shift && m_selection && getCursorPos() == m_selection.left())
+        else if (!key.shift && m_selection && getCursorPos() == m_selection.lower())
         {
             // This is a special case for better ergonomics:
             // Resume the disappearing selection, and move the cursor to the right of it,
             // because what's actually desired is almost never to finish a selection,
             // do nothing with it, and then move the cursor a bit just to kill it...
             m_selection.resume();
-            m_selection.set_from_to(getCursorPos(), m_selection.right());
-            setCursorPos(m_selection.right());
+            m_selection.set_from_to(getCursorPos(), m_selection.upper());
+            setCursorPos(m_selection.upper());
             m_selection.stop();
         }
         else
@@ -388,24 +323,23 @@ void TextBox::onMouseLeave()
 
 void TextBox::onMousePressed(float x, float)
 {
-    for (int i = (int)m_text.getString().getSize(); i >= 0; --i)
+    size_t pos;
+    for (pos = getTextLength(); pos > 0; --pos)
     {
         // Place cursor after the character under the mouse
-        sf::Vector2f glyphPos = m_text.findCharacterPos(i);
+        sf::Vector2f glyphPos = m_text.findCharacterPos(pos);
         if (glyphPos.x <= x)
         {
-//cerr << "onPeress-> i: " << i <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << ", follow: " << m_selection.following <<endl;
-
-            setCursorPos(i);
-//cerr << "              " << i <<", anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << endl;
-
-            // Must do this hackery after setCursorPos(), as follow() there would clean up an inactive selection!
-            m_selection.reset(); //! This is a bit too eager, shouldn't start selecting just on a click,
-                                  //! ...but must record the starting pos somehow, nonetheless! :-o
-            m_selection.set_from_to(i,i);
             break;
         }
     }
+    setCursorPos(pos);
+
+    // Must do this hackery after setCursorPos(), as follow() there would clean up an inactive selection!
+    m_selection.start(pos); //! This is a bit too eager, shouldn't start selecting just on a click,
+                            //! ...but must record the starting pos somehow, nonetheless! :-o
+
+//cerr << "onPeress-> pos: " << pos <<", anchor: " <<m_selection.anchor_pos << ", head: "<< m_selection.active_pos << ", state: " << m_selection.state <<endl;
 }
 
 
@@ -431,20 +365,24 @@ void TextBox::onMouseMoved(float x, float)
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
     {
-        for (int i = (int)m_text.getString().getSize(); i >= 0; --i)
+        size_t pos;
+        if (x < Theme::borderSize + Theme::PADDING)
+        {
+            pos = 0;
+        }
+        else for (pos = getTextLength(); pos > 0; --pos)
         {
             // Place cursor after the character under the mouse
-            sf::Vector2f glyphPos = m_text.findCharacterPos(i);
+            sf::Vector2f glyphPos = m_text.findCharacterPos(pos);
             if (glyphPos.x <= x)
             {
-//cerr << "onMove-> anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << endl;
-                m_selection.resume();
-                setCursorPos(i);
-//cerr << "         anchor: " <<m_selection.anchor_pos << ", active: "<< m_selection.active_pos << endl;
                 break;
             }
         }
+        setCursorPos(pos);
+        m_selection.follow(pos);
     }
+//cerr << "onMove-> pos: " << pos <<", anchor: " <<m_selection.anchor_pos << ", head: "<< m_selection.active_pos << ", state: " << m_selection.state <<endl;
 }
 
 
@@ -549,9 +487,9 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
         if (m_selection)
         {
             sf::RectangleShape selRect;
-            const sf::Vector2f& startPos = m_text.findCharacterPos(m_selection.left());
+            const sf::Vector2f& startPos = m_text.findCharacterPos(m_selection.lower());
             selRect.setPosition(startPos);
-            selRect.setSize({m_text.findCharacterPos(m_selection.right()).x - startPos.x, m_cursorRect.getSize().y});
+            selRect.setSize({m_text.findCharacterPos(m_selection.upper()).x - startPos.x, m_cursorRect.getSize().y});
             selRect.setFillColor(Theme::input.textSelectionColor);
             ctx.target.draw(selRect, sfml_renderstates);
         }
@@ -577,20 +515,20 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 }
 
 
-void TextBox::setSelection(size_t from, size_t to)
+void TextBox::setSelection(size_t from, size_t length)
 {
-    m_selection.set(from, to - from);
+    m_selection.set_span(from, (int)length);
 }
 
 void TextBox::clearSelection()
 {
-    m_selection.reset();
+    m_selection.cancel();
 }
 
 
 sf::String TextBox::getSelectedText() const
 {
-    return m_text.getString().substring(m_selection.left(), m_selection.length());
+    return m_text.getString().substring(m_selection.lower(), m_selection.length());
 }
 
 
@@ -600,8 +538,8 @@ void TextBox::deleteSelectedText()
     if (!m_selection.empty())
     {
         sf::String str = m_text.getString();
-        str.erase(m_selection.left(), m_selection.length());
-        setCursorPos(m_selection.left());
+        str.erase(m_selection.lower(), m_selection.length());
+        setCursorPos(m_selection.lower());
         m_text.setString(str);
     }
     clearSelection(); //! Must clear it even if empty, so it won't start growing "out of nothing"! (-> #159)

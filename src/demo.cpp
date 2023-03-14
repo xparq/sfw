@@ -332,6 +332,7 @@ int main()
 			assert(w->get("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->get("theme-selector")))->currentRef();
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
+cerr << themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
 		});
 
