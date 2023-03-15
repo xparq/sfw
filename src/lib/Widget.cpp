@@ -55,9 +55,9 @@ GUI* Widget::getMain() const
 }
 
 
-Widget* Widget::find(const std::string& name) const
+Widget* Widget::getWidget(const std::string& name) const
 {
-    if (GUI* Main = getMain(); Main != nullptr)
+    if (GUI* Main = getMain(); Main)
     {
         return Main->recall(name);
     }

@@ -100,11 +100,9 @@ Widget* WidgetContainer::insertAfter(Widget* anchor, Widget* widget, const std::
 
 
     // Register the widget globally, too
-    if (GUI* Main = getMain(); Main != nullptr)
+    if (GUI* Main = getMain(); Main)
     {
-        // Make the default name hex, for a more climactic debug experience...:
-        char abuf[17] = {0}; to_chars(abuf, std::end(abuf), (size_t)(void*)widget, 16);
-        Main->remember(name.empty() ? string(abuf) : name, widget);
+        Main->remember(widget, name); // Will assign default if name.empty()!
     }
 
     // Adjust the layout
@@ -165,7 +163,7 @@ Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, const std::st
 
 Widget* WidgetContainer::addBefore(const std::string& anchor_name, Widget* widget, const std::string& name)
 {
-	Widget* a = get(anchor_name);
+	Widget* a = getWidget(anchor_name);
 	return a ? addBefore(a, widget, name) : add(widget, name);
 }
 
@@ -186,7 +184,7 @@ Widget* WidgetContainer::addAfter(Widget* anchor, Widget* widget, const std::str
 
 Widget* WidgetContainer::addAfter(const std::string& anchor_name, Widget* widget, const std::string& name)
 {
-	Widget* a = get(anchor_name);
+	Widget* a = getWidget(anchor_name);
 	return a ? addAfter(a, widget, name) : add(widget, name);
 }
 

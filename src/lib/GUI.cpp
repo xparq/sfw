@@ -1,13 +1,16 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
 
+#include <charconv>
 #include <system_error>
-#include <iostream> // for printing errors
+#include <iostream> // for printing errors/warnings
+#include <cassert>
 using namespace std;
 
 namespace sfw
 {
 
+//----------------------------------------------------------------------------
 GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg):
     m_error(), // no error by default
     m_window(window),
@@ -23,9 +26,11 @@ GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg):
 }
 
 
+//----------------------------------------------------------------------------
 GUI::operator bool() { return !m_error; }
 
 
+//----------------------------------------------------------------------------
 bool GUI::reset()
 {
     m_error = std::error_code();
@@ -42,6 +47,7 @@ bool GUI::reset()
 }
 
 
+//----------------------------------------------------------------------------
 void GUI::process(const sf::Event& event)
 {
     switch (event.type)
@@ -91,6 +97,7 @@ void GUI::process(const sf::Event& event)
 }
 
 
+//----------------------------------------------------------------------------
 bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 {
 //traverseChildren([&](Widget* w) { cerr << w->getName() << "\n"; } );
@@ -128,6 +135,7 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 }
 
 
+//----------------------------------------------------------------------------
 void GUI::render()
 {
     if (sfw::Theme::clearWindow)
@@ -140,18 +148,54 @@ void GUI::render()
 }
 
 
-void GUI::remember(const string& name, Widget* widget)
+//----------------------------------------------------------------------------
+bool GUI::remember(Widget* widget, string name, bool override_existing)
 {
-    if (widgets.find(name) != widgets.end())
+    if (name.empty())
     {
-        cerr << "- Warning: A widget with the name \"" << name << "\" has already been registered.\n"
-             << "  Overriding...\n";
+        // Make the default name hex, for a more climactic debug experience...:
+        char defname[17] = {0}; to_chars(defname, std::end(defname), (size_t)(void*)widget, 16);
+        name = string(defname);
+        // Paranoid sanity-checking of this default name
+        if (widgets[name] != nullptr)
+        {
+            cerr << "- Warning: Widget ["<<name<<"] has already been registered with this default name.\n";
+            assert(widgets[name] == widget);
+            return true;
+        }
     }
+    else if (auto other_it = widgets.find(name); other_it != widgets.end()) // Someone has this name aleady?
+    {
+        Widget* other = other_it->second;
+        if (other == widget)
+        {
+            cerr << "- Warning: Repeated registration of widget as \"" << name << "\".\n";
+            return true;
+        }
 
+        if (!override_existing)
+        {
+            cerr << "- Warning: Refusing to override the name (\"" << name << "\") of another widget.\n";
+            return false;
+        }
+        else
+        {
+            cerr << "- Warning: Another widget has already been registered as \"" << name << "\".\n"
+                 << "  Overriding...\n";
+
+            // Forget the name of the other widget:
+            auto result_of_forgetting = remember(other, "");
+            assert(result_of_forgetting);
+
+            // Fall through to assign `name` to `widget`...
+        }
+    }
+    
     widgets[name] = widget;
+    return true;
 }
 
-
+//----------------------------------------------------------------------------
 Widget* GUI::recall(const std::string& name) const
 {
     auto widget_iter = widgets.find(name);
@@ -170,6 +214,7 @@ string GUI::recall(const Widget* w) const
 }
 
 
+//----------------------------------------------------------------------------
 sf::Vector2f GUI::convertMousePosition(int x, int y) const
 {
     sf::Vector2f mouse = m_window.mapPixelToCoords(sf::Vector2i(x, y));
@@ -178,6 +223,7 @@ sf::Vector2f GUI::convertMousePosition(int x, int y) const
 }
 
 
+//----------------------------------------------------------------------------
 void GUI::setMouseCursor(sf::Cursor::Type cursorType)
 {
     if (cursorType != m_cursorType)

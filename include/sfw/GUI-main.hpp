@@ -46,10 +46,24 @@ public:
     void render();
 
 
-    /**
-     * Implement a name->widget registry
-     */
-    void remember(const std::string& name, Widget* widget);
+    /*************************************************************************
+     Name->widget registry
+
+     If name == "", the widget will be registered with a default name, which
+     is also a unique internal ID (for disagnostic purposes).
+
+     If `override_existing` is true, a previously registered widget with the
+     same name will lose its name, and will revert to having a default instead.
+
+     Notes:
+     - Since default names uniquely identify widgets, the override flag is
+       redudndant with empty names.
+     - The registry doesn't store const pointers, to allow any widget operations
+       to be applied directly on a retrieved pointer.
+     - If you're wondering why remember() doesn't have a const string& input
+       type, see its implementation.
+     *************************************************************************/
+    bool remember(Widget* widget, std::string name, bool override_existing = true);
     Widget* recall(const std::string& name) const;
     std::string recall(const Widget*) const;
 

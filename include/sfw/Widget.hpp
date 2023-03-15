@@ -78,18 +78,39 @@ public:
     //      return (InterestingWidget*) Widget::setCallback(callback);
     // }
 
+
+    /*************************************************************************
+      Set/Reset the internal name of a widget
+
+      If a widget is not assigned a name explicitly, it will have a unique
+      default ID (e.g. the hex. representation of its address).
+
+      If the name has already been assigned to another widget, it will lose
+      its explicit name (reverting to the default), and the new widget will
+      take over, having that name thereafter.
+      
+      Notes:
+      - This may be a slow operation, intended mainly for diagnostic use!
+      - const, because this doesn't actually change the widget, but
+        registers it in a central widget registry.
+     */
+    std::string setName(const std::string& name) const;
+
     /**
-      * Get the internal name of a widget (or its hex address if it wasn't named)
-      * (This may be a slow operation, intended mainly for diagnostic use!
-      * Basically that's why it's not just called `name()`. ;) )
-      * No widget (address) means this widget.
-      */
+      Get the internal name of a widget (or its default ID if hasn't been named)
+
+      If no widget (address) is specified, it means this widget.
+
+      Note:
+      - This may be a slow operation, intended mainly for diagnostic use!
+     */
     std::string getName(Widget* widget = nullptr) const;
 
     /**
-      * Find (some other) widget by name, if previously registered (or null if not)
-      */
-    Widget* get(const std::string& name) const { return find(name); }
+      Find a registered widget by name
+      Returns nullptr if no widget by that name was found.
+     */
+    Widget* getWidget(const std::string& name) const;
 
 
 protected:
@@ -161,11 +182,6 @@ friend class Form;
 
 private:
     virtual void recomputeGeometry() {} // Can be requested by friend widgets, too
-
-    /**
-     * name->widget lookup (implemented in GUI::Main)
-     */
-    Widget* find(const std::string& name) const;
 
     // Callbacks
     virtual void onStateChanged(WidgetState state);
