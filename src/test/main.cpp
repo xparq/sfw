@@ -438,9 +438,12 @@ int main()
 	// the get() name fix of #200 (assuming CheckBox still has its "real" get():
 	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = ((sfw::CheckBox*)w->getWidget("x"))->get(); }, true), "x");
 
-
 	// Custom exit button (also useless, but feels so nice! :) )
 	demo.add(sfw::Button("Quit", [&] { window.close(); }));
+
+	// Test the duplicate naming warning:
+	demo.setName("demo");
+	demo.setName("demo");
 
 
 	//--------------------------------------------------------------------

@@ -55,13 +55,12 @@ GUI* Widget::getMain() const
 }
 
 
-Widget* Widget::getWidget(const std::string& name) const
+void Widget::setName(const std::string& name)
 {
-    if (GUI* Main = getMain(); Main)
+    if (GUI* Main = getMain(); Main != nullptr)
     {
-        return Main->recall(name);
+        Main->remember(this, name);
     }
-    return nullptr;
 }
 
 std::string Widget::getName(Widget* widget) const
@@ -71,6 +70,16 @@ std::string Widget::getName(Widget* widget) const
         return Main->recall(widget ? widget : this);
     }
     return "";
+}
+
+
+Widget* Widget::getWidget(const std::string& name) const
+{
+    if (GUI* Main = getMain(); Main)
+    {
+        return Main->recall(name);
+    }
+    return nullptr;
 }
 
 

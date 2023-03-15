@@ -40,10 +40,9 @@ public:
      */
     void setPosition(const sf::Vector2f& pos);
     void setPosition(float x, float y);
+
     const sf::Vector2f& getPosition() const;
-
     const sf::Vector2f& getSize() const;
-
     const sf::Transform& getTransform() const;
 
     /**
@@ -80,21 +79,17 @@ public:
 
 
     /*************************************************************************
-      Set/Reset the internal name of a widget
+      Set/Reset the internal name of the widget
 
-      If a widget is not assigned a name explicitly, it will have a unique
-      default ID (e.g. the hex. representation of its address).
-
-      If the name has already been assigned to another widget, it will lose
-      its explicit name (reverting to the default), and the new widget will
-      take over, having that name thereafter.
-      
       Notes:
-      - This may be a slow operation, intended mainly for diagnostic use!
-      - const, because this doesn't actually change the widget, but
-        registers it in a central widget registry.
+      - If a widget is not assigned a name explicitly, it will have a unique
+        default ID (e.g. the hex. representation of its address).
+
+      - If the name has already been assigned to another widget, it will lose
+        its explicit name (reverting to the default), and the new widget will
+        take over, having that name thereafter.
      */
-    std::string setName(const std::string& name) const;
+    void setName(const std::string& name);
 
     /**
       Get the internal name of a widget (or its default ID if hasn't been named)
@@ -108,7 +103,7 @@ public:
 
     /**
       Find a registered widget by name
-      Returns nullptr if no widget by that name was found.
+      Returns nullptr if the name was not found.
      */
     Widget* getWidget(const std::string& name) const;
 
@@ -118,9 +113,6 @@ protected:
 friend class GUI;
 friend class WidgetContainer;
 friend class Layout;
-friend class VBox;
-friend class HBox;
-friend class Form;
 //----------------------
 
     Widget();

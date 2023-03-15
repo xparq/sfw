@@ -45,7 +45,7 @@ void Form::recomputeGeometry()
     m_labelWidth = 0;
     const auto minLineHeight = Theme::getBoxHeight();
 
-    for (Widget *label = m_first, *content = m_first->m_next; //!!?? is label->m_next UB?
+    for (Widget *label = begin(), *content = next(begin()); //!!?? is label->m_next UB?
          label != end() && content != end();
          label = next(content), content = next(label)) //!!?? and this?! GCC didn't warn...
     {
@@ -66,7 +66,7 @@ void Form::recomputeGeometry()
     // Position child widgets...
     //
     float y = 0;
-    for (Widget *label = m_first, *content = m_first->m_next; //!!?? is label->m_next UB?
+    for (Widget *label = begin(), *content = next(begin()); //!!?? is label->m_next UB?
          label != end() && content != end();
          label = next(content), content = next(label))
     {
