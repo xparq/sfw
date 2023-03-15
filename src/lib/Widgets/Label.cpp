@@ -59,14 +59,12 @@ Label* Label::setStyle(sf::Text::Style style)
     return this;
 }
 
+
 void Label::draw(const gfx::RenderContext& ctx) const
 {
     auto sfml_renderstates = ctx.props;
     sfml_renderstates.transform *= getTransform();
     ctx.target.draw(m_text, sfml_renderstates);
-#ifdef DEBUG
-//    Widget::draw_outline(ctx);
-#endif
 }
 
 
@@ -83,7 +81,8 @@ void Label::onThemeChanged()
 void Label::recomputeGeometry()
 {
     Widget::setSize(
-        m_text.getLocalBounds().width + Theme::PADDING * 2, m_text.getLocalBounds().height + Theme::PADDING * 2
+        m_text.getLocalBounds().width + Theme::PADDING * 2  + m_text.getLocalBounds().left,
+        m_text.getLocalBounds().height + Theme::PADDING * 2 + m_text.getLocalBounds().top
     );
 }
 
