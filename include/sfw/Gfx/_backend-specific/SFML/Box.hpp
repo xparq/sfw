@@ -40,6 +40,7 @@ public:
      * Set the box dimensions
      */
     void setSize(float width, float height);
+    void setSize(const sf::Vector2f& size) { return setSize(size.x, size.y); }
 
     /**
      * Get box dimensions

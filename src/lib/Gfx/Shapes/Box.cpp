@@ -27,6 +27,10 @@ const sf::Vector2f& Box::getPosition() const
 
 void Box::setPosition(float x, float y)
 {
+    // OpenGL will render things kinda funny otherwise:
+    x = roundf(x);
+    y = roundf(y);
+
     sf::Vector2f diff = sf::Vector2f(x, y) - getPosition();
     for (size_t i = 0; i < VERTEX_COUNT; ++i)
         m_vertices[i].position += diff;
@@ -37,6 +41,10 @@ void Box::setSize(float width, float height)
 {
     if (width <= 0 || height <= 0)
         return;
+
+    // OpenGL will render things kinda funny otherwise:
+    width = roundf(width);
+    height = roundf(height);
 
     // Move/resize each of the 9 slices
     // 0--x1--x2--x3

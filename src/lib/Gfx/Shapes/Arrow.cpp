@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
+#include <cmath>
+
 namespace sfw
 {
 
@@ -30,6 +32,10 @@ void Arrow::setFillColor([[maybe_unused]] const sf::Color& color)
 
 void Arrow::setPosition(sf::Vector2f pos)
 {
+    // OpenGL will render things kinda funny otherwise:
+    pos.x = roundf(pos.x);
+    pos.y = roundf(pos.y);
+
     updateGeometry(pos.x, pos.y, m_direction);
 }
 
