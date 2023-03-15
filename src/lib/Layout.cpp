@@ -29,21 +29,25 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 {
     auto sfml_renderstates = ctx.props;
     sfml_renderstates.transform *= getTransform();
+    gfx::RenderContext lctx{ctx.target, sfml_renderstates};
 
 #ifdef DEBUG
 	if (DEBUG_INSIGHT_KEY_PRESSED && m_state == WidgetState::Hovered) {
-		if (auto* root = getMain(); root) root->draw_outline(ctx, sf::Color::Yellow);
-		draw_outline(ctx, sf::Color::White);
+		if (auto* root = getMain(); root) {
+//cerr << getAbsolutePosition().x << ", " << getAbsolutePosition().y << endl;
+			root->draw_outline(ctx, sf::Color::Yellow);
+		}
+		draw_outline(lctx, sf::Color::White);
 	}
 #endif
 
     for (const Widget* widget = begin(); widget != end(); widget = next(widget))
     {
-        widget->draw(gfx::RenderContext{ctx.target, sfml_renderstates});
+        widget->draw(lctx);
 #ifdef DEBUG
 	if (DEBUG_INSIGHT_KEY_PRESSED && widget->m_state == WidgetState::Hovered) {
 		if (auto* root = getMain(); root) {
-			widget->draw_outline(ctx,
+			widget->draw_outline(lctx,
 				const_cast<Widget*>(widget)->toLayout() ? sf::Color::White : sf::Color::Blue);
 		}
 	}

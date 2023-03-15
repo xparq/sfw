@@ -59,7 +59,7 @@ public:
     bool isFocused() const;
 
     /**
-     * Set a function to be called when this widget is triggered
+     * Set a function to be called when the "value" of the widget is changed
      */
 private:
     using Callback_void = std::optional<std::function<void()>>;

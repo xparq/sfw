@@ -102,10 +102,10 @@ int main()
 	auto issue127box = test_hbox->add(new VBox);
 	// #127 + name lookup
 	issue127box->add(sfw::Button("Issue #127/void", [&] {
-		((sfw::Button*)(demo.get("test #127")))->setText("Found itself!");
+		((sfw::Button*)(demo.getWidget("test #127")))->setText("Found itself!");
 	}), "test #127");
-	issue127box->add(sfw::Button("Issue #127/w", [&](auto* w) { cerr << w << ", " << demo.get("test #127/w") << endl;
-		((sfw::Button*)(w->get("test #127/w")))->setText("Found itself!");
+	issue127box->add(sfw::Button("Issue #127/w", [&](auto* w) { cerr << w << ", " << demo.getWidget("test #127/w") << endl;
+		((sfw::Button*)(w->getWidget("test #127/w")))->setText("Found itself!");
 	}), "test #127/w");
 
 	demo.add(new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
@@ -230,7 +230,7 @@ int main()
 	});
 
 	form->add("Rotation", sliderForRotation);
-	form->add("Scale", sliderForScale);
+	form->add("Size", sliderForScale);
 
 	// Color selectors
 	// -- Creating one as a template to clone it later, because
@@ -317,11 +317,11 @@ int main()
 	auto buttons_form = middle_panel->add(new Form);
 
 //	buttons_form->add("Default button", sfw::Button("button"));
-//	cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.get("Default button"))->getText() << "\"\n";
+//	cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.getWidget("Default button"))->getText() << "\"\n";
 
 	auto utf8button_tag = "UTF-8 test"; // Will also use it to recall the button!
 	buttons_form->add(utf8button_tag, sfw::Button("hőtűrő LÓTÚRÓ")); // Note: this source is already UTF-8 encoded.
-	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get(utf8button_tag))->getText() << "\"\n";
+	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.getWidget(utf8button_tag))->getText() << "\"\n";
 
 	// Bitmap button
 	sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
@@ -358,9 +358,9 @@ int main()
 
 	// Slider & progress bar for cropping an Image widget
 	vboximg->add(sfw::Slider(1, 100))->setCallback([&](auto* w) {
-		((sfw::ProgressBar*)w->get("cropbar"))->setValue(w->getValue());
+		((sfw::ProgressBar*)w->getWidget("cropbar"))->setValue(w->getValue());
 		// Show the slider value in a text box retrieved by its name:
-		auto tbox = (sfw::TextBox*)w->get("Text with limit (5)");
+		auto tbox = (sfw::TextBox*)w->getWidget("Text with limit (5)");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
 		else tbox->setText(to_string((int)w->getValue()));
 		imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
@@ -397,9 +397,9 @@ int main()
 	right_bar->add(sfw::Slider(10, 100))
 		->setValue(30)
 		->setCallback([&] (auto* w){
-			assert(w->get("theme-selector"));
-			auto& themecfg = ((OBTheme*)(w->get("theme-selector")))->currentRef();
-cerr << themecfg.textSize << endl; //!!#196
+			assert(w->getWidget("theme-selector"));
+			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
+//cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
 			demo.setTheme(themecfg);
 		});
@@ -434,7 +434,9 @@ cerr << themecfg.textSize << endl; //!!#196
 	// A pretty useless, but interesting clear-background checkbox
 	auto hbox4 = right_bar->add(new sfw::HBox);
 	hbox4->add(sfw::Label("Clear background"));
-	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = ((sfw::CheckBox*)w->get("x"))->isChecked(); }, true), "x");
+	// + a uselessly convoluted name-lookup through its own widget pointer, to check
+	// the get() name fix of #200 (assuming CheckBox still has its "real" get():
+	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = ((sfw::CheckBox*)w->getWidget("x"))->get(); }, true), "x");
 
 
 	// Custom exit button (also useless, but feels so nice! :) )

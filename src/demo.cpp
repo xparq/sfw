@@ -136,9 +136,9 @@ int main()
 		->setText("Hello world!");
 
 	// Slider + progress bar for scaling
-	auto sliderForScale = new sfw::Slider(10, 175); // granularity (%), width (pixel)
+	auto sliderForSize = new sfw::Slider(10, 175); // granularity (%), width (pixel)
 	auto pbarScale = new sfw::ProgressBar(175, sfw::Horizontal, sfw::LabelOver);
-	sliderForScale->setCallback([&](auto* w) {
+	sliderForSize->setCallback([&](auto* w) {
 		float scale = 1 + w->getValue() * 2 / 100.f;
 		text.setScale({scale, scale});
 		pbarScale->setValue(w->getValue());
@@ -152,7 +152,7 @@ int main()
 	});
 
 	// Add the scaling slider + its horizontal progress bar
-	form->add("Scale", sliderForScale);
+	form->add("Size", sliderForSize);
 	form->add("", HBox())->add(pbarScale); // BTW: add(Stuff()) is also OK, not just add(new Stuff)!
 
 	// Add the rotation slider + its vertical progress bar
@@ -165,17 +165,17 @@ int main()
 		rot_and_chkboxes->add(sfw::Label("         ")); // Just a (vert.) spacer...
 
 		auto styleboxes = rot_and_chkboxes->add(Form());
-		// Checkboxes to set text properties
+		// Checkboxes to set text properties (using all 3 query styles):
 		styleboxes->add("Bold text", sfw::CheckBox([&](auto* w) {
 			int style = text.getStyle();
-			if (w->isChecked()) style |=  sf::Text::Bold;
-			else                style &= ~sf::Text::Bold;
+			if (*w) style |=  sf::Text::Bold;
+			else    style &= ~sf::Text::Bold;
 			text.setStyle(style);
 		}));
 		styleboxes->add("Italic", sfw::CheckBox([&](auto* w) {
 			int style = text.getStyle();
-			if (w->isChecked()) style |=  sf::Text::Italic;
-			else                style &= ~sf::Text::Italic;
+			if (w->checked()) style |=  sf::Text::Italic;
+			else              style &= ~sf::Text::Italic;
 			text.setStyle(style);
 		}));
 		styleboxes->add("Underlined", sfw::CheckBox([&](auto* w) {
@@ -236,7 +236,7 @@ int main()
 
 	auto utf8button_tag = "UTF-8 by default:"; // We'll also use this text to find the button.
 	buttons_form->add(utf8button_tag, sfw::Button("Ψ ≠ 99° ± β")); // Note: this source is already UTF-8 encoded!
-	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.get(utf8button_tag))->getText() << "\"\n";
+	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.getWidget(utf8button_tag))->getText() << "\"\n";
 
 	// Bitmap buttons
 	auto imgbuttons_form = left_panel->add(sfw::Form());
@@ -286,9 +286,9 @@ int main()
 	sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg");
 	// Slider & progress bar for cropping an Image widget
 	auto cropslider = (new sfw::Slider(1, 100))->setCallback([&](auto* w) {
-		((sfw::ProgressBar*)w->get("cropbar"))->setValue(w->getValue());
+		((sfw::ProgressBar*)w->getWidget("cropbar"))->setValue(w->getValue());
 		// Show the slider value in a text box retrieved by its name:
-		auto tbox = (sfw::TextBox*)w->get("crop%");
+		auto tbox = (sfw::TextBox*)w->getWidget("crop%");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
 		else tbox->setText(w->getValue() ? to_string((int)w->getValue()) : "");
 		imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
@@ -329,10 +329,10 @@ int main()
 	right_bar->add(sfw::Slider(10, 100))
 		->setValue(30)
 		->setCallback([&] (auto* w){
-			assert(w->get("theme-selector"));
-			auto& themecfg = ((OBTheme*)(w->get("theme-selector")))->currentRef();
+			assert(w->getWidget("theme-selector"));
+			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
-cerr << themecfg.textSize << endl; //!!#196
+//cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
 		});
 
@@ -354,18 +354,18 @@ cerr << themecfg.textSize << endl; //!!#196
 
 	right_bar->add(sfw::Label(" ")); // Just for some space, indeed...
 
+	// A pretty useless, but interesting clear-background checkbox
+	auto hbox4 = right_bar->add(new sfw::HBox);
+	hbox4->add(sfw::Label("Clear background"));
+	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = w->checked(); }, true));
+
 	// Window background color selector
-	right_bar->add(new Form)->add("Window bg.", (new OBColor(ColorSelect_TEMPLATE))
+	right_bar->add(new Form)->add("Bg. color", (new OBColor(ColorSelect_TEMPLATE))
 		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
 			Theme::windowBgColor = w->current();
 		})
 	);
-
-	// A pretty useless, but interesting clear-background checkbox
-	auto hbox4 = right_bar->add(new sfw::HBox);
-	hbox4->add(sfw::Label("Clear background"));
-	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = w->isChecked(); }, true));
 
 	// Custom exit button (also useless, but feels so nice! :) )
 	demo.add(sfw::Button("Quit", [&] { window.close(); }));
@@ -376,7 +376,7 @@ cerr << themecfg.textSize << endl; //!!#196
 	// (after setup, as these may trigger callbacks etc.)
 	//
 	sliderForRotation->setValue(29);
-	sliderForScale->setValue(20);
+	sliderForSize->setValue(20);
 	// Colors of the example text + rect:
 	optTxtColor->select("Red");
 	optTxtBg->select("Black");
