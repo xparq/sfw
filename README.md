@@ -15,7 +15,7 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 - Richer, more flexible API, bugfixes, improvements to existing widgets etc.
 - Reshuffled source tree (to allow growth & to help integrating into other projects)
 - Default quick-start assets included (and removed the non-free ones from the demo)
-- Auto download & setup the latest SFML-master lib (mostly for the GitHGub workflow)
+- Auto download & setup the latest SFML-master lib (mostly for the GitHub workflow)
 
 _For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
 
