@@ -32,7 +32,7 @@ void Layout::draw(const gfx::RenderContext& ctx) const
     gfx::RenderContext lctx{ctx.target, sfml_renderstates};
 
 #ifdef DEBUG
-	if (DEBUG_INSIGHT_KEY_PRESSED && m_state == WidgetState::Hovered) {
+	if (DEBUG_INSIGHT_KEY_PRESSED && getState() == WidgetState::Hovered) {
 		if (auto* root = getMain(); root) {
 //cerr << getAbsolutePosition().x << ", " << getAbsolutePosition().y << endl;
 			root->draw_outline(ctx, sf::Color::Yellow);
@@ -45,7 +45,7 @@ void Layout::draw(const gfx::RenderContext& ctx) const
     {
         widget->draw(lctx);
 #ifdef DEBUG
-	if (DEBUG_INSIGHT_KEY_PRESSED && widget->m_state == WidgetState::Hovered) {
+	if (DEBUG_INSIGHT_KEY_PRESSED && widget->getState() == WidgetState::Hovered) {
 		if (auto* root = getMain(); root) {
 			widget->draw_outline(lctx,
 				const_cast<Widget*>(widget)->toLayout() ? sf::Color::White : sf::Color::Blue);

@@ -23,7 +23,7 @@ GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the
     m_themeCfg(themeCfg)
 {
     // "Officially" mark this object as the "Main" in the GUI Widget tree:
-    m_parent = this;
+    setParent(this);
 
     // Also register ourselves to our own widget registry:
     widgets["/"] = this;
@@ -226,7 +226,7 @@ bool GUI::remember(Widget* widget, string name, bool override_existing)
                  << "  Overriding...\n";
 
             // Forget the name of the other widget:
-            auto result_of_forgetting = remember(other, "");
+            [[maybe_unused]] auto result_of_forgetting = remember(other, "");
             assert(result_of_forgetting);
 
             // Fall through to assign `name` to `widget`...

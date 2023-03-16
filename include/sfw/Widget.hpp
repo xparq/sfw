@@ -110,9 +110,9 @@ public:
 
 protected:
 //----------------------
-friend class GUI;
 friend class WidgetContainer;
 friend class Layout;
+friend class GUI;
 //----------------------
 
     Widget();
