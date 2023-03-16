@@ -31,7 +31,7 @@ Slider::Slider(float step, float length, Orientation orientation):
 
         for (int i = 0; i < 4; ++i)
         {
-            m_progression[i].color = Theme::windowBgColor;
+            m_progression[i].color = Theme::bgColor;
             m_progression[i].position.x = m_groove.getPosition().x + Theme::borderSize;
             m_progression[i].position.y = m_groove.getPosition().y + Theme::borderSize;
         }
@@ -48,7 +48,7 @@ Slider::Slider(float step, float length, Orientation orientation):
 
         for (int i = 0; i < 4; ++i)
         {
-            m_progression[i].color = Theme::windowBgColor;
+            m_progression[i].color = Theme::bgColor;
             m_progression[i].position.x = m_groove.getPosition().x + Theme::borderSize;
             m_progression[i].position.y = m_groove.getSize().y - Theme::borderSize;
         }

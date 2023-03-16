@@ -4,8 +4,15 @@
 
 #include <string> // to_string
 #include <iostream> // cerr, for errors, cout for some "demo" info
+#include <thread>
+#include <chrono>
 #include <cassert>
 using namespace std;
+
+
+void background_thread_main(sfw::GUI& gui);
+static auto main_ended = false;
+static auto sampletext_angle = sf::degrees(0);
 
 int main()
 {
@@ -50,7 +57,7 @@ int main()
 
 	//--------------------------------------------------------------------
 	// Creating the main GUI controller:
-	sfw::GUI demo(window, themes[DEFAULT_THEME]);
+	sfw::GUI demo(window, themes[DEFAULT_THEME], false);
 	if (!demo) {
 		return EXIT_FAILURE; // Errors have already been printed to cerr.
 	}
@@ -128,6 +135,9 @@ int main()
 		sf::RectangleShape textrect;
 
 	auto sfText = new DrawHost([&](auto* raw_w, auto ctx) {
+	        //!! Just a guick hack to see something moving...
+		text.setRotation(sampletext_angle);
+
 		// Get current (raw, untransformed) text size
 		//! Note: the text string & style attributes may have been
 		//! changed by other widgets!
@@ -427,7 +437,7 @@ int main()
 	right_bar->add(new Form)->add("Window bg.", (new OBColor(ColorSelect_TEMPLATE))
 		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
-			Theme::windowBgColor = w->current();
+			Theme::bgColor = w->current();
 		})
 	);
 
@@ -436,14 +446,14 @@ int main()
 	hbox4->add(sfw::Label("Clear background"));
 	// + a uselessly convoluted name-lookup through its own widget pointer, to check
 	// the get() name fix of #200 (assuming CheckBox still has its "real" get():
-	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = ((sfw::CheckBox*)w->getWidget("x"))->get(); }, true), "x");
+	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearBackground = ((sfw::CheckBox*)w->getWidget("x"))->get(); }, true), "x");
 
-	// Custom exit button (also useless, but feels so nice! :) )
-	demo.add(sfw::Button("Quit", [&] { window.close(); }));
+	// "GUI::close" button -- should NOT close the window:
+	demo.add(sfw::Button("Close the GUI!", [&] { demo.close(); }));
 
 	// Test the duplicate naming warning:
-	demo.setName("demo");
-	demo.setName("demo");
+	demo.setName("demo"); demo.setName("demo");
+	cerr << "(Should see a warning about dup. reg. above.)\n";
 
 
 	//--------------------------------------------------------------------
@@ -457,6 +467,11 @@ int main()
 	optTxtBg->select("Black");
 
 	//--------------------------------------------------------------------
+	// Start another thread for some unrelated job
+	thread bg_thread(background_thread_main, std::ref(demo));
+	main_ended = false;
+
+	//--------------------------------------------------------------------
 	// The event loop
 	while (window.isOpen())
 	{
@@ -464,16 +479,47 @@ int main()
 		window.display();
 
 		sf::Event event;
+		// Pass events to the GUI & check for closing or failure
+		//!! Can't shortcut it when the GUI doesn't own the window,
+		//!! so when it gets deactivated it wouldn't block the loop:
+		//!!while (window.pollEvent(event) && demo.process(event) || )
 		while (window.pollEvent(event))
 		{
 			demo.process(event);
 
+			// Handle the window closing separately, as we
+			// don't want to close with the gui in this setup:
 			if (event.type == sf::Event::Closed ||
-			   (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
-				window.close();
+			    // Just for convenience, also close on Esc:
+			    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+			{
+				window.close(); // Not demo.close if the GUI doesn't own the window!
+			}
 		}
-
 	}
 
+	//--------------------------------------------------------------------
+	// Finish the bg. thread, too
+	main_ended = true;
+	bg_thread.join();
+
 	return EXIT_SUCCESS;
+}
+
+//----------------------------------------------------------------------------
+void background_thread_main(sfw::GUI& gui)
+{
+	int n = 0;
+	while (!main_ended)
+	{
+	        this_thread::sleep_for(chrono::milliseconds(50));
+
+		++n;
+		sampletext_angle = sf::degrees(n*2.f);
+
+		if (n%20 != 0)
+			gui.setPosition(float(10 + (n/20)%10), float(10 + (n/20)%10));
+//		if (n%20) continue;
+//		gui.setPosition(float(10 + (n/20)%10), float(10 + (n/20)%10));
+	}
 }

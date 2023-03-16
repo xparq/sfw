@@ -85,8 +85,8 @@ public:
     static Style click;
     static Style input;
 
-    static sf::Color windowBgColor;
-    static bool clearWindow;
+    static sf::Color bgColor;
+    static bool clearBackground;
     static int borderSize; // Recalculated from the actual texture, so don't try setting it directly...
     static int minWidgetWidth;
 

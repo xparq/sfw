@@ -37,7 +37,7 @@ bool Theme::Cfg::apply()
     {
         return false; // SFML has already explained the situation...
     }
-    Theme::windowBgColor = bgColor;
+    Theme::bgColor = bgColor;
     Theme::textSize = textSize;
     return true;
 }
@@ -56,8 +56,8 @@ static sf::Cursor& getDefaultCursor()
 size_t Theme::textSize = Theme::DEFAULT.textSize;
 Theme::Style Theme::click;
 Theme::Style Theme::input;
-sf::Color Theme::windowBgColor = sf::Color::White;
-bool Theme::clearWindow = true;
+sf::Color Theme::bgColor = sf::Color::White;
+bool Theme::clearBackground = true;
 int Theme::borderSize = 1; //! Will get reset based on the loaded texture, so no use setting it here!
 int Theme::minWidgetWidth = 86;
 float Theme::PADDING = 1.f;

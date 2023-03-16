@@ -4,8 +4,12 @@
 
 #include <string> // to_string
 #include <iostream> // cerr, for errors, cout for some "demo" info
+#include <thread>
+#include <chrono>
 #include <cassert>
 using namespace std;
+
+void background_thread_main(sfw::GUI& gui);
 
 int main()
 {
@@ -153,14 +157,14 @@ int main()
 
 	// Add the scaling slider + its horizontal progress bar
 	form->add("Size", sliderForSize);
-	form->add("", HBox())->add(pbarScale); // BTW: add(Stuff()) is also OK, not just add(new Stuff)!
+	form->add("", pbarScale);
 
 	// Add the rotation slider + its vertical progress bar
         // ...And, since there would be too much wasted space next to the p.bar,
 	// put some text-styling checkboxes there. :)
 	// (Note the use of the "new-less" (move-constructing) add(...) style, for a change!)
 	auto rot_and_chkboxes = form->add("Rotation", HBox());
-		rot_and_chkboxes->add(sliderForRotation);
+		rot_and_chkboxes->add(sliderForRotation, "rotation-slider");
 		rot_and_chkboxes->add(pbarRotation);
 		rot_and_chkboxes->add(sfw::Label("         ")); // Just a (vert.) spacer...
 
@@ -333,7 +337,7 @@ int main()
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
 //cerr << "font size: "<< themecfg.textSize << endl; //!!#196
-			demo.setTheme(themecfg);
+			demo.setTheme(themecfg); // Forcing an onThemeChanged callback sweep...
 		});
 
 	// Show the current theme texture bitmaps
@@ -357,18 +361,18 @@ int main()
 	// A pretty useless, but interesting clear-background checkbox
 	auto hbox4 = right_bar->add(new sfw::HBox);
 	hbox4->add(sfw::Label("Clear background"));
-	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearWindow = w->checked(); }, true));
+	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearBackground = w->checked(); }, true));
 
 	// Window background color selector
 	right_bar->add(new Form)->add("Bg. color", (new OBColor(ColorSelect_TEMPLATE))
 		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
-			Theme::windowBgColor = w->current();
+			Theme::bgColor = w->current();
 		})
 	);
 
 	// Custom exit button (also useless, but feels so nice! :) )
-	demo.add(sfw::Button("Quit", [&] { window.close(); }));
+	demo.add(sfw::Button("Quit", [&] { demo.close(); }));
 
 
 	//--------------------------------------------------------------------
@@ -381,7 +385,11 @@ int main()
 	optTxtColor->select("Red");
 	optTxtBg->select("Black");
 
-	//------------------------------------------------------------------------
+	//--------------------------------------------------------------------
+	// Start another thread for the fun of it
+	thread bg_thread(background_thread_main, std::ref(demo));
+
+	//--------------------------------------------------------------------
 	// Start the event loop
 	while (window.isOpen())
 	{
@@ -391,18 +399,37 @@ int main()
 		// Show the updated window
 		window.display();
 
-		// Process events
+		// Pass events to the GUI & check for closing or failure
 		sf::Event event;
-		while (window.pollEvent(event))
+		while (window.pollEvent(event) && demo.process(event) )
 		{
-			// Send events to the demo GUI
-			demo.process(event);
-
-			if (event.type == sf::Event::Closed ||
-			(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
-				window.close();
+			// Just for convenience, close on Esc, too:
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+				window.close(); // 
 		}
 	}
 
+	//--------------------------------------------------------------------
+	// Finish the bg. thread, too
+	bg_thread.join();
+
 	return EXIT_SUCCESS;
+}
+
+
+//----------------------------------------------------------------------------
+void background_thread_main([[maybe_unused]] sfw::GUI& gui)
+{
+	auto sampletext_angle = sf::degrees(0);
+	int n = 0;
+	while (gui)
+	{
+	        this_thread::sleep_for(chrono::milliseconds(50));
+		++n;
+		sampletext_angle = sf::degrees(n*2.f);
+		if (auto rot_slider = (sfw::Slider*)gui.getWidget("rotation-slider"); rot_slider)
+		{
+			rot_slider->setValue(float(int(sampletext_angle.asDegrees()/3) % 100));
+		}
+	}
 }

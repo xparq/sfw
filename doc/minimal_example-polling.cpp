@@ -18,13 +18,13 @@ int main()
     // sfw::GUI gui(window, { .basePath = "asset/",
     //                        .textureFile = "texture/default.png",
     //                        .fontFile = "font/default.ttf",
-    //                        /* ... */ };
+    //                        /* ... */ });
 
     // Add a button
-    gui.add(sfw::Button("Close!", [&] { window.close(); }));
+    gui.add(sfw::Button("Close!", [&] { gui.close(); }));
 
     // Main event loop (polling variant; note: the GUI will be redrawn in each frame, regardless of changes)
-    while (window.isOpen())
+    while (gui) // Or while(gui.active()), but we're in a minimal example. ;)
     {
         // Render the GUI
         gui.render();
@@ -32,11 +32,11 @@ int main()
         // Actually show the (updated) window content
         window.display();
 
-        // Process events in the queue (each one, to avoid possible congestion)
-        for (sf::Event event; window.pollEvent(event) && event.type != sf::Event::Closed; )
+        // Process events in the queue (each one, to avoid possible congestion),
+        // and pass them to the GUI, until closing or an error has occured
+        for (sf::Event event; window.pollEvent(event) && gui.process(event); )
         {
-            // Pass events to the GUI
-            gui.process(event);
+            // Your own custom event processing here...
         }
     }
 

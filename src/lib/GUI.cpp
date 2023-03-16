@@ -1,6 +1,11 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
 
+//!! Stuff for clearing the bg. when not owning the entire window
+//!! (Should be moved to the Renderer!)
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Color.hpp>
+
 #include <charconv>
 #include <system_error>
 #include <iostream> // for printing errors/warnings
@@ -11,9 +16,10 @@ namespace sfw
 {
 
 //----------------------------------------------------------------------------
-GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg):
+GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the_window):
     m_error(), // no error by default
     m_window(window),
+    m_own_the_window(own_the_window),
     m_themeCfg(themeCfg)
 {
     // "Officially" mark this object as the "Main" in the GUI Widget tree:
@@ -27,7 +33,10 @@ GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg):
 
 
 //----------------------------------------------------------------------------
-GUI::operator bool() { return !m_error; }
+bool GUI::active()
+{
+    return !m_closed && !m_error;
+}
 
 
 //----------------------------------------------------------------------------
@@ -48,8 +57,19 @@ bool GUI::reset()
 
 
 //----------------------------------------------------------------------------
-void GUI::process(const sf::Event& event)
+void GUI::close()
 {
+	m_closed = true;
+
+	// Do we control the window, too (or just the widgets)?
+	if (m_own_the_window) m_window.close();
+}
+
+//----------------------------------------------------------------------------
+bool GUI::process(const sf::Event& event)
+{
+    if (!active()) return false;
+
     switch (event.type)
     {
     case sf::Event::MouseMoved:
@@ -91,9 +111,16 @@ void GUI::process(const sf::Event& event)
         onTextEntered(event.text.unicode);
         break;
 
+    case sf::Event::Closed:
+	close();
+        return false;
+	break;
+
     default:
         break;
     }
+
+    return true;
 }
 
 
@@ -138,13 +165,28 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 //----------------------------------------------------------------------------
 void GUI::render()
 {
-    if (sfw::Theme::clearWindow)
+    if (!active()) return;
+
+    if (sfw::Theme::clearBackground)
     {
-        m_window.clear(sfw::Theme::windowBgColor);
+        if (m_own_the_window)
+        {
+            m_window.clear(Theme::bgColor);
+        }
+        else
+        {
+            // Just clear the GUI rect!
+            sf::RectangleShape bgRect(getSize());
+            bgRect.setPosition(getPosition());
+            bgRect.setFillColor(Theme::bgColor);
+            bgRect.setOutlineThickness(0);
+            //!!m_renderer.draw(bgRect);
+            m_window.draw(bgRect);
+	}
     }
 
     // Draw whatever we have, via our a top-level widget container ancestor
-    draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! function-style RenderContext(...) failed with CLANG
+    /*m_renderer.*/draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! function-style RenderContext(...) failed with CLANG
 }
 
 

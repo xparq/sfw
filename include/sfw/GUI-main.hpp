@@ -25,26 +25,34 @@ namespace sfw
 class GUI: public VBox
 {
 public:
-    GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg = Theme::DEFAULT);
+    GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg = Theme::DEFAULT,
+        bool own_the_window = true);
 
     /**
-     * Return true if no errors.
+     * Return true if no errors & has not been closed.
      */
-    operator bool();
-
+    bool active();
+    operator bool() { return active(); }
 
     bool setTheme(const sfw::Theme::Cfg& themeCfg);
 
     /**
      * Process events from the backend (i.e. SFML)
+     * Returns false if the GUI is inactive, or when the underlying backend's
+     * CLOSE event has been received. In that case close() will also be called
+     * (which will deactivate the GUI).
      */
-    void process(const sf::Event& event);
+    bool process(const sf::Event& event);
 
     /**
      * Draw the entire GUI to the backend (i.e. SFML)
      */
     void render();
 
+    /**
+     * Shut down the GUI (but not the window by default)
+     */
+    void close();
 
     /*************************************************************************
      Name->widget registry
@@ -92,13 +100,12 @@ private:
 
     std::error_code m_error;
     sf::RenderWindow& m_window;
+    bool m_own_the_window;
     sfw::Theme::Cfg m_themeCfg;
     sf::Cursor::Type m_cursorType;
     std::map<std::string, Widget*> widgets;
 
-#ifdef DEBUG
-    friend class Layout;
-#endif
+    bool m_closed = false;
 };
 
 } // namespace

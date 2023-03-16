@@ -17,13 +17,13 @@ int main()
     // sfw::GUI gui(window, { .basePath = "asset/",
     //                        .textureFile = "texture/default.png",
     //                        .fontFile = "font/default.ttf",
-    //                        /* ... */ };
+    //                        /* ... */ });
 
     // Add a button
-    gui.add(sfw::Button("Close!", [&] { window.close(); }));
+    gui.add(sfw::Button("Close!", [&] { gui.close(); }));
 
     // Event loop (blocking variant)
-    while (window.isOpen())
+    while (gui) // Or while(gui.active()), but we're in a minimal example. ;)
     {
         // Render the GUI
         gui.render();
@@ -36,6 +36,8 @@ int main()
         {
             // Pass events to the GUI
             gui.process(event);
+
+            // Your own custom event processing here...
         }
     }
 
