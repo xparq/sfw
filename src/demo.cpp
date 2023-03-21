@@ -11,6 +11,8 @@ using namespace std;
 
 void background_thread_main(sfw::GUI& gui);
 
+static auto toy_anim_on = false;
+
 int main()
 {
 	//------------------------------------------------------------------------
@@ -248,19 +250,19 @@ int main()
 	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
 		auto combined_labels = new VBox();
-		combined_labels->add(sfw::Label("Img. button"));
-		combined_labels->add(sfw::Label("- native size"));		
+		combined_labels->add(sfw::Label("Imgage button"));
+		combined_labels->add(sfw::Label("- native size"));
 
-		imgbuttons_form->add(combined_labels, new sfw::ImageButton(buttonimg, "All defaults"))
+		imgbuttons_form->add(combined_labels, new sfw::ImageButton(buttonimg, "Start moving"))
 			->setTextSize(20)
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ });
+			->setCallback([]/*(auto* w)*/ { toy_anim_on = true; });
 
-		imgbuttons_form->add("- resized (etc.)", new sfw::ImageButton(buttonimg, "Bold"))
+		imgbuttons_form->add("- customized", new sfw::ImageButton(buttonimg, "Stop"))
 			->setTextSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
 			->setTextColor(hex2color("#d0e0c0"))
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ });
+			->setCallback([]/*(auto* w)*/ { toy_anim_on = false; });
 	}
 
 
@@ -391,7 +393,7 @@ int main()
 
 	//--------------------------------------------------------------------
 	// Start the event loop
-	while (window.isOpen())
+	while (demo)
 	{
 		// Render the GUI
 		demo.render();
@@ -405,7 +407,7 @@ int main()
 		{
 			// Just for convenience, close on Esc, too:
 			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
-				window.close(); // 
+				demo.close();
 		}
 	}
 
@@ -418,18 +420,24 @@ int main()
 
 
 //----------------------------------------------------------------------------
-void background_thread_main([[maybe_unused]] sfw::GUI& gui)
+void background_thread_main(sfw::GUI& gui)
 {
-	auto sampletext_angle = sf::degrees(0);
-	int n = 0;
+	auto rot_slider = (sfw::Slider*)gui.getWidget("rotation-slider");
+	if (!rot_slider)
+		return;
+
 	while (gui)
 	{
-	        this_thread::sleep_for(chrono::milliseconds(50));
-		++n;
-		sampletext_angle = sf::degrees(n*2.f);
-		if (auto rot_slider = (sfw::Slider*)gui.getWidget("rotation-slider"); rot_slider)
-		{
-			rot_slider->setValue(float(int(sampletext_angle.asDegrees()/3) % 100));
-		}
+		// Cycle the rot. slider
+	        auto sampletext_angle = sf::degrees(rot_slider->getValue() * 3 + 4);
+		rot_slider->setValue(float(int(sampletext_angle.asDegrees()/3) % 100));
+
+		// Keep on sleeping while the anim. is disabled.
+		// But still also poll the GUI for termination.
+		// NOTE: it's important to do this AFTER manipulating the widget
+		// exactly because the GUI may have been shut down in the meantime,
+		// and it's unhealthy (UB) to still use it.
+		do this_thread::sleep_for(chrono::milliseconds(50));
+		while (!toy_anim_on && gui);
 	}
 }

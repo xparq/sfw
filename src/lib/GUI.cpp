@@ -19,7 +19,7 @@ namespace sfw
 GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the_window):
     m_error(), // no error by default
     m_window(window),
-    m_own_the_window(own_the_window),
+    m_own_window(own_the_window),
     m_themeCfg(themeCfg)
 {
     // "Officially" mark this object as the "Main" in the GUI Widget tree:
@@ -35,7 +35,8 @@ GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the
 //----------------------------------------------------------------------------
 bool GUI::active()
 {
-    return !m_closed && !m_error;
+    return !m_closed && !m_error
+           && (!m_own_window || (m_own_window && m_window.isOpen()));
 }
 
 
@@ -62,7 +63,7 @@ void GUI::close()
 	m_closed = true;
 
 	// Do we control the window, too (or just the widgets)?
-	if (m_own_the_window) m_window.close();
+	if (m_own_window) m_window.close();
 }
 
 //----------------------------------------------------------------------------
@@ -169,7 +170,7 @@ void GUI::render()
 
     if (sfw::Theme::clearBackground)
     {
-        if (m_own_the_window)
+        if (m_own_window)
         {
             m_window.clear(Theme::bgColor);
         }

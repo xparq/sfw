@@ -100,7 +100,7 @@ private:
 
     std::error_code m_error;
     sf::RenderWindow& m_window;
-    bool m_own_the_window;
+    bool m_own_window;
     sfw::Theme::Cfg m_themeCfg;
     sf::Cursor::Type m_cursorType;
     std::map<std::string, Widget*> widgets;
