@@ -44,7 +44,7 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 - Run `nmake -f Makefile.msvc` to build the lib (`lib/sfw.lib`) & the demo (`./sfw-demo.exe`).
 
-(See the Makefiles for options. The MSVC variant is rather dumb yet!)
+(See the Makefiles for options.)
 
 
 ## Use
