@@ -2,7 +2,7 @@
 #define GUI_SLIDER_HPP
 
 #include "sfw/Widget.hpp"
-#include "sfw/Gfx/Shapes/Box.hpp"
+#include "sfw/Gfx/Elements/Box.hpp"
 #include "sfw/Geometry.hpp"
 
 namespace sfw

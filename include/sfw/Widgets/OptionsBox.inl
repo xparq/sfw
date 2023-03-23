@@ -32,8 +32,8 @@ auto OptionsBox<T>::add(const std::string& label, const T& value)
     m_items.push_back(Item(label, value));
 
     m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(label));
-    float width = m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2;
     // Check if the box needs to be resized
+    float width = m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2;
     if (width > getSize().x)
     {
         m_box.setSize(width, (float)Theme::getBoxHeight());
@@ -43,6 +43,21 @@ auto OptionsBox<T>::add(const std::string& label, const T& value)
     }
 
     update_selection(m_items.size() - 1, false);
+    return this;
+}
+
+
+template <class T>
+auto OptionsBox<T>::set(const std::string& label, const T& value)
+{
+    for (size_t i = 0; i < m_items.size(); ++i)
+    {
+        if (label == m_items[i].label)
+        {
+            m_items[i].value = value;
+            break;
+        }
+    }
     return this;
 }
 

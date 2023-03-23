@@ -2,7 +2,8 @@
 #define GUI_THEME_HPP
 
 #include "sfw/Widget.hpp"
-#include "sfw/Gfx/Shapes/Box.hpp"
+#include "sfw/Gfx/Elements/Box.hpp"
+#include "sfw/Gfx/Elements/Wallpaper.hpp"
 
 #include <SFML/Window.hpp>
 #include <SFML/Window/Event.hpp>
@@ -10,12 +11,20 @@
 
 #include <map>
 #include <string>
+#include <variant>
 
 namespace sfw
 {
 class Theme
 {
 public:
+
+    //!! This should percolate to its proper home at `Wallpaper`!
+    struct WallpaperCfg
+    {
+        std::string filename;
+        Wallpaper::Placement placement;
+    };
 
     // Quick-And-Dirty Theme Config Pack
     // -- will gradually encompass the entire Theme class,
@@ -27,10 +36,11 @@ public:
         //
         //  { "asset/custom", "MyClassic", "mytextures.png", hex2color("#e6e8e0"), 12, "font/MyFont.ttf" }
         //
+	// Note: these are not "defaults" here, but "unset" markers (and/or diagnostic sentinels)!
         const char* name = nullptr;
         const char* basePath = nullptr;
         const char* textureFile = nullptr;
-        sf::Color bgColor;
+        std::variant<sf::Color, WallpaperCfg> bg = sf::Color::Black;
         size_t textSize;
         const char* fontFile = nullptr;
 
@@ -86,6 +96,7 @@ public:
     static Style input;
 
     static sf::Color bgColor;
+    static WallpaperCfg cfgWallpaper;
     static bool clearBackground;
     static int borderSize; // Recalculated from the actual texture, so don't try setting it directly...
     static int minWidgetWidth;

@@ -23,18 +23,17 @@ class Image: public Widget
 public:
     Image();
     Image(const std::string& filename, const sf::IntRect& r = NullRect);
-    Image(const sf::Image& image     , const sf::IntRect& r = NullRect);
-    Image(const sf::Texture& texture , const sf::IntRect& r = NullRect);
+    Image(const sf::Image& image,      const sf::IntRect& r = NullRect);
+    Image(const sf::Texture& texture,  const sf::IntRect& r = NullRect);
 
     Image* setTexture(const std::string& filename, const sf::IntRect& r = NullRect);
     Image* setTexture(const sf::Image& image,      const sf::IntRect& r = NullRect);
     Image* setTexture(const sf::Texture& texture,  const sf::IntRect& r = NullRect);
 
     const sf::Texture& texture() const { return m_texture; }
-    sf::Texture& texture()             { return m_texture; }
 
     Image* setCropRect(const sf::IntRect& r);
-    sf::IntRect getCropRect() const;
+    sf::IntRect cropRect() const;
 
     Image* scale(float factor);
     float  scale() const { return m_scalingFactor; }
@@ -45,14 +44,12 @@ public:
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
-
     void onResized() override;
 
-    sf::Vertex m_vertices[4];
     sf::Texture m_texture;
-
-    float m_scalingFactor = 1.f;
     sf::Vector2f m_baseSize;
+    float m_scalingFactor = 1.f;
+    sf::Vertex m_vertices[4];
 };
 
 } // namespace

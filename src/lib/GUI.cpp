@@ -1,5 +1,6 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/util/diagnostics.hpp"
 
 //!! Stuff for clearing the bg. when not owning the entire window
 //!! (Should be moved to the Renderer!)
@@ -9,7 +10,6 @@
 #include <charconv>
 #include <system_error>
 #include <iostream> // for printing errors/warnings
-#include <cassert>
 using namespace std;
 
 namespace sfw
@@ -35,8 +35,11 @@ GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the
 //----------------------------------------------------------------------------
 bool GUI::active()
 {
-    return !m_closed && !m_error
-           && (!m_own_window || (m_own_window && m_window.isOpen()));
+    // Inactive, if:
+    // - the gui has been (explicitly) closed
+    // - it's in "error state"
+    // - the (hosting) window is not open (regardless of owning it or not)
+    return !m_closed && !m_error && m_window.isOpen();
 }
 
 
@@ -45,11 +48,21 @@ bool GUI::reset()
 {
     m_error = std::error_code();
 
+//!! This isn't useful here at all, as the generic layout resizer will
+//!! shrink it back down dynamically anyway...:
+//!!    if (m_own_window)
+//!!        setSize(m_window.getSize());
+//!! Instead, an overridden getSize() could use the dynamic size in case of
+//!! owning the full window.
+
     setTheme(m_themeCfg); //! Should this be reset to some internal safe default instead?
                           //! And then should also even the widgets be deleted, perhaps? :-o
                           //! No. Better to destroy the entire GUI for that. And for a
                           //! blank slate a new GUI instance can always be created.
                           //! Which then means...: the current config should also NOT be zapped!
+
+    //! Can't set a wallpaper just yet, as the size may be unknown yet!
+    //! Widgets are yet to be added! See onResized()!
 
     m_cursorType = sf::Cursor::Arrow;
 
@@ -69,6 +82,18 @@ void GUI::close()
 //----------------------------------------------------------------------------
 bool GUI::process(const sf::Event& event)
 {
+    thread_local bool event_processing_started = false;
+
+    if (!event_processing_started)
+    {
+        //!!Call the subscription-based onEventProcessingStarted() notifications!...
+        //!!This one is just hacked in here for now (to give it a chance to reapply
+        //!!its placement according to the "final" GUI state):
+        setWallpaper();
+
+        event_processing_started = true;
+    }
+
     if (!active()) return false;
 
     switch (event.type)
@@ -159,6 +184,13 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
     //! (NOTE: there are ample chances of infinite looping here too, some of
     //! which I've duly explored already...)
 
+    // Do we have a wallpaper to deal with?
+    if (std::holds_alternative<Theme::WallpaperCfg>(m_themeCfg.bg))
+	setWallpaper(std::get<Theme::WallpaperCfg>(m_themeCfg.bg).filename,
+                     std::get<Theme::WallpaperCfg>(m_themeCfg.bg).placement);
+    else
+        m_wallpaper.disable(); // There may be one from a previous theme, ditch it!
+
     return true;
 }
 
@@ -170,13 +202,17 @@ void GUI::render()
 
     if (sfw::Theme::clearBackground)
     {
-        if (m_own_window)
+        if (m_wallpaper)
+        {
+            m_window.draw(m_wallpaper); // Will (supposedly ;) ) only draw into the GUI rect!
+        }
+        else if (m_own_window)
         {
             m_window.clear(Theme::bgColor);
         }
-        else
-        {
-            // Just clear the GUI rect!
+	else
+	{
+            // Just clear the GUI rect
             sf::RectangleShape bgRect(getSize());
             bgRect.setPosition(getPosition());
             bgRect.setFillColor(Theme::bgColor);
@@ -277,6 +313,53 @@ void GUI::setMouseCursor(sf::Cursor::Type cursorType)
             m_cursorType = cursorType;
         }
     }
+}
+
+//----------------------------------------------------------------------------
+void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement)
+{
+	// This may also get called way too early, even before any widgets
+	// are added (i.e. from the initial setTheme() via the ctor!), so
+	// better not waste time/resources then:
+	if (!getSize().x || !getSize().y)
+		return;
+
+	if (filename.empty())
+		filename = Theme::cfgWallpaper.filename;
+	if (filename.empty())
+		return;
+
+	m_wallpaper.setImage(filename);
+	m_wallpaper.setSize(getSize()); //!!Rename it to `setWallSize` or sg. more expressive!
+	//!! This shoud be done by the wallpaper itself!
+	using enum Wallpaper::Placement;
+	switch (placement)
+	{
+	case Center:
+		break;
+	default: break;
+	}
+}
+
+bool GUI::hasWallpaper()
+//!! Define the exact meaning of this query!
+//!! Checking only for m_wallpaper can only tell the current state of the current wallpaper,
+//!! which may be disabled/missing etc. for whatever reason, but clients might ask this question
+//!! to find out about the _intent_! (In which case the theme config must also be checked.)
+{
+    return m_wallpaper; //!!?? && !Theme::WallpaperCfg.filename.empty()
+}
+
+void GUI::disableWallpaper()
+{
+    m_wallpaper.disable();
+}
+
+
+sf::Vector2f GUI::getSize() const
+{
+    return m_own_window ? sf::Vector2f{(float)m_window.getSize().x, (float)m_window.getSize().y}
+                        : Widget::getSize();
 }
 
 } // namespace

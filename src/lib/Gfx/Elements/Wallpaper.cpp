@@ -1,52 +1,52 @@
-#include "sfw/Widgets/Image.hpp"
+#include "sfw/Gfx/Elements/Wallpaper.hpp"
+#include "sfw/util/diagnostics.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
 namespace sfw
 {
 
-Image::Image()
+Wallpaper::Wallpaper()
 {
-    setSelectable(false);
 }
 
-Image::Image(const std::string& filename, const sf::IntRect& r): Image()
+Wallpaper::Wallpaper(const std::string& filename, const sf::IntRect& r): Wallpaper()
 {
-    setTexture(filename, r);
+    setImage(filename, r);
 }
 
-Image::Image(const sf::Image& image, const sf::IntRect& r): Image()
+Wallpaper::Wallpaper(const sf::Image& image, const sf::IntRect& r): Wallpaper()
 {
-    setTexture(image, r);
+    setImage(image, r);
 }
 
-Image::Image(const sf::Texture& texture, const sf::IntRect& r): Image()
+Wallpaper::Wallpaper(const sf::Texture& texture, const sf::IntRect& r): Wallpaper()
 {
-    setTexture(texture, r);
+    setImage(texture, r);
 }
 
 
-Image* Image::setTexture(const std::string& filename, const sf::IntRect& r)
+Wallpaper* Wallpaper::setImage(const std::string& filename, const sf::IntRect& r)
 {
     if (m_texture.loadFromFile(filename, r))
     {
-        setTexture(m_texture);
+        setImage(m_texture);
     }
     // else: SFML has already written an error, but we should add our own error feedback here!!
 
     return this;
 }
 
-Image* Image::setTexture(const sf::Image& image, const sf::IntRect& r)
+Wallpaper* Wallpaper::setImage(const sf::Image& image, const sf::IntRect& r)
 {
     if (m_texture.loadFromImage(image, r)) //!!?? What does SFML do with a null/invalid rect?!
     {
-        setTexture(m_texture);
+        setImage(m_texture);
     }
     return this;
 }
 
-Image* Image::setTexture(const sf::Texture& texture, const sf::IntRect& crop)
+Wallpaper* Wallpaper::setImage(const sf::Texture& texture, const sf::IntRect& crop)
 {
     // Don't copy over itself (but still alow cropping even then)
     if (&m_texture != &texture)
@@ -61,7 +61,7 @@ Image* Image::setTexture(const sf::Texture& texture, const sf::IntRect& crop)
 }
 
 
-Image* Image::setCropRect(const sf::IntRect& r)
+Wallpaper* Wallpaper::setCropRect(const sf::IntRect& r)
 {
     float left = (float) (r.left ? r.left : 0);
     float top  = (float) (r.top  ? r.top  : 0);
@@ -83,14 +83,14 @@ Image* Image::setCropRect(const sf::IntRect& r)
     return this;
 }
 
-sf::IntRect Image::cropRect() const
+sf::IntRect Wallpaper::cropRect() const
 {
     return sf::IntRect(sf::Vector2i(m_vertices[0].texCoords),
                        sf::Vector2i(m_vertices[3].texCoords - m_vertices[0].texCoords));
 }
 
 
-Image* Image::scale(float factor)
+Wallpaper* Wallpaper::scale(float factor)
 {
     m_scalingFactor = factor;
     setSize(m_baseSize * m_scalingFactor);
@@ -98,7 +98,7 @@ Image* Image::scale(float factor)
 }
 
 
-Image* Image::rescale(float factor)
+Wallpaper* Wallpaper::rescale(float factor)
 {
     m_scalingFactor *= factor;
     setSize(getSize() * m_scalingFactor);
@@ -106,7 +106,7 @@ Image* Image::rescale(float factor)
 }
 
 
-Image* Image::setColor(const sf::Color& color)
+Wallpaper* Wallpaper::setColor(const sf::Color& color)
 {
     for (int i = 0; i < 4; ++i)
         m_vertices[i].color = color;
@@ -114,22 +114,51 @@ Image* Image::setColor(const sf::Color& color)
 }
 
 
-void Image::onResized()
+Wallpaper* Wallpaper::setSize(sf::Vector2f size)
 {
-    auto [right, bottom] = getSize();
     m_vertices[0].position = {0, 0};
-    m_vertices[1].position = {0, bottom};
-    m_vertices[2].position = {right, 0};
-    m_vertices[3].position = {right, bottom};
+    m_vertices[1].position = {0, size.y};
+    m_vertices[2].position = {size.x, 0};
+    m_vertices[3].position = {size.x, size.y};
+
+    return this;
+}
+
+sf::Vector2f Wallpaper::getSize() const
+{
+    return { m_vertices[3].position.x - m_vertices[0].position.x,
+             m_vertices[3].position.y - m_vertices[0].position.y };
 }
 
 
-void Image::draw(const gfx::RenderContext& ctx) const
+Wallpaper::operator bool() const
+{
+    return m_vertices[3].position.x > m_vertices[0].position.x
+        && m_vertices[3].position.y > m_vertices[0].position.y;
+}
+
+
+void Wallpaper::disable()
+{
+    setSize({0,0});
+    assert(!*this);
+}
+
+/*!!
+void Wallpaper::draw(const gfx::RenderContext& ctx) const
 {
     auto sfml_renderstates = ctx.props;
     sfml_renderstates.transform *= getTransform();
     sfml_renderstates.texture = &m_texture;
     ctx.target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
+}
+!!*/
+void Wallpaper::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+{
+    auto lstates = states;
+    lstates.transform *= getTransform();
+    lstates.texture = &m_texture;
+    target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, lstates);
 }
 
 } // namespace

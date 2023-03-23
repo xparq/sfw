@@ -5,8 +5,8 @@
 #include <string>
 
 // For the implementation:
-#include "sfw/Gfx/Shapes/Arrow.hpp"
-#include "sfw/Gfx/Shapes/ItemBox.hpp"
+#include "sfw/Gfx/Elements/Arrow.hpp"
+#include "sfw/Gfx/Elements/ItemBox.hpp"
 #include <SFML/Graphics/Text.hpp>
 
 namespace sfw
@@ -26,9 +26,14 @@ public:
     /**
      * Append a new item in the list
      * @param label: displayed label when selected
-     * @param value: value associated
+     * @param value: value associated with that label
      */
     auto add(const std::string& label, const T& value);
+
+    /**
+     * Update an existing item
+     */
+    auto set(const std::string& label, const T& value);
 
     /**
      * Make an item at the specified index the current one

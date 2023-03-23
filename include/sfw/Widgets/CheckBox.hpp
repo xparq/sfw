@@ -2,8 +2,8 @@
 #define SFW_CHECKBOX_HPP
 
 #include "sfw/Widget.hpp"
-#include "sfw/Gfx/Shapes/Box.hpp"
-#include "sfw/Gfx/Shapes/CheckMark.hpp"
+#include "sfw/Gfx/Elements/Box.hpp"
+#include "sfw/Gfx/Elements/CheckMark.hpp"
 
 namespace sfw
 {

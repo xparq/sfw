@@ -1,7 +1,7 @@
 #ifndef GUI_ITEMBOX_SFML_HPP
 #define GUI_ITEMBOX_SFML_HPP
 
-#include "sfw/Gfx/Shapes/Box.hpp"
+#include "sfw/Gfx/Elements/Box.hpp"
 
 #include <SFML/Graphics/Color.hpp>
 

@@ -1,10 +1,10 @@
-#include "sfw/Gfx/Shapes/Box.hpp"
+#include "sfw/Gfx/Elements/Box.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/util/diagnostics.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 
-#include <cassert>
 #include <cmath>
 
 namespace sfw

@@ -2,7 +2,7 @@
 #define GUI_TEXTBOX_HPP
 
 #include "sfw/Widget.hpp"
-#include "sfw/Gfx/Shapes/Box.hpp"
+#include "sfw/Gfx/Elements/Box.hpp"
 #include "sfw/TextSelection.hpp"
 
 #include <string>

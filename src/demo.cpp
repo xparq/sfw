@@ -51,7 +51,8 @@ int main()
 
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
-		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11, "font/Liberation/LiberationSans-Regular.ttf" },
+		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", Theme::WallpaperCfg{"asset/wallpaper.jpg"s, sfw::Wallpaper::Center},
+		  17, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), 12, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
 		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
@@ -204,19 +205,19 @@ int main()
 		->add("White", sf::Color::White)
 	;
 
-	// Text color selector
+	// Select smple text color
 	auto optTxtColor = (new OBColor(ColorSelect_TEMPLATE))
 		->setCallback([&](auto* w) {
 			text.setFillColor(w->current());
 			w->setTextColor(w->current());
 		});
 
-	// Text backgorund rect color
+	// Select sample text box color
 	auto optTxtBg = (new OBColor(ColorSelect_TEMPLATE))
-		->add("Default", themes[DEFAULT_THEME].bgColor)
+		->add("Default", std::holds_alternative<sf::Color>(themes[DEFAULT_THEME].bg) ?
+		                 std::get<sf::Color>(themes[DEFAULT_THEME].bg) : Theme::bgColor)
 		->setCallback([&](auto* w) {
 			textrect.setFillColor(w->current());
-//			w->setTextColor(sf::Color::White);
 			w->setFillColor(w->current() * sf::Color(255, 255, 255, 64));
 		});
 
@@ -323,6 +324,12 @@ int main()
 	auto themeselect = new OBTheme([&](auto* w) {
 		const auto& themecfg = w->current();
 		demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
+			demo.setTheme(themecfg); // Forcing an onThemeChanged callback sweep...
+			// Update the wallpaper on/off checkbox:
+			if (demo.getWidget("Wallpaper")) ((sfw::CheckBox*)demo.getWidget("Wallpaper"))->set(demo.hasWallpaper());
+			// Update the bg. color selector's "Default" option:
+			if (demo.getWidget("Bg. color")) ((OBColor*)demo.getWidget("Bg. color"))->set("Default",
+				std::holds_alternative<sf::Color>(themecfg.bg) ? std::get<sf::Color>(themecfg.bg) : Theme::bgColor);
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
 	themeselect->select(DEFAULT_THEME);
@@ -338,8 +345,7 @@ int main()
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
-//cerr << "font size: "<< themecfg.textSize << endl; //!!#196
-			demo.setTheme(themecfg); // Forcing an onThemeChanged callback sweep...
+cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		});
 
 	// Show the current theme texture bitmaps
@@ -360,22 +366,31 @@ int main()
 
 	right_bar->add(sfw::Label(" ")); // Just for some space, indeed...
 
-	// A pretty useless, but interesting clear-background checkbox
-	auto hbox4 = right_bar->add(new sfw::HBox);
-	hbox4->add(sfw::Label("Clear background"));
-	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearBackground = w->checked(); }, true));
+	// Playing with the background...
+	auto bgform = right_bar->add(new Form);
 
+	// Wallpaper on/off checkbox
+	bgform->add("Wallpaper", sfw::CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
+	                                       demo.hasWallpaper()));
 	// Window background color selector
 	right_bar->add(new Form)->add("Bg. color", (new OBColor(ColorSelect_TEMPLATE))
-		->add("Default", themes[DEFAULT_THEME].bgColor)
+		->add("Default", std::holds_alternative<sf::Color>(themes[DEFAULT_THEME].bg) ?
+		                 std::get<sf::Color>(themes[DEFAULT_THEME].bg) : Theme::bgColor)
 		->setCallback([&](auto* w) {
 			Theme::bgColor = w->current();
 		})
 	);
+	// A pretty useless, but interesting clear-background checkbox
+	auto hbox5 = right_bar->add(new sfw::HBox);
+	hbox5->add(sfw::Label("Clear background"));
+	hbox5->add(sfw::CheckBox([&](auto* w) { Theme::clearBackground = w->checked(); }, true));
 
 	// Custom exit button (also useless, but feels so nice! :) )
 	demo.add(sfw::Button("Quit", [&] { demo.close(); }));
 
+	// Set this last, otherwise the dynamic GUI resize (on adding new widgets)
+	// may interfere with it!
+	//demo.setWallpaper("asset/wallpaper.jpg");
 
 	//--------------------------------------------------------------------
 	// OK, GUI Setup done, set some "high-level" defaults

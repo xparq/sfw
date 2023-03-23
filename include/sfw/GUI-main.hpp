@@ -4,6 +4,7 @@
 #include "sfw/Theme.hpp"
 #include "sfw/Gfx/Render.hpp"
 #include "sfw/Layouts/VBox.hpp"
+#include "sfw/Gfx/Elements/Wallpaper.hpp"
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -80,8 +81,23 @@ public:
      */
     void setMouseCursor(sf::Cursor::Type cursorType);
 
-private:
+    /**
+     * Set/manage wallpaper image
+     * If `filename` is omitted, the wallpaper configured for the current theme
+     * (if any) will be reset.
+     */
+    void setWallpaper(std::string filename = "", Wallpaper::Placement placement = sfw::Wallpaper::Placement::Center);
+    void disableWallpaper();
+    bool hasWallpaper();
 
+    /**
+     * Current GUI rectangle size: if the GUI manages (owns) the (host) window,
+     * then the size of that, otherwise the current size the rectangle the GUI
+     * actually occupies
+     */
+    sf::Vector2f getSize() const;
+
+private:
     /**
      * "Soft-reset" the GUI state, keeping the current config & widgets
      * Clears the error state, too.
@@ -102,9 +118,9 @@ private:
     sf::RenderWindow& m_window;
     bool m_own_window;
     sfw::Theme::Cfg m_themeCfg;
+    sfw::Wallpaper m_wallpaper;
     sf::Cursor::Type m_cursorType;
     std::map<std::string, Widget*> widgets;
-
     bool m_closed = false;
 };
 

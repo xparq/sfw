@@ -2,7 +2,7 @@
 #define GUI_BUTTON_HPP
 
 #include "sfw/Widget.hpp"
-#include "sfw/Gfx/Shapes/ItemBox.hpp"
+#include "sfw/Gfx/Elements/ItemBox.hpp"
 
 #include <string>
 

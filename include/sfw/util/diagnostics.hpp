@@ -2,6 +2,7 @@
 #define SFW_DIAGNOSTICS_HPP
 #ifdef DEBUG
 
+	#include <cassert>
 	#include <iostream>
 	using std::cerr, std::endl;
 

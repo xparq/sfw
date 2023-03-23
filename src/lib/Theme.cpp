@@ -12,7 +12,7 @@ Theme::Cfg Theme::DEFAULT =
 	.name = "",
 	.basePath = "asset/",
 	.textureFile = "texture/default.png",
-	.bgColor = sf::Color::Black,
+	.bg = sf::Color::White,
 	.textSize = 12,
 	.fontFile = "font/default.ttf",
 };
@@ -37,8 +37,21 @@ bool Theme::Cfg::apply()
     {
         return false; // SFML has already explained the situation...
     }
-    Theme::bgColor = bgColor;
     Theme::textSize = textSize;
+
+    assert( std::holds_alternative<sf::Color>(bg) || std::holds_alternative<WallpaperCfg>(bg) );
+    if (std::holds_alternative<sf::Color>(bg))
+    {
+        Theme::bgColor = std::get<sf::Color>(bg);
+        //!!This is pretty fragile, sort it out!...
+	// Also clear the current (leftover, possibly!) Wallpaper cfg.:
+        Theme::cfgWallpaper = {};
+    }
+    else
+    {
+        Theme::cfgWallpaper = std::get<WallpaperCfg>(bg);
+    }
+
     return true;
 }
 
@@ -56,12 +69,15 @@ static sf::Cursor& getDefaultCursor()
 size_t Theme::textSize = Theme::DEFAULT.textSize;
 Theme::Style Theme::click;
 Theme::Style Theme::input;
-sf::Color Theme::bgColor = sf::Color::White;
+
+sf::Color Theme::bgColor = sf::Color::Black;
+Theme::WallpaperCfg Theme::cfgWallpaper{};
 bool Theme::clearBackground = true;
+
 int Theme::borderSize = 1; //! Will get reset based on the loaded texture, so no use setting it here!
 int Theme::minWidgetWidth = 86;
 float Theme::PADDING = 1.f;
-float Theme::MARGIN = 7.f;
+float Theme::MARGIN = 4.f;
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push

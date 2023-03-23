@@ -9,10 +9,9 @@
 #include <cassert>
 using namespace std;
 
-
 void background_thread_main(sfw::GUI& gui);
-static auto main_ended = false;
-static auto sampletext_angle = sf::degrees(0);
+
+static auto toy_anim_on = false;
 
 int main()
 {
@@ -27,7 +26,7 @@ int main()
 	window.setFramerateLimit(30);
 
 	//------------------------------------------------------------------------
-	// Test GUI setuo...
+	// Setup the Test GUI...
 
 	using namespace sfw;
 	using OBColor = sfw::OptionsBox<sf::Color>;
@@ -47,7 +46,9 @@ int main()
 
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
-		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"), 11, "font/Liberation/LiberationSans-Regular.ttf" },
+		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", Theme::WallpaperCfg{"asset/wallpaper.jpg"s, sfw::Wallpaper::Center},
+//		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
+		  11, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), 12, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
 		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
@@ -135,9 +136,6 @@ int main()
 		sf::RectangleShape textrect;
 
 	auto sfText = new DrawHost([&](auto* raw_w, auto ctx) {
-	        //!! Just a guick hack to see something moving...
-		text.setRotation(sampletext_angle);
-
 		// Get current (raw, untransformed) text size
 		//! Note: the text string & style attributes may have been
 		//! changed by other widgets!
@@ -255,16 +253,18 @@ int main()
 		->add("White", sf::Color::White)
 	;
 
-	// Text color selector
+	// Select sample text color
 	auto optTxtColor = (new OBColor(ColorSelect_TEMPLATE))
 		->setCallback([&](auto* w) {
 			text.setFillColor(w->current());
 			w->setTextColor(w->current());
 		});
 
-	// Text backgorund rect color
+	// Select sample text box color
 	auto optTxtBg = (new OBColor(ColorSelect_TEMPLATE))
-		->add("Default", themes[DEFAULT_THEME].bgColor)
+//!!old:	->add("Default", themes[DEFAULT_THEME].bgColor)
+		->add("Default", std::holds_alternative<sf::Color>(themes[DEFAULT_THEME].bg) ?
+		                 std::get<sf::Color>(themes[DEFAULT_THEME].bg) : Theme::bgColor)
 		->setCallback([&](auto* w) {
 			textrect.setFillColor(w->current());
 			w->setFillColor(w->current());
@@ -339,14 +339,15 @@ int main()
 	{
 		buttons_form->add("Native size", new sfw::ImageButton(buttonimg, "All defaults"))
 			->setTextSize(20)
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ });
+			->setCallback([]/*(auto* w)*/ { toy_anim_on = true; });
+
 
 		buttons_form->add("Customized", new sfw::ImageButton(buttonimg, "Bold"))
 			->setTextSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
 			->setTextColor(hex2color("#d0e0c0"))
-			->setCallback([]/*(auto* w)*/ { /*no-arg. compilation test*/ });
+			->setCallback([]/*(auto* w)*/ { toy_anim_on = false; });
 	}
 
 
@@ -395,6 +396,8 @@ int main()
 	auto themeselect = new OBTheme([&](auto* w) {
 		const auto& themecfg = w->current();
 		demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
+		// Update the wallpaper on/off checkbox:
+		if (demo.getWidget("Wallpaper")) ((sfw::CheckBox*)demo.getWidget("Wallpaper"))->set(demo.hasWallpaper());
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
 	themeselect->select(DEFAULT_THEME);
@@ -409,7 +412,7 @@ int main()
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
-//cerr << "font size: "<< themecfg.textSize << endl; //!!#196
+cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
 			demo.setTheme(themecfg);
 		});
@@ -433,9 +436,17 @@ int main()
 
 	right_bar->add(Label(" ")); // Just for some space, indeed...
 
+	// Playing with the background...
+	auto bgform = right_bar->add(new Form);
+
+	// Wallpaper on/off checkbox
+	bgform->add("Wallpaper", sfw::CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
+	                                       demo.hasWallpaper()));
 	// Window background color selector
-	right_bar->add(new Form)->add("Window bg.", (new OBColor(ColorSelect_TEMPLATE))
-		->add("Default", themes[DEFAULT_THEME].bgColor)
+	bgform->add("Window bg.", (new OBColor(ColorSelect_TEMPLATE))
+//!!old:	->add("Default", themes[DEFAULT_THEME].bgColor)
+		->add("Default", std::holds_alternative<sf::Color>(themes[DEFAULT_THEME].bg) ?
+		                 std::get<sf::Color>(themes[DEFAULT_THEME].bg) : Theme::bgColor)
 		->setCallback([&](auto* w) {
 			Theme::bgColor = w->current();
 		})
@@ -450,6 +461,11 @@ int main()
 
 	// "GUI::close" button -- should NOT close the window:
 	demo.add(sfw::Button("Close the GUI!", [&] { demo.close(); }));
+
+	// Set this last, otherwise the dynamic GUI resize (on adding new widgets)
+	// may interfere with it!
+	//demo.setWallpaper("asset/wallpaper.jpg");
+//	demo.setWallpaper();
 
 	// Test the duplicate naming warning:
 	demo.setName("demo"); demo.setName("demo");
@@ -469,7 +485,6 @@ int main()
 	//--------------------------------------------------------------------
 	// Start another thread for some unrelated job
 	thread bg_thread(background_thread_main, std::ref(demo));
-	main_ended = false;
 
 	//--------------------------------------------------------------------
 	// The event loop
@@ -480,8 +495,8 @@ int main()
 
 		sf::Event event;
 		// Pass events to the GUI & check for closing or failure
-		//!! Can't shortcut it when the GUI doesn't own the window,
-		//!! so when it gets deactivated it wouldn't block the loop:
+		//!! Can't shortcut it when the GUI doesn't own the window, so when
+		//!! it gets deactivated it wouldn't block the rest of the world, too:
 		//!!while (window.pollEvent(event) && demo.process(event) || )
 		while (window.pollEvent(event))
 		{
@@ -493,6 +508,7 @@ int main()
 			    // Just for convenience, also close on Esc:
 			    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
 			{
+				//demo.close(); // No need to close it manually: window.close() will make it inactive!
 				window.close(); // Not demo.close if the GUI doesn't own the window!
 			}
 		}
@@ -500,7 +516,6 @@ int main()
 
 	//--------------------------------------------------------------------
 	// Finish the bg. thread, too
-	main_ended = true;
 	bg_thread.join();
 
 	return EXIT_SUCCESS;
@@ -509,17 +524,26 @@ int main()
 //----------------------------------------------------------------------------
 void background_thread_main(sfw::GUI& gui)
 {
-	int n = 0;
-	while (!main_ended)
+	auto rot_slider = (sfw::Slider*)gui.getWidget("Rotation");
+	if (!rot_slider)
+		return;
+
+	for (size_t n = 0; gui;)
 	{
-	        this_thread::sleep_for(chrono::milliseconds(50));
+		// Cycle the rot. slider
+	        auto sampletext_angle = sf::degrees(rot_slider->getValue() * 3 + 4);
+		rot_slider->setValue(float(int(sampletext_angle.asDegrees()/3) % 100));
+
+		// Keep on sleeping while the anim. is disabled.
+		// But still also poll the GUI for termination.
+		// NOTE: it's important to do this AFTER manipulating the widget
+		// exactly because the GUI may have been shut down in the meantime,
+		// and it's unhealthy (UB) to still use it.
+		do this_thread::sleep_for(chrono::milliseconds(50));
+		while (!toy_anim_on && gui);
 
 		++n;
-		sampletext_angle = sf::degrees(n*2.f);
-
-		if (n%20 != 0)
-			gui.setPosition(float(10 + (n/20)%10), float(10 + (n/20)%10));
-//		if (n%20) continue;
-//		gui.setPosition(float(10 + (n/20)%10), float(10 + (n/20)%10));
+		if (n%20) continue;
+		gui.setPosition(float(10 + (n/20)%10), float(10 + (n/20)%10));
 	}
 }
