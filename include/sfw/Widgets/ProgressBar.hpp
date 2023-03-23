@@ -30,18 +30,23 @@ public:
     ProgressBar(float length = 200.f, Orientation orientation = Horizontal, LabelPlacement labelPlacement = LabelOver);
 
     /// [0..100]
-    void setValue(float value);
+    ProgressBar* setValue(float value);
     float getValue() const;
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
+    // Callbacks
+    void onThemeChanged() override;
+    // Helpers
+    void updateGeometry();
 
-    Box m_box;
     Orientation m_orientation;
-    sf::Vertex m_bar[4];
-    sf::Text m_label;
+    float m_boxLength;
     LabelPlacement m_labelPlacement;
     float m_value;
+    Box m_box;
+    sf::Vertex m_bar[4];
+    sf::Text m_label;
 };
 
 } // namespace
