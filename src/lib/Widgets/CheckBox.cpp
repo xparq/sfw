@@ -53,11 +53,9 @@ void CheckBox::onStateChanged(WidgetState state)
 
 void CheckBox::onThemeChanged()
 {
-    float offset = Theme::PADDING + Theme::borderSize;
-    float box_size = m_checkmark.getSize().x + offset * 2;
+    float chkmark_offset = Theme::PADDING + Theme::borderSize;
+    float box_size = m_checkmark.getSize().x + chkmark_offset * 2;
     m_box.setSize(box_size, box_size);
-    m_checkmark.setPosition({offset, offset});
-
     setSize(max(box_size, (float)Theme::getLineSpacing() / 1.5f),
             max(box_size, (float)Theme::getLineSpacing()));
 }
@@ -67,6 +65,10 @@ void CheckBox::onResized()
 {
     m_box.setPosition((getSize().x - m_box.getSize().x) / 2,
                       (getSize().y - m_box.getSize().y) / 2);
+
+    float chkmark_offset = Theme::PADDING + Theme::borderSize;
+    m_checkmark.setPosition({m_box.getPosition().x + chkmark_offset,
+                             m_box.getPosition().y + chkmark_offset});
 }
 
 
