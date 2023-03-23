@@ -6,7 +6,6 @@ using std::string;
 namespace sfw
 {
 
-//!!THESE ARE NOT YET ACTUALLY PACKAGED, but the code is already there, so...:
 Theme::Cfg Theme::DEFAULT =
 {
 	.name = "",

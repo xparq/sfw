@@ -344,8 +344,9 @@ int main()
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
-			themecfg.textSize = 8 + size_t(w->getValue() / 10);
 cerr << "font size: "<< themecfg.textSize << endl; //!!#196
+			themecfg.textSize = 8 + size_t(w->getValue() / 10);
+			demo.setTheme(themecfg);
 		});
 
 	// Show the current theme texture bitmaps

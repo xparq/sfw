@@ -71,7 +71,10 @@ void Label::draw(const gfx::RenderContext& ctx) const
 void Label::onThemeChanged()
 {
     m_text.setFont(Theme::getFont());
-    m_text.setPosition({Theme::PADDING, Theme::PADDING});
+    m_text.setPosition({Theme::PADDING, Theme::PADDING}); //!!  ... + m_text.getLocalBounds().top});
+                                                          //!! The "canonical" SFML offest correction would
+                                                          //!! make the positioning inconsistent: some text
+                                                          //!! would then sit on the baseline, some won't etc.!
     m_text.setFillColor(Theme::click.textColor);
     m_text.setCharacterSize((unsigned)Theme::textSize);
     recomputeGeometry();
@@ -80,9 +83,10 @@ void Label::onThemeChanged()
 
 void Label::recomputeGeometry()
 {
+    auto bounds = m_text.getLocalBounds();
     Widget::setSize(
-        m_text.getLocalBounds().width + Theme::PADDING * 2  + m_text.getLocalBounds().left,
-        m_text.getLocalBounds().height + Theme::PADDING * 2 + m_text.getLocalBounds().top
+        bounds.width + Theme::PADDING * 2 + bounds.left,
+        bounds.height + Theme::PADDING * 2 + bounds.top
     );
 }
 
