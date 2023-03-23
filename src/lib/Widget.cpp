@@ -225,6 +225,7 @@ void Widget::onKeyReleased(const sf::Event::KeyEvent&) { }
 void Widget::onTextEntered(uint32_t) { }
 void Widget::onThemeChanged() { }
 void Widget::onResized() { }
+void Widget::onTick() { }
 
 
 // diagnostics ---------------------------------------------------------------

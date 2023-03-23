@@ -454,5 +454,7 @@ void background_thread_main(sfw::GUI& gui)
 		// and it's unhealthy (UB) to still use it.
 		do this_thread::sleep_for(chrono::milliseconds(50));
 		while (!toy_anim_on && gui);
+
+		cerr << gui.sessionTime() << "          \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
 	}
 }

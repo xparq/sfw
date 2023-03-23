@@ -10,6 +10,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Cursor.hpp>
+#include <SFML/System/Clock.hpp>
 
 #include <string>
 #include <map>
@@ -97,6 +98,9 @@ public:
      */
     sf::Vector2f getSize() const;
 
+    // Seconds since creating the GUI; will stop being refreshed while !active()
+    float sessionTime() const;
+
 private:
     /**
      * "Soft-reset" the GUI state, keeping the current config & widgets
@@ -114,12 +118,23 @@ private:
      */
     sf::Vector2f convertMousePosition(int x, int y) const;
 
+    // Callbacks -------------------------------------------------------------
+
+    // If the GUI doesn't manage the entire window, and its size hasn't been
+    // fixed explicitly, then it'll auto-grow as widgets are added (or removed).
+    // Certain internal functions may need to keep up with those changes.
+    //void onResized() override;
+
+    void onTick() override;
+
     std::error_code m_error;
     sf::RenderWindow& m_window;
     bool m_own_window;
     sfw::Theme::Cfg m_themeCfg;
     sfw::Wallpaper m_wallpaper;
     sf::Cursor::Type m_cursorType;
+    sf::Clock m_clock;
+    sf::Time m_sessionTime;
     std::map<std::string, Widget*> widgets;
     bool m_closed = false;
 };

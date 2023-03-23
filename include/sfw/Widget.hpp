@@ -68,13 +68,13 @@ public:
     Widget* setCallback(Callback callback);
 
     // The actual (derived) widgets should then provide specific overloads, as:
-    // InterestingWidget* setCallback(std::function<void(InterestingWidget*)> callback)
+    // SomeWidget* setCallback(std::function<void(SomeWidget*)> callback)
     // {
-    //     return (InterestingWidget*) Widget::setCallback([callback] (Widget* w) { callback( (InterestingWidget*)w ); });
+    //     return (SomeWidget*) Widget::setCallback([callback] (Widget* w) { callback( (SomeWidget*)w ); });
     // }
-    // InterestingWidget* setCallback(std::function<void()> callback)
+    // SomeWidget* setCallback(std::function<void()> callback)
     // {
-    //      return (InterestingWidget*) Widget::setCallback(callback);
+    //      return (SomeWidget*) Widget::setCallback(callback);
     // }
 
 
@@ -188,6 +188,7 @@ private:
     virtual void onTextEntered(uint32_t unicode);
     virtual void onThemeChanged();
     virtual void onResized();
+    virtual void onTick();
 
     WidgetContainer* m_parent;
     Widget* m_previous;

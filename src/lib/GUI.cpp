@@ -200,6 +200,9 @@ void GUI::render()
 {
     if (!active()) return;
 
+    // Hitch-hike the per-frame draw routine for updating the session time...
+    onTick();
+
     if (sfw::Theme::clearBackground)
     {
         if (m_wallpaper)
@@ -360,6 +363,33 @@ sf::Vector2f GUI::getSize() const
 {
     return m_own_window ? sf::Vector2f{(float)m_window.getSize().x, (float)m_window.getSize().y}
                         : Widget::getSize();
+}
+
+float GUI::sessionTime() const
+{
+    return m_sessionTime.asSeconds();
+}
+
+//----------------------------------------------------------------------------
+// Callbacks...
+//----------------------------------------------------------------------------
+/*
+void GUI::onResized()
+{
+}
+*/
+
+void GUI::onTick()
+{
+	m_sessionTime += m_clock.restart();
+
+	//!! Go through the set of registered timer callbacks to check if
+	//!! any of them are (over)due, and call those. (Note: most of them
+	//!! may have requested triggering on (relative) timeouts, rather than
+	//!! on "absolute" session time!)
+	//!!...
+	//!! Then remove the one-shot hooks:
+	//!! ...
 }
 
 } // namespace
