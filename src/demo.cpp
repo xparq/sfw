@@ -379,6 +379,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		                 std::get<sf::Color>(themes[DEFAULT_THEME].bg) : Theme::bgColor)
 		->setCallback([&](auto* w) {
 			Theme::bgColor = w->current();
+			demo.themeChanged();
 		})
 	);
 	// A pretty useless, but interesting clear-background checkbox

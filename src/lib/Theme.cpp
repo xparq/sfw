@@ -1,7 +1,8 @@
 #include "sfw/Theme.hpp"
+#include "sfw/util/diagnostics.hpp"
 
 #include <string>
-using std::string;
+	using std::string;
 
 namespace sfw
 {

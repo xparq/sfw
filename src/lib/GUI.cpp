@@ -170,6 +170,22 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
         return false;
     }
 
+    // Do we have a wallpaper to deal with?
+    // (Note: since it's not a widget (yet?...), it doesn't depend on the theme-changed notifications.)
+    if (std::holds_alternative<Theme::WallpaperCfg>(m_themeCfg.bg))
+	setWallpaper(std::get<Theme::WallpaperCfg>(m_themeCfg.bg).filename,
+                     std::get<Theme::WallpaperCfg>(m_themeCfg.bg).placement);
+    else
+        m_wallpaper.disable(); // There may be one from a previous theme, ditch it!
+
+    // OK, tell everyone about what just happened
+    themeChanged();
+
+    return true;
+}
+
+void GUI::themeChanged()
+{
     // Notify widgets of the change
     traverseChildren([](Widget* w) { w->onThemeChanged(); } );
         // Another reason to not use the widget registry map (besides "frugalism"
@@ -183,15 +199,6 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
     //! in turn also calls parent->recomputeGeometry() (via Widget::setSize)!
     //! (NOTE: there are ample chances of infinite looping here too, some of
     //! which I've duly explored already...)
-
-    // Do we have a wallpaper to deal with?
-    if (std::holds_alternative<Theme::WallpaperCfg>(m_themeCfg.bg))
-	setWallpaper(std::get<Theme::WallpaperCfg>(m_themeCfg.bg).filename,
-                     std::get<Theme::WallpaperCfg>(m_themeCfg.bg).placement);
-    else
-        m_wallpaper.disable(); // There may be one from a previous theme, ditch it!
-
-    return true;
 }
 
 

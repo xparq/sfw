@@ -1,17 +1,27 @@
 #include "sfw/Widgets/Slider.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/util/diagnostics.hpp"
 
-#include <SFML/Graphics/RenderTarget.hpp>
 #include <cmath>
+#include <algorithm>
+    using std::min, std::max;
 
 namespace sfw
 {
 
 Slider::Slider(float step, float length, Orientation orientation):
     m_orientation(orientation),
+    m_boxLength(length),
     m_step(step),
     m_value(0),
-    m_groove(Box::Input)
+    m_groove(Box::Input),
+    m_handle(Box::Click)
+{
+    updateGeometry();
+}
+
+
+void Slider::updateGeometry()
 {
     // (Using unsigned short here (instead of e.g. just unsigned or size_t)
     // shuts up the "possible loss of data" warnings... Plain short would be
@@ -21,13 +31,13 @@ Slider::Slider(float step, float length, Orientation orientation):
     unsigned short grooveHeight = (unsigned short)Theme::borderSize * 3;
     short grooveOffset = (short)(handleHeight - grooveHeight) / 2;
 
-    if (orientation == Horizontal)
+    if (m_orientation == Horizontal)
     {
-        m_groove.setSize(length, grooveHeight);
+        m_groove.setSize(m_boxLength, grooveHeight);
         m_groove.setPosition(0, grooveOffset);
         m_handle.setSize(handleWidth, handleHeight);
 
-        setSize(length, handleHeight);
+        setSize(m_boxLength, handleHeight);
 
         for (int i = 0; i < 4; ++i)
         {
@@ -40,17 +50,17 @@ Slider::Slider(float step, float length, Orientation orientation):
     }
     else
     {
-        m_groove.setSize(grooveHeight, length);
+        m_groove.setSize(grooveHeight, m_boxLength);
         m_groove.setPosition(grooveOffset, 0);
         m_handle.setSize(handleHeight, handleWidth);
 
-        setSize(handleHeight, length);
+        setSize(handleHeight, m_boxLength);
 
         for (int i = 0; i < 4; ++i)
         {
             m_progression[i].color = Theme::bgColor;
             m_progression[i].position.x = m_groove.getPosition().x + Theme::borderSize;
-            m_progression[i].position.y = m_groove.getSize().y - Theme::borderSize;
+            m_progression[i].position.y = m_groove.getPosition().y + Theme::borderSize;
         }
         m_progression[2].position.x += m_groove.getSize().x - Theme::borderSize * 2;
         m_progression[3].position.x += m_groove.getSize().x - Theme::borderSize * 2;
@@ -58,10 +68,38 @@ Slider::Slider(float step, float length, Orientation orientation):
     updateHandlePosition();
 }
 
-
-float Slider::getStep() const
+void Slider::updateHandlePosition()
 {
-    return m_step;
+    if (m_orientation == Horizontal)
+    {
+        float max = getSize().x - m_handle.getSize().x - Theme::borderSize * 2;
+        float x = floor(max * m_value / 100 + Theme::borderSize);
+        m_handle.setPosition(x, 0);
+        m_progression[2].position.x = x;
+        m_progression[3].position.x = x;
+    }
+    else
+    {
+        float max = getSize().y - m_handle.getSize().y - Theme::borderSize * 2;
+        float reverse_value = 100.f - m_value;
+        float y = floor(max * reverse_value / 100 + (float)Theme::borderSize);
+        m_handle.setPosition(0, y);
+        m_progression[0].position.y = y;
+        m_progression[2].position.y = y;
+    }
+}
+
+float Slider::mouseToValue(float x, float y) const
+{
+    float value;
+    if (m_orientation == Horizontal)
+        value = 100 * (x - Theme::borderSize) / (getSize().x - Theme::borderSize * 2);
+    else
+        value = 100 - (100 * (y - Theme::borderSize) / (getSize().y - Theme::borderSize * 2));
+
+    value = max(0.f, value);
+    value = min(100.f, value);
+    return value;
 }
 
 
@@ -72,10 +110,9 @@ Slider* Slider::setStep(float step)
     return this;
 }
 
-
-float Slider::getValue() const
+float Slider::getStep() const
 {
-    return m_value;
+    return m_step;
 }
 
 
@@ -104,26 +141,9 @@ Slider* Slider::setValue(float value)
     return this;
 }
 
-
-void Slider::updateHandlePosition()
+float Slider::getValue() const
 {
-    if (m_orientation == Horizontal)
-    {
-        float max = getSize().x - m_handle.getSize().x - Theme::borderSize * 2;
-        float x = floor(max * m_value / 100 + Theme::borderSize);
-        m_handle.setPosition(x, 0);
-        m_progression[2].position.x = x;
-        m_progression[3].position.x = x;
-    }
-    else
-    {
-        float max = getSize().y - m_handle.getSize().y - Theme::borderSize * 2;
-        float reverse_value = 100.f - m_value;
-        float y = floor(max * reverse_value / 100 + (float)Theme::borderSize);
-        m_handle.setPosition(0, y);
-        m_progression[0].position.y = y;
-        m_progression[2].position.y = y;
-    }
+    return m_value;
 }
 
 
@@ -134,9 +154,6 @@ void Slider::draw(const gfx::RenderContext& ctx) const
     ctx.target.draw(m_groove, sfml_renderstates);
     ctx.target.draw(m_progression, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
     ctx.target.draw(m_handle, sfml_renderstates);
-#ifdef DEBUG
-//    Widget::draw_outline(ctx);
-#endif
 }
 
 
@@ -172,11 +189,7 @@ void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void Slider::onMousePressed(float x, float y)
 {
-    if (m_orientation == Horizontal)
-        setValue(100 * x / getSize().x);
-    else
-        setValue(100 - (100 * (y) / getSize().y));
-
+    setValue(mouseToValue(x, y));
     m_handle.press();
 }
 
@@ -187,10 +200,13 @@ void Slider::onMouseMoved(float x, float y)
     {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
+            setValue(mouseToValue(x, y));
+/*
             if (m_orientation == Horizontal)
                 setValue(100 * x / getSize().x);
             else
                 setValue(100 - (100 * y / getSize().y));
+*/
         }
     }
     else if (m_handle.containsPoint(x, y))
@@ -223,6 +239,12 @@ void Slider::onStateChanged(WidgetState state)
         m_handle.applyState(state);
     }
 }
+
+void Slider::onThemeChanged()
+{
+    updateGeometry();
+}
+
 
 Slider* Slider::setCallback(std::function<void(Slider*)> callback)
 {

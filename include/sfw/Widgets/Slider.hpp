@@ -44,13 +44,18 @@ private:
     void onMouseReleased(float x, float y) override;
     void onMouseWheelMoved(int delta) override;
     void onStateChanged(WidgetState state) override;
+    void onThemeChanged() override;
+    // Helpers
+    void updateGeometry();
+    float mouseToValue(float x, float y) const;
 
     Orientation m_orientation;
+    float m_boxLength;
     float m_step;
     float m_value;
     Box m_groove;
-    sf::Vertex m_progression[4];
     Box m_handle;
+    sf::Vertex m_progression[4];
 };
 
 } // namespace

@@ -37,6 +37,11 @@ public:
     operator bool() { return active(); }
 
     bool setTheme(const sfw::Theme::Cfg& themeCfg);
+    /**
+     * Broadcast the onThemeChanged notification so widgets can pick up any
+     * manual changes made directly to the current (static) theme props.
+     */
+    void themeChanged();
 
     /**
      * Process events from the backend (i.e. SFML)
