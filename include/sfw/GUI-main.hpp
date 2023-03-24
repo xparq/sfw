@@ -92,9 +92,22 @@ public:
      * If `filename` is omitted, the wallpaper configured for the current theme
      * (if any) will be reset.
      */
-    void setWallpaper(std::string filename = "", Wallpaper::Placement placement = sfw::Wallpaper::Placement::Center);
+    void setWallpaper(const Wallpaper::Cfg& cfg);
+    void setWallpaper(std::string filename = "",
+                      Wallpaper::Placement placement = sfw::Wallpaper::Placement::Center,
+                      sf::Color tintColor = sf::Color::White);
     void disableWallpaper();
     bool hasWallpaper();
+    /**
+     * Tint the wallpaper and/or set its transparency (alpha) level
+     */
+    void setWallpaperColor(sf::Color tint);
+
+    /**
+     * Overloaded Widget::setPosition() for wallpaper support (etc.)
+     */
+    void setPosition(const sf::Vector2f& pos);
+    void setPosition(float x, float y);
 
     /**
      * Current GUI rectangle size: if the GUI manages (owns) the (host) window,
@@ -128,9 +141,16 @@ private:
     // If the GUI doesn't manage the entire window, and its size hasn't been
     // fixed explicitly, then it'll auto-grow as widgets are added (or removed).
     // Certain internal functions may need to keep up with those changes.
-    //void onResized() override;
-
+    void onResized() override;
     void onTick() override;
+    // Helpers
+    /**
+     * Fill the window if managing (owning) it, else just the GUI rect,
+     * with the current Theme::bgColor, then show the wallpaper, if set
+     * (The background fill is needed even if there's a wallpaper, because
+     * the image may be semi-transparent.)
+     */
+    void renderBackground();
 
     std::error_code m_error;
     sf::RenderWindow& m_window;

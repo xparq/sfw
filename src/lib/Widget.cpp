@@ -122,10 +122,13 @@ sf::Vector2f Widget::getAbsolutePosition() const
 
 void Widget::setSize(const sf::Vector2f& size)
 {
-    m_size = sf::Vector2f(roundf(size.x), roundf(size.y));
-
-    onResized();
-    if (!isRoot()) getParent()->recomputeGeometry();
+    auto new_size = sf::Vector2f(roundf(size.x), roundf(size.y));
+    if (m_size.x != new_size.x || m_size.y != new_size.y)
+    {
+        m_size = new_size;
+        onResized();
+        if (!isRoot()) getParent()->recomputeGeometry();
+    }
 }
 
 

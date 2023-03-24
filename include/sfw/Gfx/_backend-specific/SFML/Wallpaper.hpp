@@ -18,6 +18,20 @@ class Wallpaper: public GenericWallpaper, public sf::Drawable, public sf::Transf
     static constexpr sf::IntRect NullRect = {{0,0}, {0,0}};
 
 public:
+    struct Cfg
+    {
+        std::string filename;
+        Placement placement;
+        sf::Color tint;
+
+        Cfg(const std::string& f = "", Wallpaper::Placement p = Center, sf::Color c = sf::Color::White):
+            filename(f),
+            placement(p),
+            tint(c)
+        {}
+    };
+
+
     Wallpaper();
     Wallpaper(const std::string& filename, const sf::IntRect& r = NullRect);
     Wallpaper(const sf::Image& Wallpaper,  const sf::IntRect& r = NullRect);

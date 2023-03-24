@@ -51,9 +51,10 @@ int main()
 
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
-		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", Theme::WallpaperCfg{"asset/wallpaper.jpg"s, sfw::Wallpaper::Center},
+		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
+		  sfw::Wallpaper::Cfg{"asset/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,255,255,63)},
 		  17, "font/Liberation/LiberationSans-Regular.ttf" },
-		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), 12, "font/Liberation/LiberationSans-Regular.ttf" },
+		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
 		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
 	};
@@ -214,8 +215,7 @@ int main()
 
 	// Select sample text box color
 	auto optTxtBg = (new OBColor(ColorSelect_TEMPLATE))
-		->add("Default", std::holds_alternative<sf::Color>(themes[DEFAULT_THEME].bg) ?
-		                 std::get<sf::Color>(themes[DEFAULT_THEME].bg) : Theme::bgColor)
+		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
 			textrect.setFillColor(w->current());
 			w->setFillColor(w->current() * sf::Color(255, 255, 255, 64));
@@ -328,8 +328,7 @@ int main()
 			// Update the wallpaper on/off checkbox:
 			if (demo.getWidget("Wallpaper")) ((sfw::CheckBox*)demo.getWidget("Wallpaper"))->set(demo.hasWallpaper());
 			// Update the bg. color selector's "Default" option:
-			if (demo.getWidget("Bg. color")) ((OBColor*)demo.getWidget("Bg. color"))->set("Default",
-				std::holds_alternative<sf::Color>(themecfg.bg) ? std::get<sf::Color>(themecfg.bg) : Theme::bgColor);
+			if (demo.getWidget("Bg. color")) ((OBColor*)demo.getWidget("Bg. color"))->set("Default", themecfg.bgColor);
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
 	themeselect->select(DEFAULT_THEME);
@@ -373,10 +372,21 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	// Wallpaper on/off checkbox
 	bgform->add("Wallpaper", sfw::CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
 	                                       demo.hasWallpaper()));
+	// Wallpaper transparency slider
+	bgform->add("Wallpaper α", sfw::Slider(1, 75))
+		->setValue(10)
+		->setCallback([&](auto* w) {
+			assert(w->getWidget("theme-selector"));
+			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
+			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
+			                           themecfg.wallpaper.tint.g,
+			                           themecfg.wallpaper.tint.b,
+			                           uint8_t(w->getValue()*2.55)};
+			demo.setWallpaperColor(themecfg.wallpaper.tint);
+		});
 	// Window background color selector
 	right_bar->add(new Form)->add("Bg. color", (new OBColor(ColorSelect_TEMPLATE))
-		->add("Default", std::holds_alternative<sf::Color>(themes[DEFAULT_THEME].bg) ?
-		                 std::get<sf::Color>(themes[DEFAULT_THEME].bg) : Theme::bgColor)
+		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
 			Theme::bgColor = w->current();
 			demo.themeChanged();

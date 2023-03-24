@@ -12,7 +12,8 @@ Theme::Cfg Theme::DEFAULT =
 	.name = "",
 	.basePath = "asset/",
 	.textureFile = "texture/default.png",
-	.bg = sf::Color::White,
+	.bgColor = sf::Color::White,
+	.wallpaper = {},
 	.textSize = 12,
 	.fontFile = "font/default.ttf",
 };
@@ -39,18 +40,8 @@ bool Theme::Cfg::apply()
     }
     Theme::textSize = textSize;
 
-    assert( std::holds_alternative<sf::Color>(bg) || std::holds_alternative<WallpaperCfg>(bg) );
-    if (std::holds_alternative<sf::Color>(bg))
-    {
-        Theme::bgColor = std::get<sf::Color>(bg);
-        //!!This is pretty fragile, sort it out!...
-	// Also clear the current (leftover, possibly!) Wallpaper cfg.:
-        Theme::cfgWallpaper = {};
-    }
-    else
-    {
-        Theme::cfgWallpaper = std::get<WallpaperCfg>(bg);
-    }
+    Theme::bgColor = bgColor;
+    Theme::wallpaper = wallpaper;
 
     return true;
 }
@@ -70,8 +61,8 @@ size_t Theme::textSize = Theme::DEFAULT.textSize;
 Theme::Style Theme::click;
 Theme::Style Theme::input;
 
-sf::Color Theme::bgColor = sf::Color::Black;
-Theme::WallpaperCfg Theme::cfgWallpaper{};
+sf::Color Theme::bgColor = sf::Color::White;
+Wallpaper::Cfg Theme::wallpaper{};
 bool Theme::clearBackground = true;
 
 int Theme::borderSize = 1; //! Will get reset based on the loaded texture, so no use setting it here!

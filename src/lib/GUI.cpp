@@ -172,11 +172,12 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 
     // Do we have a wallpaper to deal with?
     // (Note: since it's not a widget (yet?...), it doesn't depend on the theme-changed notifications.)
-    if (std::holds_alternative<Theme::WallpaperCfg>(m_themeCfg.bg))
-	setWallpaper(std::get<Theme::WallpaperCfg>(m_themeCfg.bg).filename,
-                     std::get<Theme::WallpaperCfg>(m_themeCfg.bg).placement);
+    if (!m_themeCfg.wallpaper.filename.empty())
+        setWallpaper(m_themeCfg.wallpaper.filename,
+                     m_themeCfg.wallpaper.placement,
+                     m_themeCfg.wallpaper.tint);
     else
-        m_wallpaper.disable(); // There may be one from a previous theme, ditch it!
+        m_wallpaper.disable(); // There may be one from a previous theme -- ditch it!
 
     // OK, tell everyone about what just happened
     themeChanged();
@@ -203,6 +204,36 @@ void GUI::themeChanged()
 
 
 //----------------------------------------------------------------------------
+void GUI::renderBackground() //!!Move this to the renderer!
+{
+	if (sfw::Theme::clearBackground)
+	{
+		if (m_own_window)
+		{
+			m_window.clear(Theme::bgColor);
+		}
+		else
+		{
+			// Just clear the GUI rect
+			sf::RectangleShape bgRect(getSize());
+			bgRect.setPosition(getPosition());
+			bgRect.setFillColor(Theme::bgColor);
+			bgRect.setOutlineThickness(0);
+			//!!renderer.draw(bgRect);...
+			m_window.draw(bgRect);
+		}
+	}
+
+	// The wallpaper is an overlay on the background color!
+	// (It would become apparent e.g. when trying to change the transparency
+	// of an existing one: it won't work without erasing the prev. first!)
+	if (m_wallpaper)
+	{
+		m_window.draw(m_wallpaper); // Will (supposedly ;) ) only draw into the GUI rect!
+	}
+}
+
+//----------------------------------------------------------------------------
 void GUI::render()
 {
     if (!active()) return;
@@ -210,27 +241,7 @@ void GUI::render()
     // Hitch-hike the per-frame draw routine for updating the session time...
     onTick();
 
-    if (sfw::Theme::clearBackground)
-    {
-        if (m_wallpaper)
-        {
-            m_window.draw(m_wallpaper); // Will (supposedly ;) ) only draw into the GUI rect!
-        }
-        else if (m_own_window)
-        {
-            m_window.clear(Theme::bgColor);
-        }
-	else
-	{
-            // Just clear the GUI rect
-            sf::RectangleShape bgRect(getSize());
-            bgRect.setPosition(getPosition());
-            bgRect.setFillColor(Theme::bgColor);
-            bgRect.setOutlineThickness(0);
-            //!!m_renderer.draw(bgRect);
-            m_window.draw(bgRect);
-	}
-    }
+    /*m_renderer.*/renderBackground();
 
     // Draw whatever we have, via our a top-level widget container ancestor
     /*m_renderer.*/draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! function-style RenderContext(...) failed with CLANG
@@ -325,8 +336,14 @@ void GUI::setMouseCursor(sf::Cursor::Type cursorType)
     }
 }
 
+
 //----------------------------------------------------------------------------
-void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement)
+void GUI::setWallpaper(const Wallpaper::Cfg& cfg)
+{
+	setWallpaper(cfg.filename, cfg.placement, cfg.tint);
+}
+
+void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf::Color tint)
 {
 	// This may also get called way too early, even before any widgets
 	// are added (i.e. from the initial setTheme() via the ctor!), so
@@ -335,12 +352,22 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement)
 		return;
 
 	if (filename.empty())
-		filename = Theme::cfgWallpaper.filename;
+	{
+		filename = Theme::wallpaper.filename;
+		placement = Theme::wallpaper.placement;
+		tint = Theme::wallpaper.tint;
+	}
 	if (filename.empty())
 		return;
 
+	// Clear any previous background (unless disabled by the client via Theme::clearBackground)
+	// -- critical e.g. when changing the transparency of the existing one!
+	renderBackground();
+
 	m_wallpaper.setImage(filename);
 	m_wallpaper.setSize(getSize()); //!!Rename it to `setWallSize` or sg. more expressive!
+	m_wallpaper.setColor(tint);
+
 	//!! This shoud be done by the wallpaper itself!
 	using enum Wallpaper::Placement;
 	switch (placement)
@@ -351,18 +378,38 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement)
 	}
 }
 
+void GUI::setWallpaperColor(sf::Color tint)
+{
+	m_wallpaper.setColor(tint);
+}
+
 bool GUI::hasWallpaper()
 //!! Define the exact meaning of this query!
 //!! Checking only for m_wallpaper can only tell the current state of the current wallpaper,
 //!! which may be disabled/missing etc. for whatever reason, but clients might ask this question
 //!! to find out about the _intent_! (In which case the theme config must also be checked.)
 {
-    return m_wallpaper; //!!?? && !Theme::WallpaperCfg.filename.empty()
+	return m_wallpaper; //!!?? && !Theme::wallpaper.filename.empty()
 }
 
 void GUI::disableWallpaper()
 {
-    m_wallpaper.disable();
+	m_wallpaper.disable();
+	assert(!m_wallpaper);
+
+	renderBackground();
+}
+
+
+void GUI::setPosition(const sf::Vector2f& pos)
+{
+    if (m_wallpaper) m_wallpaper.setPosition(pos);
+    Widget::setPosition(pos);
+}
+
+void GUI::setPosition(float x, float y)
+{
+    setPosition(sf::Vector2f(x, y));
 }
 
 
@@ -380,11 +427,13 @@ float GUI::sessionTime() const
 //----------------------------------------------------------------------------
 // Callbacks...
 //----------------------------------------------------------------------------
-/*
 void GUI::onResized()
 {
+#ifdef DEBUG
+//cerr <<"resized to " <<getSize().x <<" x "<<getSize().y <<" /" <<sessionTime() <<endl;
+#endif
+	m_wallpaper.setSize(getSize());
 }
-*/
 
 void GUI::onTick()
 {

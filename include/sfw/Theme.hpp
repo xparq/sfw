@@ -8,23 +8,16 @@
 #include <SFML/Window.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 #include <map>
 #include <string>
-#include <variant>
 
 namespace sfw
 {
 class Theme
 {
 public:
-
-    //!! This should percolate to its proper home at `Wallpaper`!
-    struct WallpaperCfg
-    {
-        std::string filename;
-        Wallpaper::Placement placement;
-    };
 
     // Quick-And-Dirty Theme Config Pack
     // -- will gradually encompass the entire Theme class,
@@ -40,7 +33,8 @@ public:
         const char* name = nullptr;
         const char* basePath = nullptr;
         const char* textureFile = nullptr;
-        std::variant<sf::Color, WallpaperCfg> bg = sf::Color::Black;
+        sf::Color bgColor = sf::Color::Black;
+        Wallpaper::Cfg wallpaper = {};
         size_t textSize;
         const char* fontFile = nullptr;
 
@@ -96,7 +90,7 @@ public:
     static Style input;
 
     static sf::Color bgColor;
-    static WallpaperCfg cfgWallpaper;
+    static Wallpaper::Cfg wallpaper;
     static bool clearBackground;
     static int borderSize; // Recalculated from the actual texture, so don't try setting it directly...
     static int minWidgetWidth;

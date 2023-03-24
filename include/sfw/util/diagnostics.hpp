@@ -4,7 +4,7 @@
 
 	#include <cassert>
 	#include <iostream>
-	using std::cerr, std::endl;
+	using std::cerr, std::endl, std::hex;
 
 #else
 
