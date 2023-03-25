@@ -62,6 +62,9 @@ void ItemBox<T>::applyState(WidgetState state)
     case WidgetState::Focused:
         m_item.setFillColor(m_type == Click ? Theme::click.textColorFocus : Theme::input.textColorFocus);
         break;
+    case WidgetState::Disabled:
+        //!!Not implemented yet, see #223!
+        break;
     }
 }
 

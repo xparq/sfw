@@ -8,7 +8,7 @@ SRC     := $(shell cd "$(SRCDIR)"; find . -name "*.cpp" -type f)
 OUTDIR  := tmp/build
 OBJDIR  := $(OUTDIR)
 OBJ     := $(SRC:%.cpp=$(OBJDIR)/%.o)
-DEMO_OBJ:= demo
+DEMO_OBJ:= examples/demo
 TEST_OBJ:= test/main
 ifndef SFML_DIR
 SFML_DIR:= extern/sfml

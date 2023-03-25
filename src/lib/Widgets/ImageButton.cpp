@@ -122,6 +122,9 @@ void ImageButton::onStateChanged(WidgetState state)
     case WidgetState::Focused:
         m_background.setTextureRect(sf::IntRect({0, size.y * 2}, {size.x, size.y}));
         break;
+    case WidgetState::Disabled:
+        //!!Not implemented yet, see #223!
+        break;
     }
 }
 

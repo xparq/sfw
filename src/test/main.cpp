@@ -31,8 +31,8 @@ int main()
 	using namespace sfw;
 	using OBColor = sfw::OptionsBox<sf::Color>;
 
-	Theme::DEFAULT.basePath = "demo/";
-	Theme::DEFAULT.fontFile = "font/Vera.ttf";
+//	Theme::DEFAULT.basePath = "demo/";
+//	Theme::DEFAULT.fontFile = "font/Vera.ttf"; // relative to basePath!
 
 	Theme::PADDING = 2.f;
 	Theme::click.textColor      = hex2color("#191B18");
@@ -46,12 +46,13 @@ int main()
 
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
-		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
+		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
 		  sfw::Wallpaper::Cfg("asset/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,25,25,10)),
 		  11, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/Liberation/LiberationSans-Regular.ttf" },
-		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
-		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
+		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
+		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), {}, 12, "font/Vera.ttf" },
+		{ "\"factory default\"", },
 	};
 	const size_t DEFAULT_THEME = 0;
 
@@ -75,7 +76,7 @@ int main()
 	auto circlevista = new DrawHost([&](auto* w, auto ctx) {
 		sf::CircleShape circ(50);
 		sf::Texture backdrop;
-                if (!backdrop.loadFromFile("test/thumbnail.jpg")) return;
+                if (!backdrop.loadFromFile("test/example.jpg")) return;
 		circ.setTexture(&backdrop);
 		circ.setTextureRect({{10, 10}, {100, 100}});
 
@@ -98,7 +99,7 @@ int main()
 	auto gh171form = test_hbox->add(new Form);
 	gh171form->add("#171 autocast", new sfw::TextBox(50))->setText("OK!");
 	//#171 + #168 (with an Image*):
-	gh171form->add((new Image("test/thumbnail.jpg"))->rescale(0.25), new sfw::TextBox(50))->setText("171 + 168 OK!");
+	gh171form->add((new Image("test/example.jpg"))->rescale(0.25), new sfw::TextBox(50))->setText("171 + 168 OK!");
 	//#171 + #168 + template widget + move
 	gh171form->add(new Label("tempWidget"), sfw::TextBox(70))->setText("171/tmp + 168 OK!");
 	//#171, template-move also for the "label":
@@ -410,8 +411,8 @@ int main()
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
-cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
+cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
 		});
 

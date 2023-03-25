@@ -143,6 +143,9 @@ const sf::IntRect& Theme::getTextureRect(Box::Type type, WidgetState state)
     case WidgetState::Focused:
         id = type == Box::Click ? BOX_FOCUSED : BOX_INPUT_FOCUSED;
         break;
+    case WidgetState::Disabled:
+        //!!Not implemented yet, see #223!
+        break;
     }
     return m_subrects[id];
 }

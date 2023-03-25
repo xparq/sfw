@@ -36,8 +36,8 @@ int main()
 
 	// Customizing some theme props. (optional)
 
-	Theme::DEFAULT.basePath = "demo/";
-	Theme::DEFAULT.fontFile = "font/Vera.ttf";
+//	Theme::DEFAULT.basePath = "demo/";
+//	Theme::DEFAULT.fontFile = "font/Vera.ttf"; // relative to basePath
 
 	Theme::PADDING = 2.f;
 	Theme::click.textColor      = hex2color("#191B18");
@@ -51,12 +51,13 @@ int main()
 
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
-		{ "Default (\"Baseline\")", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
+		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
 		  sfw::Wallpaper::Cfg{"asset/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,255,255,63)},
 		  17, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/Liberation/LiberationSans-Regular.ttf" },
-		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), },
-		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), },
+		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
+		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), {}, 12, "font/Vera.ttf" },
+		{ "factory default" },
 	};
 	const size_t DEFAULT_THEME = 0;
 
@@ -281,11 +282,11 @@ int main()
 	// Image directly from file
 	auto vboximg = main_hbox->add(new VBox);
 	vboximg->add(sfw::Label("Image (directly from file):"));
-	vboximg->add(sfw::Image("demo/thumbnail.jpg"));
+	vboximg->add(sfw::Image("demo/example.jpg"));
 
 	// Image crop + scaling directly from file
 	vboximg->add(sfw::Label("Image crop + zoom:"));
-	vboximg->add(sfw::Image("demo/thumbnail.jpg", {{100, 110}, {30, 20}}))->scale(3);
+	vboximg->add(sfw::Image("demo/example.jpg", {{100, 110}, {30, 20}}))->scale(3);
 
 	// Image from file, cropped dynamically
 	vboximg->add(sfw::Label("Dynamic cropping:"));
@@ -343,8 +344,8 @@ int main()
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
-cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			themecfg.textSize = 8 + size_t(w->getValue() / 10);
+cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
 		});
 
