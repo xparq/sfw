@@ -45,7 +45,6 @@ private:
     // Callbacks
     void onStateChanged(WidgetState state) override;
     void onThemeChanged() override;
-    void onResized() override;
     void onMouseReleased(float x, float y) override;
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
 
