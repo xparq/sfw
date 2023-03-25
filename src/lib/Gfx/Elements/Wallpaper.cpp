@@ -131,19 +131,6 @@ sf::Vector2f Wallpaper::getSize() const
 }
 
 
-Wallpaper::operator bool() const
-{
-    return m_vertices[3].position.x > m_vertices[0].position.x
-        && m_vertices[3].position.y > m_vertices[0].position.y;
-}
-
-
-void Wallpaper::disable()
-{
-    setSize({0,0});
-    assert(!*this);
-}
-
 /*!!
 void Wallpaper::draw(const gfx::RenderContext& ctx) const
 {

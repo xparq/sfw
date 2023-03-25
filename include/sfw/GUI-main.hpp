@@ -143,6 +143,11 @@ private:
     // Certain internal functions may need to keep up with those changes.
     void onResized() override;
     void onTick() override;
+    // If the user had changed the theme params. directly, GUI.setTheme() should
+    // then be called, too, which would in turn trigger this callback (just like
+    // for all the other widgets)
+    void onThemeChanged() override;
+
     // Helpers
     /**
      * Fill the window if managing (owning) it, else just the GUI rect,

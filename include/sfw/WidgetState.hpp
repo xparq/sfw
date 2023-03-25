@@ -9,7 +9,8 @@ enum class WidgetState
     Default,
     Hovered,
     Pressed,
-    Focused
+    Focused,
+    Disabled
 };
 
 } // namespace

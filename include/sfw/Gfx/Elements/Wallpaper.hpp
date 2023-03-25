@@ -2,6 +2,8 @@
 #define SFW_WALLPAPER_HPP
 
 #include "sfw/Gfx/Render.hpp"
+#include "sfw/WidgetState.hpp"
+
 #include <string>
 
 namespace sfw
@@ -38,8 +40,12 @@ public:
 	};
 	using enum Placement;
 
-	virtual void disable() = 0;
+	void disable() { state = WidgetState::Disabled; }
+	void enable()  { state = WidgetState::Default; }
+	operator bool() const { return state == WidgetState::Default; }
+
 private:
+	WidgetState state = WidgetState::Default;
 };
 
 } // namespace

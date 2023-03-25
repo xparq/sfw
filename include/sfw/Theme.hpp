@@ -33,7 +33,7 @@ public:
         const char* name = nullptr;
         const char* basePath = nullptr;
         const char* textureFile = nullptr;
-        sf::Color bgColor = sf::Color::Black;
+        sf::Color bgColor = sf::Color::White; // no "unset" color, so must use a sensible default here
         Wallpaper::Cfg wallpaper = {};
         size_t textSize;
         const char* fontFile = nullptr;

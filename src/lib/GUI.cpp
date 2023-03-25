@@ -170,15 +170,6 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
         return false;
     }
 
-    // Do we have a wallpaper to deal with?
-    // (Note: since it's not a widget (yet?...), it doesn't depend on the theme-changed notifications.)
-    if (!m_themeCfg.wallpaper.filename.empty())
-        setWallpaper(m_themeCfg.wallpaper.filename,
-                     m_themeCfg.wallpaper.placement,
-                     m_themeCfg.wallpaper.tint);
-    else
-        m_wallpaper.disable(); // There may be one from a previous theme -- ditch it!
-
     // OK, tell everyone about what just happened
     themeChanged();
 
@@ -187,7 +178,12 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 
 void GUI::themeChanged()
 {
-    // Notify widgets of the change
+    // Notify widgets of the change...
+
+    // Start with the GUI itself
+    onThemeChanged();
+
+    // Then all the rest
     traverseChildren([](Widget* w) { w->onThemeChanged(); } );
         // Another reason to not use the widget registry map (besides "frugalism"
         // and that it's not even intended for this (i.e. it may not even contain
@@ -340,7 +336,10 @@ void GUI::setMouseCursor(sf::Cursor::Type cursorType)
 //----------------------------------------------------------------------------
 void GUI::setWallpaper(const Wallpaper::Cfg& cfg)
 {
-	setWallpaper(cfg.filename, cfg.placement, cfg.tint);
+	if (cfg.filename.empty())
+		m_wallpaper.disable(); // There may be one from a previous theme -- ditch it!
+	else
+		setWallpaper(cfg.filename, cfg.placement, cfg.tint);
 }
 
 void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf::Color tint)
@@ -360,13 +359,10 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf:
 	if (filename.empty())
 		return;
 
-	// Clear any previous background (unless disabled by the client via Theme::clearBackground)
-	// -- critical e.g. when changing the transparency of the existing one!
-	renderBackground();
-
 	m_wallpaper.setImage(filename);
 	m_wallpaper.setSize(getSize()); //!!Rename it to `setWallSize` or sg. more expressive!
 	m_wallpaper.setColor(tint);
+	m_wallpaper.enable();
 
 	//!! This shoud be done by the wallpaper itself!
 	using enum Wallpaper::Placement;
@@ -396,8 +392,6 @@ void GUI::disableWallpaper()
 {
 	m_wallpaper.disable();
 	assert(!m_wallpaper);
-
-	renderBackground();
 }
 
 
@@ -424,9 +418,17 @@ float GUI::sessionTime() const
     return m_sessionTime.asSeconds();
 }
 
+
 //----------------------------------------------------------------------------
 // Callbacks...
 //----------------------------------------------------------------------------
+
+void GUI::onThemeChanged()
+{
+    setWallpaper(Theme::wallpaper);
+}
+
+
 void GUI::onResized()
 {
 #ifdef DEBUG
@@ -434,6 +436,7 @@ void GUI::onResized()
 #endif
 	m_wallpaper.setSize(getSize());
 }
+
 
 void GUI::onTick()
 {

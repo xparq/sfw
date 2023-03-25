@@ -56,11 +56,6 @@ public:
 
     Wallpaper* setColor(const sf::Color& color);
 
-    operator bool() const;
-
-// Virtuals ------------------------------------------------------------------
-	void disable() override;
-
 private:
 //    void draw(const gfx::RenderContext& ctx) const override;
     void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
