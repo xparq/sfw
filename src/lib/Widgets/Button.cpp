@@ -104,7 +104,7 @@ void Button::onMouseReleased(float x, float y)
 
 void Button::onKeyPressed(const sf::Event::KeyEvent& key)
 {
-    if (key.code == sf::Keyboard::Enter)
+    if (key.code == sf::Keyboard::Enter || key.code == sf::Keyboard::Space)
     {
         triggerCallback();
         m_box.press();
