@@ -13,7 +13,7 @@
 #include <SFML/System/Clock.hpp>
 
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <system_error>
 
 namespace sfw
@@ -165,7 +165,7 @@ private:
     sf::Cursor::Type m_cursorType;
     sf::Clock m_clock;
     sf::Time m_sessionTime;
-    std::map<std::string, Widget*> widgets;
+    std::unordered_map<std::string, Widget*> widgets;
     bool m_closed = false;
 };
 

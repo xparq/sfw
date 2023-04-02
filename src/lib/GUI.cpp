@@ -185,10 +185,11 @@ void GUI::themeChanged()
 
     // Then all the rest
     traverseChildren([](Widget* w) { w->onThemeChanged(); } );
-        // Another reason to not use the widget registry map (besides "frugalism"
-        // and that it's not even intended for this (i.e. it may not even contain
-        // every widget!) that std::map reorders its content alphabetically,
-        // which is pretty awkward here (e.g. for diagnostics).
+	// Another reason to not use the widget registry map (besides "general
+	// frugalism", and that it's not intended for this (i.e. it may not
+	// even contain every widget!), is that std::map reorders its content
+	// alphabetically, which is pretty awkward here (e.g. for diagnostics).
+	// (Note: std::unordered_map won't preserve the original order either!)
 
     //! This would be redundant in the current model:
     //!traverseChildren([](Widget* w) { w->recomputeGeometry(); } );
@@ -220,7 +221,7 @@ void GUI::renderBackground() //!!Move this to the renderer!
 		}
 	}
 
-	// The wallpaper is an overlay on the background color!
+	// The wallpaper is an overlay on top of the background color!
 	// (It would become apparent e.g. when trying to change the transparency
 	// of an existing one: it won't work without erasing the prev. first!)
 	if (m_wallpaper)
