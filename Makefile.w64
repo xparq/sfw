@@ -1,4 +1,4 @@
-# GNU Makefile for Linux (native GCC/CLANG, locally installed SFML)
+# GNU Makefile for Windows + MinGW or w64devkit
 
 LIBNAME := sfw
 DEMO    := $(LIBNAME)-demo
@@ -17,19 +17,30 @@ SFML_DIR:= extern/sfml
 endif
 CC      := g++
 CFLAGS  := -I$(SFML_DIR)/include -I./include -std=c++20 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
-LDFLAGS := -L$(SFML_DIR)/lib -lGL
-
+# --- Linux:
+#LDFLAGS := -L$(SFML_DIR)/lib -lGL
+# --- Windows:
+LDFLAGS := -L$(SFML_DIR)/lib -lopengl32 -lwinmm -lgdi32
+CFLAGS  := $(CFLAGS) -mwindows
 #-----------------------------------------------------------------------------
 # Debug / Release adjustments (Use `make DEBUG=1` for a debug build!):
 ifndef DEBUG
 DEBUG=0
 endif
-CC_FLAGS_DEBUG_0=-DNDEBUG
-CC_FLAGS_DEBUG_1=-DDEBUG
-LINK_FLAGS_DEBUG_0=-lsfml-graphics -lsfml-window -lsfml-system
-LINK_FLAGS_DEBUG_1=-lsfml-graphics-d -lsfml-window-d -lsfml-system-d
-CFLAGS  := $(CFLAGS) $(CC_FLAGS_DEBUG_$(DEBUG))
-LDFLAGS := $(LDFLAGS) $(LINK_FLAGS_DEBUG_$(DEBUG))
+#ifndef SFML_LINKMODE
+SFML_STATIC=1
+#endif
+CC_FLAGS_SFMLSTATIC_1_DEBUG_0=-DNDEBUG -DSFML_STATIC
+CC_FLAGS_SFMLSTATIC_1_DEBUG_1=-DDEBUG -DSFML_STATIC
+CC_FLAGS_SFMLSTATIC_0_DEBUG_0=-DNDEBUG
+CC_FLAGS_SFMLSTATIC_0_DEBUG_1=-DDEBUG
+LINK_FLAGS_SFMLSTATIC_1_DEBUG_0=-lsfml-graphics-s -lsfml-window-s -lsfml-system-s
+LINK_FLAGS_SFMLSTATIC_1_DEBUG_1=-lsfml-graphics-s-d -lsfml-window-s-d -lsfml-system-s-d
+LINK_FLAGS_SFMLSTATIC_0_DEBUG_0=-lsfml-graphics -lsfml-window -lsfml-system
+LINK_FLAGS_SFMLSTATIC_0_DEBUG_1=-lsfml-graphics-d -lsfml-window-d -lsfml-system-d
+CFLAGS  :=    $(CFLAGS) $(CC_FLAGS_SFMLSTATIC_$(SFML_STATIC)_DEBUG_$(DEBUG))
+LDFLAGS := $(LDFLAGS) $(LINK_FLAGS_SFMLSTATIC_$(SFML_STATIC)_DEBUG_$(DEBUG))
+$(info $(LDFLAGS))
 
 #-----------------------------------------------------------------------------
 $(DEMO): $(OBJDIR)/$(DEMO_OBJ).o $(LIBFILE)

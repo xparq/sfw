@@ -1,6 +1,7 @@
 #!/bin/sh
-# We are supposed to be in the repo's work-tree root; at least
-# that seems to be the case when being run from a GH Action...
+# Linux only! (See the hardcoded SFML dl. package name below, for example...)
+# NOTE:	We are supposed to be in the repo's work-tree root. (And that seems
+#	to be the case when being run from a GH Action.)
 
 main(){
 	SFML_LIBROOT=`realpath -Lms ${SFML_DIR:-extern/sfml}`
