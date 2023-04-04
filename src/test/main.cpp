@@ -47,7 +47,7 @@ int main()
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
 		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
-		  sfw::Wallpaper::Cfg("asset/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,25,25,10)),
+		  sfw::Wallpaper::Cfg("demo/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,25,25,10)),
 		  11, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/Liberation/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },

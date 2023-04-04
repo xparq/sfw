@@ -22,7 +22,7 @@ Theme::Cfg Theme::DEFAULT =
 bool Theme::Cfg::apply()
 {
     // Pick up the defaults first...
-    // (This really should be a constructor, but that would kill the designated inits... :-/ )
+    // (This really should be a constructor, but that would kill the stupid C++ designated init. :-/ )
     if (!name)         name        = Theme::DEFAULT.name;
     if (!basePath)     basePath    = Theme::DEFAULT.basePath;
     if (!fontFile)     fontFile    = Theme::DEFAULT.fontFile;

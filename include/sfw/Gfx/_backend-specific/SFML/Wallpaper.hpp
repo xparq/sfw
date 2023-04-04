@@ -49,9 +49,10 @@ public:
     Wallpaper* setCropRect(const sf::IntRect& r);
     sf::IntRect cropRect() const;
 
+    // Scaling based on the original image size
     Wallpaper* scale(float factor);
     float  scale() const { return m_scalingFactor; }
-    // Relative scaling based on the current size, not the original
+    // Relative scaling based on the current size
     Wallpaper* rescale(float factor);
 
     Wallpaper* setColor(const sf::Color& color);
