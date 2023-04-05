@@ -1,82 +1,109 @@
-# GNU Makefile for Windows + MinGW or w64devkit
+# GNU Makefile for Windows + MinGW (or w64devkit)
+# NOTE: Make sure SFML_DIR points to the correct SFML package!
 
-LIBNAME := sfw
-DEMO    := $(LIBNAME)-demo
-TEST    := $(LIBNAME)-test
-LIBDIR  := lib
-LIBFILE := $(LIBDIR)/lib$(LIBNAME).a
-SRCDIR  := src
-SRC     := $(shell cd "$(SRCDIR)"; find . -name "*.cpp" -type f)
-OUTDIR  := tmp/build
-OBJDIR  := $(OUTDIR)
-OBJ     := $(SRC:%.cpp=$(OBJDIR)/%.o)
-DEMO_OBJ:= examples/demo
-TEST_OBJ:= test/main
+NAME     := sfw-mingw
+LIBNAME  := $(NAME)
+DEMO     := $(NAME)-demo
+TEST     := $(NAME)-test
+LIBDIR   := lib/mingw
+SRCDIR   := src
+SRC      := $(shell cd "$(SRCDIR)"; find . -name "*.cpp" -type f)
+OUTDIR   := tmp/build/mingw
+OBJDIR   := $(OUTDIR)
+DEMO_OBJ := examples/demo
+TEST_OBJ := test/main
 ifndef SFML_DIR
-SFML_DIR:= extern/sfml
+SFML_DIR := extern/sfml.mingw
 endif
-CC      := g++
-CFLAGS  := -I$(SFML_DIR)/include -I./include -std=c++20 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
-# --- Linux:
-#LDFLAGS := -L$(SFML_DIR)/lib -lGL
-# --- Windows:
-LDFLAGS := -L$(SFML_DIR)/lib -lopengl32 -lwinmm -lgdi32
-CFLAGS  := $(CFLAGS) -mwindows
-#-----------------------------------------------------------------------------
-# Debug / Release adjustments (Use `make DEBUG=1` for a debug build!):
-ifndef DEBUG
-DEBUG=0
+CC       := g++
+
+CFLAGS   := -I$(SFML_DIR)/include -I./include -std=c++20 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
+# --- Windows/MinGW:
+LDFLAGS  := $(LDFLAGS) -L$(SFML_DIR)/lib
+LDFLAGS  := $(LDFLAGS)
+LDFLAGS  := $(LDFLAGS) -lwinmm -lgdi32 -lopengl32
+
+ifeq "$(shell echo ${WINDIR})" ""
+# Not Windows (assuming "something Linux-like")...
+TERM_YELLOW   := \033[1;33m
+TERM_GREEN    := \033[1;32m
+TERM_NO_COLOR := \033[0m
+else
+# Windows...
+EXE_SUFFIX :=.exe
 endif
-#ifndef SFML_LINKMODE
-SFML_STATIC=1
-#endif
-CC_FLAGS_SFMLSTATIC_1_DEBUG_0=-DNDEBUG -DSFML_STATIC
-CC_FLAGS_SFMLSTATIC_1_DEBUG_1=-DDEBUG -DSFML_STATIC
-CC_FLAGS_SFMLSTATIC_0_DEBUG_0=-DNDEBUG
-CC_FLAGS_SFMLSTATIC_0_DEBUG_1=-DDEBUG
-LINK_FLAGS_SFMLSTATIC_1_DEBUG_0=-lsfml-graphics-s -lsfml-window-s -lsfml-system-s
-LINK_FLAGS_SFMLSTATIC_1_DEBUG_1=-lsfml-graphics-s-d -lsfml-window-s-d -lsfml-system-s-d
-LINK_FLAGS_SFMLSTATIC_0_DEBUG_0=-lsfml-graphics -lsfml-window -lsfml-system
-LINK_FLAGS_SFMLSTATIC_0_DEBUG_1=-lsfml-graphics-d -lsfml-window-d -lsfml-system-d
-CFLAGS  :=    $(CFLAGS) $(CC_FLAGS_SFMLSTATIC_$(SFML_STATIC)_DEBUG_$(DEBUG))
-LDFLAGS := $(LDFLAGS) $(LINK_FLAGS_SFMLSTATIC_$(SFML_STATIC)_DEBUG_$(DEBUG))
-$(info $(LDFLAGS))
 
 #-----------------------------------------------------------------------------
-$(DEMO): $(OBJDIR)/$(DEMO_OBJ).o $(LIBFILE)
-	@echo "\033[1;33mlinking the demo\033[0m $@"
-	@$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
-	@echo "\033[1;32mDone!\033[0m"
+# Build alternatives (debug & link modes)...
+#   DEBUG must be 0 or 1
+#   SFML_LINKMODE must be dll or static
+DEBUG ?= 0
+SFML_LINKMODE ?= static
 
-$(TEST): $(OBJDIR)/$(TEST_OBJ).o $(LIBFILE)
-	@echo "\033[1;33mlinking the test executable\033[0m $@"
+FILE_SUFFIX_DEBUG_1                      := -d
+DIR_SUFFIX_DEBUG_1                       := .d
+FILE_SUFFIX_SFML_LINKMODE_dll_DEBUG_1    := -d
+FILE_SUFFIX_SFML_LINKMODE_static_DEBUG_0 := -s
+FILE_SUFFIX_SFML_LINKMODE_static_DEBUG_1 := -s-d
+CC_FLAGS_SFML_LINKMODE_static_DEBUG_0    := -DNDEBUG -DSFML_STATIC
+CC_FLAGS_SFML_LINKMODE_static_DEBUG_1    := -DDEBUG -DSFML_STATIC
+CC_FLAGS_SFML_LINKMODE_dll_DEBUG_0       := -DNDEBUG
+CC_FLAGS_SFML_LINKMODE_dll_DEBUG_1       := -DDEBUG
+LINK_FLAGS_SFML_LINKMODE_static_DEBUG_0  := -lsfml-graphics-s   -lsfml-window-s   -lsfml-system-s   -lfreetype -lopengl32 -lwinmm -lgdi32
+LINK_FLAGS_SFML_LINKMODE_static_DEBUG_1  := -lsfml-graphics-s-d -lsfml-window-s-d -lsfml-system-s-d -lfreetype -lopengl32 -lwinmm -lgdi32
+LINK_FLAGS_SFML_LINKMODE_dll_DEBUG_0     := -lsfml-graphics -lsfml-window -lsfml-system       -lwinmm -lgdi32 -lopengl32
+LINK_FLAGS_SFML_LINKMODE_dll_DEBUG_1     := -lsfml-graphics-d -lsfml-window-d -lsfml-system-d -lwinmm -lgdi32 -lopengl32
+
+FILE_SUFFIX :=           $(FILE_SUFFIX_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
+CFLAGS      :=    $(CFLAGS) $(CC_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
+LDFLAGS     := $(LDFLAGS) $(LINK_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
+
+DEMO_EXE := $(DEMO)$(FILE_SUFFIX)$(EXE_SUFFIX)
+TEST_EXE := $(TEST)$(FILE_SUFFIX)$(EXE_SUFFIX)
+# Under GCC the same lib (i.e. compilation mode) seems to work just fine 
+# for linking with both the static and dynamic SFML libs, so enough to just
+# dispatch for debug mode:
+OBJDIR   := $(OUTDIR)$(DIR_SUFFIX_DEBUG_$(DEBUG))
+OBJ      := $(SRC:%.cpp=$(OBJDIR)/%.o)
+LIBNAME  := $(LIBNAME)$(FILE_SUFFIX_DEBUG_$(DEBUG))
+LIBFILE  := $(LIBDIR)/lib$(LIBNAME).a
+
+#-----------------------------------------------------------------------------
+all: $(DEMO_EXE) $(TEST_EXE)
+
+$(DEMO_EXE): $(OBJDIR)/$(DEMO_OBJ).o $(LIBFILE)
+	@echo "$(TERM_YELLOW)linking the demo ($(DEMO_EXE))$(TERM_NO_COLOR) $@"
 	@$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
-	@echo "\033[1;32mDone!\033[0m"
+	@echo "$(TERM_GREEN)Done!$(TERM_NO_COLOR)"
+
+$(TEST_EXE): $(OBJDIR)/$(TEST_OBJ).o $(LIBFILE)
+	@echo "$(TERM_YELLOW)linking the test ($(TEST_EXE))$(TERM_NO_COLOR) $@"
+	@$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+	@echo "$(TERM_GREEN)Done!$(TERM_NO_COLOR)"
 
 $(LIBFILE): $(OBJ)
 	@mkdir -p $(LIBDIR)
-	@echo "\033[1;33mcreating library\033[0m $@"
+	@echo "$(TERM_YELLOW)creating library$(TERM_NO_COLOR) $@"
 	@ar crvf $@ $(OBJ)
 
 # Obj. files for the library, test, demo, examples etc.
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
-	@echo "\033[1;33mcompiling\033[0m $<"
+	@echo "$(TERM_YELLOW)compiling$(TERM_NO_COLOR) $<"
 	@mkdir -p $(shell dirname $@)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-test: $(TEST)
-	@echo "\033[1;33mRunning tests...\033[0m $(TEST)"
-	@$(TEST)
+test: $(TEST_EXE)
+	@echo "$(TERM_YELLOW)Running tests...$(TERM_NO_COLOR) $(TEST_EXE)"
+	@$(TEST_EXE)
 
 clean:
-	@echo "\033[1;33mremoving\033[0m $(OUTDIR)"
+	@echo "$(TERM_YELLOW)removing$(TERM_NO_COLOR) $(OUTDIR) & $(LIBDIR)"
 	-@rm -r $(LIBDIR)
 	-@rm -r $(OUTDIR)
 
 mrproper: clean
-	@echo "\033[1;33mremoving\033[0m $(DEMO)"
-	-@rm $(DEMO)
-	@echo "\033[1;33mremoving\033[0m $(TEST)"
-	-@rm $(TEST)
+	@echo "$(TERM_YELLOW)removing$(TERM_NO_COLOR) $(DEMO_EXE)"
+	-@rm $(DEMO_EXE)
+	@echo "$(TERM_YELLOW)removing$(TERM_NO_COLOR) $(TEST_EXE)"
+	-@rm $(TEST_EXE)
 
-all: mrproper $(TEST) $(DEMO)
