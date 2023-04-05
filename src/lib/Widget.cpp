@@ -225,7 +225,7 @@ void Widget::onMouseReleased(float, float) { }
 void Widget::onMouseWheelMoved(int) { }
 void Widget::onKeyPressed(const sf::Event::KeyEvent&) { }
 void Widget::onKeyReleased(const sf::Event::KeyEvent&) { }
-void Widget::onTextEntered(uint32_t) { }
+void Widget::onTextEntered(char32_t) { }
 void Widget::onThemeChanged() { }
 void Widget::onResized() { }
 void Widget::onTick() { }

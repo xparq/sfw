@@ -27,7 +27,7 @@ protected:
     void onMouseWheelMoved(int delta) override;
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onKeyReleased(const sf::Event::KeyEvent& key) override;
-    void onTextEntered(uint32_t unicode) override;
+    void onTextEntered(char32_t unichar) override;
     void onMouseLeave() override;
 
     inline Layout* toLayout() override { return this; }

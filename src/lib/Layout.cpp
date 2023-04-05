@@ -220,11 +220,11 @@ void Layout::onKeyReleased(const sf::Event::KeyEvent& key)
 }
 
 
-void Layout::onTextEntered(uint32_t unicode)
+void Layout::onTextEntered(char32_t unichar)
 {
     if (m_focus)
     {
-        m_focus->onTextEntered(unicode);
+        m_focus->onTextEntered(unichar);
     }
 }
 

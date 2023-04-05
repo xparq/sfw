@@ -107,7 +107,6 @@ public:
      */
     Widget* getWidget(const std::string& name) const;
 
-
 protected:
 //----------------------
 friend class WidgetContainer;
@@ -116,7 +115,7 @@ friend class GUI;
 //----------------------
 
     Widget();
-    virtual ~Widget() {}
+    virtual ~Widget() = default;
 
     void setSize(const sf::Vector2f& size);
     void setSize(float width, float height);
@@ -136,7 +135,7 @@ friend class GUI;
     virtual Layout* toLayout() { return nullptr; }
 
     /**
-     * Set the parent (container) of the widget
+     * Set/get the parent (container) of the widget
      */
     void setParent(WidgetContainer* parent);
     WidgetContainer* getParent() const { return m_parent; }
@@ -185,7 +184,7 @@ private:
     virtual void onMouseWheelMoved(int delta);
     virtual void onKeyPressed(const sf::Event::KeyEvent& key);
     virtual void onKeyReleased(const sf::Event::KeyEvent& key);
-    virtual void onTextEntered(uint32_t unicode);
+    virtual void onTextEntered(char32_t unichar);
     virtual void onThemeChanged();
     virtual void onResized();
     virtual void onTick();

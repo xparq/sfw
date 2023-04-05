@@ -379,9 +379,9 @@ void TextBox::onMouseMoved(float x, float)
 }
 
 
-void TextBox::onTextEntered(uint32_t unicode)
+void TextBox::onTextEntered(char32_t unichar)
 {
-    if (unicode > 30 && (unicode < 127 || unicode > 159))
+    if (unichar > 30 && (unichar < 127 || unichar > 159))
     {
         // Delete selected text when a new input is received
         deleteSelectedText();
@@ -389,7 +389,7 @@ void TextBox::onTextEntered(uint32_t unicode)
         if (string.getSize() < m_maxLength)
         {
             // Insert character in string at cursor position
-            string.insert(m_cursorPos, unicode);
+            string.insert(m_cursorPos, unichar);
             m_text.setString(string);
             setCursorPos(m_cursorPos + 1);
         }

@@ -100,7 +100,7 @@ private:
     void onMousePressed(float x, float y) override;
     void onMouseReleased(float x, float y) override;
     void onMouseMoved(float x, float y) override;
-    void onTextEntered(uint32_t unicode) override;
+    void onTextEntered(char32_t unichar) override;
     void onStateChanged(WidgetState state) override;
     void onThemeChanged() override;
 
