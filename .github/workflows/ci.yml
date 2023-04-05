@@ -1,4 +1,4 @@
-name: Build
+name: Build (Linux)
 
 on: [workflow_dispatch, push, pull_request]
 
@@ -6,28 +6,29 @@ env:
   SFML_DIR: extern/sfml
 
 jobs:
-  lint:
-    name: Clang-format - ENFORCING DISABLED (see #17)!
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install dependencies
-        run: sudo apt install clang-format
-      - name: Run clang-format
-        run: tooling/lint.sh --dry-run
-        # -Werror
+#  lint:
+#    name: Clang-format - ENFORCING DISABLED (see #17)!
+#    runs-on: ubuntu-22.04
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Install dependencies
+#        run: sudo apt install clang-format
+#      - name: Run clang-format
+#        run: tooling/lint.sh --dry-run
+#        # -Werror
   build:
-    name: Build
+    name: Multi-Build (GCC & CLANG, only on Linux yet!)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         cc: [clang++, g++]
+        target: [linux]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install SFML dependencies...
-        run: sudo apt-get install libgl-dev
-      - name: Download & setup SFML/master manually...
-        run: ./tooling/sfml-setup
+        run: sudo apt install libgl-dev
+      - name: Download & setup SFML/master...
+        run: ./tooling/sfml-setup ${{ matrix.target }}
       - name: Build (Ubuntu only! Windows is being manually tested locally for now...)
-        run: make CC=${{ matrix.cc }}
+        run: make CC=${{ matrix.cc }} TOOLCHAIN=${{ matrix.target }}
