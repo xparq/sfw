@@ -16,7 +16,7 @@ test_exe=$(exe_dir)/$(PRJ_NAME)-test$(buildmode_file_suffix).exe
 BUILD = $(main_lib) $(main_exe) $(test_exe)
 
 SRC_DIR=src
-OUT_DIR=tmp/build
+OUT_DIR=tmp/build/msvc
 LIB_DIR=lib
 EXE_DIR=
 OBJ_DIR=$(OUT_DIR)/obj
@@ -28,8 +28,8 @@ LIB_SRC_SUBDIR=lib
 UNITS_PATTERN=*
 
 # External dependencies:
-EXT_INCLUDE_DIRS=extern/sfml/include
-EXT_LIB_DIRS=extern/sfml/lib
+EXT_INCLUDE_DIRS=extern/sfml.msvc/include
+EXT_LIB_DIRS=extern/sfml.msvc/lib
 EXT_LIBS=$(sfml_and_deps_libs)
 
 #-----------------------------------------------------------------------------
