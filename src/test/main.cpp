@@ -48,8 +48,8 @@ int main()
 	Theme::Cfg themes[] = {
 		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
 		  sfw::Wallpaper::Cfg("demo/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,25,25,10)),
-		  11, "font/Liberation/LiberationSans-Regular.ttf" },
-		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/Liberation/LiberationSans-Regular.ttf" },
+		  11, "font/LiberationSans-Regular.ttf" },
+		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
 		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), {}, 12, "font/Vera.ttf" },
 		{ "\"factory default\"", },
@@ -133,7 +133,7 @@ int main()
 	//!!
 	//!! Plus, a light (template-based?) interface would also be needed
 	//!! for accessging them from the outside in a somewhat civilized way!
-		sf::Text text("Hello world!", Theme::getFont());
+		sf::Text text(Theme::getFont(), "Hello world!");
 		sf::RectangleShape textrect;
 
 	auto sfText = new DrawHost([&](auto* raw_w, auto ctx) {

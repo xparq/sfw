@@ -34,7 +34,7 @@ LDFLAGS   := $(LDFLAGS) -L$(SFML_DIR)/lib
 
 ifeq "$(shell echo ${WINDIR})" ""
 # --- Not Windows (assuming "something Linux-like"):
-AUXLIBS       := -lGL
+AUXLIBS       := -lGL -lX11
 TERM_YELLOW   := \033[1;33m
 TERM_GREEN    := \033[1;32m
 TERM_NO_COLOR := \033[0m
@@ -49,7 +49,7 @@ endif
 #   DEBUG must be 0 or 1
 #   SFML_LINKMODE must be dll or static
 DEBUG ?= 0
-SFML_LINKMODE ?= static
+SFML_LINKMODE ?= dll
 
 FILE_SUFFIX_DEBUG_1                      := -d
 DIR_SUFFIX_DEBUG_1                       := .d

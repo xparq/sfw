@@ -2,11 +2,11 @@
 #define GUI_IMAGEBUTTON_HPP
 
 #include "sfw/Widget.hpp"
+#include "sfw/Gfx/Elements/Text.hpp"
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Text.hpp>
 
 namespace sfw
 {
@@ -50,7 +50,7 @@ private:
     void press();
     void release();
 
-    sf::Text m_text;
+    Text m_text;
     sf::Sprite m_background;
     bool m_pressed;
 };

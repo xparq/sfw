@@ -2,12 +2,11 @@
 #define GUI_OPTIONSBOX_HPP
 
 #include "sfw/Widget.hpp"
-#include <string>
-
-// For the implementation:
+#include "sfw/Gfx/Elements/Text.hpp"
 #include "sfw/Gfx/Elements/Arrow.hpp"
 #include "sfw/Gfx/Elements/ItemBox.hpp"
-#include <SFML/Graphics/Text.hpp>
+
+#include <string>
 
 namespace sfw
 {
@@ -105,7 +104,7 @@ private:
     size_t m_currentIndex;
 
     // Visual components
-    ItemBox<sf::Text> m_box;     // The entire widget
+    ItemBox<Text> m_box;         // The entire widget (incl. the arrows)
     ItemBox<Arrow> m_arrowLeft;  // Control for "Select Prev."
     ItemBox<Arrow> m_arrowRight; // Control for "Select Next"
 };

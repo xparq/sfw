@@ -55,8 +55,8 @@ int main()
 	Theme::Cfg themes[] = {
 		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
 		  sfw::Wallpaper::Cfg{"demo/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,255,255,63)},
-		  17, "font/Liberation/LiberationSans-Regular.ttf" },
-		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/Liberation/LiberationSans-Regular.ttf" },
+		  17, "font/LiberationSans-Regular.ttf" },
+		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
 		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), {}, 12, "font/Vera.ttf" },
 		{ "factory default" },
@@ -97,7 +97,7 @@ int main()
 	// to be manipulated by other widgets...
 	// + a wrapper widget for boxing them nicely
 
-		sf::Text text("Hello world!", Theme::getFont());
+		sf::Text text(Theme::getFont(), "Hello world!");
 		sf::RectangleShape textrect;
 
 	auto sfText = new sfw::DrawHost([&](auto* raw_w, auto ctx) {
@@ -275,7 +275,7 @@ int main()
 	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
 		auto combined_labels = new VBox();
-		combined_labels->add(sfw::Label("Imgage button"));
+		combined_labels->add(sfw::Label("Image button"));
 		combined_labels->add(sfw::Label("- native size"));
 
 		imgbuttons_form->add(combined_labels, new sfw::ImageButton(buttonimg, "Start moving"))

@@ -3,6 +3,7 @@
 
 #include "sfw/Widget.hpp"
 #include "sfw/Gfx/Elements/Box.hpp"
+#include "sfw/Gfx/Elements/Text.hpp"
 #include "sfw/Geometry.hpp"
 
 namespace sfw
@@ -46,7 +47,7 @@ private:
     float m_value;
     Box m_box;
     sf::Vertex m_bar[4];
-    sf::Text m_label;
+    Text m_label;
 };
 
 } // namespace

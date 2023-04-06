@@ -2,11 +2,10 @@
 #define GUI_BUTTON_HPP
 
 #include "sfw/Widget.hpp"
+#include "sfw/Gfx/Elements/Text.hpp"
 #include "sfw/Gfx/Elements/ItemBox.hpp"
 
 #include <string>
-
-#include <SFML/Graphics/Text.hpp>
 
 namespace sfw
 {
@@ -42,7 +41,7 @@ private:
     void onKeyReleased(const sf::Event::KeyEvent& key) override;
     void onThemeChanged() override;
 
-    ItemBox<sf::Text> m_box;
+    ItemBox<Text> m_box;
 };
 
 } // namespace

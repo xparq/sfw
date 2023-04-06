@@ -2,10 +2,9 @@
 #define GUI_LABEL_HPP
 
 #include "sfw/Widget.hpp"
+#include "sfw/Gfx/Elements/Text.hpp"
 
 #include <string>
-
-#include <SFML/Graphics/Text.hpp>
 
 namespace sfw
 {
@@ -37,7 +36,7 @@ private:
 
     void onThemeChanged() override;
 
-    sf::Text m_text;
+    Text m_text;
 };
 
 } // namespace

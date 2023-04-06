@@ -3,11 +3,11 @@
 
 #include "sfw/Widget.hpp"
 #include "sfw/Gfx/Elements/Box.hpp"
+#include "sfw/Gfx/Elements/Text.hpp"
 #include "sfw/TextSelection.hpp"
 
 #include <string>
 
-#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Clock.hpp>
@@ -30,7 +30,7 @@ public:
     TextBox(float width = 200.f, CursorStyle style = BLINK);
 
     /**
-     * Define textbox content
+     * Set textbox content
      */
     TextBox* setText(const sf::String& string);
 
@@ -42,7 +42,7 @@ public:
     size_t getTextLength() const { return m_text.getString().getSize(); }
 
     /**
-     * Define max length of textbox content (default is 256 characters)
+     * Set max length of textbox content (default is 256 characters)
      */
     TextBox* setMaxLength(size_t maxLength);
 
@@ -110,8 +110,8 @@ private:
     CursorStyle m_cursorStyle;
     float m_cursorBlinkPeriod = 1.f;
     // Editor inrernal state:
-    sf::Text m_text;
-    sf::Text m_placeholder;
+    Text m_text;
+    Text m_placeholder;
     size_t m_cursorPos; // Despite the name, this isn't a property of the visual cursor representation
     TextSelection m_selection;
     // Cursor visual state:
