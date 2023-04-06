@@ -27,7 +27,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install SFML dependencies...
-        run: sudo apt install libgl-dev
+        run: |
+          sudo apt install libgl-dev
+          # The rest is only needed for static builds:
+          sudo apt install libx11-dev
+          sudo apt install libxrandr-dev
+          sudo apt install libxcursor-dev
+          sudo apt install libxi-dev
+          sudo apt install libudev-dev
       - name: Download & setup SFML/master...
         run: ./tooling/sfml-setup ${{ matrix.target }}
       - name: Build (Ubuntu only! Windows is being manually tested locally for now...)

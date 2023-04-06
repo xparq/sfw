@@ -5,7 +5,8 @@
 # Dependencies: 
 # - SFML: should be preinstalled locally (e.g. via tooling/sfml-setup, which
 #   currently only works on Linux)
-# - OpenGL: should be provided by the host sytem
+# - OpenGL & other platform deps (see AUXLIBS): should be provided by the host
+#   system (e.g. the GHA job installs them before launching the build!)
 # - freetype: provided by the host for shared builds, or bundled with SFML
 #   for static
 # NOTE: Make sure SFML_DIR points to the correct SFML package, and that the
@@ -15,6 +16,11 @@
 # Set this to e.g. "mingw" on Windows
 TOOLCHAIN ?= linux
 SFML_DIR  ?= extern/sfml.$(TOOLCHAIN)
+# Build alternatives (debug & link modes):
+#   DEBUG must be 0 or 1
+#   SFML_LINKMODE must be shared or static
+DEBUG     ?= 0
+SFML_LINKMODE ?= shared
 
 NAME      := sfw
 LIBNAME   := $(NAME)
@@ -34,7 +40,7 @@ LDFLAGS   := $(LDFLAGS) -L$(SFML_DIR)/lib
 
 ifeq "$(shell echo ${WINDIR})" ""
 # --- Not Windows (assuming "something Linux-like"):
-AUXLIBS       := -lGL -lX11
+AUXLIBS       := -lGL -lX11 -lXrandr -lXcursor -ludev
 TERM_YELLOW   := \033[1;33m
 TERM_GREEN    := \033[1;32m
 TERM_NO_COLOR := \033[0m
@@ -45,25 +51,19 @@ EXE_SUFFIX    :=.exe
 endif
 
 #-----------------------------------------------------------------------------
-# Build alternatives (debug & link modes)...
-#   DEBUG must be 0 or 1
-#   SFML_LINKMODE must be dll or static
-DEBUG ?= 0
-SFML_LINKMODE ?= dll
-
 FILE_SUFFIX_DEBUG_1                      := -d
 DIR_SUFFIX_DEBUG_1                       := .d
-FILE_SUFFIX_SFML_LINKMODE_dll_DEBUG_1    := -d
+FILE_SUFFIX_SFML_LINKMODE_shared_DEBUG_1 := -d
 FILE_SUFFIX_SFML_LINKMODE_static_DEBUG_0 := -s
 FILE_SUFFIX_SFML_LINKMODE_static_DEBUG_1 := -s-d
 CC_FLAGS_SFML_LINKMODE_static_DEBUG_0    := -DNDEBUG -DSFML_STATIC
 CC_FLAGS_SFML_LINKMODE_static_DEBUG_1    := -DDEBUG -DSFML_STATIC
-CC_FLAGS_SFML_LINKMODE_dll_DEBUG_0       := -DNDEBUG
-CC_FLAGS_SFML_LINKMODE_dll_DEBUG_1       := -DDEBUG
+CC_FLAGS_SFML_LINKMODE_shared_DEBUG_0    := -DNDEBUG
+CC_FLAGS_SFML_LINKMODE_shared_DEBUG_1    := -DDEBUG
 LINK_FLAGS_SFML_LINKMODE_static_DEBUG_0  := -lsfml-graphics-s   -lsfml-window-s   -lsfml-system-s   -lfreetype $(AUXLIBS)
 LINK_FLAGS_SFML_LINKMODE_static_DEBUG_1  := -lsfml-graphics-s-d -lsfml-window-s-d -lsfml-system-s-d -lfreetype $(AUXLIBS)
-LINK_FLAGS_SFML_LINKMODE_dll_DEBUG_0     := -lsfml-graphics -lsfml-window -lsfml-system       $(AUXLIBS)
-LINK_FLAGS_SFML_LINKMODE_dll_DEBUG_1     := -lsfml-graphics-d -lsfml-window-d -lsfml-system-d $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_0  := -lsfml-graphics -lsfml-window -lsfml-system       $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_1  := -lsfml-graphics-d -lsfml-window-d -lsfml-system-d $(AUXLIBS)
 
 FILE_SUFFIX :=           $(FILE_SUFFIX_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
 CFLAGS      :=    $(CFLAGS) $(CC_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
