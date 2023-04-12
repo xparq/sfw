@@ -1,6 +1,6 @@
 #-----------------------------------------------------------------------------
-# GNU Makefile for GCC/CLANG, both native Linux/POSIX and MinGW (or similar,
-# e.g. w64devkit) Windows hosted builds
+# GNU Makefile for GCC/CLANG -- on both "native GNU" (i.e. Linux etc.) and
+# Windows (i.e. MinGW, w64devkit or compatible)
 #
 # Dependencies: 
 # - SFML: should be preinstalled locally (e.g. via tooling/sfml-setup, which
@@ -13,14 +13,28 @@
 #       SFML dir suffix (if any) matches $(TOOLCHAIN)!
 #-----------------------------------------------------------------------------
 
-# Set this to e.g. "mingw" on Windows
+# "Detect" default GCC/CLANG flavor ("mingw" on Windows, "linux" otherwise;
+# rather hamfisted, but OK for now) -- use `make TOOLCHAIN=...` to override!):
+ifeq "$(shell echo ${WINDIR})" ""
 TOOLCHAIN ?= linux
+else
+TOOLCHAIN ?= mingw
+endif
+
+# Use `make SFML_DIR=...` to override:
 SFML_DIR  ?= extern/sfml.$(TOOLCHAIN)
-# Build alternatives (debug & link modes):
+
+# Supported build alternatives: debug/release, shared/static SFML:
 #   DEBUG must be 0 or 1
 #   SFML_LINKMODE must be shared or static
 DEBUG     ?= 0
-SFML_LINKMODE ?= shared
+SFML_LINKMODE ?= $(if $(findstring linux,$(TOOLCHAIN)),shared,static)
+
+$(info DEBUG = $(DEBUG))
+$(info SFML_LINKMODE = $(SFML_LINKMODE))
+
+#-----------------------------------------------------------------------------
+# Project layout
 
 NAME      := sfw
 LIBNAME   := $(NAME)
@@ -34,10 +48,12 @@ OBJDIR    := $(OUTDIR)
 DEMO_OBJ  := examples/demo
 TEST_OBJ  := test/main
           
-CC        ?= g++
+CC        := g++
 CFLAGS    := -I$(SFML_DIR)/include -I./include -std=c++20 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
 LDFLAGS   := $(LDFLAGS) -L$(SFML_DIR)/lib
 
+# Switch various params. according to the host platform (i.e. the list
+# of "auxilary" libs for static build, terminal control etc.)
 ifeq "$(shell echo ${WINDIR})" ""
 # --- Not Windows (assuming "something Linux-like"):
 AUXLIBS       := -lGL -lX11 -lXrandr -lXcursor -ludev
@@ -51,6 +67,9 @@ EXE_SUFFIX    :=.exe
 endif
 
 #-----------------------------------------------------------------------------
+# Tag the executables with "-mingw-", or nothing, respectively:
+TOOLCHAIN_TAG := $(if $(findstring linux,$(TOOLCHAIN)),,-mingw)
+
 FILE_SUFFIX_DEBUG_1                      := -d
 DIR_SUFFIX_DEBUG_1                       := .d
 FILE_SUFFIX_SFML_LINKMODE_shared_DEBUG_1 := -d
@@ -69,8 +88,8 @@ FILE_SUFFIX :=           $(FILE_SUFFIX_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DE
 CFLAGS      :=    $(CFLAGS) $(CC_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
 LDFLAGS     := $(LDFLAGS) $(LINK_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
 
-DEMO_EXE := $(DEMO)$(FILE_SUFFIX)$(EXE_SUFFIX)
-TEST_EXE := $(TEST)$(FILE_SUFFIX)$(EXE_SUFFIX)
+DEMO_EXE := $(DEMO)$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(EXE_SUFFIX)
+TEST_EXE := $(TEST)$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(EXE_SUFFIX)
 # Under GCC the same lib (i.e. compilation mode) seems to work just fine 
 # for linking with both the static and dynamic SFML libs, so enough to just
 # dispatch for debug mode:
@@ -83,12 +102,12 @@ LIBFILE  := $(LIBDIR)/lib$(LIBNAME).a
 all: $(DEMO_EXE) $(TEST_EXE)
 
 $(DEMO_EXE): $(OBJDIR)/$(DEMO_OBJ).o $(LIBFILE)
-	@echo "$(TERM_YELLOW)linking the demo ($(DEMO_EXE))$(TERM_NO_COLOR) $@"
+	@echo "$(TERM_YELLOW)linking $(DEMO_EXE)$(TERM_NO_COLOR)"
 	@$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 	@echo "$(TERM_GREEN)Done!$(TERM_NO_COLOR)"
 
 $(TEST_EXE): $(OBJDIR)/$(TEST_OBJ).o $(LIBFILE)
-	@echo "$(TERM_YELLOW)linking the test ($(TEST_EXE))$(TERM_NO_COLOR) $@"
+	@echo "$(TERM_YELLOW)linking $(TEST_EXE)$(TERM_NO_COLOR)"
 	@$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 	@echo "$(TERM_GREEN)Done!$(TERM_NO_COLOR)"
 
