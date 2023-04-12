@@ -12,8 +12,9 @@ extern/
 # Test/demo binaries (created in the repo root currently)
 *-demo
 *-test
-# Ignore these in the root only (may have some in tooling/ etc.)
+# Ignore these in the root & test only (may have some in tooling/ etc.)
 /*.exe
+test/**/*.exe
 
 # Lib
 lib/

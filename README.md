@@ -1,4 +1,4 @@
-[![Build](https://github.com/xparq/sfw/actions/workflows/ci.yml/badge.svg)](https://github.com/xparq/sfw/actions/workflows/ci.yml)
+[![Build](https://github.com/xparq/sfw/actions/workflows/build.yml/badge.svg)](https://github.com/xparq/sfw/actions/workflows/build.yml)
 
 sfw::GUI - A fork of "SFML Widgets", a small & simple SFML-based GUI
 ====================================================================
@@ -9,13 +9,13 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 
 ## Changes to the original:
 
-- Adapted to the pre-3.0 ("master") SFML API
-- Windows/MSVC build added
+- Adapted to the upcoming SFML v3 API
 - Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already)
-- Richer, more flexible API, bugfixes, improvements to existing widgets etc.
+- Richer, more flexible API, new features, bugfixes, improvements
+- Default quick-start assets included (and removed the non-free ones from the old package)
+- Windows build support (MSVC and MinGW (actually [w64devkit](https://github.com/skeeto/w64devkit)))
 - Reshuffled source tree (to allow growth & to help integrating into other projects)
-- Default quick-start assets included (and removed the non-free ones from the demo)
-- Auto download & setup the latest SFML-master lib (mostly for the GitHub workflow)
+- Auto download & setup the latest SFML-master locally (mostly for GitHub workflows)
 
 _For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
 
@@ -38,11 +38,11 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 ### GCC/CLANG:
 
-- Run `make` to build the library (`lib/libsfw.a`) & the demo (`./sfw-demo`).
+- Run `make` to build the library (`lib/libsfw.a`) & the demo (`./sfw-demo`) etc.
 
 ### MSVC (Windows):
 
-- Run `nmake -f Makefile.msvc` to build the lib (`lib/sfw.lib`) & the demo (`./sfw-demo.exe`).
+- Run `nmake -f Makefile.msvc` to build the lib (`lib/sfw.lib`) & the demo (`./sfw-demo.exe`) etc.
 
 (See the Makefiles for options.)
 

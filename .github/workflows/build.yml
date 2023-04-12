@@ -4,18 +4,11 @@ on: [workflow_dispatch, push, pull_request]
 
 env:
   SFML_DIR: extern/sfml
+#!!... :-/  LD_LIBRARY_PATH: extern/sfml.${{ matrix.target }}/lib
+#!!... :-/  LD_LIBRARY_PATH: ${{ env.CWD }}/extern/sfml.linux/lib
+#!!... :-/  LD_LIBRARY_PATH: $CWD/extern/sfml.linux/lib
 
 jobs:
-#  lint:
-#    name: Clang-format - ENFORCING DISABLED (see #17)!
-#    runs-on: ubuntu-22.04
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Install dependencies
-#        run: sudo apt install clang-format
-#      - name: Run clang-format
-#        run: tooling/lint.sh --dry-run
-#        # -Werror
   build:
     name: Multi-Build (GCC & CLANG, only on Linux yet!)
     runs-on: ubuntu-latest
@@ -39,3 +32,11 @@ jobs:
         run: ./tooling/sfml-setup ${{ matrix.target }}
       - name: Build (Ubuntu only! Windows is being manually tested locally for now...)
         run: make CC=${{ matrix.cc }} TOOLCHAIN=${{ matrix.target }}
+
+
+      - name: Smoke test - set PATH for the SFML shared libs...
+        run: echo "LD_LIBRARY_PATH=${{ github.workspace }}/${{ env.SFML_DIR }}/lib" >> $GITHUB_ENV
+
+      - name: Smoke test...
+        run: |
+          ./test/smoke

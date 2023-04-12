@@ -13,7 +13,8 @@ PRJ_NAME=sfw
 main_lib=$(lib_dir)/$(PRJ_NAME)$(buildmode_file_suffix).lib
 main_exe=$(exe_dir)/$(PRJ_NAME)-demo$(buildmode_file_suffix).exe
 test_exe=$(exe_dir)/$(PRJ_NAME)-test$(buildmode_file_suffix).exe
-BUILD = $(main_lib) $(main_exe) $(test_exe)
+smoke_test_exe=./test/smoke.exe
+BUILD = $(main_lib) $(main_exe) $(test_exe) $(smoke_test_exe)
 
 SRC_DIR=src
 OUT_DIR=tmp/build/msvc
@@ -374,6 +375,14 @@ clean_all:
 #-----------------------------------------------------------------------------
 # Actual (low-level) one-off build jobs...
 #-----------------------------------------------------------------------------
+# Alas, NMAKE can't treat multiline macros as separate commands in build rules,
+# so no use trying this:
+#link_exe = \
+#	@echo Creating executable: $@... ^
+#	link -nologo $(LINKFLAGS) -out:$@ $(EXT_LIBS) $**
+link_exe = link -nologo $(LINKFLAGS) -out:$@ $(EXT_LIBS) $**
+
+
 #------------------------
 # Build the "main" lib
 #------
@@ -389,12 +398,16 @@ clean_all:
 !if "$(main_exe)" != ""
 $(main_exe): $(obj_dir)\examples\demo.obj $(main_lib)
 	@echo Creating executable: $@...
-	link -nologo $(LINKFLAGS) -out:$@ $(EXT_LIBS) $**
+	$(link_exe)
 !endif
 
-#------------------------
-# Build the "test" exe
+#------------------------------
+# Build the test executables
 #------
 $(test_exe): $(obj_dir)\test\main.obj $(main_lib)
 	@echo Creating executable: $@...
-	link -nologo $(LINKFLAGS) -out:$@ $(EXT_LIBS) $**
+	$(link_exe)
+
+$(smoke_test_exe): $(obj_dir)\test\smoke.obj $(main_lib)
+	@echo Creating executable: $@...
+	$(link_exe)
