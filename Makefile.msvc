@@ -339,12 +339,17 @@ clean:
 # And no way I'd just let loose a blanket RD /S /Q "$(out_dir)"!...
 	@if not "$(abspath $(obj_dir))" == "$(abspath .\$(obj_dir))" echo - ERROR: Invalid object dir path: "$(obj_dir)" && exit -1
 # Stop listing all the deleted .obj files despite /q -> cmd /e:off (self-explanatory, right?)
-	@if exist "$(obj_dir)\*.obj" cmd /e:off /c del /s /q "$(obj_dir)\*.obj"
-# To let the idiotic tools run at least, the dir must exist, so if it was deleted
-# in a previous run, we must recreate it just to be able to check and then delete
-# it right away again... Otherwise: "The system cannot find the file specified."):
+#	if exist "$(obj_dir)\*.obj" cmd /e:off /c del /s "$(obj_dir)\*.obj"
+# And `if exist ...\*` can't check recursively, so it can't be used here.
+# OTOH, if the dir itself doesn't exist, then DEL would fail (aborting nmake), so:
+	@if exist "$(obj_dir)" del /s "$(obj_dir)\*.obj"
+# But `if exist ... dir ... || rd ...` (below) would also fail to do what you'd expect,
+# so... to let the idiotic tools just run at least, the dir'd better exist, so if it
+# was deleted in a previous run, we must recreate it just to be able to check & then
+# delete it right away again... Otherwise: "The system cannot find the file specified."
 	@if not exist "$(obj_dir)" mkdir "$(obj_dir)"
-	@dir "$(obj_dir)" /s /b /a:-d 2>nul || rd /s /q "$(obj_dir)"
+	@dir "$(obj_dir)" /s /b /a:-d 2 || rd /s /q "$(obj_dir)"
+	@if exist "$(obj_dir)" echo - Couldn't remove "$(obj_dir)"...
 # Delete the main targets (lib/exe) separately, as they may be outside the tree:
 	@for %f in ($(build)) do @if exist "%f" del "%f"
 # Delete some other cruft, too:
