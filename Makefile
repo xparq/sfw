@@ -102,7 +102,7 @@ LIBFILE  := $(LIBDIR)/lib$(LIBNAME).a
 
 #-----------------------------------------------------------------------------
 define link-exe =
-	@echo "$(TERM_YELLOW)Linking $(DEMO_EXE)$(TERM_NO_COLOR)"
+	@echo "$(TERM_YELLOW)Linking $@$(TERM_NO_COLOR)"
 	@$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 	@echo "$(TERM_GREEN)Done.$(TERM_NO_COLOR)"
 endef

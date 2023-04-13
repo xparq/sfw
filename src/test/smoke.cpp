@@ -9,16 +9,16 @@ using namespace std;
 int main()
 {
 	//------------------------------------------------------------------------
+	// Setup low-level GFX (GL + X (or Windows) context
+	sf::RenderWindow dummy_window;
+
+	//------------------------------------------------------------------------
 	// Setup the Test GUI...
 	using namespace sfw;
-
-/*!! Even this crashes with "Failed to open X11 display; make sure the DISPLAY
-   environment variable is set correctly" 
-	sf::RenderWindow dummy_window;
 	GUI demo(dummy_window, Theme::DEFAULT, false); // false: don't own the window
 	if (!demo) {
-		return 0; // Failure is expected here for now...
+		return 0; // Failure is expected here for now (with a dead window...)!
 	}
-!!*/
-	return 0;
+
+	return 1; // WTF?! Failed to even fail?!
 }

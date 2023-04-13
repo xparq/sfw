@@ -33,9 +33,16 @@ jobs:
       - name: Build (Ubuntu only! Windows is being manually tested locally for now...)
         run: make CC=${{ matrix.cc }} TOOLCHAIN=${{ matrix.target }}
 
-
-      - name: Smoke test - set PATH for the SFML shared libs...
+      - name: Smoke test - Set PATH for the SFML shared libs...
         run: echo "LD_LIBRARY_PATH=${{ github.workspace }}/${{ env.SFML_DIR }}/lib" >> $GITHUB_ENV
+
+      - name: Smoke test - Start dummy headless X server...
+          # Already installed on the Ubuntu runner:
+          # run: sudo apt install xvfb
+        run: |
+          Xvfb :0 -ac &
+          sleep 5
+          echo "DISPLAY=:0" >> $GITHUB_ENV
 
       - name: Smoke test...
         run: |
