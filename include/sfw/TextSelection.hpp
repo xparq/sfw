@@ -114,13 +114,14 @@ struct TextSelection
     //------------------------------------------------------------------------
     // Queries
     //------------------------------------------------------------------------
-    operator bool() const { return state != CANCELLED && !empty(); }
-    bool   valid()  const { return state != CANCELLED; }
-    size_t empty()  const { return !valid() || active_pos == anchor_pos; }
-    bool   active() const { return state == ACTIVE; }
-    size_t lower()  const { return std::min(anchor_pos, active_pos); }
-    size_t upper()  const { return std::max(anchor_pos, active_pos); }
-    size_t length() const { return upper() - lower(); }
+    operator bool()  const { return valid() && !empty(); }
+    bool   valid()   const { return state != CANCELLED; }
+    size_t empty()   const { return !valid() || active_pos == anchor_pos; }
+    bool   active()  const { return state == ACTIVE; }
+    bool   stopped() const { return state == STOPPED; }
+    size_t lower()   const { return valid() ? std::min(anchor_pos, active_pos) : 0; }
+    size_t upper()   const { return valid() ? std::max(anchor_pos, active_pos) : 0; }
+    size_t length()  const { return valid() ? upper() - lower() : 0; }
 
     //------------------------------------------------------------------------
     // Convenience setters to assist the text editing actions
@@ -140,10 +141,10 @@ struct TextSelection
     // Operations
     //------------------------------------------------------------------------
     void start(size_t pos, bool persistent = false);
-    void stop() { state = STOPPED; }
-    void resume() { state = ACTIVE; }
+    void stop()   { if (active())  state = STOPPED; }
+    void resume() { if (stopped()) state = ACTIVE; }
     void cancel() { state = CANCELLED; }
-    void reset() { cancel(); set_empty(0); }
+    void reset()  { cancel(); set_empty(0); }
 
     void follow(size_t pos);
 };
@@ -163,9 +164,9 @@ inline void TextSelection::set_span(size_t anchor, int offset)
 }
 
 //----------------------------------------------------------------------------
-inline void TextSelection::start(size_t pos, bool persistent_)
+inline void TextSelection::start(size_t pos, bool persist)
 {
-    persistent = persistent_; set_empty(pos); resume();
+    persistent = persist; set_empty(pos); state = ACTIVE;
 }
 
 //----------------------------------------------------------------------------

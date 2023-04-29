@@ -41,7 +41,7 @@ int main()
 	Theme::input.textColor = hex2color("#000");
 	Theme::input.textColorHover = hex2color("#000");
 	Theme::input.textColorFocus = hex2color("#000");
-	Theme::input.textSelectionColor = hex2color("#8791AD");
+	Theme::input.textSelectionColor = hex2color("#97b1AD");
 	Theme::input.textPlaceholderColor = hex2color("#8791AD");
 
 	// Some dynamically switcahble theme "quick config packs" to play with
@@ -97,25 +97,29 @@ int main()
 
 	// #171
 	auto gh171form = test_hbox->add(new Form);
-	gh171form->add("#171 autocast", new sfw::TextBox(50))->setText("OK!");
+	gh171form->add("#171 autocast", new sfw::TextBox(50))->set("OK!");
 	//#171 + #168 (with an Image*):
-	gh171form->add((new Image("test/example.jpg"))->rescale(0.25), new sfw::TextBox(50))->setText("171 + 168 OK!");
+	gh171form->add((new Image("test/example.jpg"))->rescale(0.25), new sfw::TextBox(50))->set("171 + 168 OK!");
 	//#171 + #168 + template widget + move
-	gh171form->add(new Label("tempWidget"), sfw::TextBox(70))->setText("171/tmp + 168 OK!");
+	gh171form->add(new Label("tempWidget"), sfw::TextBox(70))->set("171/tmp + 168 OK!");
 	//#171, template-move also for the "label":
 	gh171form->add(Label("tmpLabel"), Label("#171(tmp,tmp) OK too!"));
 
 	//!! This is not yet supported (nor separators...):
 	//!!test_hbox->add(new Form)->add("This is just some text on its own.");
 
-	auto issue127box = test_hbox->add(new VBox);
+	auto issuebox2 = test_hbox->add(new VBox);
 	// #127 + name lookup
-	issue127box->add(sfw::Button("Issue #127/void", [&] {
+	issuebox2->add(sfw::Button("Issue #127/void", [&] {
 		((sfw::Button*)(demo.getWidget("test #127")))->setText("Found itself!");
 	}), "test #127");
-	issue127box->add(sfw::Button("Issue #127/w", [&](auto* w) { cerr << w << ", " << demo.getWidget("test #127/w") << endl;
+	issuebox2->add(sfw::Button("Issue #127/w", [&](auto* w) { cerr << w << ", " << demo.getWidget("test #127/w") << endl;
 		((sfw::Button*)(w->getWidget("test #127/w")))->setText("Found itself!");
 	}), "test #127/w");
+
+	//#174: std::string API
+	issuebox2->add(new TextBox)->setPlaceholder("#174: std áéíÓÖŐ");
+
 
 	demo.add(new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
 	                   "(proper separators are not yet supported...)"
@@ -200,17 +204,17 @@ int main()
 	/*!! #171: this won't compile yet:
 	form->add("Text", new sfw::TextBox())
 		->setPlaceholder("Type something!")
-		->setText("Hello world!")
-		->setCallback([&](auto* w) { text.setString(w->getText()); });
+		->set("Hello world!")
+		->setCallback([&](auto* w) { text.setString(w->getString()); });
 	*/
 	form->add("Text", new sfw::TextBox())
 		->setPlaceholder("Type something!")
-		->setText("Hello world!")
-		->setCallback([&](auto* w) { text.setString(w->getText()); });
+		->set("Hello world!")
+		->setCallback([&](auto* w) { text.setString(w->getString()); });
 	// Length limit & pulsating cursor
 	form->add("Text with limit (5)", new TextBox(50.f, TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
-		->setText("Hello world!");
+		->set("Hello world!");
 	//! The label above ("Text with limit (5)") will be used for retrieving
 	//! the widget later by the crop slider (somewhere below)!
 
@@ -317,9 +321,9 @@ int main()
 
 	// Button factory...
 	auto boxfactory = middle_panel->add(sfw::HBox());
-	auto labeller = boxfactory->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+	auto labeller = boxfactory->add(sfw::TextBox(100))->set("Edit Me!")->setPlaceholder("Button label");
 	boxfactory->add(sfw::Button("Create button", [&] {
-		middle_panel->addAfter(boxfactory, new sfw::Button(labeller->getText()));
+		middle_panel->addAfter(boxfactory, new sfw::Button(labeller->get()));
 	}));
 
 	// More buttons...
@@ -372,7 +376,7 @@ int main()
 		// Show the slider value in a text box retrieved by its name:
 		auto tbox = (sfw::TextBox*)w->getWidget("Text with limit (5)");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
-		else tbox->setText(to_string((int)w->getValue()));
+		else tbox->set(to_string((int)w->getValue()));
 		imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
 		                      {(int)(w->getValue() * 1.4), (int)w->getValue()}});
 	});

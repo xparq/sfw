@@ -21,9 +21,9 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 ## Quick Summary
 
-- Small package with no external dependencies (beyond SFML & `std::`)
-- Simple, straightforward API
-- Spritesheet-based visuals: a single, small image file to customize widget styles (like box borders/corners etc.)
+- Small package with no external dependencies beyond SFML & `std::`.
+- Simple, straightforward, but versatile API
+- Visual styling via spritesheets (small image files to customize borders, markers etc.)
 - Simple callbacks: optional lambdas (or `std::function`s) triggered on _important_ user actions (only)
   _(You can still derive from the widgets to override the other event handlers, too, of course.)_
 - Easy layouts: automatically align content without the need to precalculate positions/sizes

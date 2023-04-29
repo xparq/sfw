@@ -46,7 +46,7 @@ int main()
 	Theme::input.textColor = hex2color("#000");
 	Theme::input.textColorHover = hex2color("#000");
 	Theme::input.textColorFocus = hex2color("#000");
-	Theme::input.textSelectionColor = hex2color("#8791AD");
+	Theme::input.textSelectionColor = hex2color("#b0c0c0");
 	Theme::input.textPlaceholderColor = hex2color("#8791AD");
 
 	// Prepare some dynamically switchable theme config "quick packs" to play with...
@@ -160,12 +160,12 @@ int main()
 	// A text box to set the text of the example SFML object (created above)
 	form->add("Text", new sfw::TextBox(175)) // <- width (pixels)
 		->setPlaceholder("Type something!")
-		->setText("Hello world!")
-		->setCallback([&](auto* w) { text.setString(w->getText()); });
+		->set("Hello world!")
+		->setCallback([&](auto* w) { text.setString(w->getString()); });
 	// Another text box, with length limit & pulsating cursor
 	form->add("Text with limit (5)", new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
-		->setText("Hello world!");
+		->set("Hello world!");
 
 	// Slider + progress bar for scaling
 	auto sliderForSize = new sfw::Slider(10, 175); // granularity (%), width (pixel)
@@ -257,9 +257,9 @@ int main()
 
 	// "Button factory" labeller textbox + creat button...
 	auto buttfactory = buttons_vbox->add(new HBox);
-	auto labeller = buttfactory->add(sfw::TextBox(100))->setText("Edit Me!")->setPlaceholder("Button label");
+	auto labeller = buttfactory->add(sfw::TextBox(100))->set("Edit Me!")->setPlaceholder("Button label");
 	buttfactory->add(sfw::Button("Create button", [&] {
-		buttons_vbox->addAfter(buttfactory, new sfw::Button(labeller->getText()));
+		buttons_vbox->addAfter(buttfactory, new sfw::Button(labeller->get()));
 	}));
 
 	// More buttons...
@@ -321,7 +321,7 @@ int main()
 		// Show the slider value in a text box retrieved by its name:
 		auto tbox = (sfw::TextBox*)w->getWidget("crop%");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
-		else tbox->setText(w->getValue() ? to_string((int)w->getValue()) : "");
+		else tbox->set(w->getValue() ? to_string((int)w->getValue()) : "");
 		imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
 		                      {(int)(w->getValue() * 1.4), (int)w->getValue()}});
 	});
@@ -331,7 +331,7 @@ int main()
 		boxcrop->add(sfw::Label("Crop square size:"));
 		boxcrop->add(sfw::ProgressBar(40), "cropbar");
 		boxcrop->add((new sfw::TextBox(36.f))->setMaxLength(3), "crop%")->setCallback([&](auto* w) {
-			cropslider->setValue(stof(SFMLString_to_stdstring(w->getText())));
+			cropslider->setValue(stof(w->get()));
 		});
 
 	vboximg->add(imgCrop);
@@ -482,14 +482,15 @@ void background_thread_main(sfw::GUI& gui)
 	        auto sampletext_angle = sf::degrees(rot_slider->getValue() * 3 + 4);
 		rot_slider->setValue(float(int(sampletext_angle.asDegrees()/3) % 100));
 
-		// Keep on sleeping while the anim. is disabled.
-		// But still also poll the GUI for termination.
-		// NOTE: it's important to do this AFTER manipulating the widget
-		// exactly because the GUI may have been shut down in the meantime,
-		// and it's unhealthy (UB) to still use it.
 		do this_thread::sleep_for(chrono::milliseconds(50));
+		// Keep on sleeping while the anim. is disabled, and poll for termination:
 		while (!toy_anim_on && gui);
+		// (NOTE: doing this AFTER manipulating the widget, because the GUI
+		// may have been shut down in the meantime, and it's unhealthy (UB)
+		// to still keep using it then...
+		// This is far from bullet-proof, of course, as the threads aren't
+		// synced in any way, but for a demo like this, it's OK.)
 
-		cerr << gui.sessionTime() << "          \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
+		cerr << gui.sessionTime() << "          \b\b\b\b\b\b\b\b\b\b\b";
 	}
 }

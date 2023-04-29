@@ -1,11 +1,12 @@
 #ifndef SFW_SHIMS_HPP
 #define SFW_SHIMS_HPP
 
-//----------------------------------------------------------------------------
-// This should also be moved to something SFML-specific:
-//
+//!!----------------------------------------------------------------------------
+//!! This should also be moved to something SFML-specific:
+
 #include <SFML/Window/Event.hpp>
-// FFS, still no default == for POD structs, even in c++20?! :-o :-/
+// FFS, still no default == (at least for PODs), even in c++20?! :-/
+// (https://stackoverflow.com/a/27837789/1479945)
 inline bool operator==(const sf::Event::KeyEvent& key1, const sf::Event::KeyEvent& key2)
 {
     return key1.code == key2.code
@@ -14,9 +15,20 @@ inline bool operator==(const sf::Event::KeyEvent& key1, const sf::Event::KeyEven
         && key1.control == key2.control
         && key1.shift == key2.shift
         && key1.system == key2.system
-	;
+    ;
 }
 
+inline bool SFML_keypress_has_modifiers(const sf::Event::KeyEvent& key)
+// Is there a sane way already to check this?
+{
+    return key.alt
+        || key.control
+        || key.shift
+        || key.system
+    ;
+}
+
+//----------------------------------------------------------------------------
 #include <SFML/System/String.hpp>
 #include <string>
 
@@ -33,15 +45,17 @@ inline bool operator==(const sf::Event::KeyEvent& key1, const sf::Event::KeyEven
 //!! But that would probably crash for char-length >= utf8-length! :(
 inline sf::String stdstring_to_SFMLString(const std::string& stdstr)
 {
-    return sf::String::fromUtf8(stdstr.c_str(), stdstr.c_str() + stdstr.length());
-    //! Wow, OK, it didn't crash, and even seems to work fine! :-o
-    //! So they do need plain "byte iterators" for this then?! Phew...
-}   //! (Can't quite make sense of that, but whatever -- let's celebrate! :) )
+	return sf::String::fromUtf8(stdstr.c_str(), stdstr.c_str() + stdstr.length());
+	//! Wow, OK, it didn't crash, and even seems to work fine! :-o
+	//! So they do need plain "byte iterators" for this then?! Phew...
+}	//! (Can't quite make sense of that, but whatever -- let's celebrate! :) )
 
 //!!See above about not trying to be too utf8-smart for nothing...
 inline std::string SFMLString_to_stdstring(const sf::String& sfstr)
 {
-    return (const char*)sfstr.toUtf8().c_str();
+	// Need recasting (-> recopy... :-/ ) from SFML's string<uint8_t> to string<char>:
+	return (const char*)sfstr.toUtf8().c_str();
 }
+
 
 #endif // SFW_SHIMS_HPP
