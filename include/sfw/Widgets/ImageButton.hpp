@@ -4,6 +4,8 @@
 #include "sfw/Widget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
 
+#include <string>
+
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Font.hpp>
@@ -17,10 +19,10 @@ namespace sfw
 class ImageButton: public Widget
 {
 public:
-    ImageButton(const sf::Texture& texture, const sf::String& label = "");
+    ImageButton(const sf::Texture& texture, const std::string& label = "");
 
-    ImageButton* setText(const sf::String& text);
-    const sf::String& getText() const;
+    ImageButton* setText(const std::string& label);
+    std::string getText() const;
 
     ImageButton* setSize(sf::Vector2f size);
 

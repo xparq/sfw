@@ -491,6 +491,6 @@ void background_thread_main(sfw::GUI& gui)
 		// This is far from bullet-proof, of course, as the threads aren't
 		// synced in any way, but for a demo like this, it's OK.)
 
-		cerr << gui.sessionTime() << "          \b\b\b\b\b\b\b\b\b\b\b";
+		cerr << gui.sessionTime() << "           \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
 	}
 }

@@ -10,7 +10,7 @@
 namespace sfw
 {
 
-ImageButton::ImageButton(const sf::Texture& texture, const sf::String& text):
+ImageButton::ImageButton(const sf::Texture& texture, const std::string& label):
     Widget(),
     m_pressed(false)
 {
@@ -19,7 +19,7 @@ ImageButton::ImageButton(const sf::Texture& texture, const sf::String& text):
     m_text.setFont(Theme::getFont());
     m_text.setCharacterSize((unsigned)Theme::textSize);
 
-    setText(text);
+    setText(label);
 }
 
 
@@ -36,6 +36,19 @@ ImageButton* ImageButton::setTexture(const sf::Texture& texture)
 }
 
 
+ImageButton* ImageButton::setText(const std::string& label)
+{
+    m_text.set(label);
+    centerText();
+    return this;
+}
+
+std::string ImageButton::getText() const
+{
+    return m_text.get();
+}
+
+/*
 ImageButton* ImageButton::setText(const sf::String& text)
 {
     m_text.setString(text);
@@ -43,12 +56,11 @@ ImageButton* ImageButton::setText(const sf::String& text)
     return this;
 }
 
-
 const sf::String& ImageButton::getText() const
 {
     return m_text.getString();
 }
-
+*/
 
 ImageButton* ImageButton::setSize(sf::Vector2f size)
 {
