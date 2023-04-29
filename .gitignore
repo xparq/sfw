@@ -1,10 +1,10 @@
 tmp/
 
-# External deps. (e.g. SFML could be auto-downloaded here)
-extern/
+# Smaller external deps. are kept embedded locally, but SFML is not one of those:
+extern/sfml/
 
 # Build artifacts etc.
-#tmp/build/
+#tmp/build/ <- tmp/ is already ignored
 *.tmp
 *.ilk
 *.pdb

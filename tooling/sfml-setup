@@ -8,7 +8,7 @@
 PLATFORM=${1-linux}
 
 main(){
-	SFML_LIBROOT=`realpath -Lms ${SFML_DIR:-extern/sfml.${PLATFORM}}`
+	SFML_LIBROOT=`realpath -Lms ${SFML_DIR:-extern/sfml/${PLATFORM}}`
 		#! Alas, just omitting -e was not enough... (Two (mostly) complementary
 		#! options (-e and -m) exist, and --help doesn't say what the default is.)
 

@@ -3,10 +3,11 @@ name: Build (Linux)
 on: [workflow_dispatch, push, pull_request]
 
 env:
-  SFML_DIR: extern/sfml
-#!!... :-/  LD_LIBRARY_PATH: extern/sfml.${{ matrix.target }}/lib
-#!!... :-/  LD_LIBRARY_PATH: ${{ env.CWD }}/extern/sfml.linux/lib
-#!!... :-/  LD_LIBRARY_PATH: $CWD/extern/sfml.linux/lib
+  SFML_DIR: extern/sfml/linux
+#!! None of these work here:
+#!!... LD_LIBRARY_PATH: extern/sfml/${{ matrix.target }}/lib
+#!!... LD_LIBRARY_PATH: ${{ env.CWD }}/extern/sfml/linux/lib
+#!!... LD_LIBRARY_PATH: $CWD/extern/sfml/linux/lib
 
 jobs:
   build:

@@ -1,0 +1,61 @@
+codepoints in "": 0
+codepoints in "☺": 1
+codepoints in "áéí": 3
+codepoints in "áéíÓŐŰ": 6
+codepoints in "x☺áéí": 5
+codepoints in "árvíztúró": 9
+codepoints in "árvíztúró☺": 10
+
+byte-size of "": 0
+byte-size of "☺": 3
+byte-size of the first 0 codepoints of "☺": 0
+byte-size of the first 1 codepoints of "☺": 3
+byte-size of the first 999 codepoints of "☺": 3
+byte-size of the first 0 codepoints of "áéí": 0
+byte-size of the first 1 codepoints of "áéí": 2
+byte-size of the first 2 codepoints of "áéí": 4
+byte-size of the first 3 codepoints of "áéí": 6
+byte-size of the first 999 codepoints of "áéí": 6
+byte-size of "árvíztúró": 13
+byte-size of "árvíztúró☺": 16
+
+substr(abcde, 0, ): abcde
+- byte-size of substr(abcde, 0, ): 5
+substr(abcde, 0, 0): 
+- byte-size of substr(abcde, 0, 0): 0
+substr(abcde, 0, 1): a
+- byte-size of substr(abcde, 0, 1): 1
+substr(abcde, 2, ): cde
+- byte-size of substr(abcde, 2, ): 3
+substr(abcde, 2, 3): cde
+- byte-size of substr(abcde, 2, 3): 3
+substr(abcde, 2, 999): cde
+- byte-size of substr(abcde, 2, 999): 3
+
+substr(árvíztűrő, 0, ): árvíztűrő
+- byte-size of substr(árvíztűrő, 0, ): 13
+substr(árvíztűrő, 0, 0): 
+- byte-size of substr(árvíztűrő, 0, 0): 0
+substr(árvíztűrő, 0, 1): á
+- byte-size of substr(árvíztűrő, 0, 1): 2
+substr(árvíztűrő, 2, ): víztűrő
+- byte-size of substr(árvíztűrő, 2, ): 10
+substr(árvíztűrő, 2, 3): víz
+- byte-size of substr(árvíztűrő, 2, 3): 4
+substr(árvíztűrő, 2, 999): víztűrő
+- byte-size of substr(árvíztűrő, 2, 999): 10
+
+substr(árvíztúró☺, 5, ): túró☺
+- byte-size of substr(árvíztúró☺, 5, ): 9
+substr(árvíztúró☺, 5, 4): túró
+- byte-size of substr(árvíztúró☺, 5, 4): 6
+substr(árvíztúró☺, 9, 0): 
+- byte-size of substr(árvíztúró☺, 9, 0): 0
+substr(árvíztúró☺, 9, 1): ☺
+- byte-size of substr(árvíztúró☺, 9, 1): 3
+substr(árvíztúró☺, 9, 2): ☺
+- byte-size of substr(árvíztúró☺, 9, 2): 3
+substr(árvíztúró☺, 10, 1): 
+- byte-size of substr(árvíztúró☺, 10, 1): 0
+substr(árvíztúró☺, 10, 2): 
+- byte-size of substr(árvíztúró☺, 10, 2): 0

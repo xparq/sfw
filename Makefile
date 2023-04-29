@@ -22,7 +22,7 @@ TOOLCHAIN ?= mingw
 endif
 
 # Use `make SFML_DIR=...` to override:
-SFML_DIR  ?= extern/sfml.$(TOOLCHAIN)
+SFML_DIR  ?= extern/sfml/$(TOOLCHAIN)
 
 # Supported build alternatives: debug/release, shared/static SFML:
 #   DEBUG must be 0 or 1
@@ -101,7 +101,7 @@ LIBNAME  := $(LIBNAME)$(FILE_SUFFIX_DEBUG_$(DEBUG))
 LIBFILE  := $(LIBDIR)/lib$(LIBNAME).a
 
 #-----------------------------------------------------------------------------
-define link-exe =
+define link_cmd =
 	@echo "$(TERM_YELLOW)Linking $@$(TERM_NO_COLOR)"
 	@$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
 	@echo "$(TERM_GREEN)Done.$(TERM_NO_COLOR)"
@@ -114,13 +114,13 @@ $(info Build option SFML_LINKMODE = $(SFML_LINKMODE))
 all: $(SMOKE_TEST_EXE) $(TEST_EXE) $(DEMO_EXE)
 
 $(DEMO_EXE): $(OBJDIR)/$(DEMO_OBJ).o $(LIBFILE)
-	$(link-exe)
+	$(link_cmd)
 
 $(TEST_EXE): $(OBJDIR)/$(TEST_OBJ).o $(LIBFILE)
-	$(link-exe)
+	$(link_cmd)
 
 $(SMOKE_TEST_EXE): $(OBJDIR)/$(SMOKE_TEST_OBJ).o $(LIBFILE)
-	$(link-exe)
+	$(link_cmd)
 
 $(LIBFILE): $(OBJ)
 	@mkdir -p $(LIBDIR)

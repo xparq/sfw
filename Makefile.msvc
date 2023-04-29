@@ -5,6 +5,8 @@
 #### you rename this file:
 THIS_MAKEFILE=Makefile.msvc
 
+TOOLCHAIN=msvc
+
 #-----------------------------------------------------------------------------
 # Config - Project layout
 #-----------------------------------------------------------------------------
@@ -17,20 +19,29 @@ smoke_test_exe=./test/smoke.exe
 BUILD = $(main_lib) $(main_exe) $(test_exe) $(smoke_test_exe)
 
 SRC_DIR=src
-OUT_DIR=tmp/build/msvc
+OUT_DIR=tmp/build/$(TOOLCHAIN)
 LIB_DIR=lib
 EXE_DIR=
 OBJ_DIR=$(OUT_DIR)/obj
 CXX_MOD_IFC_DIR=$(OUT_DIR)/ifc
-# Put (only) these into the lib (relative to src_dir; leave it empty for "all"):
+# Put (only) these into the lib (relative to SRC_DIR; leave it empty for "all"):
 LIB_SRC_SUBDIR=lib
 
 # Source (translation unit) basename filter:
 UNITS_PATTERN=*
+#!!UNITS_EXCLUDE_PATTERN=
 
-# External dependencies:
-EXT_INCLUDE_DIRS=extern/sfml.msvc/include
-EXT_LIB_DIRS=extern/sfml.msvc/lib
+# External dependencies ("3rd-party" or "vendor" dir, if any):
+EXT_PGK_ROOT=extern
+EXT_INCLUDE_ROOT=$(EXT_PGK_ROOT)
+#!!Do this properly, protecting against an empty root:
+EXT_LIB_ROOT=$(EXT_PGK_ROOT)
+
+EXT_INCLUDE_DIRS = $(EXT_PGK_ROOT);$(EXT_INCLUDE_DIRS)
+
+sfml_pgk=sfml/msvc
+EXT_INCLUDE_DIRS=extern;$(EXT_INCLUDE_ROOT)/$(sfml_pgk)/include
+EXT_LIB_DIRS     = $(EXT_LIB_ROOT)/$(sfml_pgk)/lib
 EXT_LIBS=$(sfml_and_deps_libs)
 
 #-----------------------------------------------------------------------------

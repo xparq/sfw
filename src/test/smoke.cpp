@@ -17,7 +17,8 @@ int main()
 	using namespace sfw;
 	GUI demo(dummy_window, Theme::DEFAULT, false); // false: don't own the window
 	if (!demo) {
-		return 0; // Failure is expected here for now (with a dead window...)!
+		//!!assert("Setup should fail due to dead host window; although -> #254!")
+		return 0; // "Failed successfully", with the dead window.
 	}
 
 	return 1; // WTF?! Failed to even fail?!

@@ -13,7 +13,7 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 - Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already)
 - Richer, more flexible API, new features, bugfixes, improvements
 - Default quick-start assets included (and removed the non-free ones from the old package)
-- Windows build support (MSVC and MinGW (actually [w64devkit](https://github.com/skeeto/w64devkit)))
+- Windows build support (MSVC & GCC (via [w64devkit](https://github.com/skeeto/w64devkit), so MingW should also work))
 - Reshuffled source tree (to allow growth & to help integrating into other projects)
 - Auto download & setup the latest SFML-master locally (mostly for GitHub workflows)
 
