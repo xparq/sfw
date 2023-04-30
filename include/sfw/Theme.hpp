@@ -15,6 +15,7 @@
 
 namespace sfw
 {
+
 class Theme
 {
 public:
@@ -82,6 +83,7 @@ public:
         sf::Color textColor;
         sf::Color textColorHover;
         sf::Color textColorFocus;
+        sf::Color textColorDisabled;
         sf::Color textSelectionColor;
         sf::Color textPlaceholderColor;
     };

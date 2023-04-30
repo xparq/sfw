@@ -41,6 +41,7 @@ int main()
 	Theme::input.textColor = hex2color("#000");
 	Theme::input.textColorHover = hex2color("#000");
 	Theme::input.textColorFocus = hex2color("#000");
+	Theme::input.textColorDisabled = hex2color("#888");
 	Theme::input.textSelectionColor = hex2color("#97b1AD");
 	Theme::input.textPlaceholderColor = hex2color("#8791AD");
 
@@ -311,6 +312,12 @@ int main()
 	vbars->add(pbarScale2);
 	vbars->add(pbarScale3);
 
+/*
+	auto disabled_ed = form->add("Disabled", (new TextBox)->set("Disabled"));
+	cout <<	"Initial state of the \"Disabled\" widget: " << disabled_ed->enabled() << endl;
+	disabled_ed->disable();
+	cout  << "- after disabling: " << disabled_ed->enabled() << endl;
+*/
 
 	//--------------------------------------------------------------------
 	// A panel in the middle
@@ -465,11 +472,20 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	);
 
 	// A pretty useless, but interesting clear-background checkbox
-	auto hbox4 = right_bar->add(new sfw::HBox);
-	hbox4->add(sfw::Label("Clear background"));
-	// + a uselessly convoluted name-lookup through its own widget pointer, to check
-	// the get() name fix of #200 (assuming CheckBox still has its "real" get():
-	hbox4->add(sfw::CheckBox([&](auto* w) { Theme::clearBackground = ((sfw::CheckBox*)w->getWidget("x"))->get(); }, true), "x");
+	auto hbox4 = right_bar->add(new HBox);
+	hbox4->add(Label("Clear background"));
+	// + a uselessly convoluted name-lookup through its own widget pointer, to confirm
+	// the get() name fix of #200 (assuming CheckBox still has its "real" get()):
+	hbox4->add(CheckBox([&](auto* w) { Theme::clearBackground = ((CheckBox*)w->getWidget("findme"))->get(); },
+	                    true), "findme");
+
+	auto disable_all_box = right_bar->add(new HBox);
+	disable_all_box->add(Label("Disable/Enable all"));
+	disable_all_box->add(CheckBox([&](auto* w) {
+		demo.foreach([&](auto* widget) {widget->enable(w->get());});
+		w->enable(); //! ;)
+	}, true ));
+
 
 	// "GUI::close" button -- should NOT close the window:
 	demo.add(sfw::Button("Close the GUI!", [&] { demo.close(); }));

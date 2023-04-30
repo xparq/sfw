@@ -38,8 +38,8 @@ public:
     /**
      * Widget position
      */
-    void setPosition(const sf::Vector2f& pos);
-    void setPosition(float x, float y);
+    Widget* setPosition(const sf::Vector2f& pos);
+    Widget* setPosition(float x, float y);
 
     const sf::Vector2f& getPosition() const;
     const sf::Vector2f& getSize() const;
@@ -50,19 +50,21 @@ public:
      */
     bool containsPoint(const sf::Vector2f& point) const;
 
-    /**
-     * Check if the widget can be selected and trigger events
-     */
-    bool isSelectable() const;
+    bool focused() const;
 
-    bool isFocused() const;
+    // Enable/disable processing user events (not just inputs, but also outputs
+    // like triggering user callbacks)
+    Widget* enable(bool state = true);
+    bool    enabled() const;
+    Widget* disable() { return enable(false); }
+    bool    disabled() const { return !enabled(); }
 
     /**
      * Set a function to be called when the "value" of the widget is changed
      */
-private:
-    using Callback_void = std::optional<std::function<void()>>;
-    using Callback_w    = std::optional<std::function<void(Widget*)>>;
+    private:
+        using Callback_void = std::optional<std::function<void()>>;
+        using Callback_w    = std::optional<std::function<void(Widget*)>>;
 public:
     using Callback  = std::variant<Callback_w, Callback_void>;
     Widget* setCallback(Callback callback);
@@ -107,6 +109,12 @@ public:
      */
     Widget* getWidget(const std::string& name) const;
 
+    /**
+      Method-chaining helper for setting up nested widget structures
+      (Note: getParent is not public, plus this may get arguments in the future.)
+    */
+    WidgetContainer* parent(/*!!enum FailMode mode = or_burn*/) { return getParent(); }
+
 protected:
 //----------------------
 friend class WidgetContainer;
@@ -125,7 +133,11 @@ friend class GUI;
     void setState(WidgetState state);
     WidgetState getState() const;
 
-    void setSelectable(bool selectable);
+    /**
+     * Set/check if the widget can be focused (i.e. process & trigger user events)
+     */
+    void setFocusable(bool focusable); //!!setInteractive, as it's all about taking user inputs!
+    bool focusable() const;
 
     void triggerCallback();
 
@@ -196,13 +208,13 @@ private:
     WidgetState m_state;
     sf::Vector2f m_position;
     sf::Vector2f m_size;
-    bool m_selectable;
+    bool m_focusable;
     Callback m_callback;
     sf::Transform m_transform;
 
 #ifdef DEBUG
 public:
-	void draw_outline(const gfx::RenderContext& ctx, sf::Color color = sf::Color::Red) const;
+	void draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor = sf::Color::Red, sf::Color fillcolor = sf::Color::Transparent) const;
 #endif
 };
 

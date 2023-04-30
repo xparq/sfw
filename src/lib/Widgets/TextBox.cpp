@@ -714,7 +714,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
     ctx.target.draw(clip, sfml_renderstates);
 */
     // Show cursor if focused
-    if (isFocused())
+    if (focused())
     {
         // Make it blink
         // Hijacking draw() as a timer tick callback... :) Hi five to Alexandre@upstream for the brilliant idea!

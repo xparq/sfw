@@ -14,7 +14,7 @@ ProgressBar::ProgressBar(float length, Orientation orientation, LabelPlacement l
     m_box(Box::Input)
 {
     setValue(m_value);
-    setSelectable(false);
+    setFocusable(false);
 
     updateGeometry();
 }

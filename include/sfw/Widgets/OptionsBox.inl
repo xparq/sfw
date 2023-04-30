@@ -194,7 +194,7 @@ void OptionsBox<T>::updateArrowState(ItemBox<Arrow>& arrow, float x, float y)
     }
     else
     {
-        arrow.applyState(isFocused() ? WidgetState::Focused : WidgetState::Default);
+        arrow.applyState(focused() ? WidgetState::Focused : WidgetState::Default);
     }
 }
 

@@ -12,15 +12,15 @@
         static auto DEBUG_INSIGHT_KEY = sf::Keyboard::LAlt;
         static auto DEBUG_INSIGHT_KEY_PRESSED = false;
     }
-#
+
 #endif
 
 namespace sfw
 {
 
 Layout::Layout():
-    m_hover(nullptr),
-    m_focus(nullptr)
+    m_hoveredWidget(nullptr),
+    m_focusedWidget(nullptr)
 {
 }
 
@@ -46,12 +46,17 @@ void Layout::draw(const gfx::RenderContext& ctx) const
     {
         widget->draw(lctx);
 #ifdef DEBUG
-	if (DEBUG_INSIGHT_KEY_PRESSED && widget->getState() == WidgetState::Hovered) {
-		if (auto* root = getMain(); root) {
-			widget->draw_outline(lctx,
-				const_cast<Widget*>(widget)->toLayout() ? sf::Color::White : sf::Color::Blue);
-		}
-	}
+        // "Dim" the widget rect. if disbled:
+        if (widget->disabled()) {
+			widget->draw_outline(lctx, sf::Color::Transparent, Theme::bgColor * sf::Color(200, 200, 200, 50));
+        }
+        // Draw an outline around the widget:
+        if (DEBUG_INSIGHT_KEY_PRESSED && widget->getState() == WidgetState::Hovered) {
+            if (auto* root = getMain(); root) {
+                widget->draw_outline(lctx,
+                    const_cast<Widget*>(widget)->toLayout() ? sf::Color::White : sf::Color::Blue);
+            }
+        }
 #endif
     }
 }
@@ -61,11 +66,11 @@ void Layout::onStateChanged(WidgetState state)
 {
     if (state == WidgetState::Default)
     {
-        // Lost the focus, reset the focused state
-        if (m_focus)
+        // Make sure no child is stuck focused
+        if (m_focusedWidget)
         {
-            m_focus->setState(WidgetState::Default);
-            m_focus = nullptr;
+            m_focusedWidget->setState(WidgetState::Default);
+            m_focusedWidget = nullptr;
         }
     }
 }
@@ -73,36 +78,37 @@ void Layout::onStateChanged(WidgetState state)
 
 void Layout::onMouseMoved(float x, float y)
 {
-    // Pressed widgets still receive mouse move events even when not hovered if mouse is pressed
-    if (m_focus && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    // Focused widgets still receive MouseMove events even when not hovered, when the mouse button is pressed
+    if (m_focusedWidget && sf::Mouse::isButtonPressed(sf::Mouse::Left))
     {
-        m_focus->onMouseMoved(x - m_focus->getPosition().x, y - m_focus->getPosition().y);
-        if (!m_focus->containsPoint({x, y}))
+        m_focusedWidget->onMouseMoved(x - m_focusedWidget->getPosition().x, y - m_focusedWidget->getPosition().y);
+        if (!m_focusedWidget->containsPoint({x, y}))
         {
-            m_hover = nullptr;
+            m_hoveredWidget = nullptr;
         }
     }
     else
     {
-        // Loop over widgets
         for (Widget* widget = begin(); widget != end(); widget = next(widget))
         {
+            if (!widget->enabled())
+                continue;
+
             // Convert mouse position to the widget's coordinate system
             sf::Vector2f mouse = sf::Vector2f(x, y) - widget->getPosition();
             if (widget->containsPoint(mouse))
             {
-                if (m_hover != widget)
+                if (widget != m_hoveredWidget) // Hovered to another widget?
                 {
-                    // A new widget is hovered
-                    if (m_hover)
+                    if (m_hoveredWidget)
                     {
-                        m_hover->setState(m_focus == m_hover ? WidgetState::Focused : WidgetState::Default);
-                        m_hover->onMouseLeave();
+                        m_hoveredWidget->setState(m_focusedWidget == m_hoveredWidget ? WidgetState::Focused : WidgetState::Default);
+                        m_hoveredWidget->onMouseLeave();
                     }
 
-                    m_hover = widget;
-                    // Don't set the Hovered state if the widget is already focused
-                    if (m_hover != m_focus)
+                    m_hoveredWidget = widget;
+                    // Set it to "Hovered" only if it's not also focused!
+                    if (m_hoveredWidget != m_focusedWidget)
                     {
                         widget->setState(WidgetState::Hovered);
                     }
@@ -116,12 +122,12 @@ void Layout::onMouseMoved(float x, float y)
             }
         }
         // No widget hovered, remove hovered state
-        if (m_hover)
+        if (m_hoveredWidget)
         {
-            m_hover->onMouseMoved(x, y);
-            m_hover->setState(m_focus == m_hover ? WidgetState::Focused : WidgetState::Default);
-            m_hover->onMouseLeave();
-            m_hover = nullptr;
+            m_hoveredWidget->onMouseMoved(x, y);
+            m_hoveredWidget->setState(m_focusedWidget == m_hoveredWidget ? WidgetState::Focused : WidgetState::Default);
+            m_hoveredWidget->onMouseLeave();
+            m_hoveredWidget = nullptr;
         }
     }
 }
@@ -129,34 +135,34 @@ void Layout::onMouseMoved(float x, float y)
 
 void Layout::onMousePressed(float x, float y)
 {
-    if (m_hover)
+    if (m_hoveredWidget)
     {
-        // Clicked widget takes focus
-        if (m_focus != m_hover)
+        // Try focusing the clicked widget...
+        if (m_focusedWidget != m_hoveredWidget)
         {
-            focusWidget(m_hover);
+            focusWidget(m_hoveredWidget);
+                //! It might not have taken it, but never mind, carry on regardless...
         }
         // Send event to widget
-        sf::Vector2f mouse = sf::Vector2f(x, y) - m_hover->getPosition();
-        m_hover->onMousePressed(mouse.x, mouse.y);
+        sf::Vector2f mouse = sf::Vector2f(x, y) - m_hoveredWidget->getPosition();
+        m_hoveredWidget->onMousePressed(mouse.x, mouse.y);
     }
-    // User didn't click on a widget, remove focus state
-    else if (m_focus)
+    else if (m_focusedWidget) // User click away from the focused widget?
     {
-        m_focus->setState(WidgetState::Default);
-        m_focus = nullptr;
+        m_focusedWidget->setState(WidgetState::Default); //!!->unfocus()!
+        m_focusedWidget = nullptr;
     }
 }
 
 
 void Layout::onMouseReleased(float x, float y)
 {
-    if (m_focus)
+    if (m_focusedWidget)
     {
         // Send event to the focused widget
-        sf::Vector2f mouse = sf::Vector2f(x, y) - m_focus->getPosition();
-        m_focus->onMouseReleased(mouse.x, mouse.y);
-        m_focus->setState(WidgetState::Focused);
+        sf::Vector2f mouse = sf::Vector2f(x, y) - m_focusedWidget->getPosition();
+        m_focusedWidget->onMouseReleased(mouse.x, mouse.y);
+        m_focusedWidget->setState(WidgetState::Focused);
     }
 }
 
@@ -164,20 +170,20 @@ void Layout::onMouseReleased(float x, float y)
 void Layout::onMouseLeave()
 {
     // Propagate it to the hovered child, if any, and then stop hovering it
-    if (m_hover)
+    if (m_hoveredWidget)
     {
-        m_hover->onMouseLeave();
-        m_hover->setState(m_focus == m_hover ? WidgetState::Focused : WidgetState::Default);
-        m_hover = nullptr;
+        m_hoveredWidget->onMouseLeave();
+        m_hoveredWidget->setState(m_focusedWidget == m_hoveredWidget ? WidgetState::Focused : WidgetState::Default);
+        m_hoveredWidget = nullptr;
     }
 }
 
 
 void Layout::onMouseWheelMoved(int delta)
 {
-    if (m_focus)
+    if (m_focusedWidget)
     {
-        m_focus->onMouseWheelMoved(delta);
+        m_focusedWidget->onMouseWheelMoved(delta);
     }
 }
 
@@ -196,9 +202,9 @@ void Layout::onKeyPressed(const sf::Event::KeyEvent& key)
             // Try to wrap around to the last widget then
             focusPreviousWidget();
     }
-    else if (m_focus)
+    else if (m_focusedWidget)
     {
-        m_focus->onKeyPressed(key);
+        m_focusedWidget->onKeyPressed(key);
     }
 
 #ifdef DEBUG
@@ -209,9 +215,9 @@ void Layout::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void Layout::onKeyReleased(const sf::Event::KeyEvent& key)
 {
-    if (m_focus)
+    if (m_focusedWidget)
     {
-        m_focus->onKeyReleased(key);
+        m_focusedWidget->onKeyReleased(key);
     }
 
 #ifdef DEBUG
@@ -222,9 +228,9 @@ void Layout::onKeyReleased(const sf::Event::KeyEvent& key)
 
 void Layout::onTextEntered(char32_t unichar)
 {
-    if (m_focus)
+    if (m_focusedWidget)
     {
-        m_focus->onTextEntered(unichar);
+        m_focusedWidget->onTextEntered(unichar);
     }
 }
 
@@ -233,16 +239,15 @@ bool Layout::focusWidget(Widget* widget)
 {
     if (widget)
     {
-        // If another widget was already focused, reset that
-        if (m_focus && m_focus != widget)
+        if (widget->focusable() && widget->enabled())
         {
-            m_focus->setState(WidgetState::Default);
-            m_focus = nullptr;
-        }
-        // Apply focus to widget
-        if (widget->isSelectable()) //!!??isFocusable()
-        {
-            m_focus = widget;
+            // If another widget was already focused, reset that
+            if (m_focusedWidget && m_focusedWidget != widget)
+            {
+                m_focusedWidget->setState(WidgetState::Default);
+                m_focusedWidget = nullptr;
+            }
+            m_focusedWidget = widget;
             widget->setState(WidgetState::Focused);
             return true;
         }
@@ -253,22 +258,22 @@ bool Layout::focusWidget(Widget* widget)
 
 bool Layout::focusPreviousWidget()
 {
-    // If a sublayout is already focused
-    if (m_focus && m_focus->toLayout())
+    // If a sublayout has the focus, let it handle this first there, locally:
+    if (m_focusedWidget && m_focusedWidget->toLayout())
     {
-        if (m_focus->toLayout()->focusPreviousWidget())
+        if (m_focusedWidget->toLayout()->focusPreviousWidget())
             return true;
     }
 
-    Widget* start = m_focus ? prev(m_focus) : rbegin();
+    Widget* start = m_focusedWidget ? prev(m_focusedWidget) : rbegin();
     for (Widget* widget = start; widget != rend(); widget = prev(widget))
     {
         if (Layout* container = widget->toLayout(); container)
         {
             if (container->focusPreviousWidget())
             {
-                focusWidget(container);
-                return true;
+                if (focusWidget(container))
+                    return true;
             }
         }
         else if (focusWidget(widget))
@@ -277,23 +282,23 @@ bool Layout::focusPreviousWidget()
         }
     }
 
-    if (m_focus)
-        m_focus->setState(WidgetState::Default);
-    m_focus = nullptr;
+    if (m_focusedWidget)
+        m_focusedWidget->setState(WidgetState::Default);
+    m_focusedWidget = nullptr;
     return false;
 }
 
 
 bool Layout::focusNextWidget()
 {
-    // If a sublayout is already focused
-    if (m_focus && m_focus->toLayout())
+    // If a sublayout has the focus, let it handle this first there, locally:
+    if (m_focusedWidget && m_focusedWidget->toLayout())
     {
-        if (m_focus->toLayout()->focusNextWidget())
+        if (m_focusedWidget->toLayout()->focusNextWidget())
             return true;
     }
 
-    Widget* start = m_focus ? next(m_focus) : begin();
+    Widget* start = m_focusedWidget ? next(m_focusedWidget) : begin();
     for (Widget* widget = start; widget != end(); widget = next(widget))
     {
         if (Layout* container = widget->toLayout(); container)
@@ -310,9 +315,9 @@ bool Layout::focusNextWidget()
         }
     }
 
-    if (m_focus)
-        m_focus->setState(WidgetState::Default);
-    m_focus = nullptr;
+    if (m_focusedWidget)
+        m_focusedWidget->setState(WidgetState::Default);
+    m_focusedWidget = nullptr;
     return false;
 }
 

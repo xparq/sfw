@@ -46,6 +46,7 @@ int main()
 	Theme::input.textColor = hex2color("#000");
 	Theme::input.textColorHover = hex2color("#000");
 	Theme::input.textColorFocus = hex2color("#000");
+	Theme::input.textColorDisabled = hex2color("#888");
 	Theme::input.textSelectionColor = hex2color("#b0c0c0");
 	Theme::input.textPlaceholderColor = hex2color("#8791AD");
 
@@ -348,8 +349,14 @@ int main()
 		const auto& themecfg = w->current();
 		demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
 			demo.setTheme(themecfg); // Forcing an onThemeChanged callback sweep...
-			// Update the wallpaper on/off checkbox:
-			if (demo.getWidget("Wallpaper")) ((sfw::CheckBox*)demo.getWidget("Wallpaper"))->set(demo.hasWallpaper());
+			// Update the wallpaper controls:
+			if (auto wpalpha = demo.getWidget("Wallpaper α"); wpalpha) {
+				wpalpha->enable(demo.hasWallpaper());
+			}
+			if (auto wptoggle = demo.getWidget("Wallpaper"); wptoggle)
+				((sfw::CheckBox*)wptoggle)
+					->set(demo.hasWallpaper())
+					->enable(demo.hasWallpaper());
 			// Update the bg. color selector's "Default" option:
 			if (demo.getWidget("Bg. color")) ((OBColor*)demo.getWidget("Bg. color"))->set("Default", themecfg.bgColor);
 	});
@@ -394,7 +401,9 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 
 	// Wallpaper on/off checkbox
 	bgform->add("Wallpaper", sfw::CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
-	                                       demo.hasWallpaper()));
+	                                       demo.hasWallpaper())
+	           )->enable(demo.hasWallpaper());
+
 	// Wallpaper transparency slider
 	bgform->add("Wallpaper α", sfw::Slider(1, 75))
 		->setValue(10)

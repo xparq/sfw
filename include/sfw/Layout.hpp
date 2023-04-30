@@ -41,8 +41,8 @@ protected:
     bool focusPreviousWidget();
 
 private:
-    Widget* m_hover;
-    Widget* m_focus;
+    Widget* m_hoveredWidget;
+    Widget* m_focusedWidget;
 };
 
 } // namespace

@@ -7,7 +7,7 @@ namespace sfw
 
 Image::Image()
 {
-    setSelectable(false);
+    setFocusable(false);
 }
 
 Image::Image(const std::string& filename, const sf::IntRect& r): Image()

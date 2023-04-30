@@ -143,7 +143,7 @@ void ImageButton::onStateChanged(WidgetState state)
 
 void ImageButton::onMouseMoved(float x, float y)
 {
-    if (isFocused())
+    if (focused())
     {
         if (containsPoint({x, y}) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
             press();

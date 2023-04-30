@@ -20,7 +20,7 @@ Widget::Widget():
     m_previous(nullptr),
     m_next(nullptr),
     m_state(WidgetState::Default),
-    m_selectable(true)
+    m_focusable(true)
 {
 }
 
@@ -83,7 +83,7 @@ Widget* Widget::getWidget(const std::string& name) const
 }
 
 
-void Widget::setPosition(const sf::Vector2f& pos)
+Widget* Widget::setPosition(const sf::Vector2f& pos)
 {
     m_position = {roundf(pos.x), roundf(pos.y)};
     m_transform = sf::Transform(
@@ -91,11 +91,15 @@ void Widget::setPosition(const sf::Vector2f& pos)
         0, 1, m_position.y, // translate y
         0, 0, 1
     );
+
+    return this;
 }
 
-void Widget::setPosition(float x, float y)
+Widget* Widget::setPosition(float x, float y)
 {
     setPosition(sf::Vector2f(x, y));
+
+    return this;
 }
 
 
@@ -150,21 +154,45 @@ bool Widget::containsPoint(const sf::Vector2f& point) const
 }
 
 
-bool Widget::isSelectable() const
-{
-    return m_selectable;
-}
-
-
-bool Widget::isFocused() const
+bool Widget::focused() const
 {
     return m_state == WidgetState::Focused || m_state == WidgetState::Pressed;
 }
 
 
-void Widget::setSelectable(bool selectable)
+void Widget::setFocusable(bool focusable)
 {
-    m_selectable = selectable;
+    m_focusable = focusable;
+}
+
+
+bool Widget::focusable() const
+{
+    return m_focusable;
+}
+
+
+Widget* Widget::enable(bool state)
+{
+	if (state) {
+        if (m_state == WidgetState::Disabled)
+        {
+		    m_state = WidgetState::Default;
+	        onStateChanged(m_state);
+        }
+    } else {
+        if (m_state != WidgetState::Disabled)
+        {
+    		m_state = WidgetState::Disabled;
+	        onStateChanged(m_state);
+        }
+    }
+    return this;
+}
+
+bool Widget::enabled() const
+{
+	return m_state != WidgetState::Disabled;
 }
 
 
@@ -177,6 +205,9 @@ Widget* Widget::setCallback(Callback callback)
 void Widget::triggerCallback()
 {
     assert( std::holds_alternative<Callback_w>(m_callback) || std::holds_alternative<Callback_void>(m_callback) );
+
+    if (disabled())
+        return;
 
     if (std::holds_alternative<Callback_w>(m_callback) && std::get<Callback_w>(m_callback))
     {
@@ -234,13 +265,13 @@ void Widget::onTick() { }
 // diagnostics ---------------------------------------------------------------
 
 #ifdef DEBUG
-void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx, sf::Color color) const
+void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx, sf::Color outlinecolor, sf::Color fillcolor) const
 {
 	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
 	r.setPosition(getAbsolutePosition());
-	r.setFillColor(sf::Color::Transparent);
+	r.setFillColor(fillcolor);
 	r.setOutlineThickness(2);
-	r.setOutlineColor(color);
+	r.setOutlineColor(outlinecolor);
 	ctx.target.draw(r);
 }
 #endif

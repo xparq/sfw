@@ -73,8 +73,8 @@ float Theme::MARGIN = 4.f;
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-#endif
 // Note: desig. init would zero the missing fields, which is fine for us, but not for GCC. :-/
+#endif
 sf::Event::KeyEvent Theme::nextWidgetKey =     { .code = sf::Keyboard::Tab };
 sf::Event::KeyEvent Theme::previousWidgetKey = { .code = sf::Keyboard::Tab, .shift = true };
 #ifdef __GNUC__
@@ -144,7 +144,7 @@ const sf::IntRect& Theme::getTextureRect(Box::Type type, WidgetState state)
         id = type == Box::Click ? BOX_FOCUSED : BOX_INPUT_FOCUSED;
         break;
     case WidgetState::Disabled:
-        //!!Not implemented yet, see #223!
+        //!! No dedicated texture (yet?); using the default...
         break;
     }
     return m_subrects[id];

@@ -57,9 +57,15 @@ public:
     void render();
 
     /**
-     * Shut down the GUI, and close the window, too, if "owning" it
+     * Shut down the GUI, and close the window, too, if owning it
      */
     void close();
+
+    /**
+     * Do things to widgets...
+     */
+    void foreach(const std::function<void(Widget*)>& f) { return traverseChildren(f); }
+
 
     /*************************************************************************
      Name->widget registry

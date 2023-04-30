@@ -10,7 +10,7 @@ namespace sfw
 Label::Label(const std::string& text)
 {
     onThemeChanged(); //!!Calling it this way is a temp. kludge (for DRY). Also: it has to happen before the rest of the init.
-    setSelectable(false);
+    setFocusable(false);
     setText(text);
 }
 
