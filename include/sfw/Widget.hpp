@@ -29,43 +29,63 @@ class WidgetContainer;
 class Layout;
 class GUI;
 
-/**
- * Abstract base class for gui widgets
- */
+/*****************************************************************************
+  Abstract base for widgets
+
+  - Every (interactive) widget has a dedicated value -- and a corresponding
+    data type -- that it represents (models) and stores.
+
+    This value can be set via user input actions, or programmatically by the
+    constructor, and a dedicated set(...) method -- in fact, any number of
+    overloaded set(...) methods (or even setXxx(...) supplementry ones, too).
+ 
+    The value can be queried with the widget's (single) SomeValue get()
+    method. (Unfortunately C++ doesn't support different return types, so other
+    getXxx() methods may be used to get various flavors of the widget value.)
+
+  - Interactive widgets can have user callbacks assigned, which get invoked
+    when the value
+
+    The set(...) methods never call the onUpdate callback.
+    The update(...) methods, OTOH, always do. (They are just set + onUpdate.)
+
+
+ *****************************************************************************/
 class Widget: public gfx::Drawable
 {
 public:
-    /**
-     * Widget position
-     */
+    
+    // Widget geometry
     Widget* setPosition(const sf::Vector2f& pos);
     Widget* setPosition(float x, float y);
-
     const sf::Vector2f& getPosition() const;
+    // - These are set automatically, so can only be queried:
     const sf::Vector2f& getSize() const;
     const sf::Transform& getTransform() const;
 
-    /**
-     * Check if a point is inside the widget
-     */
+    // Is a screen position inside the widget?
     bool containsPoint(const sf::Vector2f& point) const;
+
+    // Enable/disable processing user events
+    // (Not just inputs, but also outputs like triggering user callbacks.)
+    Widget* enable(bool state = true);
+    bool    enabled() const;
+    Widget* disable()        { return enable(false); }
+    bool    disabled() const { return !enabled(); }
 
     bool focused() const;
 
-    // Enable/disable processing user events (not just inputs, but also outputs
-    // like triggering user callbacks)
-    Widget* enable(bool state = true);
-    bool    enabled() const;
-    Widget* disable() { return enable(false); }
-    bool    disabled() const { return !enabled(); }
-
-    /**
-     * Set a function to be called when the "value" of the widget is changed
-     */
+    // Set callback to invoke when the widget is updated
+    //
+    // 1. Applies to interactive (input) widgets only.
+    // 2. The callback is not called for volatile interim state changes of the
+    //    widget (like typing into a text editor), but only when applying
+    //    (committing) the updates as its new value.
+    // 3. Whether the 
     private:
         using Callback_void = std::optional<std::function<void()>>;
         using Callback_w    = std::optional<std::function<void(Widget*)>>;
-public:
+    public:
     using Callback  = std::variant<Callback_w, Callback_void>;
     Widget* setCallback(Callback callback);
 
@@ -139,8 +159,6 @@ friend class GUI;
     void setFocusable(bool focusable); //!!setInteractive, as it's all about taking user inputs!
     bool focusable() const;
 
-    void triggerCallback();
-
     /**
      * Get the widget typed as a Layout, if applicable
      */
@@ -182,11 +200,14 @@ friend class GUI;
     // Uniform node-level interface for recursive traversal of the widget tree
     virtual void traverseChildren(const std::function<void(Widget*)>&) {}
 
-
 private:
-    virtual void recomputeGeometry() {} // Can be requested by friend widgets, too
+    virtual void recomputeGeometry() {} // Also called by some of the friend classes
 
-    // Callbacks
+    // Callbacks...
+protected:
+    virtual void onUpdate(); // Calls the *instance-specific* update callback,
+                             // so overrides should chain back to this!
+private:
     virtual void onStateChanged(WidgetState state);
     virtual void onMouseEnter();
     virtual void onMouseLeave();

@@ -161,11 +161,10 @@ void ImageButton::onMousePressed(float, float)
 
 void ImageButton::onMouseReleased(float x, float y)
 {
-
     release();
     if (containsPoint({x, y}))
     {
-        triggerCallback();
+        onUpdate();
     }
 }
 
@@ -174,8 +173,8 @@ void ImageButton::onKeyPressed(const sf::Event::KeyEvent& key)
 {
     if (key.code == sf::Keyboard::Enter)
     {
-        triggerCallback();
         press();
+        onUpdate();
     }
 }
 
@@ -195,7 +194,6 @@ void ImageButton::press()
         m_text.move({0, 1});
     }
 }
-
 
 void ImageButton::release()
 {

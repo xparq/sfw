@@ -28,7 +28,7 @@ CheckBox::CheckBox(std::function<void(CheckBox*)> callback, bool checked):
 CheckBox* CheckBox::set(bool checked)
 {
     m_checked = checked;
-    triggerCallback();
+    onUpdate();
     return this;
 }
 
@@ -70,7 +70,7 @@ void CheckBox::onMouseReleased(float x, float y)
 {
     if (containsPoint(sf::Vector2f(x, y)))
     {
-        toggle(); // will call triggerCallback()
+        toggle(); // calls onUpdate()
     }
 }
 
@@ -79,7 +79,7 @@ void CheckBox::onKeyPressed(const sf::Event::KeyEvent& key)
 {
     if (key.code == sf::Keyboard::Space)
     {
-        toggle(); // will call triggerCallback()
+        toggle(); // calls onUpdate()
     }
 }
 

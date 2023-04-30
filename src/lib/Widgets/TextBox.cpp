@@ -62,9 +62,8 @@ TextBox* TextBox::set(const std::string& content)
     setCursorPos(length());
 
     //!! This (i.e. calling the user callback also on set...()) should be consistent across all the widgets! -> #257
-    //!! Doing this prematurely (before attaching to the GUI) is not yet clearly warned about (or prevented)! -> #109
-    //!!triggerCallback();
-
+    //!! Doing this prematurely (before attaching to the GUI) is not yet clearly warned about (or prevented)! -> #109, #271
+    onUpdate();
     return this;
 }
 
@@ -493,7 +492,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
     // "Apply"
     case sf::Keyboard::Enter:
-        triggerCallback();
+        onUpdate();
         break;
 
     // Ctrl+A: Select All

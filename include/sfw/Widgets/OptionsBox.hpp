@@ -70,12 +70,9 @@ public:
     OptionsBox<T>* setCallback(std::function<void()> callback) { return Widget::setCallback(callback); }
 
 protected:
-    /**
-     * Update the selection to show the item at the specified index.
-     * Also trigger the action callback, if the selection has changed,
-     * and the callTheCallback parametere is true.
-     */
-    auto update_selection(size_t index, bool callTheCallback = true);
+    // Change the currently selected item
+    // Note: does not call onUpdate!
+    auto update_selection(size_t index);
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;

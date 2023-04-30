@@ -12,22 +12,22 @@ License: [MIT License](http://opensource.org/licenses/MIT) (See the `LICENSE` fi
 - Adapted to the upcoming SFML v3 API
 - Compiling as C++20 now (to embrace recent C++ features; SFML3 is C++17 already)
 - Richer, more flexible API, new features, bugfixes, improvements
-- Default quick-start assets included (and removed the non-free ones from the old package)
-- Windows build support (MSVC & GCC (via [w64devkit](https://github.com/skeeto/w64devkit), so MingW should also work))
-- Reshuffled source tree (to allow growth & to help integrating into other projects)
+- Default quick-start assets included (and removed the non-free ones)
+- Windows build (MSVC & GCC (via [w64devkit](https://github.com/skeeto/w64devkit), so MingW should also work))
 - Auto download & setup the latest SFML-master locally (mostly for GitHub workflows)
+- Reshuffled repo tree (to allow growth & to help integrating into other projects)
 
 _For other (both planned and completed) changes see the [issues](https://github.com/xparq/sfw/issues)!_
 
 ## Quick Summary
 
-- Small package with no external dependencies beyond SFML & `std::`.
+- Moderately sized package with no external dependencies beyond SFML
 - Simple, straightforward, but versatile API
 - Visual styling via spritesheets (small image files to customize borders, markers etc.)
-- Simple callbacks: optional lambdas (or `std::function`s) triggered on _important_ user actions (only)
-  _(You can still derive from the widgets to override the other event handlers, too, of course.)_
-- Easy layouts: automatically align content without the need to precalculate positions/sizes
-- No CMake. (Well, since I never got to learn it, now I just consider this a feature. ;)
+- Simple optional callbacks for "update" actions (supporting both `[]()` and `[](Widget*)` lambda signatures)
+  _(Any other event handlers can also be overridden in derived widgets, of course.)_
+- Easy layouts: automatically (and dynamically re)align widgets
+- No CMake. (Well, since I never got to learn it, now I just declare this a feature. ;)
   Use e.g. TGUI if you don't feel warm and cozy without CMake.)
 
 
@@ -38,11 +38,11 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 ### GCC/CLANG:
 
-- Run `make` to build the library (`lib/libsfw.a`) & the demo (`./sfw-demo`) etc.
+- Run `make` to build the lib (in the `lib` folder) and the example/demo/test executables.
 
 ### MSVC (Windows):
 
-- Run `nmake -f Makefile.msvc` to build the lib (`lib/sfw.lib`) & the demo (`./sfw-demo.exe`) etc.
+- Run `nmake -f Makefile.msvc` for the same.
 
 (See the Makefiles for options.)
 
@@ -52,19 +52,18 @@ _For other (both planned and completed) changes see the [issues](https://github.
 0. Integrate (via env. vars, or just copy) the `include` & `lib` dirs to your project.
    (Copy the `asset` dir, too, if you want to use the stock defaults.)
 1. `#include "sfw/GUI.hpp"`.
-2. Setup theme config resources (like the styling texture image, default font etc.),
-   customize default style properties etc.
-3. Create the top-level GUI manager object, connecting it to your SFML window, like: `sfw::GUI myGUI(window);`
-   (or, typically with a customized config.: `sfw::GUI myGUI(window, myConfig);`)
-4. Add containers, widgets with `...->add(sfw::SomeWidget(...))`, or if you prefer: `...->add(new sfw::OtherWidget)` calls,
-   set their properties (like callbacks) etc.
-   (Note: widget objects will be created and deleted implicitly.)
+2. Optionally (but typically) customize the theme: the styling texture image, font, colors etc.
+3. Create the top-level GUI manager object, connecting it to your SFML window (like: `sfw::GUI myGUI(window);`),
+   usually with your custom theme config (`sfw::GUI myGUI(window, myConfig);`)
+4. Add containers (layouts) and widgets with `add(sfw::SomeWidget(...))`, or if you prefer: `add(new sfw::OtherWidget)` calls,
+   set their properties (typically with method chaining, like `add(new TextBox)->set("hi")->setCallback(...)`) etc.
+   _Note: widget objects will be managed (e.g. deleted) implicitly._
 5. Pass events to the GUI (in your app's event loop): `myGUI.process(event);`.
-6. Draw the GUI (in your frame refresh loop; or the event loop in single-treaded apps): `myGUI.render();`.
+6. Draw the GUI (in your frame refresh loop; i.e. the event loop in single-treaded apps): `myGUI.render();`.
 7. Have fun!
 
 ## More...
 
 * a [minimal example](src/examples/minimal_example.cpp) (or [another](src/examples/minimal_example-polling.cpp), with a polling event loop)
 * a fairly comprehensive example: [`demo.cpp`](src/examples/demo.cpp)
-* the headers in the [`include`](include/sfw) dir, for an authoritative reference (they are easy to read)
+* see the headers in the [`include`](include/sfw) dir for an authoritative reference (they're easy to read)

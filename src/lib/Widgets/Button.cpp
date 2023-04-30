@@ -97,7 +97,7 @@ void Button::onMouseReleased(float x, float y)
 {
     if (containsPoint({x, y}))
     {
-        triggerCallback();
+        onUpdate();
     }
 }
 
@@ -106,8 +106,8 @@ void Button::onKeyPressed(const sf::Event::KeyEvent& key)
 {
     if (key.code == sf::Keyboard::Enter || key.code == sf::Keyboard::Space)
     {
-        triggerCallback();
         m_box.press();
+        onUpdate();
     }
 }
 
@@ -119,6 +119,7 @@ void Button::onKeyReleased(const sf::Event::KeyEvent& key)
         m_box.release();
     }
 }
+
 
 Button* Button::setCallback(std::function<void(Button*)> callback)
 {

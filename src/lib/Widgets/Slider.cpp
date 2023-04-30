@@ -65,10 +65,11 @@ void Slider::updateGeometry()
         m_progression[2].position.x += m_groove.getSize().x - Theme::borderSize * 2;
         m_progression[3].position.x += m_groove.getSize().x - Theme::borderSize * 2;
     }
-    updateHandlePosition();
+
+    updateView();
 }
 
-void Slider::updateHandlePosition()
+void Slider::updateView()
 {
     if (m_orientation == Horizontal)
     {
@@ -134,9 +135,8 @@ Slider* Slider::set(float value)
     if (value != m_value)
     {
         m_value = value;
-        triggerCallback();
-        // Move the handle on the slider
-        updateHandlePosition();
+        updateView();
+        onUpdate();
     }
     return this;
 }

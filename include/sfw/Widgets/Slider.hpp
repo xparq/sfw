@@ -36,8 +36,6 @@ public:
 private:
     void draw(const gfx::RenderContext& ctx) const override;
 
-    void updateHandlePosition();
-
     // Callbacks
     void onKeyPressed(const sf::Event::KeyEvent& key) override;
     void onMousePressed(float x, float y) override;
@@ -48,6 +46,7 @@ private:
     void onThemeChanged() override;
     // Helpers
     void updateGeometry();
+    void updateView();
     float mouseToValue(float x, float y) const;
 
     Orientation m_orientation;

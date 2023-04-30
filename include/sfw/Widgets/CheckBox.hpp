@@ -11,8 +11,7 @@ namespace sfw
 /*****************************************************************************
   Standard vanilla checkbox with no surprises
   (Well, actually, one surprise could still be that it doesn't even have its
-  own label. You'd need to add it yourself using layouts.)
-  The action callback is triggered on changes of the "checked" state.
+  own label... You'd need to add one yourself using a Form or HBox layout.)
  *****************************************************************************/
 class CheckBox: public Widget
 {
@@ -35,7 +34,7 @@ public:
     // Still keeping the legacy style, too:
     bool isChecked() const { return checked(); }
 
-    // Misc.
+    // Instance-specific "update" callback
     CheckBox* setCallback(std::function<void(CheckBox*)> callback);
     CheckBox* setCallback(std::function<void()> callback)         { return (CheckBox*) Widget::setCallback(callback); }
 

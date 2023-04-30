@@ -42,7 +42,7 @@ auto OptionsBox<T>::add(const std::string& label, const T& value)
         setSize(m_box.getSize());
     }
 
-    update_selection(m_items.size() - 1, false);
+    update_selection(m_items.size() - 1);
     return this;
 }
 
@@ -65,9 +65,13 @@ auto OptionsBox<T>::set(const std::string& label, const T& value)
 template <class T>
 auto OptionsBox<T>::select(size_t index)
 {
-    return update_selection(index);
+    if (index != m_currentIndex)
+    {
+        update_selection(index);
+        onUpdate();
+    }
+    return this;
 }
-
 
 template <class T>
 auto OptionsBox<T>::select(const std::string& label)
@@ -76,11 +80,24 @@ auto OptionsBox<T>::select(const std::string& label)
     {
         if (label == m_items[i].label)
         {
-            update_selection(i);
-            break;
+            return select(i);
         }
     }
     return this;
+}
+
+template <class T>
+auto OptionsBox<T>::selectNext()
+{
+    return m_items.size() < 1 ? this
+        : select(m_currentIndex == m_items.size() - 1 ? 0 : m_currentIndex + 1);
+}
+
+template <class T>
+auto OptionsBox<T>::selectPrevious()
+{
+    return m_items.size() < 1 ? this
+        : select(m_currentIndex == 0 ? m_items.size() - 1 : m_currentIndex - 1);
 }
 
 
@@ -90,13 +107,11 @@ const T& OptionsBox<T>::current() const
     return m_items[m_currentIndex].value;
 }
 
-
 template <class T>
 T& OptionsBox<T>::currentRef()
 {
     return m_items[m_currentIndex].value;
 }
-
 
 template <class T>
 size_t OptionsBox<T>::currentIndex() const
@@ -104,34 +119,10 @@ size_t OptionsBox<T>::currentIndex() const
     return m_currentIndex;
 }
 
-
 template <class T>
 const std::string& OptionsBox<T>::currentLabel() const
 {
     return m_items[m_currentIndex].label;
-}
-
-
-template <class T>
-auto OptionsBox<T>::selectNext()
-{
-    if (m_items.size() > 1)
-    {
-        // Get next item index
-        update_selection(m_currentIndex == (m_items.size() - 1) ? 0 : m_currentIndex + 1);
-    }
-    return this;
-}
-
-
-template <class T>
-auto OptionsBox<T>::selectPrevious()
-{
-    if (m_items.size() > 1)
-    {
-        // Get previous item index
-        update_selection(m_currentIndex == 0 ? m_items.size() - 1 : m_currentIndex - 1);
-    }
 }
 
 
@@ -153,18 +144,16 @@ OptionsBox<T>* OptionsBox<T>::setFillColor(const sf::Color& color)
 
 
 template <class T>
-auto OptionsBox<T>::update_selection(size_t index, bool callTheCallback)
+auto OptionsBox<T>::update_selection(size_t index)
 {
     //! No check for index != m_currentIndex, because this may also be called from
-    //! onThemeChanged, where "updating" would mean resetting the current label +
-    //! re-centering it, without having the current index changed.
+    //! onThemeChanged, where "updating" would just mean restoring the current label
+    //! and re-centering it, without actually changing the current index!
     if (index < m_items.size())
     {
         m_currentIndex = index;
         m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(m_items[index].label));
         m_box.centerTextHorizontally(m_box.item());
-
-        if (callTheCallback) triggerCallback();
     }
     return this;
 }
@@ -219,7 +208,7 @@ void OptionsBox<T>::onThemeChanged()
 
     //! Reset the current selection rolled all over in the loop above.
     //! This will also re-center it, so the widget had to have been resized first!
-    update_selection(m_currentIndex, false);
+    update_selection(m_currentIndex);
 
     // Left arrow
     m_arrowLeft.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());

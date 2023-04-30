@@ -202,24 +202,6 @@ Widget* Widget::setCallback(Callback callback)
     return this;
 }
 
-void Widget::triggerCallback()
-{
-    assert( std::holds_alternative<Callback_w>(m_callback) || std::holds_alternative<Callback_void>(m_callback) );
-
-    if (disabled())
-        return;
-
-    if (std::holds_alternative<Callback_w>(m_callback) && std::get<Callback_w>(m_callback))
-    {
-        return (std::get<Callback_w>(m_callback).value()) (this);
-    }
-    else if (std::holds_alternative<Callback_void>(m_callback) && std::get<Callback_void>(m_callback))
-    {
-        return (std::get<Callback_void>(m_callback).value()) ();
-    }
-}
-
-
 void Widget::setParent(WidgetContainer* parent)
 {
     m_parent = parent;
@@ -246,6 +228,23 @@ const sf::Transform& Widget::getTransform() const
 
 
 // callbacks -----------------------------------------------------------------
+
+void Widget::onUpdate()
+{
+    assert( std::holds_alternative<Callback_w>(m_callback) || std::holds_alternative<Callback_void>(m_callback) );
+
+    if (disabled())
+        return;
+
+    if (std::holds_alternative<Callback_w>(m_callback) && std::get<Callback_w>(m_callback))
+    {
+        return (std::get<Callback_w>(m_callback).value()) (this);
+    }
+    else if (std::holds_alternative<Callback_void>(m_callback) && std::get<Callback_void>(m_callback))
+    {
+        return (std::get<Callback_void>(m_callback).value()) ();
+    }
+}
 
 void Widget::onStateChanged(WidgetState) { }
 void Widget::onMouseEnter() { }
