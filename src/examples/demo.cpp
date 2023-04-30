@@ -172,16 +172,16 @@ int main()
 	auto sliderForSize = new sfw::Slider(10, 175); // granularity (%), width (pixel)
 	auto pbarScale = new sfw::ProgressBar(175, sfw::Horizontal, sfw::LabelOver);
 	sliderForSize->setCallback([&](auto* w) {
-		float scale = 1 + w->getValue() * 2 / 100.f;
+		float scale = 1 + w->get() * 2 / 100.f;
 		text.setScale({scale, scale});
-		pbarScale->setValue(w->getValue());
+		pbarScale->set(w->get());
 	});
 	// Slider + progress bar for rotating
 	auto sliderForRotation = new sfw::Slider(1, 75, sfw::Vertical); // granularity: 1%
 	auto pbarRotation = new sfw::ProgressBar(75.f, sfw::Vertical, sfw::LabelOver);
 	sliderForRotation->setCallback([&](auto* w) {
-		text.setRotation(sf::degrees(w->getValue() * 360 / 100.f));
-		pbarRotation->setValue(w->getValue());
+		text.setRotation(sf::degrees(w->get() * 360 / 100.f));
+		pbarRotation->set(w->get());
 	});
 
 	// Add the scaling slider + its horizontal progress bar
@@ -318,13 +318,13 @@ int main()
 	sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg");
 	// Slider & progress bar for cropping an Image widget
 	auto cropslider = (new sfw::Slider(1, 100))->setCallback([&](auto* w) {
-		((sfw::ProgressBar*)w->getWidget("cropbar"))->setValue(w->getValue());
+		((sfw::ProgressBar*)w->getWidget("cropbar"))->set(w->get());
 		// Show the slider value in a text box retrieved by its name:
 		auto tbox = (sfw::TextBox*)w->getWidget("crop%");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
-		else tbox->set(w->getValue() ? to_string((int)w->getValue()) : "");
-		imgCrop->setCropRect({{(int)(w->getValue() / 4), (int)(w->getValue() / 10)},
-		                      {(int)(w->getValue() * 1.4), (int)w->getValue()}});
+		else tbox->set(w->get() ? to_string((int)w->get()) : "");
+		imgCrop->setCropRect({{(int)(w->get() / 4), (int)(w->get() / 10)},
+		                      {(int)(w->get() * 1.4), (int)w->get()}});
 	});
 
 	vboximg->add(cropslider);
@@ -332,7 +332,7 @@ int main()
 		boxcrop->add(sfw::Label("Crop square size:"));
 		boxcrop->add(sfw::ProgressBar(40), "cropbar");
 		boxcrop->add((new sfw::TextBox(36.f))->setMaxLength(3), "crop%")->setCallback([&](auto* w) {
-			cropslider->setValue(stof(w->get()));
+			cropslider->set(stof(w->get()));
 		});
 
 	vboximg->add(imgCrop);
@@ -369,11 +369,11 @@ int main()
 	// so it will remember the new size(s)!)
 	right_bar->add(sfw::Label("Theme font size (use the m. wheel):"));
 	right_bar->add(sfw::Slider(10, 100))
-		->setValue(30)
+		->set(30)
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
-			themecfg.textSize = 8 + size_t(w->getValue() / 10);
+			themecfg.textSize = 8 + size_t(w->get() / 10);
 cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
 		});
@@ -389,9 +389,9 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	};
 	auto themeBitmap = new ThemeBitmap(2); // start with 2x zoom
 	txbox->add(sfw::Slider(1.f, 100.f, sfw::Vertical))
-		->setCallback([&](auto* w) { themeBitmap->scale(1 + (100.f - w->getValue()) / 25.f); })
+		->setCallback([&](auto* w) { themeBitmap->scale(1 + (100.f - w->get()) / 25.f); })
 		->setStep(25.f)
-		->setValue(75.f);
+		->set(75.f);
 	txbox->add(themeBitmap);
 
 	right_bar->add(sfw::Label(" ")); // Just for some space, indeed...
@@ -406,14 +406,14 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 
 	// Wallpaper transparency slider
 	bgform->add("Wallpaper α", sfw::Slider(1, 75))
-		->setValue(10)
+		->set(10)
 		->setCallback([&](auto* w) {
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
 			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
 			                           themecfg.wallpaper.tint.g,
 			                           themecfg.wallpaper.tint.b,
-			                           uint8_t(w->getValue()*2.55)};
+			                           uint8_t(w->get()*2.55)};
 			demo.setWallpaperColor(themecfg.wallpaper.tint);
 		});
 	// Window background color selector
@@ -440,8 +440,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	// OK, GUI Setup done, set some "high-level" defaults
 	// (after setup, as these may trigger callbacks etc.)
 	//
-	sliderForRotation->setValue(29);
-	sliderForSize->setValue(20);
+	sliderForRotation->set(29);
+	sliderForSize->set(20);
 	// Colors of the example text + rect:
 	optTxtColor->select("Red");
 	optTxtBg->select("Black");
@@ -488,8 +488,8 @@ void background_thread_main(sfw::GUI& gui)
 	while (gui)
 	{
 		// Cycle the rot. slider
-	        auto sampletext_angle = sf::degrees(rot_slider->getValue() * 3 + 4);
-		rot_slider->setValue(float(int(sampletext_angle.asDegrees()/3) % 100));
+	        auto sampletext_angle = sf::degrees(rot_slider->get() * 3 + 4);
+		rot_slider->set(float(int(sampletext_angle.asDegrees()/3) % 100));
 
 		do this_thread::sleep_for(chrono::milliseconds(50));
 		// Keep on sleeping while the anim. is disabled, and poll for termination:

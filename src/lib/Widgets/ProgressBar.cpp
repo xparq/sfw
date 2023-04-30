@@ -13,14 +13,14 @@ ProgressBar::ProgressBar(float length, Orientation orientation, LabelPlacement l
     m_value(0.f),
     m_box(Box::Input)
 {
-    setValue(m_value);
+    set(m_value);
     setFocusable(false);
 
     updateGeometry();
 }
 
 
-ProgressBar* ProgressBar::setValue(float value)
+ProgressBar* ProgressBar::set(float value)
 {
     m_value = value;
 
@@ -30,7 +30,7 @@ ProgressBar* ProgressBar::setValue(float value)
 }
 
 
-float ProgressBar::getValue() const
+float ProgressBar::get() const
 {
     return m_value;
 }

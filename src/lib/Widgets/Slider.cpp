@@ -116,7 +116,7 @@ float Slider::getStep() const
 }
 
 
-Slider* Slider::setValue(float value)
+Slider* Slider::set(float value)
 {
     // Ensure value is in bounds
     if (value < 0)
@@ -141,7 +141,7 @@ Slider* Slider::setValue(float value)
     return this;
 }
 
-float Slider::getValue() const
+float Slider::get() const
 {
     return m_value;
 }
@@ -164,22 +164,22 @@ void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
     switch (key.code)
     {
     case sf::Keyboard::Left:
-        if (m_orientation == Horizontal) setValue(m_value - m_step);
+        if (m_orientation == Horizontal) set(m_value - m_step);
         break;
     case sf::Keyboard::Right:
-        if (m_orientation == Horizontal) setValue(m_value + m_step);
+        if (m_orientation == Horizontal) set(m_value + m_step);
         break;
     case sf::Keyboard::Down:
-        if (m_orientation == Vertical) setValue(m_value - m_step);
+        if (m_orientation == Vertical) set(m_value - m_step);
         break;
     case sf::Keyboard::Up:
-        if (m_orientation == Vertical) setValue(m_value + m_step);
+        if (m_orientation == Vertical) set(m_value + m_step);
         break;
     case sf::Keyboard::Home:
-        setValue(0);
+        set(0);
         break;
     case sf::Keyboard::End:
-        setValue(100);
+        set(100);
         break;
     default:
         break;
@@ -189,7 +189,7 @@ void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void Slider::onMousePressed(float x, float y)
 {
-    setValue(mouseToValue(x, y));
+    set(mouseToValue(x, y));
     m_handle.press();
 }
 
@@ -200,12 +200,12 @@ void Slider::onMouseMoved(float x, float y)
     {
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            setValue(mouseToValue(x, y));
+            set(mouseToValue(x, y));
 /*
             if (m_orientation == Horizontal)
-                setValue(100 * x / getSize().x);
+                set(100 * x / getSize().x);
             else
-                setValue(100 - (100 * y / getSize().y));
+                set(100 - (100 * y / getSize().y));
 */
         }
     }
@@ -228,7 +228,7 @@ void Slider::onMouseReleased(float, float)
 
 void Slider::onMouseWheelMoved(int delta)
 {
-    setValue(m_value + (delta > 0 ? m_step : -m_step));
+    set(m_value + (delta > 0 ? m_step : -m_step));
 }
 
 

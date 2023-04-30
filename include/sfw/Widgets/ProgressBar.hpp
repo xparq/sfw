@@ -31,8 +31,8 @@ public:
     ProgressBar(float length = 200.f, Orientation orientation = Horizontal, LabelPlacement labelPlacement = LabelOver);
 
     /// [0..100]
-    ProgressBar* setValue(float value);
-    float getValue() const;
+    ProgressBar* set(float value);
+    float get() const;
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;

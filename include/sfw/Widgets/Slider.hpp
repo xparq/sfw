@@ -18,19 +18,20 @@ class Slider: public Widget
 public:
     Slider(float step = 10.f, float length = 200, Orientation orientation = Horizontal);
 
-    float getStep() const;
-
     /**
      * Define the amount of units to change the slider when adjusting by drag and drop
      */
     Slider* setStep(float step);
-
-    float getValue() const;
-
-    Slider* setValue(float value);
+    float getStep() const;
 
     Slider* setCallback(std::function<void(Slider*)> callback);
     Slider* setCallback(std::function<void()> callback)         { return (Slider*) Widget::setCallback(callback); }
+
+    /**
+     * Set/get current value
+     */
+    Slider* set(float value);
+    float get() const;
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
