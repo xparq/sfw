@@ -79,7 +79,7 @@ void Button::onMouseMoved(float x, float y)
 {
     if (getState() == WidgetState::Pressed)
     {
-        if (containsPoint(sf::Vector2f(x, y)))
+        if (contains(sf::Vector2f(x, y)))
             m_box.press();
         else
             m_box.release();
@@ -95,7 +95,7 @@ void Button::onMousePressed([[maybe_unused]] float x, [[maybe_unused]] float y)
 
 void Button::onMouseReleased(float x, float y)
 {
-    if (containsPoint({x, y}))
+    if (contains({x, y}))
     {
         onUpdate();
     }

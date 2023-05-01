@@ -144,7 +144,7 @@ const sf::IntRect& Theme::getTextureRect(Box::Type type, WidgetState state)
         id = type == Box::Click ? BOX_FOCUSED : BOX_INPUT_FOCUSED;
         break;
     case WidgetState::Disabled:
-        //!! No dedicated texture (yet?); using the default...
+        id = type == Box::Click ? BOX_DEFAULT : BOX_INPUT_DEFAULT;
         break;
     }
     return m_subrects[id];

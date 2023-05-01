@@ -57,9 +57,9 @@ public:
     void release();
 
     /**
-     * @return true if point is inside the box limits
+     * @return true if a point is inside the box (including its borders)
      */
-    bool containsPoint(float x, float y) const;
+    bool contains(float x, float y) const;
 
     void applyState(WidgetState state);
 

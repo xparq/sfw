@@ -63,8 +63,8 @@ public:
     const sf::Vector2f& getSize() const;
     const sf::Transform& getTransform() const;
 
-    // Is a screen position inside the widget?
-    bool containsPoint(const sf::Vector2f& point) const;
+    // Is a point inside the widget?
+    bool contains(const sf::Vector2f& point) const;
 
     // Enable/disable processing user events
     // (Not just inputs, but also outputs like triggering user callbacks.)
@@ -197,8 +197,15 @@ friend class GUI;
      */
     GUI* getMain() const;
 
-    // Uniform node-level interface for recursive traversal of the widget tree
-    virtual void traverseChildren(const std::function<void(Widget*)>&) {}
+    // Recursive traversal of all the widget's descendants (if any)
+    // (Does not include the target widget itself.)
+    // Note: this operation is independent from being a widget container,
+    // despite currently only WidgetContainer implementing it, indeed.
+    // This uniform interface is provided here on the Widget level a) for
+    // the convenience of uniform access, and b) to support compound Widget
+    // types that don't want to become a container (i.e. have a hardcoded
+    // internal structure rather than using that of WidgetContainer).
+    virtual void traverse(const std::function<void(Widget*)>&) {}
 
 private:
     virtual void recomputeGeometry() {} // Also called by some of the friend classes

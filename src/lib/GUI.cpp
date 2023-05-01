@@ -153,7 +153,7 @@ bool GUI::process(const sf::Event& event)
 //----------------------------------------------------------------------------
 bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 {
-//traverseChildren([&](Widget* w) { cerr << w->getName() << "\n"; } );
+//traverse([&](Widget* w) { cerr << w->getName() << "\n"; } );
 
     //!!Should be transactional, with no side-effects if failed!
 
@@ -184,7 +184,7 @@ void GUI::themeChanged()
     onThemeChanged();
 
     // Then all the rest
-    traverseChildren([](Widget* w) { w->onThemeChanged(); } );
+    traverse([](Widget* w) { w->onThemeChanged(); } );
 	// Another reason to not use the widget registry map (besides "general
 	// frugalism", and that it's not intended for this (i.e. it may not
 	// even contain every widget!), is that std::map reorders its content
@@ -192,7 +192,7 @@ void GUI::themeChanged()
 	// (Note: std::unordered_map won't preserve the original order either!)
 
     //! This would be redundant in the current model:
-    //!traverseChildren([](Widget* w) { w->recomputeGeometry(); } );
+    //!traverse([](Widget* w) { w->recomputeGeometry(); } );
     //! The onThemeChanged() call typically involves setSize() too, which
     //! in turn also calls parent->recomputeGeometry() (via Widget::setSize)!
     //! (NOTE: there are ample chances of infinite looping here too, some of
@@ -366,10 +366,10 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf:
 	m_wallpaper.enable();
 
 	//!! This shoud be done by the wallpaper itself!
-	using enum Wallpaper::Placement;
+	//!!using Wallpaper::Placement;
 	switch (placement)
 	{
-	case Center:
+	case Wallpaper::Center: //!!See above for avoiding Wallpaper::
 		break;
 	default: break;
 	}

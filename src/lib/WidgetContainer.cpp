@@ -36,7 +36,36 @@ WidgetContainer::~WidgetContainer()
 }
 
 
-Widget* WidgetContainer::insertAfter(Widget* anchor, Widget* widget, const std::string& name)
+//!!Replace this with an std-compliant interface + std::operations! (#162)
+//!!And also provide (template?) variants for different f types!
+void WidgetContainer::for_each_child(const std::function<void(Widget*)>& f)
+{
+    for (Widget* w = m_first; w != nullptr; w = w->m_next)
+    {
+        f(w);
+    }
+}
+
+void WidgetContainer::traverse(const std::function<void(Widget*)>& f)
+{
+	for_each_child([&](auto* w) {
+		f(w);
+		w->traverse(f);
+	});
+}
+
+
+bool WidgetContainer::is_child(const Widget* widget)
+{
+	for (Widget* w = begin(); w != end(); w = next(w))
+	{
+		if (w == widget) return true;
+	}
+	return false;
+}
+
+
+Widget* WidgetContainer::insert_after(Widget* anchor, Widget* widget, const std::string& name)
 // This is the common workhorse procedure for all the other various add() methods.
 // Does not check if anchor is in fact a local child!
 {
@@ -114,58 +143,9 @@ Widget* WidgetContainer::insertAfter(Widget* anchor, Widget* widget, const std::
 
 Widget* WidgetContainer::add(Widget* widget, const std::string& name)
 {
-    return insertAfter(m_last, widget, name);
+    return insert_after(m_last, widget, name);
 }
 
-//!!Replace this with an std-compliant interface + std::operations! (#162)
-void WidgetContainer::iterateChildren(const std::function<void(Widget*)>& f)
-{
-    for (Widget* w = m_first; w != nullptr; w = w->m_next)
-    {
-        f(w);
-    }
-}
-
-
-void WidgetContainer::traverseChildren(const std::function<void(Widget*)>& f)
-{
-	iterateChildren([&](auto* w) {
-		f(w);
-		w->traverseChildren(f);
-	});
-}
-
-
-bool WidgetContainer::isChild(const Widget* widget)
-{
-	for (Widget* w = begin(); w != end(); w = next(w))
-	{
-		if (w == widget) return true;
-	}
-	return false;
-}
-
-
-Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, const std::string& name)
-{
-	if (anchor == nullptr)
-	{
-        // addFirst
-        return insertAfter(nullptr, widget, name);
-	}
-	else if (isChild(anchor))
-	{
-		// link before anchor
-		return insertAfter(anchor->m_previous, widget, name);
-	}
-	else return add(widget, name);
-}
-
-Widget* WidgetContainer::addBefore(const std::string& anchor_name, Widget* widget, const std::string& name)
-{
-	Widget* a = getWidget(anchor_name);
-	return a ? addBefore(a, widget, name) : add(widget, name);
-}
 
 Widget* WidgetContainer::addAfter(Widget* anchor, Widget* widget, const std::string& name)
 {
@@ -174,10 +154,10 @@ Widget* WidgetContainer::addAfter(Widget* anchor, Widget* widget, const std::str
 		// addLast
 		return add(widget, name);
 	}
-	else if (isChild(anchor))
+	else if (is_child(anchor))
 	{
 		// link after anchor
-		return insertAfter(anchor, widget, name);
+		return insert_after(anchor, widget, name);
 	}
 	else return add(widget, name);
 }
@@ -186,6 +166,28 @@ Widget* WidgetContainer::addAfter(const std::string& anchor_name, Widget* widget
 {
 	Widget* a = getWidget(anchor_name);
 	return a ? addAfter(a, widget, name) : add(widget, name);
+}
+
+
+Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, const std::string& name)
+{
+	if (anchor == nullptr)
+	{
+        // addFirst
+        return insert_after(nullptr, widget, name);
+	}
+	else if (is_child(anchor))
+	{
+		// link before anchor
+		return insert_after(anchor->m_previous, widget, name);
+	}
+	else return add(widget, name);
+}
+
+Widget* WidgetContainer::addBefore(const std::string& anchor_name, Widget* widget, const std::string& name)
+{
+	Widget* a = getWidget(anchor_name);
+	return a ? addBefore(a, widget, name) : add(widget, name);
 }
 
 } // namespace

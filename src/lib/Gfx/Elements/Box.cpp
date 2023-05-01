@@ -89,7 +89,7 @@ void Box::release()
 }
 
 
-bool Box::containsPoint(float x, float y) const
+bool Box::contains(float x, float y) const
 {
     return x > m_vertices[TOP_LEFT].position.x && x < m_vertices[BOTTOM_RIGHT].position.x
         && y > m_vertices[TOP_LEFT].position.y && y < m_vertices[BOTTOM_RIGHT].position.y;

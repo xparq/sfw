@@ -9,17 +9,15 @@ namespace sfw
 
 void HBox::recomputeGeometry()
 {
-    sf::Vector2f pos{};
-    sf::Vector2f size{};
-    for (Widget* w = begin(); w != end(); w = next(w))
-    {
+    sf::Vector2f pos{}, size{};
+    for_each_child([&](Widget* w) {
         w->setPosition(pos);
         pos.x += w->getSize().x + Theme::MARGIN;
 
         // The layout height is the largest widget height
         if (w->getSize().y > size.y)
             size.y = w->getSize().y;
-    }
+    });
     size.x = max(0.f, pos.x - Theme::MARGIN); // 0 for an empty container
     Widget::setSize(size);
 }

@@ -481,9 +481,10 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 
 	auto disable_all_box = right_bar->add(new HBox);
 	disable_all_box->add(Label("Disable/Enable all"));
-	disable_all_box->add(CheckBox([&](auto* w) {
-		demo.foreach([&](auto* widget) {widget->enable(w->get());});
-		w->enable(); //! ;)
+	disable_all_box->add(CheckBox([&](auto* chkbox) {
+		demo.foreach([&](auto* widget) {
+			if (widget != chkbox) widget->enable(chkbox->get()); // Leave the checkbox alive! :)
+		});
 	}, true ));
 
 

@@ -145,7 +145,7 @@ void ImageButton::onMouseMoved(float x, float y)
 {
     if (focused())
     {
-        if (containsPoint({x, y}) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        if (contains({x, y}) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
             press();
         else
             release();
@@ -162,7 +162,7 @@ void ImageButton::onMousePressed(float, float)
 void ImageButton::onMouseReleased(float x, float y)
 {
     release();
-    if (containsPoint({x, y}))
+    if (contains({x, y}))
     {
         onUpdate();
     }

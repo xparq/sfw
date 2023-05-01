@@ -209,7 +209,7 @@ void Slider::onMouseMoved(float x, float y)
 */
         }
     }
-    else if (m_handle.containsPoint(x, y))
+    else if (m_handle.contains(x, y))
     {
         m_handle.applyState(WidgetState::Hovered);
     }

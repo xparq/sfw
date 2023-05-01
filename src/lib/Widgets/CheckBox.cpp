@@ -68,7 +68,7 @@ void CheckBox::onThemeChanged()
 
 void CheckBox::onMouseReleased(float x, float y)
 {
-    if (containsPoint(sf::Vector2f(x, y)))
+    if (contains(sf::Vector2f(x, y)))
     {
         toggle(); // calls onUpdate()
     }

@@ -148,7 +148,7 @@ const sf::Vector2f& Widget::getSize() const
 }
 
 
-bool Widget::containsPoint(const sf::Vector2f& point) const
+bool Widget::contains(const sf::Vector2f& point) const
 {
     return point.x > 0.f && point.x < m_size.x && point.y > 0.f && point.y < m_size.y;
 }
@@ -173,8 +173,38 @@ bool Widget::focusable() const
 
 
 Widget* Widget::enable(bool state)
+// To support the use case of mass-disabling/enabling a bunch of widgets,
+// which typically involves recursive tree traversal via GUI::foreach(),
+// some emerging inconsistencies must be explicitly addressed:
+//
+// - Some widgets will typically remain active, while others get disabled,
+//   and those two sets may not align with container boundaries!
+//   So, we can't just transitively disable/enable subtrees and call it a day.
+//
+// - Or, what should happen if a container gets disabled, but then a child of
+//   it gets enabled specifically? Seems tempting to transitively re-enable
+//   the container, but then all its other children that weren't explicitly
+//   disabled would also get reenabled implicitly, which is not what should
+//   happen.
+//   Besides, unless all the children of a disabled container each get in
+//   turn disabled too (recursively), there wouldn't even be any difference
+//   between the child that was enabled specifically, and those that were
+//   not, but are still supposed to become disabled implicitly...
+//
+//   - Or, if -- let's say -- a disabled parent container shouldn't get
+//     reenabled by enabling a child of it, then how exactly should events
+//     propagate down to that child across the disabled parent?
+//
+// Etc. So, to avoid such annoying inconsistencies and messy complications,
+// containers just can't be disabled for now... (Which is also bad: making
+// it impossible to a) disable an entire subtree of widgets with one move,
+// and b) automatically preserve/restore individual widget disabled/enabled
+// states within that subtree...)
 {
-	if (state) {
+    if (toLayout()) // Well, we are interested in Layouts actually, not WidgetContainers.
+        return this;
+
+    if (state) {
         if (m_state == WidgetState::Disabled)
         {
 		    m_state = WidgetState::Default;

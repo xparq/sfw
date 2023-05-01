@@ -13,7 +13,7 @@ class GenericWallpaper
 {
 public:
 
-	enum class Placement : unsigned //!!Generalize this to gfx::Image::Placement!!
+	enum Placement : unsigned //!!Generalize this to gfx::Image::Placement!!
 	{
 		Default, // no alignment/scaling, just toss the image at (0,0) and run...
 
@@ -38,7 +38,7 @@ public:
 		VTile = HTile <1,
 		Tile = HTile | VTile,
 	};
-	using enum Placement;
+//	using GenericWallpaper::Placement;
 
 	void disable() { state = WidgetState::Disabled; }
 	void enable()  { state = WidgetState::Default; }

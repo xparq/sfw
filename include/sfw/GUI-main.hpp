@@ -64,7 +64,7 @@ public:
     /**
      * Do things to widgets...
      */
-    void foreach(const std::function<void(Widget*)>& f) { return traverseChildren(f); }
+    void foreach(const std::function<void(Widget*)>& f) { return traverse(f); }
 
 
     /*************************************************************************

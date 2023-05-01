@@ -174,7 +174,7 @@ void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
 template <class T>
 void OptionsBox<T>::updateArrowState(ItemBox<Arrow>& arrow, float x, float y)
 {
-    if (arrow.containsPoint(x, y))
+    if (arrow.contains(x, y))
     {
         if (getState() == WidgetState::Pressed)
             arrow.press();
@@ -249,10 +249,10 @@ void OptionsBox<T>::onMouseMoved(float x, float y)
 template <class T>
 void OptionsBox<T>::onMousePressed(float x, float y)
 {
-    if (m_arrowLeft.containsPoint(x, y))
+    if (m_arrowLeft.contains(x, y))
         m_arrowLeft.press();
 
-    else if (m_arrowRight.containsPoint(x, y))
+    else if (m_arrowRight.contains(x, y))
         m_arrowRight.press();
 }
 
@@ -260,12 +260,12 @@ void OptionsBox<T>::onMousePressed(float x, float y)
 template <class T>
 void OptionsBox<T>::onMouseReleased(float x, float y)
 {
-    if (m_arrowLeft.containsPoint(x, y))
+    if (m_arrowLeft.contains(x, y))
     {
         m_arrowLeft.release();
         selectPrevious();
     }
-    else if (m_arrowRight.containsPoint(x, y))
+    else if (m_arrowRight.contains(x, y))
     {
         m_arrowRight.release();
         selectNext();

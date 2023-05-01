@@ -43,19 +43,19 @@ public:
         { return (W*) (Widget*) add((Widget*)widget, name); }
 
     /**
-     * If the `anchor` is `nullptr`, that means "add before first", or "add
-     * after last", respectively.
-     * In case the anchor can't be found, the widget will be appended as if
-     * appending it with a vanilla add() call.
-     * Note: the anchor widgets can't be `const` because their next/prev
-     * pointers will need to be updated.
+     * If the `anchor` is `nullptr`, that means "add before the first", or "add
+     * after the last", respectively.
+     * In case the anchor can't be found, the widget will be appended with a
+     * vanilla add().
+     * Note: the anchor widget isn't `const` because its next/prev pointers
+     * will be updated.
      */
     Widget* addBefore(Widget* anchor, Widget* widget, const std::string& name = "");
     Widget* addBefore(const std::string& anchor_name, Widget* widget, const std::string& name = "");
     Widget* addAfter(Widget* anchor, Widget* widget, const std::string& name = "");
     Widget* addAfter(const std::string& anchor_name, Widget* widget, const std::string& name = "");
 
-    // Helpers ---------------------------------------------------------------
+    // STL-like iteration helpers --------------------------------------------
     bool empty() const { return !m_first; }
     Widget* begin() const { return m_first; }
     Widget* end() const { return nullptr; }
@@ -63,20 +63,25 @@ public:
     Widget* prev(const Widget* w) const { return w ? w->m_previous : end(); }
     Widget* rend() const { return nullptr; }
     Widget* rbegin() const { return m_last; }
-    //!! Make it std-compatible, so that all the std:: algorithms can be used on it! (#162)
+    //!! Make the entire class STL-compatible, so the std:: algorithms can be used on it! (#162)
 
 protected:
+    // Internal helpers ------------------------------------------------------
+    //!!Some of them might as well be made public!
+    Widget* insert_after(Widget* anchor, Widget* widget, const std::string& name);
 
-    // Helpers ---------------------------------------------------------------
-    bool isChild(const Widget*);
-    Widget* insertAfter(Widget* anchor, Widget* widget, const std::string& name);
+    // Check if widget is a (direct or top-level) child of the container
+    bool is_child(const Widget* widget);
 
+    // Enumerate (only) the direct (top-level) children of the container
     //!!This may also need to be defined in Widget instead, because client
     //!!code shouldn't really care whether some widgets can or cannot have
     //!!children! A pure tree structure in this regard too could be preferable.
-    void iterateChildren(const std::function<void(Widget*)>& f);
+    void for_each_child(const std::function<void(Widget*)>& f);
 
-    void traverseChildren(const std::function<void(Widget*)>& f) override;
+    // Recursive traversal of all the contained widgets
+    // (Does not include this container itself.)
+    void traverse(const std::function<void(Widget*)>& f) override;
 
 protected:
     Widget* m_first;
