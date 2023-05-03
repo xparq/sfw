@@ -220,7 +220,7 @@ int main()
 	//! the widget later by the crop slider (somewhere below)!
 
 	// Slider + progress bars for rotating
-	auto sliderForRotation = new sfw::Slider(1); // granularity = 1%
+	auto sliderForRotation = new Slider({.step = 1});
 	auto pbarRotation1 = new ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
 	auto pbarRotation2 = new ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
 	auto pbarRotation3 = new ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
@@ -231,7 +231,7 @@ int main()
 		pbarRotation3->set(w->get());
 	});
 	// Slider + progress bars for scaling
-	auto sliderForScale = new sfw::Slider(); // default granularity: 10%
+	auto sliderForScale = new Slider(); // defaults: [0..100], step = 10
 	auto pbarScale1 = new ProgressBar(100, sfw::Vertical, sfw::LabelNone);
 	auto pbarScale2 = new ProgressBar(100, sfw::Vertical, sfw::LabelOver);
 	auto pbarScale3 = new ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
@@ -378,8 +378,8 @@ int main()
 	sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg");
 
 	// Slider & progress bar for cropping an Image widget
-	vboximg->add(sfw::Slider(1, 100))->setCallback([&](auto* w) {
-		((sfw::ProgressBar*)w->getWidget("cropbar"))->set(w->get());
+	vboximg->add(Slider({.step = 1}, 100))->setCallback([&](auto* w) {
+		((ProgressBar*)w->getWidget("cropbar"))->set(w->get());
 		// Show the slider value in a text box retrieved by its name:
 		auto tbox = (sfw::TextBox*)w->getWidget("Text with limit (5)");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
@@ -416,8 +416,8 @@ int main()
 	// Theme font size slider
 	// (Changes the font size directly of the cfg. data stored in "theme-selector",
 	// so it will remember the new size(s)!)
-	right_bar->add(sfw::Label("Theme font size (use the m. wheel):"));
-	right_bar->add(sfw::Slider(10, 100))
+	right_bar->add(Label("Theme font size (use the m. wheel):"));
+	right_bar->add(Slider({}, 100)) // {} -> defaults
 		->set(30)
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
@@ -437,7 +437,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		}
 	};
 	auto themeBitmap = new ThemeBitmap(2); // start with 2x zoom
-	txbox->add(sfw::Slider(1.f, 100.f, sfw::Vertical))
+	txbox->add(Slider({.step = 1, .orientation = Vertical}, 100))
 		->setCallback([&](auto* w) { themeBitmap->scale(1 + (100.f - w->get()) / 25.f); })
 		->setStep(25.f)
 		->set(75.f);
@@ -452,7 +452,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	bgform->add("Wallpaper", sfw::CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
 	                                       demo.hasWallpaper()));
 	// Wallpaper transparency slider
-	bgform->add("Wallpaper α", sfw::Slider(1, 75))
+	bgform->add("Wallpaper α", Slider({.step = 1}, 75))
 		->set(10)
 		->setCallback([&](auto* w) {
 			assert(w->getWidget("theme-selector"));

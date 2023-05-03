@@ -169,7 +169,7 @@ int main()
 		->set("Hello world!");
 
 	// Slider + progress bar for scaling
-	auto sliderForSize = new sfw::Slider(10, 175); // granularity (%), width (pixel)
+	auto sliderForSize = new sfw::Slider({}, 175); // {} -> defaults: [0..100], step = 10
 	auto pbarScale = new sfw::ProgressBar(175, sfw::Horizontal, sfw::LabelOver);
 	sliderForSize->setCallback([&](auto* w) {
 		float scale = 1 + w->get() * 2 / 100.f;
@@ -177,7 +177,7 @@ int main()
 		pbarScale->set(w->get());
 	});
 	// Slider + progress bar for rotating
-	auto sliderForRotation = new sfw::Slider(1, 75, sfw::Vertical); // granularity: 1%
+	auto sliderForRotation = new sfw::Slider({.step = 1, .orientation = sfw::Vertical}, 75);
 	auto pbarRotation = new sfw::ProgressBar(75.f, sfw::Vertical, sfw::LabelOver);
 	sliderForRotation->setCallback([&](auto* w) {
 		text.setRotation(sf::degrees(w->get() * 360 / 100.f));
@@ -317,7 +317,9 @@ int main()
 
 	sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg");
 	// Slider & progress bar for cropping an Image widget
-	auto cropslider = (new sfw::Slider(1, 100))->setCallback([&](auto* w) {
+	// (`jumpy_thumb_click = true` allows immediately readjusting the pos.
+	// of the slider thumb on clicking it)
+	auto cropslider = (new sfw::Slider({.step = 1, .jumpy_thumb_click = true}, 100))->setCallback([&](auto* w) {
 		((sfw::ProgressBar*)w->getWidget("cropbar"))->set(w->get());
 		// Show the slider value in a text box retrieved by its name:
 		auto tbox = (sfw::TextBox*)w->getWidget("crop%");
@@ -332,7 +334,8 @@ int main()
 		boxcrop->add(sfw::Label("Crop square size:"));
 		boxcrop->add(sfw::ProgressBar(40), "cropbar");
 		boxcrop->add((new sfw::TextBox(36.f))->setMaxLength(3), "crop%")->setCallback([&](auto* w) {
-			cropslider->set(stof(w->get()));
+			try { cropslider->set(stof(w->get())); }
+			catch (...) { cropslider->set(0); }
 		});
 
 	vboximg->add(imgCrop);
@@ -368,7 +371,7 @@ int main()
 	// (Changes the font size directly of the cfg. data stored in "theme-selector",
 	// so it will remember the new size(s)!)
 	right_bar->add(sfw::Label("Theme font size (use the m. wheel):"));
-	right_bar->add(sfw::Slider(10, 100))
+	right_bar->add(sfw::Slider({}, 100))
 		->set(30)
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
@@ -388,10 +391,9 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		}
 	};
 	auto themeBitmap = new ThemeBitmap(2); // start with 2x zoom
-	txbox->add(sfw::Slider(1.f, 100.f, sfw::Vertical))
-		->setCallback([&](auto* w) { themeBitmap->scale(1 + (100.f - w->get()) / 25.f); })
-		->setStep(25.f)
-		->set(75.f);
+	txbox->add(sfw::Slider({.step = 25, .orientation = sfw::Vertical, .invert = true}, 100)) // height = 100
+		->setCallback([&](auto* w) { themeBitmap->scale(1 + w->get() / w->step()); })
+		->set(75);
 	txbox->add(themeBitmap);
 
 	right_bar->add(sfw::Label(" ")); // Just for some space, indeed...
@@ -405,7 +407,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	           )->enable(demo.hasWallpaper());
 
 	// Wallpaper transparency slider
-	bgform->add("Wallpaper α", sfw::Slider(1, 75))
+	bgform->add("Wallpaper α", sfw::Slider({.step = 1}, 75))
 		->set(10)
 		->setCallback([&](auto* w) {
 			assert(w->getWidget("theme-selector"));

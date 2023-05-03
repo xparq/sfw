@@ -63,7 +63,8 @@ TextBox* TextBox::set(const std::string& content)
 
     //!! This (i.e. calling the user callback also on set...()) should be consistent across all the widgets! -> #257
     //!! Doing this prematurely (before attaching to the GUI) is not yet clearly warned about (or prevented)! -> #109, #271
-    onUpdate();
+
+    //!!onUpdate(); //!! <- Can't do it yet, as the demo app relies on it not happening! :-/
     return this;
 }
 
