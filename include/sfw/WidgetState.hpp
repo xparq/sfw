@@ -6,11 +6,11 @@ namespace sfw
 
 enum class WidgetState
 {
-    Default,
-    Hovered,
-    Pressed,
-    Focused,
-    Disabled
+	Default,
+	Hovered,
+	Pressed,
+	Focused,
+	Disabled
 };
 
 } // namespace
