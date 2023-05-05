@@ -17,12 +17,13 @@ namespace sfw
 		struct Range
 		{
 			float min, max;
+			float size() const { return max - min; }
 		};
 
 		struct Cfg
 		{
 			Range range = {0, 100};
-			float step = 10;
+			float step = 1;
 			Orientation orientation = Horizontal;
 
 			// Preferred increase/decrase direction
@@ -42,19 +43,22 @@ class Slider: public Widget
 public:
 	Slider(const Cfg& cfg = Cfg()/*, const Style& style = Style()*/, float length = 200);
 
-	// Position increment
-	Slider* setStep(float step);
-	float step() const;
+	// Value increment, or number of intervals
+	Slider* setStep(float step); // step = 0 -> auto-adjust for continuous tracking
+	float   step() const;
+	Slider* setIntervals(float n);
+	float   intervals() const;
 
-	// Position increment
-	Slider* setRange(float min, float max);
+	// Value range
+	Slider*      setRange(float min, float max, bool continuous = true);
+	Slider*      setRange(float min, float max, float step);
 	const Range& range() const;
 	float min() const;
 	float max() const;
 
 	// Current value
 	Slider* set(float value);
-	float get() const;
+	float   get() const;
 
 	Slider* inc();
 	Slider* dec();
@@ -72,6 +76,7 @@ private:
 	void updateView(); // Sync the moving parts to the internal state
 	float mousepos_to_sliderval(float x, float y) const;
 	float sliderval_to_handledistance(float v) const;
+	float track_length() const;
 
 	void draw(const gfx::RenderContext& ctx) const override;
 
@@ -99,6 +104,7 @@ private:
 //----------------------------------------------------------------------------
 inline const Slider::Range& Slider::range() const { return m_cfg.range; }
 inline float Slider::step() const { return m_cfg.step; }
+inline float Slider::intervals() const { return m_cfg.range.size() / step(); }
 inline float Slider::min() const { return m_cfg.range.min; }
 inline float Slider::max() const { return m_cfg.range.max; }
 inline float Slider::get() const { return m_value; }

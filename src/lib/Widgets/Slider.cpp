@@ -9,7 +9,6 @@
 #include <iostream>
 	using std::cerr, std::endl;
 
-
 /*
 MODEL:
 
@@ -66,55 +65,80 @@ Slider::Slider(const Cfg& cfg/*, const Style& style*/, float length) :
 	m_track(Box::Input),
 	m_handle(Box::Click)
 {
+	// Make sure the initial value is valid:
+	set(range().min);
+
 	updateGeometry();
-}
-
-
-Slider* Slider::setRange(float min, float max)
-{
-	m_cfg.range.min = std::min(min, max);
-	m_cfg.range.max = std::max(min, max);
-	return this;
 }
 
 
 Slider* Slider::setStep(float step)
 {
-	if (step <= 0 || step > max() - min())
+	if (step < 0 || step > range().size())
 	{
 		cerr << "- Warning: invalid Slider step size " << step << " ignored." << endl;
+		return this;
 	}
-	else
+
+	if (step == 0) setIntervals(track_length());
+	else           m_cfg.step = step;
+
+	return this;
+}
+
+Slider* Slider::setIntervals(float n)
+{
+	if (n != 0)
 	{
-		m_cfg.step = step;
+		setStep(range().size() / n);
 	}
 	return this;
 }
 
+Slider* Slider::setRange(float min, float max, bool continuous)
+{
+	m_cfg.range.min = std::min(min, max);
+	m_cfg.range.max = std::max(min, max);
+
+	if (continuous)
+		setStep(0);
+
+	return this;
+}
+
+Slider* Slider::setRange(float min, float max, float step)
+{
+	setRange(min, max, false);
+	return setStep(step);
+}
+
 
 Slider* Slider::set(float value)
+// Snaps to the closest multiple of step. (Remember: step may be non-integer!)
 {
-	// Ensure value is in bounds
-	if (value < range().min)
+	if (value != m_value) // Really changing?
 	{
-		value = range().min;
-	}
-	else if (value > range().max)
-	{
-		value = range().max;
-	}
-	else
-	{
-		// Round value to the closest multiple of step
-		float temp = floor(value + step() / 2);
-		value = temp - fmod(temp, step());
-	}
+//cerr << "set("<< value <<")... [" << range().min << ".." << range().max << "], step: "<< step() <<endl;
 
-	if (value != m_value) // Really changed?
-	{
-		m_value = value;
-		updateView();
-		onUpdate();
+		auto d = value - min();
+		value = min() + floor( (d + step()/2) / step())
+		        * step();
+//cerr << " - set(): snapped value (before capping): "<< value <<endl;
+
+		value = std::max(range().min, value);
+		value = std::min(range().max, value);
+		//!! NOTE: as FP errors accumulate, it might have grown out-of-bound,
+		//!! but then it has now got reset by the capping that we have to do
+		//!! anyway... However, this doesn't protect against lots of sliding
+		//!! to and fro well within the interval!
+
+		if (value != m_value) // Still looks like a change? ;) (Note: the FP errors make this hit-and-miss though!)
+		{
+			m_value = value;
+//cerr << " - set(): m_value: "<< m_value <<endl;
+			updateView();
+			onUpdate();
+		}
 	}
 	return this;
 }
@@ -199,16 +223,14 @@ float Slider::mousepos_to_sliderval(float x, float y) const
 // (without setting it)
 {
 	sf::Vector2f frame_thickness = { (float)Theme::borderSize, (float)Theme::borderSize }; // No padding for sliders!
+	float pixel_distance, track_len = track_length();
 
-	float track_len, pixel_distance;
 	if (m_cfg.orientation == Horizontal)
 	{
-		track_len = getSize().x - m_handle.getSize().x - frame_thickness.x * 2;
 		pixel_distance = x - frame_thickness.x - m_handle.getSize().x / 2;
 	}
 	else
 	{
-		track_len = getSize().y - m_handle.getSize().y - frame_thickness.y * 2;
 		pixel_distance = y - frame_thickness.y - m_handle.getSize().y / 2;
 		pixel_distance = track_len - pixel_distance; // The default direction is "inc up" (max val at min y)!
 	}
@@ -216,11 +238,22 @@ float Slider::mousepos_to_sliderval(float x, float y) const
 	pixel_distance = std::max(pixel_distance, 0.f);
 	pixel_distance = std::min(pixel_distance, track_len);
 
-	float value = min() + (max() - min()) * pixel_distance / track_len;
+	float dv = pixel_distance / track_len * range().size();
+	if (m_cfg.invert) dv = range().size() - dv;
 
+	float value = min() + dv;
+/*
+cerr	<< "mouse -> value: " << value
+	<< ", dv: " << dv
+	<< ", [" << min() << ".." << max() << "], range-size: " << range().size()
+	<< ", step: " << step()
+	<< ", pixel_distance: " << pixel_distance
+	<< ", track_len: " << track_len
+	<< endl;
+*/
 	value = std::max(range().min, value);
 	value = std::min(range().max, value);
-	return m_cfg.invert ? range().max - value : value;
+	return value;
 }
 
 float Slider::sliderval_to_handledistance(float v) const
@@ -228,26 +261,47 @@ float Slider::sliderval_to_handledistance(float v) const
 {
 	sf::Vector2f frame_thickness = { (float)Theme::borderSize, (float)Theme::borderSize }; // No padding for sliders!
 
-	float track_len, pixel_distance;
+	float pixel_distance;
+	float dv = v - range().min;
+/*
+cerr	<< "m_value: " << m_value << " of ["<< min() <<".."<< max() <<"]"
+	<< ", v: " << v
+	<< ", dv: " << dv
+//	<< ", step: " << step()
+//	<< ", range().size(): " << range().size()
+	<< endl;
+*/	
+	assert(dv >= 0);
+
 	if (m_cfg.orientation == Horizontal)
 	{
-		track_len = getSize().x - m_handle.getSize().x - frame_thickness.x * 2;
-		if (m_cfg.invert) v = range().max - v;
+		if (m_cfg.invert) dv = range().size() - dv;
+		assert(dv >= 0);
 		pixel_distance = floor(frame_thickness.x
-		                       + track_len * v / (range().max - range().min));
+		                       + track_length() * dv / range().size());
 	}
 	else
 	{
-		track_len = getSize().y - m_handle.getSize().y - frame_thickness.y * 2;
-		v = range().max - v; // The default direction is "inc up" (max val at min y)!
-		if (m_cfg.invert) v = range().max - v;
+		dv = range().size() - dv; // The default direction is "inc up" (max val at min y)!
+		if (m_cfg.invert) dv = range().size() - dv;
+		assert(dv >= 0);
 		pixel_distance = floor(frame_thickness.y
-		                       + track_len * v / (range().max - range().min));
+		                       + track_length() * dv / range().size());
 	}
 
 	return pixel_distance;
 }
 
+
+float Slider::track_length() const
+{
+	sf::Vector2f frame_thickness = { (float)Theme::borderSize, (float)Theme::borderSize }; // No padding for sliders!
+
+	return m_cfg.orientation == Horizontal
+		? getSize().x - m_handle.getSize().x - frame_thickness.x * 2
+		: getSize().y - m_handle.getSize().y - frame_thickness.y * 2
+	;
+}
 
 
 void Slider::draw(const gfx::RenderContext& ctx) const
