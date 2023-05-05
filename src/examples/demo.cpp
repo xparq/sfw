@@ -353,14 +353,14 @@ int main()
 		if (demo.setTheme(themecfg))
 		{
 			// Update the wallpaper controls:
-			if (sfw::CheckBox* wptoggle = demo.getWidget("Wallpaper"); wptoggle)
-				wptoggle->enable(demo.hasWallpaper())
-				        ->set(demo.hasWallpaper());
-			if (auto wpalpha = demo.getWidget("Wallpaper α"); wpalpha) { // auto -> Widget*
+			if (auto wptoggle = (sfw::CheckBox*)demo.getWidget("Wallpaper"); wptoggle)
+				wptoggle->set(demo.hasWallpaper())     // set() first, as it returns CheckBox*
+				        ->enable(demo.hasWallpaper()); // (enable() would "degrade" to Widget*)
+			if (auto wpalpha = demo.getWidget("Wallpaper α"); wpalpha) // auto -> Widget*
 				wpalpha->enable(demo.hasWallpaper());
-			}
+			
 			// Update the bg. color selector's "Default" value:
-			if (OBColor* bgsel = demo.getWidget("Bg. color")); bgsel)
+			if (auto bgsel = (OBColor*)demo.getWidget("Bg. color"); bgsel)
 				bgsel->set("Default", themecfg.bgColor);
 		}
 	});
