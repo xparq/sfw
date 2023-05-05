@@ -350,18 +350,19 @@ int main()
 	right_bar->add(sfw::Label("Change theme:"));
 	auto themeselect = new OBTheme([&](auto* w) {
 		const auto& themecfg = w->current();
-		demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
-			demo.setTheme(themecfg); // Forcing an onThemeChanged callback sweep...
+		if (demo.setTheme(themecfg))
+		{
 			// Update the wallpaper controls:
-			if (auto wpalpha = demo.getWidget("Wallpaper α"); wpalpha) {
+			if (sfw::CheckBox* wptoggle = demo.getWidget("Wallpaper"); wptoggle)
+				wptoggle->enable(demo.hasWallpaper())
+				        ->set(demo.hasWallpaper());
+			if (auto wpalpha = demo.getWidget("Wallpaper α"); wpalpha) { // auto -> Widget*
 				wpalpha->enable(demo.hasWallpaper());
 			}
-			if (auto wptoggle = demo.getWidget("Wallpaper"); wptoggle)
-				((sfw::CheckBox*)wptoggle)
-					->set(demo.hasWallpaper())
-					->enable(demo.hasWallpaper());
-			// Update the bg. color selector's "Default" option:
-			if (demo.getWidget("Bg. color")) ((OBColor*)demo.getWidget("Bg. color"))->set("Default", themecfg.bgColor);
+			// Update the bg. color selector's "Default" value:
+			if (OBColor* bgsel = demo.getWidget("Bg. color")); bgsel)
+				bgsel->set("Default", themecfg.bgColor);
+		}
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
 	themeselect->select(DEFAULT_THEME);
