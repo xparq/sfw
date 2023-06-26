@@ -2,7 +2,7 @@
 #define SFW_GFX_TEXT_SFML_HPP
 
 #include <SFML/Graphics/Text.hpp>
-#include "sfw/util/shims.hpp"
+#include "sfw/util/shim/sfml.hpp"
 
 namespace sfw
 {

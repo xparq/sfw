@@ -1,5 +1,5 @@
 #include "sfw/Theme.hpp"
-#include "sfw/util/shims.hpp" // std::string <-> sf::String conv.
+#include "sfw/util/shim/sfml.hpp" // std::string <-> sf::String conv.
 #include "sfw/util/diagnostics.hpp"
 
 #include <algorithm>

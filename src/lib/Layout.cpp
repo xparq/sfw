@@ -1,7 +1,7 @@
 #include "sfw/Layout.hpp"
 #include "sfw/Theme.hpp"
 #include "sfw/Gfx/Render.hpp"
-#include "sfw/util/shims.hpp" // for sf::Event::KeyEvent::==
+#include "sfw/util/shim/sfml.hpp" // for sf::Event::KeyEvent::==
 
 #ifdef DEBUG
 #   include "sfw/GUI-main.hpp"

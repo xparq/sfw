@@ -1,7 +1,7 @@
 #include "sfw/WidgetContainer.hpp"
 
 #include "sfw/GUI-main.hpp"
-#include "sfw/util/shims.hpp"
+#include "sfw/util/shim/sfml.hpp"
 
 #include <cassert>
 #include <string>

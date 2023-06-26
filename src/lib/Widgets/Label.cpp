@@ -1,6 +1,6 @@
 #include "sfw/Widgets/Label.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/util/shims.hpp"
+#include "sfw/util/shim/sfml.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 

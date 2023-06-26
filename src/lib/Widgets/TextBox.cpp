@@ -3,7 +3,7 @@
 #include "sfw/Theme.hpp"
 #include "sfw/GUI-main.hpp"
 #include "sfw/util/utf8.hpp"
-#include "sfw/util/shims.hpp"
+#include "sfw/util/shim/sfml.hpp"
 #include "sfw/util/diagnostics.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -58,13 +58,8 @@ TextBox::TextBox(float pxWidth, CursorStyle style):
 TextBox* TextBox::set(const std::string& content)
 {
 	m_text.set(sfw::utf8_substr(content, 0, m_maxLength)); // Limit the length
-
 	setCursorPos(length());
-
-	//!! This (i.e. calling the user callback also on set...()) should be consistent across all the widgets! -> #257
-	//!! Doing this prematurely (before attaching to the GUI) is not yet clearly warned about (or prevented)! -> #109, #271
-
-	//!!onUpdate(); //!! <- Can't do it yet, as the demo app relies on it not happening! :-/
+//!!	changed(); //! Will become more sophisticated later (-> Undo/Redo)
 	return this;
 }
 
@@ -273,7 +268,7 @@ void TextBox::Paste()
 	std::string newcontent = get();
 	auto u8bpos = utf8_bsize(newcontent, m_cursorPos);
 	newcontent.insert(u8bpos, clip);
-	m_text.set(newcontent); //! not this->set(), to preserve m_cursorPos
+	m_text.set(newcontent); //! not this->set(), to preserve the cursor pos.
 	// Go to the end of the inserted part (or EOS)
 	setCursorPos(m_cursorPos + cliplen);
 }
@@ -502,7 +497,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
 	// "Apply"
 	case sf::Keyboard::Enter:
-		onUpdate();
+		onUpdate(); //!!TBD: Should instead call update(), but that's a NOOP if !changed()
 		break;
 
 	// Ctrl+A: Select All

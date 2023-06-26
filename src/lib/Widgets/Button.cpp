@@ -1,6 +1,6 @@
 #include "sfw/Widgets/Button.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/util/shims.hpp"
+#include "sfw/util/shim/sfml.hpp"
 
 #include <algorithm>
     using std::max;
