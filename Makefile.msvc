@@ -255,17 +255,17 @@ _compilable_src_exts_=$(patsubst %,.%,$(obj_source_exts))
 .SUFFIXES: $(_compilable_src_exts_) .ixx
 #-----------------------------------------------------------------------------
 {$(src_dir)}.c{$(obj_dir)}.obj::
-	$(CC) $(CFLAGS) -Fo$(obj_dir)\ $<
+	@$(CC) $(CFLAGS) -Fo$(obj_dir)\ $<
 
 {$(src_dir)}.cpp{$(obj_dir)}.obj::
-	$(CXX) $(CFLAGS) $(CXXFLAGS) -Fo$(obj_dir)\ $<
+	@$(CXX) $(CFLAGS) $(CXXFLAGS) -Fo$(obj_dir)\ $<
 
 {$(src_dir)}.cxx{$(obj_dir)}.obj::
-	$(CXX) $(CFLAGS) $(CXXFLAGS) -Fo$(obj_dir)\ $<
+	@$(CXX) $(CFLAGS) $(CXXFLAGS) -Fo$(obj_dir)\ $<
 
 #!!?? This is probably not the way to compile mod. ifcs!...:
 #{$(src_dir)}.ixx{$(obj_dir)}.ifc::
-#	$(CXX) $(CFLAGS) $(CXXFLAGS) -ifcOutput $(cxx_mod_ifc_dir)\ $<
+#	@$(CXX) $(CFLAGS) $(CXXFLAGS) -ifcOutput $(cxx_mod_ifc_dir)\ $<
 
 #-----------------------------------------------------------------------------
 # Default target - walk through the src tree dir-by-dir & build each,

@@ -52,6 +52,8 @@ SMOKE_TEST_OBJ := test/smoke
 CC        := g++
 CFLAGS    := -I$(SFML_DIR)/include -I./include -std=c++20 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
 LDFLAGS   := $(LDFLAGS) -L$(SFML_DIR)/lib
+#!! This may also be needed on Debian (not on Ubuntu) -- but just compiled it on my WSL Bullseye without it, so WTF?? --:
+#!! LDFLAGS   := -pthread $(LDFLAGS)
 
 # Switch various params. according to the host platform (i.e. the list
 # of "auxilary" libs for static build, terminal control etc.)
@@ -95,7 +97,7 @@ SMOKE_TEST_EXE := $(SMOKE_TEST)$(EXE_SUFFIX)
 # Under GCC the same lib (i.e. compilation mode) seems to work just fine 
 # for linking with both the static and dynamic SFML libs, so enough to just
 # dispatch for debug mode:
-OBJDIR   := $(OUTDIR)$(DIR_SUFFIX_DEBUG_$(DEBUG))
+OBJDIR   := $(OUTDIR)/o$(DIR_SUFFIX_DEBUG_$(DEBUG))
 OBJ      := $(SRC:%.cpp=$(OBJDIR)/%.o)
 LIBNAME  := $(LIBNAME)$(FILE_SUFFIX_DEBUG_$(DEBUG))
 LIBFILE  := $(LIBDIR)/lib$(LIBNAME).a
@@ -138,9 +140,9 @@ test: $(TEST_EXE)
 	@$(TEST_EXE)
 
 clean:
-	@echo "$(TERM_YELLOW)Removing$(TERM_NO_COLOR) $(OUTDIR) & $(LIBDIR)"
-	-@rm -r $(LIBDIR)
-	-@rm -r $(OUTDIR)
+	@echo "$(TERM_YELLOW)Removing$(TERM_NO_COLOR) $(OBJDIR) & $(LIBFILE)"
+	-@rm -r $(OBJDIR)
+	-@rm -r $(LIBFILE)
 
 mrproper: clean
 	@echo "$(TERM_YELLOW)Removing$(TERM_NO_COLOR) $(DEMO_EXE)"

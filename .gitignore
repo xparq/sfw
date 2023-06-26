@@ -9,12 +9,15 @@ extern/sfml/
 *.ilk
 *.pdb
 
-# Test/demo binaries (created in the repo root currently)
+# Test/demo binaries
 *-demo
 *-test
+*-demo-d
+*-test-d
+test/smoke
+test/**/*.exe
 # Ignore these in the root & test only (may have some in tooling/ etc.)
 /*.exe
-test/**/*.exe
 
 # Lib
 lib/
