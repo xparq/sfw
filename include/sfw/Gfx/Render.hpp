@@ -1,9 +1,7 @@
-#ifndef SFW_RENDER_HPP	
+#ifndef SFW_RENDER_HPP
 #define SFW_RENDER_HPP
 
-namespace sfw
-{
-namespace gfx
+namespace sfw::gfx
 {
 
 template <typename Backend>
@@ -37,8 +35,7 @@ public:
 };
 
 
-} // namespace gfx
-} // namespace sfw
+} // namespace sfw::gfx
 
 
 //----------------------------------------------------------------------------

@@ -5,9 +5,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
-namespace sfw
-{
-namespace gfx
+namespace sfw::gfx
 {
 
 struct SFML //!!extend into some proper backend representation later
@@ -54,6 +52,6 @@ public:
 };
 
 
-} // namespace gfx
-} // namespace sfw
+} // namespace sfw::gfx
+
 #endif // SFW_RENDER_SFML_HPP
