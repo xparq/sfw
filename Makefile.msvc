@@ -14,8 +14,9 @@ PRJ_NAME=sfw
 # Use the lower-case (processed) dir macros for the targets!
 main_lib=$(lib_dir)/$(PRJ_NAME)$(buildmode_file_suffix).lib
 main_exe=$(exe_dir)/$(PRJ_NAME)-demo$(buildmode_file_suffix).exe
-test_exe=$(exe_dir)/$(PRJ_NAME)-test$(buildmode_file_suffix).exe
 smoke_test_exe=./test/smoke.exe
+test_exe=./test/main$(buildmode_file_suffix).exe
+#test_exe=$(exe_dir)/$(PRJ_NAME)-test$(buildmode_file_suffix).exe
 BUILD = $(main_lib) $(main_exe) $(test_exe) $(smoke_test_exe)
 
 SRC_DIR=src

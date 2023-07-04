@@ -37,7 +37,7 @@ NAME      := sfw
 LIBNAME   := $(NAME)
 
 DEMO      := $(NAME)-demo
-TEST      := $(NAME)-test
+TEST      := test/main
 SMOKE_TEST:= test/smoke
 
 LIBDIR    := lib/$(TOOLCHAIN)
