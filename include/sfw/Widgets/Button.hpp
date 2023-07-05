@@ -20,28 +20,30 @@ class Button: public InputWidget<Button>
  ===========================================================================*/
 {
 public:
-    explicit Button(const std::string& text);
-    Button(const std::string& text, std::function<void()> callback);
-    Button(const std::string& text, std::function<void(Button*)> callback);
+	explicit Button(const std::string& text);
+	Button(const std::string& text, std::function<void()> callback);
+	Button(const std::string& text, std::function<void(Button*)> callback);
 
-    void setText(const std::string& text);
-    std::string getText() const;
+	Button* setText(const std::string& text);
+	std::string getText() const;
+
+	Button* click(); // "Macro" for automation
 
 private:
-    void draw(const gfx::RenderContext& ctx) const override;
+	void draw(const gfx::RenderContext& ctx) const override;
 
-    void recomputeGeometry() override;
+	void recomputeGeometry() override;
 
-    // Callbacks
-    void onStateChanged(WidgetState state) override;
-    void onMouseMoved(float x, float y) override;
-    void onMousePressed(float x, float y) override;
-    void onMouseReleased(float x, float y) override;
-    void onKeyPressed(const sf::Event::KeyEvent& key) override;
-    void onKeyReleased(const sf::Event::KeyEvent& key) override;
-    void onThemeChanged() override;
+	// Callbacks
+	void onStateChanged(WidgetState state) override;
+	void onMouseMoved(float x, float y) override;
+	void onMousePressed(float x, float y) override;
+	void onMouseReleased(float x, float y) override;
+	void onKeyPressed(const sf::Event::KeyEvent& key) override;
+	void onKeyReleased(const sf::Event::KeyEvent& key) override;
+	void onThemeChanged() override;
 
-    ItemBox<Text> m_box;
+	ItemBox<Text> m_box;
 };
 
 } // namespace

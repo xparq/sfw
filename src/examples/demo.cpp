@@ -258,10 +258,13 @@ int main()
 
 	// "Button factory" labeller textbox + creat button...
 	auto buttfactory = buttons_vbox->add(new HBox);
-	auto labeller = buttfactory->add(sfw::TextBox(100))->set("Edit Me!")->setPlaceholder("Button label");
+	auto labeller = buttfactory->add(sfw::TextBox(100))->set("Edit Me!")->setPlaceholder("Button label")
+		->setCallback([&] {
+			if (auto b = (sfw::Button*)demo.getWidget("button spawner"); b) b->click();
+		});
 	buttfactory->add(sfw::Button("Create button", [&] {
 		buttons_vbox->addAfter(buttfactory, new sfw::Button(labeller->get()));
-	}));
+	}), "button spawner");
 
 	// More buttons...
 	auto buttons_form = buttons_vbox->add(sfw::Form());
@@ -279,7 +282,7 @@ int main()
 		combined_labels->add(sfw::Label("Image button"));
 		combined_labels->add(sfw::Label("- native size"));
 
-		imgbuttons_form->add(combined_labels, new sfw::ImageButton(buttonimg, "Start moving"))
+		imgbuttons_form->add(combined_labels, new sfw::ImageButton(buttonimg, "Start rotating"))
 			->setTextSize(20)
 			->setCallback([]/*(auto* w)*/ { toy_anim_on = true; });
 
@@ -439,7 +442,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	hbox5->add(sfw::CheckBox([&](auto* w) { Theme::clearBackground = w->checked(); }, true));
 
 	// Custom exit button (also useless, but feels so nice! :) )
-	demo.add(sfw::Button("Quit", [&] { /*demo.close();*/ ((sfw::TextBox*)demo.getWidget("Text"))->set("123"); }));
+	demo.add(sfw::Button("Quit", [&] { demo.close(); }));
 
 	// Set this last, otherwise the dynamic GUI resize (on adding new widgets)
 	// may interfere with it!
