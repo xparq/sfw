@@ -57,7 +57,7 @@ void CheckBox::onThemeChanged()
     float box_size = m_checkmark.getSize().x + chkmark_offset * 2;
     m_box.setSize(box_size, box_size);
     setSize(max(box_size, (float)Theme::getLineSpacing() / 1.5f),
-            max(box_size, (float)Theme::getLineSpacing()));
+            max(box_size, (float)Theme::getBoxHeight()) * 0.85f); //!! Heuristic quick-fix for #199...
 
     m_box.setPosition((getSize().x - m_box.getSize().x) / 2,
                       (getSize().y - m_box.getSize().y) / 2);
