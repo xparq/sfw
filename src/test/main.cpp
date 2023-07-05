@@ -48,7 +48,7 @@ int main()
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
 		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
-		  sfw::Wallpaper::Cfg("demo/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,25,25,10)),
+		  sfw::Wallpaper::Cfg("demo/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,25,25,20)),
 		  11, "font/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
@@ -453,14 +453,14 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	                                       demo.hasWallpaper()));
 	// Wallpaper transparency slider
 	bgform->add("Wallpaper α", Slider({.range={0, 255}}, 75))
-		->set(25)
+		->set(demo.getWallpaper().getColor().a)
 		->setCallback([&](auto* w) {
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
 			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
 			                           themecfg.wallpaper.tint.g,
 			                           themecfg.wallpaper.tint.b,
-			                           uint8_t(w->get()*2.55)};
+			                           (uint8_t)w->get()};
 			demo.setWallpaperColor(themecfg.wallpaper.tint);
 		});
 	// Window background color selector

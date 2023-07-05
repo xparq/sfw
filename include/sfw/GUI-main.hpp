@@ -102,6 +102,7 @@ public:
     void setWallpaper(std::string filename = "",
                       Wallpaper::Placement placement = sfw::Wallpaper::Placement::Center,
                       sf::Color tintColor = sf::Color::White);
+    const Wallpaper& getWallpaper() const { return m_wallpaper; }
     void disableWallpaper();
     bool hasWallpaper();
     /**

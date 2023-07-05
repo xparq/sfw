@@ -415,14 +415,14 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 
 	// Wallpaper transparency slider
 	bgform->add("Wallpaper α", sfw::Slider({.range={0, 255}}, 75))
-		->set(25)
+		->set(demo.getWallpaper().getColor().a)
 		->setCallback([&](auto* w) {
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
 			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
 			                           themecfg.wallpaper.tint.g,
 			                           themecfg.wallpaper.tint.b,
-			                           uint8_t(w->get()*2.55)};
+			                           (uint8_t)w->get()};
 			demo.setWallpaperColor(themecfg.wallpaper.tint);
 		});
 	// Window background color selector
