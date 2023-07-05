@@ -68,7 +68,7 @@ auto OptionsBox<T>::select(size_t index)
     if (index != m_currentIndex)
     {
         update_selection(index);
-        onUpdate();
+        updated(); // Call the update handler!
     }
     return this;
 }
@@ -314,11 +314,5 @@ OptionsBox<T>::Item::Item(const std::string& text, const T& val):
 {
 }
 
-
-template <class T>
-OptionsBox<T>* OptionsBox<T>::setCallback(std::function<void(OptionsBox<T>*)> callback)
-{
-    return (OptionsBox<T>*) Widget::setCallback( [callback](Widget* w) { callback( (OptionsBox*)w ); });
-}
 
 } // namespace

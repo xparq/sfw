@@ -13,9 +13,9 @@ namespace sfw
 CheckBox::CheckBox(bool checked_state):
     m_box(Box::Input)
 {
-    set(checked_state);
+	set(checked_state);
 
-    onThemeChanged();
+	onThemeChanged(); //!!kludge to force geom. recalc.!
 }
 
 CheckBox::CheckBox(std::function<void(CheckBox*)> callback, bool checked):
@@ -27,9 +27,9 @@ CheckBox::CheckBox(std::function<void(CheckBox*)> callback, bool checked):
 
 CheckBox* CheckBox::set(bool checked)
 {
-    m_checked = checked;
-    onUpdate();
-    return this;
+	m_checked = checked;
+	changed(true);
+	return this;
 }
 
 
@@ -70,7 +70,7 @@ void CheckBox::onMouseReleased(float x, float y)
 {
     if (contains(sf::Vector2f(x, y)))
     {
-        toggle(); // calls onUpdate()
+        toggle();
     }
 }
 
@@ -79,14 +79,8 @@ void CheckBox::onKeyPressed(const sf::Event::KeyEvent& key)
 {
     if (key.code == sf::Keyboard::Space)
     {
-        toggle(); // calls onUpdate()
+        toggle();
     }
-}
-
-
-CheckBox* CheckBox::setCallback(std::function<void(CheckBox*)> callback)
-{
-    return (CheckBox*) Widget::setCallback( [callback] (Widget* w) { callback( (CheckBox*)w ); });
 }
 
 } // namespace

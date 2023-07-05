@@ -11,7 +11,6 @@ namespace sfw
 {
 
 ImageButton::ImageButton(const sf::Texture& texture, const std::string& label):
-	Widget(),
 	m_background(texture), // no default sf::Sprite ctor
 	m_pressed(false)
 {
@@ -163,7 +162,7 @@ void ImageButton::onMouseReleased(float x, float y)
 	release();
 	if (contains({x, y}))
 	{
-		onUpdate();
+		onUpdated();
 	}
 }
 
@@ -173,7 +172,7 @@ void ImageButton::onKeyPressed(const sf::Event::KeyEvent& key)
 	if (key.code == sf::Keyboard::Enter)
 	{
 		press();
-		onUpdate();
+		onUpdated();
 	}
 }
 
@@ -212,12 +211,6 @@ void ImageButton::centerText()
 	sf::FloatRect t = m_text.getLocalBounds();
 	m_text.setOrigin({t.left + round(t.width / 2.f), t.top + round(t.height / 2.f)});
 	m_text.setPosition({boxwidth / 2, boxheight / 2});
-}
-
-
-ImageButton* ImageButton::setCallback(std::function<void(ImageButton*)> callback)
-{
-	return (ImageButton*) Widget::setCallback( [callback] (Widget* w) { callback( (ImageButton*)w ); });
 }
 
 } // namespace

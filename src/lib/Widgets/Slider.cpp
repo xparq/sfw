@@ -63,7 +63,7 @@ Slider::Slider(const Cfg& cfg/*, const Style& style*/, float length) :
 	m_boxLength(length),
 	m_value(0),
 	m_track(Box::Input),
-	m_handle(Box::Click)
+	m_thumb(Box::Click)
 {
 	// Make sure the initial value is valid:
 	set(range().min);
@@ -132,12 +132,18 @@ Slider* Slider::set(float value)
 		//!! anyway... However, this doesn't protect against lots of sliding
 		//!! to and fro well within the interval!
 
-		if (value != m_value) // Still looks like a change? ;) (Note: the FP errors make this hit-and-miss though!)
+		if (value != m_value) // Still looks like a change? :) (Note: floating-point errors make this hit-and-miss though!)
 		{
 			m_value = value;
 //cerr << " - set(): m_value: "<< m_value <<endl;
-			updateView();
-			onUpdate();
+			updateView(); //! This is equivalent to `if (changed()) updateView()`,
+			              //! and also should be in onUpdated(), but for most widgets,
+			              //! the view can change even if the value doesn't (e.g. in
+				      //! onThemeChanged, or a text box may have resize etc. etc.)
+				      //!! So, this should be an entire additional dimension to
+				      //!! widget change control (apart from value, i.e. the "model";
+				      //!! the "view" lives its own life, only _mostly_ depending on
+				      //!! the value!
 		}
 	}
 	return this;
@@ -146,7 +152,7 @@ Slider* Slider::set(float value)
 
 Slider* Slider::move(float delta)
 {
-	set(get() + delta);
+	update(get() + delta);
 	return this;
 }
 
@@ -165,7 +171,7 @@ void Slider::updateGeometry()
 	{
 		m_track.setSize(m_boxLength, grooveHeight);
 		m_track.setPosition(0, grooveOffset);
-		m_handle.setSize(handleWidth, handleHeight);
+		m_thumb.setSize(handleWidth, handleHeight);
 
 		setSize(m_boxLength, handleHeight);
 
@@ -182,7 +188,7 @@ void Slider::updateGeometry()
 	{
 		m_track.setSize(grooveHeight, m_boxLength);
 		m_track.setPosition(grooveOffset, 0);
-		m_handle.setSize(handleHeight, handleWidth);
+		m_thumb.setSize(handleHeight, handleWidth);
 
 		setSize(handleHeight, m_boxLength);
 
@@ -205,13 +211,13 @@ void Slider::updateView()
 
 	if (m_cfg.orientation == Horizontal)
 	{
-		m_handle.setPosition(offset, 0);
+		m_thumb.setPosition(offset, 0);
 		m_progression[2].position.x = offset;
 		m_progression[3].position.x = offset;
 	}
 	else
 	{
-		m_handle.setPosition(0, offset);
+		m_thumb.setPosition(0, offset);
 		m_progression[0].position.y = offset;
 		m_progression[2].position.y = offset;
 	}
@@ -227,11 +233,11 @@ float Slider::mousepos_to_sliderval(float x, float y) const
 
 	if (m_cfg.orientation == Horizontal)
 	{
-		pixel_distance = x - frame_thickness.x - m_handle.getSize().x / 2;
+		pixel_distance = x - frame_thickness.x - m_thumb.getSize().x / 2;
 	}
 	else
 	{
-		pixel_distance = y - frame_thickness.y - m_handle.getSize().y / 2;
+		pixel_distance = y - frame_thickness.y - m_thumb.getSize().y / 2;
 		pixel_distance = track_len - pixel_distance; // The default direction is "inc up" (max val at min y)!
 	}
 	// Cap distance to track length
@@ -298,8 +304,8 @@ float Slider::track_length() const
 	sf::Vector2f frame_thickness = { (float)Theme::borderSize, (float)Theme::borderSize }; // No padding for sliders!
 
 	return m_cfg.orientation == Horizontal
-		? getSize().x - m_handle.getSize().x - frame_thickness.x * 2
-		: getSize().y - m_handle.getSize().y - frame_thickness.y * 2
+		? getSize().x - m_thumb.getSize().x - frame_thickness.x * 2
+		: getSize().y - m_thumb.getSize().y - frame_thickness.y * 2
 	;
 }
 
@@ -310,7 +316,7 @@ void Slider::draw(const gfx::RenderContext& ctx) const
 	sfml_renderstates.transform *= getTransform();
 	ctx.target.draw(m_track, sfml_renderstates);
 	ctx.target.draw(m_progression, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
-	ctx.target.draw(m_handle, sfml_renderstates);
+	ctx.target.draw(m_thumb, sfml_renderstates);
 }
 
 
@@ -342,10 +348,10 @@ void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
 		else if (m_cfg.use_all_arrow_keys)   inc(delta);
 		break;
 	case sf::Keyboard::Home:
-		set(range().min);
+		update(range().min);
 		break;
 	case sf::Keyboard::End:
-		set(range().max);
+		update(range().max);
 		break;
 	default:
 		break;
@@ -355,10 +361,10 @@ void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void Slider::onMousePressed(float x, float y)
 {
-	if (m_cfg.jumpy_thumb_click || !m_handle.contains(x, y)) // #219: Don't reposition on clicking the thumb
-		set(mousepos_to_sliderval(x, y));
+	if (m_cfg.jumpy_thumb_click || !m_thumb.contains(x, y)) // #219: Don't reposition on clicking the thumb
+		update(mousepos_to_sliderval(x, y));
 
-	m_handle.press();
+	m_thumb.press();
 }
 
 
@@ -368,29 +374,38 @@ void Slider::onMouseMoved(float x, float y)
 	{
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
-			set(mousepos_to_sliderval(x, y));
+			update(mousepos_to_sliderval(x, y));
+			//!!TODO: Support notify_on_drag: call set instead of update if false.
+			//!!      But then it must also call updated() at the end of the drag (-> onMouseReleased).
 		}
 	}
-	else if (m_handle.contains(x, y))
+	else if (m_thumb.contains(x, y))
 	{
-		m_handle.applyState(WidgetState::Hovered);
+		m_thumb.applyState(WidgetState::Hovered);
 	}
 	else
 	{
-		m_handle.applyState(WidgetState::Default);
+		m_thumb.applyState(WidgetState::Default);
 	}
 }
 
 
 void Slider::onMouseReleased(float, float)
 {
-	m_handle.release();
+	m_thumb.release();
+	//!!TODO: Support notify_on_drag = false: do an extra updated() after dragging
+	//!!      (so, it must distinguish between release after just a click (+ "minor" accidental moves?!),
+	//!!      and "real" dragging, obviously -- but the "how" of it isn't obvious to me at all...),
+	//!!      and also make sure the notification is not skipped due to !changed().
+	//!!      (-> onMouseMoved)
 }
 
 
 void Slider::onMouseWheelMoved(int delta)
 {
+	if (m_cfg.invert) delta = -delta;
 	if (delta > 0) inc(); else dec();
+	//!!if (delta > 0) inc(delta * step()); else dec(delta * step());
 }
 
 
@@ -398,7 +413,7 @@ void Slider::onStateChanged(WidgetState state)
 {
 	if (state == WidgetState::Focused || state == WidgetState::Default)
 	{
-		m_handle.applyState(state);
+		m_thumb.applyState(state);
 	}
 }
 
@@ -407,10 +422,5 @@ void Slider::onThemeChanged()
 	updateGeometry();
 }
 
-
-Slider* Slider::setCallback(std::function<void(Slider*)> callback)
-{
-	return (Slider*) Widget::setCallback( [callback] (Widget* w) { callback( (Slider*)w ); });
-}
 
 } // namespace

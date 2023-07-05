@@ -1,9 +1,9 @@
 #ifndef GUI_SLIDER_HPP
 #define GUI_SLIDER_HPP
 
-#include "sfw/Widget.hpp"
-#include "sfw/Gfx/Elements/Box.hpp"
+#include "sfw/InputWidget.hpp"
 #include "sfw/Geometry.hpp"
+#include "sfw/Gfx/Elements/Box.hpp"
 
 namespace sfw
 {
@@ -26,17 +26,26 @@ namespace sfw
 			float step = 1;
 			Orientation orientation = Horizontal;
 
-			// Preferred increase/decrase direction
+			// Direction by default: up/right > down/left
 			bool invert = false;
+			//!!bool invert_h = false;
+			//!!bool invert_v = false;
+			//!! Should ensure consistency among ^these^, while still allowing
+			//!! simple prop-based configuration (without accessors)! Probably
+			//!! via enums: .invert = Horizontal|Vertical
 			// Use each arrow key, not just those matching the orientation
 			bool use_all_arrow_keys = true;
 			// Don't readjust the handle position on clicking it (#219)
 			bool jumpy_thumb_click = false;
+//!! NOT IMPL. YET:
+//!!			// Continuously call the update callback on dragging
+//!!			bool notify_on_drag = true;
 		};
 	}
 
-class Slider: public Widget
+class Slider: public InputWidget<Slider>
 {
+public:
 	using Cfg = SliderConfig_GCC_CLANG_bug_workaround::Cfg;
 	using Range = SliderConfig_GCC_CLANG_bug_workaround::Range;
 
@@ -59,16 +68,15 @@ public:
 	// Current value
 	Slider* set(float value);
 	float   get() const;
+	// Unfortunately, these are also needed to seamlessly support integers, too, without warnings:
+	Slider* set(int value)      { return set((float)value); }
+	Slider* set(unsigned value) { return set((float)value); }
 
 	Slider* inc();
 	Slider* dec();
 	Slider* inc(float delta);
 	Slider* dec(float delta);
 	Slider* move(float delta);
-
-	// Set the onUpdate callback
-	Slider* setCallback(std::function<void(Slider*)> callback);
-	Slider* setCallback(std::function<void()> callback)         { return (Slider*) Widget::setCallback(callback); }
 
 private:
 	// Helpers
@@ -96,7 +104,7 @@ private:
 	float m_value;
 	// Visual ("view") state:
 	Box m_track;
-	Box m_handle;
+	Box m_thumb;
 	sf::Vertex m_progression[4];
 };
 

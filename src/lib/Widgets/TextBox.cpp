@@ -47,7 +47,7 @@ TextBox::TextBox(float pxWidth, CursorStyle style):
 {
 	// Visuals
 	m_cursorStyle = style;
-	onThemeChanged();
+	onThemeChanged(); //!!Kludge to force geom. recalc.!
 
 	// Mechanics - need to be done after the visuals, as the visual part of
 	// the cursor positioning depends on the visual setup!
@@ -58,8 +58,9 @@ TextBox::TextBox(float pxWidth, CursorStyle style):
 TextBox* TextBox::set(const std::string& content)
 {
 	m_text.set(sfw::utf8_substr(content, 0, m_maxLength)); // Limit the length
-	setCursorPos(length());
-//!!	changed(); //! Will become more sophisticated later (-> Undo/Redo)
+	setCursorPos(length()); // End(), but it's unclear if it'd be too high-level here...
+
+	changed(); //! Will become more sophisticated later (-> Undo/Redo)
 	return this;
 }
 
@@ -92,7 +93,7 @@ TextBox* TextBox::setMaxLength(size_t maxLength)
 	// Trim current text if needed
 	if (length() > m_maxLength)
 	{
-	set(get());
+		set(get());
 	}
 
 	return this;
@@ -393,6 +394,14 @@ cerr << endl;
 		m_cursorRect.move({diff, 0});
 	}
 
+	//!!Moved these here from the end of onThemeChanged (and put a call to update_view() there!), to fix #300:
+	//!!But I really don't understand, why what exactly caused the problem (a regression, I suppose!), and
+	//!!how exactly this fixes it... :-o
+	//!!
+	//!!This should also adjust the x offset (later...)! (See notes at onThemeChanged!)
+	m_text.setPosition({m_text.getPosition().x, framing_offset});
+	m_cursorRect.setPosition({m_cursorRect.getPosition().x, framing_offset});
+
 	// Also update the selection highlight...
 	if (m_selection)
 	{
@@ -497,7 +506,7 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
 	// "Apply"
 	case sf::Keyboard::Enter:
-		onUpdate(); //!!TBD: Should instead call update(), but that's a NOOP if !changed()
+		updated(); //!!TBD: Should it be forced even if !changed()?
 		break;
 
 	// Ctrl+A: Select All
@@ -625,18 +634,17 @@ void TextBox::onStateChanged(WidgetState state)
 
 void TextBox::onThemeChanged()
 {
-	float offset = Theme::borderSize + Theme::PADDING;
+	float framing_offset = Theme::borderSize + Theme::PADDING;
 
 //!! The repositionings below are incomplete alone! x needs readjusting, too!
 //!! Ideally no repos. should even be needed, but a clean, net inner rect
 //!! should be used instead for all the text + cursor drawing, but... later.
 //!!
-//!! Alternatively, before draw() (or latest: right there, but that
-//!! should of course be avoided for perf. reasons) there should be an
-//!! internal update_view() call to iron out any possible inconsistencies
-//!! (irrespective of what has caused it)! And it would be called from
-//!! onResize, too, in case that becomes a thing (likely for a multi-line
-//!! TextBox in the future).
+//!! Alternatively, somewhere before draw() (or latest: right there -- but
+//!! of course that would be stupidly wasteful), there should be an internal
+//!! update_view() call to iron out any possible inconsistencies (irrespective
+//!! of what may have caused them)! And it would be called from onResize, too,
+//!! if that becomes a thing (likely for a multi-line TextBox in the future).
 
 	m_text.setFont(Theme::getFont());
 	m_text.setFillColor(Theme::input.textColor);
@@ -647,7 +655,7 @@ void TextBox::onThemeChanged()
 	m_placeholder.setCharacterSize((unsigned)Theme::textSize);
 	//!! This is a "static fixture", can't move, so it's *probably* OK to
 	//!! reposition it only once per theme change:
-	m_placeholder.setPosition({offset, offset});
+	m_placeholder.setPosition({framing_offset, framing_offset});
 
 	m_cursorColor = Theme::input.textColor;
 	m_cursorRect.setFillColor(Theme::input.textColor);
@@ -656,13 +664,9 @@ void TextBox::onThemeChanged()
 	(float)Theme::getLineSpacing()));
 
 	m_box.setSize(m_pxWidth, Theme::getBoxHeight());
-
 	setSize(m_box.getSize());
 
-//!!update_view():
-	//!!And then this should adjust the x offset, too (later)!
-	m_text.setPosition({m_text.getPosition().x, offset});
-	m_cursorRect.setPosition({m_cursorRect.getPosition().x, offset});
+	update_view();
 }
 
 
@@ -728,12 +732,6 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 	}
 
 	//!!??Not needed now, but could be here: glDisable(GL_SCISSOR_TEST);
-}
-
-
-TextBox* TextBox::setCallback(std::function<void(TextBox*)> callback)
-{
-	return (TextBox*) Widget::setCallback( [callback] (Widget* w) { callback( (TextBox*)w ); });
 }
 
 

@@ -334,7 +334,7 @@ int main()
 		boxcrop->add(sfw::Label("Crop square size:"));
 		boxcrop->add(sfw::ProgressBar(47), "cropbar");
 		boxcrop->add((new sfw::TextBox(36))->setMaxLength(3), "crop%")->setCallback([&](auto* w) {
-			try { cropslider->set(stof(w->get())); }
+			try { cropslider->update(stof(w->get())); }
 			catch (...) { cropslider->set(0); }
 		});
 
@@ -362,6 +362,11 @@ int main()
 			// Update the bg. color selector's "Default" value:
 			if (auto bgsel = (OBColor*)demo.getWidget("Bg. color"); bgsel)
 				bgsel->set("Default", themecfg.bgColor);
+
+			//!! Update the font size slider:
+			//!! (Beware of infinite recursion, as its own onUpdate callback would
+			//!! trigger another theme change, if the new font size differs!...)
+			//!!...
 		}
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
@@ -369,11 +374,14 @@ int main()
 	right_bar->add(themeselect, "theme-selector");
 
 	// Theme font size slider
-	// (Changes the font size directly of the cfg. data stored in "theme-selector",
-	// so it will remember the new size(s)!)
-	right_bar->add(sfw::Label("Theme font size (use the m. wheel):"));
-	right_bar->add(sfw::Slider({.range = {8, 18}}, 100))
-		->set(30)
+	// (Also directly changes the font size of the theme cfg. data stored in the
+	// "theme-selector" widget, so that it remembers the updated size (for each theme)!)
+	right_bar->add(sfw::Label("Theme font size (use the m. wheel):")); // Move that remark to a tooltip!
+	right_bar->add(sfw::Slider({.range = {8, 18}}, 100), "font size slider")
+		//!! Would be tempting to sync the initial font size directly with
+		//!! the theme selector widget -- but can't: the GUI is not up yet!
+		//!! ->set(((OBTheme*)(w->getWidget("theme-selector")))->currentRef().textSize) //! This would fail here!
+		->set((float)themes[DEFAULT_THEME].textSize)
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
@@ -386,15 +394,13 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	right_bar->add(sfw::Label("Theme textures:"));
 	auto txbox = right_bar->add(new HBox);
 	struct ThemeBitmap : public sfw::Image {
-		ThemeBitmap(float zoom) : Image(Theme::getTexture()) { scale(zoom); }
-		void onThemeChanged() override {
-			setTexture(Theme::getTexture()); // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
-		}
+		ThemeBitmap() : Image(Theme::getTexture()) {}
+		void onThemeChanged() override { setTexture(Theme::getTexture()); } // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
 	};
-	auto themeBitmap = new ThemeBitmap(2); // start with 2x zoom
+	auto themeBitmap = new ThemeBitmap; //ThemeBitmap(2); // start with 2x zoom
 	txbox->add(sfw::Slider({.range = {0, 4}, .orientation = sfw::Vertical, .invert = true}, 100)) // height = 100
 		->setCallback([&](auto* w) { themeBitmap->scale(1 + w->get()); })
-		->set(3);
+		->update(3); // use update(), not set(), to trigger the callback!
 	txbox->add(themeBitmap);
 
 	right_bar->add(sfw::Label(" ")); // Just for some space, indeed...
@@ -404,8 +410,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 
 	// Wallpaper on/off checkbox
 	bgform->add("Wallpaper", sfw::CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
-	                                       demo.hasWallpaper())
-	           )->enable(demo.hasWallpaper());
+                                               demo.hasWallpaper())
+	           )->enable(demo.hasWallpaper()); // Only enable if there actually is a wallpaper!
 
 	// Wallpaper transparency slider
 	bgform->add("Wallpaper α", sfw::Slider({}, 75))
@@ -433,7 +439,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	hbox5->add(sfw::CheckBox([&](auto* w) { Theme::clearBackground = w->checked(); }, true));
 
 	// Custom exit button (also useless, but feels so nice! :) )
-	demo.add(sfw::Button("Quit", [&] { demo.close(); }));
+	demo.add(sfw::Button("Quit", [&] { /*demo.close();*/ ((sfw::TextBox*)demo.getWidget("Text"))->set("123"); }));
 
 	// Set this last, otherwise the dynamic GUI resize (on adding new widgets)
 	// may interfere with it!
@@ -443,6 +449,11 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	// OK, GUI Setup done, set some "high-level" defaults
 	// (after setup, as these may trigger callbacks etc.)
 	//
+
+	// Change the font size (to "prime" SFML) to avoid #196! :-o
+	if (auto w = (sfw::Slider*)demo.getWidget("font size slider"); w)
+		w->update(14);
+
 	sliderForRotation->set(104);
 	sliderForSize->set(1.2f);
 	// Colors of the example text + rect:
@@ -492,7 +503,7 @@ void background_thread_main(sfw::GUI& gui)
 	{
 		// Cycle the rot. slider
 	        auto sampletext_angle = sf::degrees(rot_slider->get());
-		rot_slider->set(float( int(sampletext_angle.asDegrees()) % 360 ) + 2);
+		rot_slider->update(int(sampletext_angle.asDegrees()) % 360 + 2);
 
 		do this_thread::sleep_for(chrono::milliseconds(50));
 		// Keep on sleeping while the anim. is disabled, and poll for termination:

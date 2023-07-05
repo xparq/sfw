@@ -1,7 +1,7 @@
 #ifndef GUI_TEXTBOX_HPP
 #define GUI_TEXTBOX_HPP
 
-#include "sfw/Widget.hpp"
+#include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
 #include "sfw/Gfx/Elements/Box.hpp"
 #include "sfw/TextSelection.hpp"
@@ -20,7 +20,7 @@ namespace sfw
   The TextBox widget is a one-line plain-text editor with selection support.
   All the strings expected or returned by the operations are UTF-8 encoded.
  *****************************************************************************/
-class TextBox: public Widget
+class TextBox: public InputWidget<TextBox>
 {
 public:
 	enum CursorStyle
@@ -52,9 +52,6 @@ public:
 
 	TextBox*    setPlaceholder(const std::string& placeholder);
 	std::string getPlaceholder() const;
-
-	TextBox* setCallback(std::function<void()> callback)         { return (TextBox*) Widget::setCallback(callback); }
-	TextBox* setCallback(std::function<void(TextBox*)> callback);
 
 	//------------------------------------------------------------------------
 	// Legacy support for SFML strings

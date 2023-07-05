@@ -416,11 +416,11 @@ int main()
 	right_bar->add(themeselect, "theme-selector");
 
 	// Theme font size slider
-	// (Changes the font size directly of the cfg. data stored in "theme-selector",
-	// so it will remember the new size(s)!)
+	// (Also directly changes the font size of the theme cfg. data stored in the
+	// "theme-selector" widget, so that it remembers the updated size (for each theme)!)
 	right_bar->add(Label("Theme font size (use the m. wheel):"));
 	right_bar->add(Slider({.range = {8, 18}}, 100))
-		->set(30)
+		->set((float)themes[DEFAULT_THEME].textSize)
 		->setCallback([&] (auto* w){
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
@@ -433,16 +433,14 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	right_bar->add(sfw::Label("Theme textures:"));
 	auto txbox = right_bar->add(new HBox);
 	struct ThemeBitmap : public Image {
-		ThemeBitmap(float zoom) : Image(Theme::getTexture()) { scale(zoom); }
-		void onThemeChanged() override {
-			setTexture(Theme::getTexture()); // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
-		}
+		ThemeBitmap() : Image(Theme::getTexture()) {}
+		void onThemeChanged() override { setTexture(Theme::getTexture()); } // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
 	};
-	auto themeBitmap = new ThemeBitmap(2); // start with 2x zoom
+	auto themeBitmap = new ThemeBitmap; //ThemeBitmap(2); // start with 2x zoom
 	txbox->add(Slider({.range = {1, 5}, .orientation = Vertical, .invert = true}, 100))
 		->setCallback([&](auto* w) { themeBitmap->scale(w->get()); })
-		->setIntervals(2)
-		->set(4);
+		->setIntervals(2) // divide the range into 2 intervals, yielding stops at: 1, 3, 5
+		->update(4.f); // use update(), not set(), to trigger the callback!
 	txbox->add(themeBitmap);
 
 	right_bar->add(Label(" ")); // Just for some space, indeed...
@@ -563,7 +561,7 @@ void background_thread_main(sfw::GUI& gui)
 	{
 		// Cycle the rot. slider
 	        auto sampletext_angle = sf::degrees(rot_slider->get() * 3 + 4);
-		rot_slider->set(float(int(sampletext_angle.asDegrees()/3) % 100));
+		rot_slider->update(float(int(sampletext_angle.asDegrees()/3) % 100));
 
 		// Keep on sleeping while the anim. is disabled.
 		// But still also poll the GUI for termination.

@@ -1,7 +1,7 @@
 #ifndef SFW_CHECKBOX_HPP
 #define SFW_CHECKBOX_HPP
 
-#include "sfw/Widget.hpp"
+#include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Box.hpp"
 #include "sfw/Gfx/Elements/CheckMark.hpp"
 
@@ -13,7 +13,7 @@ namespace sfw
   (Well, actually, one surprise could still be that it doesn't even have its
   own label... You'd need to add one yourself using a Form or HBox layout.)
  *****************************************************************************/
-class CheckBox: public Widget
+class CheckBox: public InputWidget<CheckBox>
 {
 public:
     CheckBox(bool checked = false);
@@ -24,19 +24,15 @@ public:
     bool get() const { return m_checked; }
 
     // Widget-specific operations
-    CheckBox* check()   { return set(true); }
-    CheckBox* uncheck() { return set(false); }
-    CheckBox* toggle()  { return set(!checked()); }
+    CheckBox* check()   { return update(true); }
+    CheckBox* uncheck() { return update(false); }
+    CheckBox* toggle()  { return update(!checked()); }
 
     // Widget-specific queries
     operator bool() const { return checked(); }
     bool checked() const { return get(); }
     // Still keeping the legacy style, too:
     bool isChecked() const { return checked(); }
-
-    // Instance-specific "update" callback
-    CheckBox* setCallback(std::function<void(CheckBox*)> callback);
-    CheckBox* setCallback(std::function<void()> callback)         { return (CheckBox*) Widget::setCallback(callback); }
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;

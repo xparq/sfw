@@ -97,7 +97,7 @@ void Button::onMouseReleased(float x, float y)
 {
     if (contains({x, y}))
     {
-        onUpdate();
+        onUpdated();
     }
 }
 
@@ -107,7 +107,7 @@ void Button::onKeyPressed(const sf::Event::KeyEvent& key)
     if (key.code == sf::Keyboard::Enter || key.code == sf::Keyboard::Space)
     {
         m_box.press();
-        onUpdate();
+        onUpdated();
     }
 }
 
@@ -120,10 +120,11 @@ void Button::onKeyReleased(const sf::Event::KeyEvent& key)
     }
 }
 
-
+/*!!
 Button* Button::setCallback(std::function<void(Button*)> callback)
 {
     return (Button*) Widget::setCallback( [callback] (Widget* w) { callback( (Button*)w ); });
 }
+!!*/
 
 } // namespace

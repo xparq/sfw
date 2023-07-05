@@ -1,7 +1,7 @@
 #ifndef GUI_IMAGEBUTTON_HPP
 #define GUI_IMAGEBUTTON_HPP
 
-#include "sfw/Widget.hpp"
+#include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
 
 #include <string>
@@ -16,7 +16,7 @@ namespace sfw
 /**
  * Push button linked to a sprite sheet
  */
-class ImageButton: public Widget
+class ImageButton: public InputWidget<ImageButton>
 {
 public:
     ImageButton(const sf::Texture& texture, const std::string& label = "");
@@ -34,9 +34,6 @@ public:
     ImageButton* setTextColor(sf::Color color);
 
     ImageButton* setTexture(const sf::Texture& texture);
-
-    ImageButton* setCallback(std::function<void()> callback)         { return (ImageButton*) Widget::setCallback(callback); }
-    ImageButton* setCallback(std::function<void(ImageButton*)> callback);
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;

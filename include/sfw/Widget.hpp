@@ -1,20 +1,18 @@
 #ifndef GUI_WIDGET_HPP
 #define GUI_WIDGET_HPP
 
+#include "sfw/Event.hpp"
 #include "sfw/WidgetState.hpp"
 #include "sfw/Gfx/Render.hpp"
 //!!#include "sfw/WidgetContainer.hpp" // See forw. decl. below instead...
 //!!#include "sfw/Layout.hpp" // See forw. decl. below instead...
 //!!#include "sfw/GUI-main.hpp" // See forw. decl. below instead...
 
-#include <functional>
-#include <optional>
-#include <variant>
-#include <string>
-
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Window/Event.hpp>
+
+#include <string>
 
 #ifdef DEBUG
 #
@@ -32,28 +30,33 @@ class GUI;
 /*****************************************************************************
   Abstract base class for widgets
 
-  - Every (interactive) widget has a dedicated value -- and a corresponding
-    data type -- that it represents (models, stores, displays etc.).
+  - Every (interactive) widget has a dedicated value of a corresponding
+    type that the widget represents (models, stores, displays etc.).
 
     This value can be set via user input actions, or programmatically by the
-    constructor, and a dedicated set(...) method (and, in fact, any number
-    of overloaded set(...) methods, for convenient auto-conversions).
+    constructor, and a dedicated set(...) method (and its overloads, if any).
  
-    The current value can be queried with the widget's (single) get() method.
-    (Unfortunately C++ doesn't support different return types for one name,
-    so, for outward auto-conversions, separate getXxx() methods may be defined.)
+    The current value can be queried with the widget's get() method.
+    (Unfortunately C++ doesn't support overloading on return types, so for
+    outward type conversions, separate getXxx() methods may be defined.
+    However, it's better to define the widget's data type explicitly, with
+    conversions in both directions (converting ctors and "cast operators"),
+    and then just use a single set/get method.)
 
-    - However, it's better to define the widget's data type explicitly, with
-      conversions in both directions (converting ctors and "cast operators"),
-      and then just use a single set/get method.
-
-  - Interactive widgets typically have a user callback set, which gets invoked
-    when the widget's value gets updated (and committed, so interim changes
-    don't trigger the callback, usually (with exceptions like Slider)).
+  - Interactive widgets are typically configured to have callbacks to be
+    invoked when the widget's value gets updated (and finalized/committed,
+    so interim changes can be ignored).
  *****************************************************************************/
-class Widget: public gfx::Drawable
+class Widget: public gfx::Drawable, public Event::Handler
 {
 public:
+	// Tracking the value of the widget
+	// Derived real widgets will need to define getter/setters:
+	// - set(V value); // Will call changed() as applicable
+	// - V get();
+	bool changed() const { return m_changed; }
+	Widget* changed(bool newstate = true) { m_changed = newstate; return this; }
+
 	// Widget geometry
 	Widget* setPosition(const sf::Vector2f& pos);
 	Widget* setPosition(float x, float y);
@@ -65,7 +68,7 @@ public:
 	// Is a point inside the widget?
 	bool contains(const sf::Vector2f& point) const;
 
-	// Enable/disable processing user events
+	// Enable/disable processing (user) events
 	// (Not just inputs, but also outputs like triggering user callbacks.)
 	Widget* enable(bool state = true);
 	bool    enabled() const;
@@ -74,31 +77,12 @@ public:
 
 	bool focused() const;
 
-	// Set callback to invoke, when the widget's content changes
-	private:
-		using Callback_void = std::optional<std::function<void()>>;
-		using Callback_w    = std::optional<std::function<void(Widget*)>>;
-	public:
-	using Callback  = std::variant<Callback_w, Callback_void>;
-	Widget* setCallback(Callback callback);
-
-	// The actual (derived) widgets should then provide specific overloads, as:
-	// SomeWidget* setCallback(std::function<void(SomeWidget*)> callback)
-	// {
-	//     return (SomeWidget*) Widget::setCallback([callback] (Widget* w) { callback( (SomeWidget*)w ); });
-	// }
-	// SomeWidget* setCallback(std::function<void()> callback)
-	// {
-	//     return (SomeWidget*) Widget::setCallback(callback);
-	// }
-
-
 	// Set/Reset the internal name of the widget
 	//
 	// Notes:
 	// - If a widget is not assigned a name explicitly, it will have a unique
 	//   default ID (e.g. the hex. representation of its address).
-        //
+	//
 	// - If the name has already been assigned to another widget, it will lose
 	//   its explicit name (reverting to the default), and the new widget will
 	//   take over, having that name thereafter.
@@ -179,24 +163,17 @@ friend class GUI;
 private:
 	virtual void recomputeGeometry() {} // Also called by some of the friend classes
 
-	// Callbacks...
-protected:
-	virtual void onUpdate(); // Calls the *instance-specific* update callback.
-				 // Overrides are expected to chain back to Widget::onUpdate()!
+	// Callbacks... (See event.hpp for the generic ones!)
+	virtual void onStateChanged(WidgetState) {}
+	virtual void onResized() {}
+	virtual void onThemeChanged() {}
+	//!!This actually belongs to InputWidget (but not sure how it'd mix with that being a template):
+	//!!Also, it's not even just a dummy callback currently, but a dispatcher...! :-/ Needs cleanup!
+	protected:
+	virtual void onUpdated();
+
 private:
-	virtual void onStateChanged(WidgetState state);
-	virtual void onMouseEnter();
-	virtual void onMouseLeave();
-	virtual void onMouseMoved(float x, float y);
-	virtual void onMousePressed(float x, float y);
-	virtual void onMouseReleased(float x, float y);
-	virtual void onMouseWheelMoved(int delta);
-	virtual void onKeyPressed(const sf::Event::KeyEvent& key);
-	virtual void onKeyReleased(const sf::Event::KeyEvent& key);
-	virtual void onTextEntered(char32_t unichar);
-	virtual void onThemeChanged();
-	virtual void onResized();
-	virtual void onTick();
+	bool m_changed;
 
 	WidgetContainer* m_parent;
 	Widget* m_previous;
@@ -206,15 +183,13 @@ private:
 	sf::Vector2f m_position;
 	sf::Vector2f m_size;
 	bool m_focusable;
-	Callback m_callback;
 	sf::Transform m_transform;
 
 #ifdef DEBUG
 public:
 	void draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor = sf::Color::Red, sf::Color fillcolor = sf::Color::Transparent) const;
 #endif
-};
-
+}; // class Widget
 
 } // namespace
 
