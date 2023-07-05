@@ -452,8 +452,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	bgform->add("Wallpaper", sfw::CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
 	                                       demo.hasWallpaper()));
 	// Wallpaper transparency slider
-	bgform->add("Wallpaper α", Slider({}, 75))
-		->set(10)
+	bgform->add("Wallpaper α", Slider({.range={0, 255}}, 75))
+		->set(25)
 		->setCallback([&](auto* w) {
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();

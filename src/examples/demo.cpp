@@ -414,8 +414,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	           )->enable(demo.hasWallpaper()); // Only enable if there actually is a wallpaper!
 
 	// Wallpaper transparency slider
-	bgform->add("Wallpaper α", sfw::Slider({}, 75))
-		->set(10)
+	bgform->add("Wallpaper α", sfw::Slider({.range={0, 255}}, 75))
+		->set(25)
 		->setCallback([&](auto* w) {
 			assert(w->getWidget("theme-selector"));
 			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
@@ -450,7 +450,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	// (after setup, as these may trigger callbacks etc.)
 	//
 
-	// Change the font size (to "prime" SFML) to avoid #196! :-o
+	// Change the font size (to bigger?) to "prime" SFML to avoid #196! :-o
 	if (auto w = (sfw::Slider*)demo.getWidget("font size slider"); w)
 		w->update(14);
 
