@@ -1,5 +1,5 @@
-#ifndef GUI_OPTIONSBOX_HPP
-#define GUI_OPTIONSBOX_HPP
+#ifndef SFW_OPTIONSBOX_HPP
+#define SFW_OPTIONSBOX_HPP
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
@@ -132,4 +132,4 @@ private:
 
 #include "OptionsBox.inl"
 
-#endif // GUI_OPTIONSBOX_HPP
+#endif // SFW_OPTIONSBOX_HPP
