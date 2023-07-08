@@ -289,6 +289,7 @@ template <class T> void OptionsBox<T>::onKeyPressed(const sf::Event::KeyEvent& k
 	case sf::Keyboard::PageDown:
 		selectLast();
 		break;
+	default: ; // (Just for GCC to shut up...)
 	}
 }
 
@@ -308,6 +309,7 @@ template <class T> void OptionsBox<T>::onKeyReleased(const sf::Event::KeyEvent& 
 		// Without this the focus rect would be lost on the arrow (#137):
 		updateArrowState(m_arrowRight, -1, -1); // -1,-1 to avoid the "hover" state
 		break;
+	default: ; // (Just for GCC to shut up...)
 	}
 }
 
