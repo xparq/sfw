@@ -20,7 +20,7 @@ template <class T> OptionsBox<T>::OptionsBox():
 template <class T> OptionsBox<T>::OptionsBox(std::function<void(OptionsBox<T>*)> callback):
 	OptionsBox()
 {
-	setCallback(callback);    
+	this->setCallback(callback); //! See comment at the class def., why this->...
 }
 
 
@@ -31,12 +31,12 @@ template <class T> auto OptionsBox<T>::add(const std::string& label, const T& va
 	m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(label));
 	// Check if the box needs to be resized
 	float width = m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2;
-	if (width > getSize().x)
+	if (width > this->getSize().x) //! See comment at the class def., why this->...
 	{
 		m_box.setSize(width, (float)Theme::getBoxHeight());
 		m_arrowRight.setPosition(width - (float)Theme::getBoxHeight(), 0.f);
 		m_arrowRight.centerItem(m_arrowRight.item());
-		setSize(m_box.getSize());
+		this->setSize(m_box.getSize()); //! See comment at the class def., why this->...
 	}
 
 	update_selection(m_items.size() - 1);
@@ -44,7 +44,7 @@ template <class T> auto OptionsBox<T>::add(const std::string& label, const T& va
 }
 
 
-template <class T> auto OptionsBox<T>::set(const std::string& label, const T& value)
+template <class T> auto OptionsBox<T>::assign(const std::string& label, const T& value)
 {
 	for (size_t i = 0; i < m_items.size(); ++i)
 	{
@@ -58,26 +58,36 @@ template <class T> auto OptionsBox<T>::set(const std::string& label, const T& va
 }
 
 
-template <class T> auto OptionsBox<T>::select(size_t index)
+template <class T> auto OptionsBox<T>::set(size_t index)
 {
 	if (index != m_currentIndex)
 	{
 		update_selection(index);
-		updated(); // Call the update handler!
 	}
 	return this;
 }
 
-template <class T> auto OptionsBox<T>::select(const std::string& label)
+template <class T> auto OptionsBox<T>::set(const std::string& label)
 {
 	for (size_t i = 0; i < m_items.size(); ++i)
 	{
 		if (label == m_items[i].label)
 		{
-			return select(i);
+			return set(i);
 		}
 	}
 	return this;
+}
+
+
+template <class T> auto OptionsBox<T>::select(size_t index)
+{
+	return this->update(index);
+}
+
+template <class T> auto OptionsBox<T>::select(const std::string& label)
+{
+	return this->update(label);
 }
 
 template <class T> auto OptionsBox<T>::selectNext()
@@ -154,30 +164,29 @@ template <class T> auto OptionsBox<T>::update_selection(size_t index)
 }
 
 
-template <class T> void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
-{
-	auto sfml_renderstates = ctx.props;
-	sfml_renderstates.transform *= getTransform();
-	ctx.target.draw(m_box, sfml_renderstates);
-	ctx.target.draw(m_arrowLeft, sfml_renderstates);
-	ctx.target.draw(m_arrowRight, sfml_renderstates);
-}
-
-
-
-template <class T> void OptionsBox<T>::updateArrowState(ItemBox<Arrow>& arrow, float x, float y)
+template <class T> void OptionsBox<T>::update_arrow_pressed_state(ItemBox<Arrow>& arrow, float x, float y)
 {
 	if (arrow.contains(x, y))
 	{
-		if (getState() == WidgetState::Pressed)
+		if (this->getState() == WidgetState::Pressed) // See comment at the class def., why this->...
 			arrow.press();
 		else
 			arrow.applyState(WidgetState::Hovered);
 	}
 	else
 	{
-		arrow.applyState(focused() ? WidgetState::Focused : WidgetState::Default);
+		arrow.applyState(this->focused() ? WidgetState::Focused : WidgetState::Default); // See comment at the class def., why this->...
 	}
+}
+
+
+template <class T> void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
+{
+	auto sfml_renderstates = ctx.props;
+	sfml_renderstates.transform *= this->getTransform(); // See comment at the class def., why this->...
+	ctx.target.draw(m_box, sfml_renderstates);
+	ctx.target.draw(m_arrowLeft, sfml_renderstates);
+	ctx.target.draw(m_arrowRight, sfml_renderstates);
 }
 
 
@@ -196,7 +205,7 @@ template <class T> void OptionsBox<T>::onThemeChanged()
 		width = max(width, m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2);
 	}
 	m_box.setSize(width, (float)Theme::getBoxHeight());
-	setSize(m_box.getSize());
+	this->setSize(m_box.getSize()); // See comment at the class def., why this->...
 
 	//! Reset the current selection rolled all over in the loop above.
 	//! This will also re-center it, so the widget had to have been resized first!
@@ -231,8 +240,8 @@ template <class T> void OptionsBox<T>::onStateChanged(WidgetState state)
 
 template <class T> void OptionsBox<T>::onMouseMoved(float x, float y)
 {
-	updateArrowState(m_arrowLeft, x, y);
-	updateArrowState(m_arrowRight, x, y);
+	update_arrow_pressed_state(m_arrowLeft, x, y);
+	update_arrow_pressed_state(m_arrowRight, x, y);
 }
 
 
@@ -301,13 +310,13 @@ template <class T> void OptionsBox<T>::onKeyReleased(const sf::Event::KeyEvent& 
 	case sf::Keyboard::Up:
 		m_arrowLeft.release();
 		// Without this the focus rect would be lost on the arrow (#137):
-		updateArrowState(m_arrowLeft, -1, -1); // -1,-1 to avoid the "hover" state
+		update_arrow_pressed_state(m_arrowLeft, -1, -1); // -1,-1 to avoid the "hover" state
 		break;
 	case sf::Keyboard::Right:
 	case sf::Keyboard::Down:
 		m_arrowRight.release();
 		// Without this the focus rect would be lost on the arrow (#137):
-		updateArrowState(m_arrowRight, -1, -1); // -1,-1 to avoid the "hover" state
+		update_arrow_pressed_state(m_arrowRight, -1, -1); // -1,-1 to avoid the "hover" state
 		break;
 	default: ; // (Just for GCC to shut up...)
 	}
