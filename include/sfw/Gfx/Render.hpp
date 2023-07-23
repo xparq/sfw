@@ -38,16 +38,8 @@ public:
 } // namespace sfw::gfx
 
 
-//----------------------------------------------------------------------------
-//!!c++23 needed for this revolutionary feature:
-//!!#warning Unknown graphics backend! Umm... well, only SFML is supported, so selecting that...
-#include "sfw/cfg/USE_SFML"
-
-#ifdef SFW_CFG_GFX_USE_SFML
-#include "Render_sfml.hpp"
-#else
-#error Unknown graphics backend! Umm... only SFML is supported, #include "sfw/cfg/USE_SFML" to select it!
-#endif
+#include "sfw/Gfx/backend.hpp"
+#include GFX_BACKEND_SPECIFIC(Render.hpp)
 
 
 #endif // SFW_RENDER_HPP
