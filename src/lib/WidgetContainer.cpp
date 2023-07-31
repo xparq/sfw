@@ -45,12 +45,26 @@ void WidgetContainer::for_each_child(const std::function<void(Widget*)>& f)
         f(w);
     }
 }
+void WidgetContainer::const_for_each_child(const std::function<void(const Widget*)>& f) const
+{
+    for (const Widget* w = m_first; w != nullptr; w = w->m_next)
+    {
+        f(w);
+    }
+}
 
 void WidgetContainer::traverse(const std::function<void(Widget*)>& f)
 {
 	for_each_child([&](auto* w) {
 		f(w);
 		w->traverse(f);
+	});
+}
+void WidgetContainer::const_traverse(const std::function<void(const Widget*)>& f) const
+{
+	const_for_each_child([&](const auto* w) {
+		f(w);
+		w->const_traverse(f);
 	});
 }
 

@@ -3,10 +3,13 @@
 
 #include "sfw/Event.hpp"
 #include "sfw/WidgetState.hpp"
-#include "sfw/Gfx/Render.hpp"
+
+//!!#include "sfw/Widgets/Tooltip.hpp" // See forw. decl. below instead...
 //!!#include "sfw/WidgetContainer.hpp" // See forw. decl. below instead...
 //!!#include "sfw/Layout.hpp" // See forw. decl. below instead...
 //!!#include "sfw/GUI-main.hpp" // See forw. decl. below instead...
+
+#include "sfw/Gfx/Render.hpp"
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Transform.hpp>
@@ -25,6 +28,7 @@ namespace sfw
 {
 class WidgetContainer;
 class Layout;
+class Tooltip;
 class GUI;
 
 /*****************************************************************************
@@ -47,26 +51,29 @@ class GUI;
     invoked when the widget's value gets updated (and finalized/committed,
     so interim changes can be ignored).
  *****************************************************************************/
-class Widget: public gfx::Drawable, public Event::Handler
+class Widget : public gfx::Drawable, public Event::Handler
 {
 public:
+	// Widget geometry
+	Widget* setPosition(const sf::Vector2f& pos);
+	Widget* setPosition(float x, float y);
+	const sf::Vector2f& getPosition() const;
+	// These can only be queried:
+	const sf::Vector2f& getSize() const;
+
+	// Check if a point belongs to the widget
+	bool contains(const sf::Vector2f& point) const;
+
 	// Tracking the value of the widget
 	// Derived real widgets will need to define getter/setters:
 	// - set(V value); // Will call changed() as applicable
 	// - V get();
 	bool changed() const { return m_changed; }
 	Widget* changed(bool newstate = true) { m_changed = newstate; return this; }
-
-	// Widget geometry
-	Widget* setPosition(const sf::Vector2f& pos);
-	Widget* setPosition(float x, float y);
-	const sf::Vector2f& getPosition() const;
-	// - These are set automatically, so can only be queried:
-	const sf::Vector2f& getSize() const;
-	const sf::Transform& getTransform() const;
-
-	// Is a point inside the widget?
-	bool contains(const sf::Vector2f& point) const;
+		//!!Rename this to a) not be so ambiguous with the above (const) one, and
+		//!!b) be in line with other similar ones (like enable/disable etc.)!...
+		//!!But change() here would be awkward -- even resorting to setChanged()
+		//!!feels better, but then it's out-of-style (for the new API) again...)
 
 	// Enable/disable processing (user) events
 	// (Not just inputs, but also outputs like triggering user callbacks.)
@@ -86,11 +93,10 @@ public:
 	// - If the name has already been assigned to another widget, it will lose
 	//   its explicit name (reverting to the default), and the new widget will
 	//   take over, having that name thereafter.
-	void setName(const std::string& name);
+	void setName(const std::string&);
 
 	// Get the internal name of a widget (or its default ID if hasn't been named)
-	//
-	// If no widget (address) is specified, it means this widget.
+	// If a widget is specified, that one will be looked up, instead of the current one.
 	//
 	// Note: This may be a slow operation, intended mainly for diagnostic use!
 	std::string getName(Widget* widget = nullptr) const;
@@ -101,22 +107,37 @@ public:
 
 	// Method-chaining helper for setting up nested widget structures
 	// (Note: getParent is not public, plus this may get arguments in the future.)
-	WidgetContainer* parent(/*!!enum FailMode mode = or_burn*/) { return getParent(); }
+	WidgetContainer* parent(/*!!enum FailMode mode = or_burn!!*/)       { return getParent(); }
+	WidgetContainer* parent(/*!!enum FailMode mode = or_burn!!*/) const { return getParent(); }
+
+	// Similarly (!!but it might finally be hidden/removed, if the above goes live):
+	const sf::Transform& getTransform() const;
+
+	Widget* setTooltip(const std::string& text);
 
 protected:
 //----------------------
 friend class WidgetContainer;
 friend class Layout;
 friend class GUI;
+//!!Temporarily, until Widget becomes WidgetContainer:
+friend class Tooltip; // just to access getMain() via Tooltip::m_owner->!
 //----------------------
 
 	Widget();
-	virtual ~Widget() = default;
+	virtual ~Widget();
+	//!! These two horrible, depressing monstrosities only temporarily, until default-friendly
+	//!! smart pointers are introduced (which will need to follow thorough valgrind etc. tests
+	//!! with raw pointers); see #320!
+		Widget(Widget&&);
+		Widget(const Widget&);
 
-	void setSize(const sf::Vector2f& size);
-	void setSize(float width, float height);
+	Widget* setSize(const sf::Vector2f& size);
+	Widget* setSize(float width, float height);
 
 	sf::Vector2f getAbsolutePosition() const;
+		// Window coordinates, not relative to the GUI Main rect.!
+		// (So, even when the GUI itself is offset, it won't affect this.)
 
 	void setState(WidgetState state);
 	WidgetState getState() const;
@@ -127,8 +148,10 @@ friend class GUI;
 
 	// Get the widget typed as a Layout, if applicable
 	virtual Layout* toLayout() { return nullptr; }
+	bool isLayout() { return toLayout() != nullptr; }
 
 	// Set/get the parent (container) of the widget
+	//!!But Widget itself should probably be a WidgetContainer, to support composition (sub-widgets)!
 	void setParent(WidgetContainer* parent);
 	WidgetContainer* getParent() const { return m_parent; }
 
@@ -159,35 +182,44 @@ friend class GUI;
 	// types that don't want to become a container (i.e. have a hardcoded
 	// internal structure rather than using that of WidgetContainer).
 	virtual void traverse(const std::function<void(Widget*)>&) {}
+	virtual void const_traverse(const std::function<void(const Widget*)>&) const {}
 
 private:
 	virtual void recomputeGeometry() {} // Also called by some of the friend classes
 
-	// Callbacks... (See event.hpp for the generic ones!)
+	// -------- Callbacks... (See event.hpp for the generic ones!)
 	virtual void onStateChanged(WidgetState) {}
 	virtual void onResized() {}
 	virtual void onThemeChanged() {}
-	//!!This actually belongs to InputWidget (but not sure how it'd mix with that being a template):
-	//!!Also, it's not even just a dummy callback currently, but a dispatcher...! :-/ Needs cleanup!
+
+	//!!This actually belongs to InputWidget (`protected` exactly for it to be visible
+	//!!there), but not sure how a virtual would mix with that being a template!...
+	//!!Also, it's not even just a dummy callback like the others, but a dispatcher! :-/
+	//!!Needs cleanup...
+	//!! -> Actually, as a generic "callback invoker", even up in EventHandler, like
+	//!!    EventHandler::invoke_callback(which), could hit all the birds with one stone.
 	protected:
-	virtual void onUpdated();
+	virtual void onUpdated(); //!! -> "EventHandler::invoke_callback(Updated)", and "updated" -> "notify(Updated)" or sg...
 
 private:
+	WidgetContainer* m_parent = nullptr;
+	Widget* m_previous = nullptr;
+	Widget* m_next = nullptr;
+
+	bool m_focusable;
+	WidgetState m_state;
 	bool m_changed;
 
-	WidgetContainer* m_parent;
-	Widget* m_previous;
-	Widget* m_next;
-
-	WidgetState m_state;
 	sf::Vector2f m_position;
 	sf::Vector2f m_size;
-	bool m_focusable;
 	sf::Transform m_transform;
+
+	Tooltip* m_tooltip = nullptr;
 
 #ifdef DEBUG
 public:
-	void draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor = sf::Color::Red, sf::Color fillcolor = sf::Color::Transparent) const;
+	void draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor = sf::Color::Red,
+		sf::Color fillcolor = sf::Color::Transparent) const; // Well, with fillColor, now it can also do interior, not just "outline"
 #endif
 }; // class Widget
 

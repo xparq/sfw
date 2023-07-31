@@ -59,7 +59,7 @@ int main()
 		  17, "font/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
-		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), {}, 12, "font/Vera.ttf" },
+		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), {}, 12, "font/Vera.ttf", /*.multiTooltips =*/ true },
 		{ "factory default" },
 	};
 /*	// More flexible (but also more cumbersome) with std::map:
@@ -137,8 +137,10 @@ int main()
                                 tsize.y / 2 + mysterious_sfml_offset.y}); //! sf::Text's bound-rect is not 0-based! :-o
 		text.setPosition({w->getSize().x / 2, w->getSize().y / 2});
 
+		//!!??Why exactly do we still need to manually fiddle with this every time? (-> #315)
 		auto sfml_renderstates = ctx.props;
 		sfml_renderstates.transform *= w->getTransform();
+
 		ctx.target.draw(textrect, sfml_renderstates);
 		ctx.target.draw(text, sfml_renderstates);
 #ifdef DEBUG
@@ -350,7 +352,6 @@ int main()
 
 	// Theme selection
 	using OBTheme = sfw::OptionsBox<Theme::Cfg>;
-	right_bar->add(sfw::Label("Change theme:"));
 	auto themeselect = new OBTheme([&](auto* w) {
 		const auto& themecfg = w->current();
 		if (demo.setTheme(themecfg))
@@ -364,7 +365,7 @@ int main()
 			
 			// Update the bg. color selector's "Default" value:
 			if (auto bgsel = (OBColor*)demo.getWidget("Bg. color"); bgsel)
-				bgsel->set("Default", themecfg.bgColor);
+				bgsel->assign("Default", themecfg.bgColor);
 
 			//!! Update the font size slider:
 			//!! (Beware of infinite recursion, as its own onUpdate callback would
@@ -373,7 +374,8 @@ int main()
 		}
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
-	themeselect->select(DEFAULT_THEME);
+	themeselect->set(DEFAULT_THEME);
+	right_bar->add(sfw::Label("Change theme:"));
 	right_bar->add(themeselect, "theme-selector");
 
 	// Theme font size slider
@@ -382,7 +384,7 @@ int main()
 	right_bar->add(sfw::Label("Theme font size (use the m. wheel):")); // Move that remark to a tooltip!
 	right_bar->add(sfw::Slider({.range = {8, 18}}, 100), "font size slider")
 		//!! Would be tempting to sync the initial font size directly with
-		//!! the theme selector widget -- but can't: the GUI is not up yet!
+		//!! the theme selector widget -- but can't: the GUI is not up yet, so:
 		//!! ->set(((OBTheme*)(w->getWidget("theme-selector")))->currentRef().textSize) //! This would fail here!
 		->set((float)themes[DEFAULT_THEME].textSize)
 		->setCallback([&] (auto* w){
@@ -441,7 +443,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	hbox5->add(sfw::Label("Clear background"));
 	hbox5->add(sfw::CheckBox([&](auto* w) { Theme::clearBackground = w->checked(); }, true));
 
-	// Custom exit button (also useless, but feels so nice! :) )
+	// Custom exit button (totally redundant, but so reassuring! :) )
 	demo.add(sfw::Button("Quit", [&] { demo.close(); }));
 
 	// Set this last, otherwise the dynamic GUI resize (on adding new widgets)
@@ -460,7 +462,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	sliderForRotation->set(104);
 	sliderForSize->set(1.2f);
 	// Colors of the example text + rect:
-	optTxtColor->select("Red");
+	optTxtColor->select("Red"); // Now all ready, safe to trigger the update callback (so, not just set()...)
 	optTxtBg->select("Black");
 
 	//--------------------------------------------------------------------

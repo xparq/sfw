@@ -1,5 +1,6 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/Widgets/Tooltip.hpp"
 #include "sfw/util/diagnostics.hpp"
 
 //!! Stuff for clearing the bg. when not owning the entire window
@@ -17,36 +18,36 @@ namespace sfw
 
 //----------------------------------------------------------------------------
 GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the_window):
-    m_error(), // no error by default
-    m_window(window),
-    m_own_window(own_the_window),
-    m_themeCfg(themeCfg)
+	m_error(), // no error by default
+	m_window(window),
+	m_own_window(own_the_window),
+	m_themeCfg(themeCfg)
 {
-    // "Officially" mark this object as the "Main" in the GUI Widget tree:
-    setParent(this);
+	// "Officially" mark this object as the "Main" in the GUI Widget tree:
+	setParent(this);
 
-    // Also register ourselves to our own widget registry:
-    widgets["/"] = this;
+	// Also register ourselves to our own widget registry:
+	widgets["/"] = this;
 
-    reset();
+	reset();
 }
 
 
 //----------------------------------------------------------------------------
 bool GUI::active()
 {
-    // Inactive, if:
-    // - the gui has been (explicitly) closed
-    // - it's in "error state"
-    // - the (hosting) window is not open (regardless of owning it or not)
-    return !m_closed && !m_error && m_window.isOpen();
+	// Inactive, if:
+	// - the gui has been (explicitly) closed
+	// - it's in "error state"
+	// - the (hosting) window is not open (regardless of owning it or not)
+	return !m_closed && !m_error && m_window.isOpen();
 }
 
 
 //----------------------------------------------------------------------------
 bool GUI::reset()
 {
-    m_error = std::error_code();
+	m_error = std::error_code();
 
 //!! This isn't useful here at all, as the generic layout resizer will
 //!! shrink it back down dynamically anyway...:
@@ -55,18 +56,18 @@ bool GUI::reset()
 //!! Instead, an overridden getSize() could use the dynamic size in case of
 //!! owning the full window.
 
-    setTheme(m_themeCfg); //! Should this be reset to some internal safe default instead?
-                          //! And then should also even the widgets be deleted, perhaps? :-o
-                          //! No. Better to destroy the entire GUI for that. And for a
-                          //! blank slate a new GUI instance can always be created.
-                          //! Which then means...: the current config should also NOT be zapped!
+	setTheme(m_themeCfg); //! Should this be reset to some internal safe default instead?
+						  //! And then should also even the widgets be deleted, perhaps? :-o
+						  //! No. Better to destroy the entire GUI for that. And for a
+						  //! blank slate a new GUI instance can always be created.
+						  //! Which then means...: the current config should also NOT be zapped!
 
-    //! Can't set a wallpaper just yet, as the size may be unknown yet!
-    //! Widgets are yet to be added! See onResized()!
+	//! Can't set a wallpaper just yet, as the size may be unknown yet!
+	//! Widgets are yet to be added! See onResized()!
 
-    m_cursorType = sf::Cursor::Arrow;
+	m_cursorType = sf::Cursor::Arrow;
 
-    return (bool)*this;
+	return (bool)*this;
 }
 
 
@@ -75,78 +76,79 @@ void GUI::close()
 {
 	m_closed = true;
 
-	// Do we control the window, too (or just the widgets)?
-	if (m_own_window) m_window.close();
+	// If we control the window (not just the widgets), close that, too:
+	if (m_own_window)
+		m_window.close();
 }
 
 //----------------------------------------------------------------------------
 bool GUI::process(const sf::Event& event)
 {
-    thread_local bool event_processing_started = false;
+	thread_local bool event_processing_started = false;
 
-    if (!event_processing_started)
-    {
-        //!!Call the subscription-based onEventProcessingStarted() notifications!...
-        //!!This one is just hacked in here for now (to give it a chance to reapply
-        //!!its placement according to the "final" GUI state):
-        setWallpaper();
+	if (!event_processing_started)
+	{
+		//!!Call the subscription-based onEventProcessingStarted() notifications!...
+		//!!This one is just hacked in here for now (to give it a chance to reapply
+		//!!its placement according to the "final" GUI state):
+		setWallpaper();
 
-        event_processing_started = true;
-    }
+		event_processing_started = true;
+	}
 
-    if (!active()) return false;
+	if (!active()) return false;
 
-    switch (event.type)
-    {
-    case sf::Event::MouseMoved:
-    {
-        sf::Vector2f mouse = convertMousePosition(event.mouseMove.x, event.mouseMove.y);
-        onMouseMoved(mouse.x, mouse.y);
-        break;
-    }
+	switch (event.type)
+	{
+	case sf::Event::MouseMoved:
+	{
+		sf::Vector2f mouse = convertMousePosition(event.mouseMove.x, event.mouseMove.y);
+		onMouseMoved(mouse.x, mouse.y);
+		break;
+	}
 
-    case sf::Event::MouseButtonPressed:
-        if (event.mouseButton.button == sf::Mouse::Left)
-        {
-            sf::Vector2f mouse = convertMousePosition(event.mouseButton.x, event.mouseButton.y);
-            onMousePressed(mouse.x, mouse.y);
-        }
-        break;
+	case sf::Event::MouseButtonPressed:
+		if (event.mouseButton.button == sf::Mouse::Left)
+		{
+			sf::Vector2f mouse = convertMousePosition(event.mouseButton.x, event.mouseButton.y);
+			onMousePressed(mouse.x, mouse.y);
+		}
+		break;
 
-    case sf::Event::MouseButtonReleased:
-        if (event.mouseButton.button == sf::Mouse::Left)
-        {
-            sf::Vector2f mouse = convertMousePosition(event.mouseButton.x, event.mouseButton.y);
-            onMouseReleased(mouse.x, mouse.y);
-        }
-        break;
+	case sf::Event::MouseButtonReleased:
+		if (event.mouseButton.button == sf::Mouse::Left)
+		{
+			sf::Vector2f mouse = convertMousePosition(event.mouseButton.x, event.mouseButton.y);
+			onMouseReleased(mouse.x, mouse.y);
+		}
+		break;
 
-    case sf::Event::MouseWheelScrolled:
-        onMouseWheelMoved((int)event.mouseWheelScroll.delta);
-        break;
+	case sf::Event::MouseWheelScrolled:
+		onMouseWheelMoved((int)event.mouseWheelScroll.delta);
+		break;
 
-    case sf::Event::KeyPressed:
-        onKeyPressed(event.key);
-        break;
+	case sf::Event::KeyPressed:
+		onKeyPressed(event.key);
+		break;
 
-    case sf::Event::KeyReleased:
-        onKeyReleased(event.key);
-        break;
+	case sf::Event::KeyReleased:
+		onKeyReleased(event.key);
+		break;
 
-    case sf::Event::TextEntered:
-        onTextEntered(event.text.unicode);
-        break;
+	case sf::Event::TextEntered:
+		onTextEntered(event.text.unicode);
+		break;
 
-    case sf::Event::Closed:
+	case sf::Event::Closed:
 	close();
-        return false;
+		return false;
 	break;
 
-    default:
-        break;
-    }
+	default:
+		break;
+	}
 
-    return true;
+	return true;
 }
 
 
@@ -155,48 +157,48 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 {
 //traverse([&](Widget* w) { cerr << w->getName() << "\n"; } );
 
-    //!!Should be transactional, with no side-effects if failed!
+	//!!Should be transactional, with no side-effects if failed!
 
-    if (&m_themeCfg != &themeCfg)
-    {
-        m_themeCfg = themeCfg;
-    }
+	if (&m_themeCfg != &themeCfg)
+	{
+		m_themeCfg = themeCfg;
+	}
 
-    // Do this even if the config has not been changed, to allow calling from the ctor!
-    if (!m_themeCfg.apply())
-    {
-        m_error = make_error_code(errc::invalid_argument); //!!Should actually be a custom one!
-        cerr << "- ERROR: Failed to setup theme!\n";
-        return false;
-    }
+	// Do this even if the config has not been changed, to allow calling from the ctor!
+	if (!m_themeCfg.apply())
+	{
+		m_error = make_error_code(errc::invalid_argument); //!!Should actually be a custom one!
+		cerr << "- ERROR: Failed to setup theme!\n";
+		return false;
+	}
 
-    // OK, tell everyone about what just happened
-    themeChanged();
+	// OK, tell everyone about what just happened
+	themeChanged();
 
-    return true;
+	return true;
 }
 
 void GUI::themeChanged()
 {
-    // Notify widgets of the change...
+	// Notify widgets of the change...
 
-    // Start with the GUI itself
-    onThemeChanged();
+	// Start with the GUI itself
+	onThemeChanged();
 
-    // Then all the rest
-    traverse([](Widget* w) { w->onThemeChanged(); } );
+	// Then all the rest
+	traverse([](Widget* w) { w->onThemeChanged(); } );
 	// Another reason to not use the widget registry map (besides "general
 	// frugalism", and that it's not intended for this (i.e. it may not
 	// even contain every widget!), is that std::map reorders its content
 	// alphabetically, which is pretty awkward here (e.g. for diagnostics).
 	// (Note: std::unordered_map won't preserve the original order either!)
 
-    //! This would be redundant in the current model:
-    //!traverse([](Widget* w) { w->recomputeGeometry(); } );
-    //! The onThemeChanged() call typically involves setSize() too, which
-    //! in turn also calls parent->recomputeGeometry() (via Widget::setSize)!
-    //! (NOTE: there are ample chances of infinite looping here too, some of
-    //! which I've duly explored already...)
+	//! This would be redundant in the current model:
+	//!traverse([](Widget* w) { w->recomputeGeometry(); } );
+	//! The onThemeChanged() call typically involves setSize() too, which
+	//! in turn also calls parent->recomputeGeometry() (via Widget::setSize)!
+	//! (NOTE: there are ample chances of infinite looping here too, some of
+	//! which I've duly explored already...)
 }
 
 
@@ -233,104 +235,138 @@ void GUI::renderBackground() //!!Move this to the renderer!
 //----------------------------------------------------------------------------
 void GUI::render()
 {
-    if (!active()) return;
+	if (!active()) return;
 
-    // Hitch-hike the per-frame draw routine for updating the session time...
-    onTick();
+	// Hitchhike the per-frame draw routine for updating the session time...
+	onTick();
 
-    /*m_renderer.*/renderBackground();
+	/*m_renderer.*/renderBackground();
 
-    // Draw whatever we have, via our a top-level widget container ancestor
-    /*m_renderer.*/draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! function-style RenderContext(...) failed with CLANG
+	// Draw whatever we have, via our a top-level widget container ancestor
+	/*m_renderer.*/draw(gfx::RenderContext{m_window, sf::RenderStates()}); //! function-style RenderContext(...) failed with CLANG
+}
+
+
+void GUI::draw(const gfx::RenderContext& ctx) const
+{
+	VBox::draw(ctx);
+
+	// Separate round for tooltips, to ensure they're on the top
+	//!!Still, if multiple tooltips are too close to each other, and the most recent is iterated
+	//!!earlier, it WILL NOT be the topmost! :-/ Proper stacking or explicit Z-ordering is required!
+	//!!
+	//!!Alas, widget-local, the nested drawing contexts available at the recursive
+	//!!draw() calls do not exist here, with this flat widget iteration, so we have to
+	//!!replicate that using that Transform() hack below... :-/ (See also: #315)
+	//!!
+	auto widget_ctx = ctx;
+	const_traverse([&widget_ctx](const Widget* w) {
+		if (w->m_tooltip) {
+			auto widget_pos = w->parent()->getAbsolutePosition();
+			//!!SFML-specific:
+			widget_ctx.props.transform = sf::Transform(
+				1, 0, widget_pos.x,
+				0, 1, widget_pos.y,
+				0, 0, 1);
+
+			w->m_tooltip->draw(widget_ctx);
+		}
+	});
 }
 
 
 //----------------------------------------------------------------------------
 bool GUI::remember(Widget* widget, string name, bool override_existing)
 {
-    if (name.empty())
-    {
-        // Make the default name hex, for a more climactic debug experience...:
-        char defname[17] = {0}; to_chars(defname, std::end(defname), (size_t)(void*)widget, 16);
-        name = string(defname);
-        // Paranoid sanity-checking of this default name
-        if (widgets[name] != nullptr)
-        {
-            cerr << "- Warning: Widget ["<<name<<"] has already been registered with this default name.\n";
-            assert(widgets[name] == widget);
-            return true;
-        }
-    }
-    else if (auto other_it = widgets.find(name); other_it != widgets.end()) // Someone has this name aleady?
-    {
-        Widget* other = other_it->second;
-        if (other == widget)
-        {
-            cerr << "- Warning: Repeated registration of widget as \"" << name << "\".\n";
-            return true;
-        }
+	if (name.empty())
+	{
+		// Make the default name hex, for a more climactic debug experience...:
+		char defname[17] = {0}; to_chars(defname, std::end(defname), (size_t)(void*)widget, 16);
+		name = string(defname);
+		// Paranoid sanity-checking of this default name
+		if (widgets[name] != nullptr)
+		{
+			cerr << "- Warning: Widget ["<<name<<"] has already been registered with this default name.\n";
+			assert(widgets[name] == widget);
+			return true;
+		}
+	}
+	else if (auto other_it = widgets.find(name); other_it != widgets.end()) // Someone has this name aleady?
+	{
+		Widget* other = other_it->second;
+		if (other == widget)
+		{
+			cerr << "- Warning: Repeated registration of widget as \"" << name << "\".\n";
+			return true;
+		}
 
-        if (!override_existing)
-        {
-            cerr << "- Warning: Refusing to override the name (\"" << name << "\") of another widget.\n";
-            return false;
-        }
-        else
-        {
-            cerr << "- Warning: Another widget has already been registered as \"" << name << "\".\n"
-                 << "  Overriding...\n";
+		if (!override_existing)
+		{
+			cerr << "- Warning: Refusing to override the name (\"" << name << "\") of another widget.\n";
+			return false;
+		}
+		else
+		{
+			cerr << "- Warning: Another widget has already been registered as \"" << name << "\".\n"
+			     << "  Overriding...\n";
 
-            // Forget the name of the other widget:
-            [[maybe_unused]] auto result_of_forgetting = remember(other, "");
-            assert(result_of_forgetting);
+			// Forget the name of the other widget:
+			[[maybe_unused]] auto result_of_forgetting = remember(other, "");
+			assert(result_of_forgetting);
 
-            // Fall through to assign `name` to `widget`...
-        }
-    }
-    
-    widgets[name] = widget;
-    return true;
+			// Fall through to assign `name` to `widget`...
+		}
+	}
+	
+	widgets[name] = widget;
+	return true;
 }
 
 //----------------------------------------------------------------------------
 Widget* GUI::recall(const std::string& name) const
 {
-    auto widget_iter = widgets.find(name);
-    if (widget_iter == widgets.end()) cerr << "- Warning: widget \"" << name << "\" not found!\n";
+	auto widget_iter = widgets.find(name);
+	if (widget_iter == widgets.end()) cerr << "- Warning: widget \"" << name << "\" not found!\n";
 //if (widget_iter != widgets.end()) cerr << "recall: found widget: \"" << widget_iter->first << "\" == "<< (void*)widget_iter->second <<"\n";
-    return widget_iter != widgets.end() ? widget_iter->second : (Widget*)nullptr;
+	return widget_iter != widgets.end() ? widget_iter->second : (Widget*)nullptr;
 }
 
 string GUI::recall(const Widget* w) const
 {
-    for (const auto& [name, widget]: widgets)
-    {
-        if (widget == w) return name;
-    }
-    return "";
+	for (const auto& [name, widget]: widgets)
+	{
+		if (widget == w) return name;
+	}
+	return "";
 }
 
+
+//----------------------------------------------------------------------------
+sf::Vector2f GUI::getMousePosition() const
+{
+	auto pixpos = sf::Mouse::getPosition(m_window);
+	return convertMousePosition(pixpos.x, pixpos.y);
+}
 
 //----------------------------------------------------------------------------
 sf::Vector2f GUI::convertMousePosition(int x, int y) const
 {
-    sf::Vector2f mouse = m_window.mapPixelToCoords(sf::Vector2i(x, y));
-    mouse -= getPosition();
-    return mouse;
+	sf::Vector2f mouse = m_window.mapPixelToCoords(sf::Vector2i(x, y));
+	mouse -= getPosition();
+	return mouse;
 }
-
 
 //----------------------------------------------------------------------------
 void GUI::setMouseCursor(sf::Cursor::Type cursorType)
 {
-    if (cursorType != m_cursorType)
-    {
-        if (Theme::cursor.loadFromSystem(cursorType))
-        {
-            m_window.setMouseCursor(Theme::cursor);
-            m_cursorType = cursorType;
-        }
-    }
+	if (cursorType != m_cursorType)
+	{
+		if (Theme::cursor.loadFromSystem(cursorType))
+		{
+			m_window.setMouseCursor(Theme::cursor);
+			m_cursorType = cursorType;
+		}
+	}
 }
 
 
@@ -371,7 +407,7 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf:
 	{
 	case Wallpaper::Center: //!!See above for avoiding Wallpaper::
 		break;
-	default: break;
+	default:;
 	}
 }
 
@@ -398,25 +434,25 @@ void GUI::disableWallpaper()
 
 void GUI::setPosition(const sf::Vector2f& pos)
 {
-    if (m_wallpaper) m_wallpaper.setPosition(pos);
-    Widget::setPosition(pos);
+	if (m_wallpaper) m_wallpaper.setPosition(pos);
+	Widget::setPosition(pos);
 }
 
 void GUI::setPosition(float x, float y)
 {
-    setPosition(sf::Vector2f(x, y));
+	setPosition(sf::Vector2f(x, y));
 }
 
 
 sf::Vector2f GUI::getSize() const
 {
-    return m_own_window ? sf::Vector2f{(float)m_window.getSize().x, (float)m_window.getSize().y}
-                        : Widget::getSize();
+	return m_own_window ? sf::Vector2f{(float)m_window.getSize().x, (float)m_window.getSize().y}
+	                    : Widget::getSize();
 }
 
 float GUI::sessionTime() const
 {
-    return m_sessionTime.asSeconds();
+	return m_sessionTime.asSeconds();
 }
 
 
@@ -426,7 +462,7 @@ float GUI::sessionTime() const
 
 void GUI::onThemeChanged()
 {
-    setWallpaper(Theme::wallpaper);
+	setWallpaper(Theme::wallpaper);
 }
 
 
@@ -447,9 +483,18 @@ void GUI::onTick()
 	//!! any of them are (over)due, and call those. (Note: most of them
 	//!! may have requested triggering on (relative) timeouts, rather than
 	//!! on "absolute" session time!)
-	//!!...
+	//!! ...
 	//!! Then remove the one-shot hooks:
 	//!! ...
+	//!!-----------------------------------------
+	//!! Or, alternatively(?):
+	//!! Just call every widget's onTick()...
+	//!! Compilers should optimize out the empty default onTick() virtuals... right?... RIGHT???
+	traverse([](Widget* w) {
+		w->onTick();
+		//!!Manual kludge until Widget becomes WidgetContainer, so tooltips can be proper tree nodes:
+		if (w->m_tooltip && w->m_tooltip->armed()) w->m_tooltip->onTick();
+	});
 }
 
 } // namespace

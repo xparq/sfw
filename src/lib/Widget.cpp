@@ -1,6 +1,7 @@
 #include "sfw/Widget.hpp"
 #include "sfw/WidgetContainer.hpp"
 #include "sfw/GUI-main.hpp"
+#include "sfw/Widgets/Tooltip.hpp"
 #include "sfw/util/diagnostics.hpp"
 
 #include <cassert>
@@ -15,17 +16,62 @@
 namespace sfw
 {
 
-Widget::Widget():
-	m_changed(false),
-	m_parent(nullptr),
-	m_previous(nullptr),
-	m_next(nullptr),
+Widget::Widget() :
+	m_focusable(true),
 	m_state(WidgetState::Default),
-	m_focusable(true)
+	m_changed(false)
 {
 }
 
+Widget::Widget(Widget&& tmp) :
+	Event::Handler(tmp),
+	m_parent(tmp.m_parent),
+	m_previous(tmp.m_previous),
+	m_next(tmp.m_next),
+	m_focusable(tmp.m_focusable),
+	m_state(tmp.m_state),
+	m_changed(tmp.m_changed),
+	m_position(tmp.m_position),
+	m_size(tmp.m_size),
+	m_transform(tmp.m_transform)
+{
+//cerr << "Moving " << &tmp << " to " << this << endl;
+	if (tmp.m_tooltip)
+	{
+		setTooltip(tmp.m_tooltip->getText()); //!! The old tooltip's "owner" (parent) must be relinked!
+		//!! So, this is a broader error class than this, actually...
+	}
+	else m_tooltip = nullptr;
+}
 
+Widget::Widget(const Widget& other) :
+	Event::Handler(other),
+	m_parent(other.m_parent),
+	m_previous(other.m_previous),
+	m_next(other.m_next),
+	m_focusable(other.m_focusable),
+	m_state(other.m_state),
+	m_changed(other.m_changed),
+	m_position(other.m_position),
+	m_size(other.m_size),
+	m_transform(other.m_transform)
+{
+//cerr << "Copying " << &other << " to " << this << endl;
+	if (other.m_tooltip)
+	{
+		setTooltip(other.m_tooltip->getText()); //!! The old tooltip's "owner" (parent) must be relinked!
+		//!! So, this is a broader error class than this, actually...
+	}
+	else m_tooltip = nullptr;
+}
+
+Widget::~Widget()
+{
+	if (m_tooltip) delete m_tooltip;
+}
+
+
+//----------------------------------------------------------------------------
 bool Widget::isRoot() const
 {
 	return getParent() == nullptr || getParent() == this;
@@ -56,6 +102,7 @@ GUI* Widget::getMain() const
 }
 
 
+//----------------------------------------------------------------------------
 void Widget::setName(const std::string& name)
 {
 	if (GUI* Main = getMain(); Main != nullptr)
@@ -84,6 +131,7 @@ Widget* Widget::getWidget(const std::string& name) const
 }
 
 
+//----------------------------------------------------------------------------
 Widget* Widget::setPosition(const sf::Vector2f& pos)
 {
 	m_position = {roundf(pos.x), roundf(pos.y)};
@@ -125,7 +173,8 @@ sf::Vector2f Widget::getAbsolutePosition() const
 }
 
 
-void Widget::setSize(const sf::Vector2f& size)
+//----------------------------------------------------------------------------
+Widget* Widget::setSize(const sf::Vector2f& size)
 {
 	auto new_size = sf::Vector2f(roundf(size.x), roundf(size.y));
 	if (m_size.x != new_size.x || m_size.y != new_size.y)
@@ -134,12 +183,13 @@ void Widget::setSize(const sf::Vector2f& size)
 		onResized();
 		if (!isRoot()) getParent()->recomputeGeometry();
 	}
+	return this;
 }
 
 
-void Widget::setSize(float width, float height)
+Widget* Widget::setSize(float width, float height)
 {
-	setSize(sf::Vector2f(width, height));
+	return setSize(sf::Vector2f(width, height));
 }
 
 
@@ -149,12 +199,14 @@ const sf::Vector2f& Widget::getSize() const
 }
 
 
+//----------------------------------------------------------------------------
 bool Widget::contains(const sf::Vector2f& point) const
 {
 	return point.x > 0.f && point.x < m_size.x && point.y > 0.f && point.y < m_size.y;
 }
 
 
+//----------------------------------------------------------------------------
 bool Widget::focused() const
 {
 	return m_state == WidgetState::Focused || m_state == WidgetState::Pressed;
@@ -173,6 +225,7 @@ bool Widget::focusable() const
 }
 
 
+//----------------------------------------------------------------------------
 Widget* Widget::enable(bool state)
 // To support the use case of mass-disabling/enabling a bunch of widgets,
 // which typically involves recursive tree traversal via GUI::foreach(),
@@ -227,12 +280,30 @@ bool Widget::enabled() const
 }
 
 
+//----------------------------------------------------------------------------
 void Widget::setParent(WidgetContainer* parent)
 {
 	m_parent = parent;
 }
 
 
+//----------------------------------------------------------------------------
+Widget* Widget::setTooltip(const std::string& text)
+{
+	if (!m_tooltip)
+	{
+		m_tooltip = new Tooltip(this, text); //!!Causes a cash later?!?! HOW?
+	}
+	else
+	{
+		m_tooltip->setText(text);
+	}
+
+	return this;
+}
+
+
+//----------------------------------------------------------------------------
 void Widget::setState(WidgetState state)
 {
 	m_state = state;
@@ -246,11 +317,11 @@ WidgetState Widget::getState() const
 }
 
 
+//----------------------------------------------------------------------------
 const sf::Transform& Widget::getTransform() const
 {
 	return m_transform;
 }
-
 
 
 // Virtuals/Callbacks --------------------------------------------------------
@@ -279,7 +350,7 @@ void Widget::onUpdated()
 // Diagnostics ---------------------------------------------------------------
 
 #ifdef DEBUG
-void Widget::draw_outline([[maybe_unused]] const gfx::RenderContext& ctx, sf::Color outlinecolor, sf::Color fillcolor) const
+void Widget::draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor, sf::Color fillcolor/* = Transparent*/) const
 {
 	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
 	r.setPosition(getAbsolutePosition());

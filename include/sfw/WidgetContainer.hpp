@@ -78,10 +78,12 @@ protected:
 	//!!code shouldn't really care whether some widgets can or cannot have
 	//!!children! A pure tree structure in this regard too could be preferable.
 	void for_each_child(const std::function<void(Widget*)>& f);
+	void const_for_each_child(const std::function<void(const Widget*)>& f) const;
 
 	// Recursive traversal of all the contained widgets
 	// (Does not include this container itself.)
 	void traverse(const std::function<void(Widget*)>& f) override;
+	void const_traverse(const std::function<void(const Widget*)>&) const override;
 
 protected:
 	Widget* m_first;

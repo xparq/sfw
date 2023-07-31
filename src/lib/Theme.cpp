@@ -16,46 +16,44 @@ Theme::Cfg Theme::DEFAULT =
 	.wallpaper = {},
 	.textSize = 12,
 	.fontFile = "font/default.ttf",
+	.multiTooltips = false, //! Ignotred! The desig. init. value can't be made distinguishable
+	                        //! from an artificial "use default" inline member-init val. in Cfg::.
 };
 
 
 bool Theme::Cfg::apply()
 {
-    // Pick up the defaults first...
-    // (This really should be a constructor, but that would kill the stupid C++ designated init. :-/ )
-    if (!name)         name        = Theme::DEFAULT.name;
-    if (!basePath)     basePath    = Theme::DEFAULT.basePath;
-    if (!fontFile)     fontFile    = Theme::DEFAULT.fontFile;
-    if (!textureFile)  textureFile = Theme::DEFAULT.textureFile;
-    if (textSize <= 1) textSize    = Theme::DEFAULT.textSize;
+	// Pick up some defaults first...
+	// (This really should be a constructor, but that would piss off C++ and make it reject the designated inits. :-/ )
+	if (!name)         name        = Theme::DEFAULT.name;
+	if (!basePath)     basePath    = Theme::DEFAULT.basePath;
+	if (!fontFile)     fontFile    = Theme::DEFAULT.fontFile;
+	if (!textureFile)  textureFile = Theme::DEFAULT.textureFile;
+	if (textSize <= 1) textSize    = Theme::DEFAULT.textSize;
 
-    // Update the global (`static`) Theme data...
-    if (!Theme::loadFont(string(basePath) + fontFile))
-    {
-        return false; // SFML has already explained the situation...
-    }
-    if (!Theme::loadTexture(string(basePath) + textureFile))
-    {
-        return false; // SFML has already explained the situation...
-    }
-    Theme::textSize = textSize;
+	// Update the global (`static`) Theme data...
 
-    Theme::bgColor = bgColor;
-    Theme::wallpaper = wallpaper;
+	// Save the config params first, for later reference... (!!Should later become the full, normative theme config itself!)
+	Theme::cfg = *this;
 
-    return true;
+	if (!Theme::loadFont(string(basePath) + fontFile))
+	{
+		return false; // SFML has already explained the situation...
+	}
+	if (!Theme::loadTexture(string(basePath) + textureFile))
+	{
+		return false; // SFML has already explained the situation...
+	}
+	Theme::textSize = textSize;
+
+	Theme::bgColor = bgColor;
+	Theme::wallpaper = wallpaper;
+
+	return true;
 }
 
-
-static sf::Cursor& getDefaultCursor()
-{
-    static sf::Cursor cursor;
-    if (!cursor.loadFromSystem(sf::Cursor::Arrow))
-    {
-        //!! loadFromSystem is `nodiscard`...
-    }
-    return cursor;
-}
+//============================================================================
+Theme::Cfg Theme::cfg; //!! Mostly unused yet, but slowly migrating to it...
 
 size_t Theme::textSize = Theme::DEFAULT.textSize;
 Theme::Style Theme::click;
@@ -84,100 +82,115 @@ sf::Event::KeyEvent Theme::previousWidgetKey = { .code = sf::Keyboard::Tab, .shi
 sf::Font Theme::m_font;
 sf::Texture Theme::m_texture;
 sf::IntRect Theme::m_subrects[_TEXTURE_ID_COUNT];
-
 sf::Cursor& Theme::cursor = getDefaultCursor();
+
+
+//============================================================================
+sf::Cursor& Theme::getDefaultCursor()
+{
+	static sf::Cursor c; //!! Basically a singleton system resource anyway, and
+	                     //!! Theme is also static, so no "additional" harm done...
+	                     //!! But if it does support RAII with stacked state restore,
+	                     //!! then this should not be static!
+	if (!c.loadFromSystem(sf::Cursor::Arrow))
+	{
+		//!! loadFromSystem is `nodiscard`...
+	}
+	return c;
+}
+
 
 bool Theme::loadFont(const std::string& filename)
 {
-    return m_font.loadFromFile(filename);
+	return m_font.loadFromFile(filename);
 }
 
 
 bool Theme::loadTexture(const std::string& filename)
 {
-    if (m_texture.loadFromFile(filename))
-    {
-        sf::IntRect subrect;
-        subrect.width = m_texture.getSize().x;
-        subrect.height = m_texture.getSize().y / _TEXTURE_ID_COUNT;
+	if (m_texture.loadFromFile(filename))
+	{
+		sf::IntRect subrect;
+		subrect.width = m_texture.getSize().x;
+		subrect.height = m_texture.getSize().y / _TEXTURE_ID_COUNT;
 
-        for (int i = 0; i < _TEXTURE_ID_COUNT; ++i)
-        {
-            m_subrects[i] = subrect;
-            subrect.top += subrect.height;
-        }
+		for (int i = 0; i < _TEXTURE_ID_COUNT; ++i)
+		{
+			m_subrects[i] = subrect;
+			subrect.top += subrect.height;
+		}
 
-        borderSize = subrect.width / 3;
-        return true;
-    }
-    return false;
+		borderSize = subrect.width / 3;
+		return true;
+	}
+	return false;
 }
 
 
 const sf::Font& Theme::getFont()
 {
-    return m_font;
+	return m_font;
 }
 
 
 const sf::Texture& Theme::getTexture()
 {
-    return m_texture;
+	return m_texture;
 }
 
 
 const sf::IntRect& Theme::getTextureRect(Box::Type type, WidgetState state)
 {
-    TextureID id(BOX_DEFAULT);
-    switch (state)
-    {
-    case WidgetState::Default:
-        id = type == Box::Click ? BOX_DEFAULT : BOX_INPUT_DEFAULT;
-        break;
-    case WidgetState::Hovered:
-        id = type == Box::Click ? BOX_HOVERED : BOX_INPUT_DEFAULT;
-        break;
-    case WidgetState::Pressed:
-        id = type == Box::Click ? BOX_PRESSED : BOX_INPUT_FOCUSED;
-        break;
-    case WidgetState::Focused:
-        id = type == Box::Click ? BOX_FOCUSED : BOX_INPUT_FOCUSED;
-        break;
-    case WidgetState::Disabled:
-        id = type == Box::Click ? BOX_DEFAULT : BOX_INPUT_DEFAULT;
-        break;
-    }
-    return m_subrects[id];
+	TextureID id(BOX_DEFAULT);
+	switch (state)
+	{
+	case WidgetState::Default:
+		id = type == Box::Click ? BOX_DEFAULT : BOX_INPUT_DEFAULT;
+		break;
+	case WidgetState::Hovered:
+		id = type == Box::Click ? BOX_HOVERED : BOX_INPUT_DEFAULT;
+		break;
+	case WidgetState::Pressed:
+		id = type == Box::Click ? BOX_PRESSED : BOX_INPUT_FOCUSED;
+		break;
+	case WidgetState::Focused:
+		id = type == Box::Click ? BOX_FOCUSED : BOX_INPUT_FOCUSED;
+		break;
+	case WidgetState::Disabled:
+		id = type == Box::Click ? BOX_DEFAULT : BOX_INPUT_DEFAULT;
+		break;
+	}
+	return m_subrects[id];
 }
 
 
 const sf::IntRect& Theme::getCheckMarkTextureRect()
 {
-    return m_subrects[CHECKMARK];
+	return m_subrects[CHECKMARK];
 }
 
 
 const sf::IntRect& Theme::getArrowTextureRect()
 {
-    return m_subrects[ARROW];
+	return m_subrects[ARROW];
 }
 
 
 const sf::IntRect& Theme::getProgressBarTextureRect()
 {
-    return m_subrects[PROGRESS_BAR];
+	return m_subrects[PROGRESS_BAR];
 }
 
 
 float Theme::getBoxHeight()
 {
-    return getLineSpacing() + borderSize * 2 + PADDING * 2;
+	return getLineSpacing() + borderSize * 2 + PADDING * 2;
 }
 
 
 int Theme::getLineSpacing()
 {
-    return (int)m_font.getLineSpacing((unsigned)textSize);
+	return (int)m_font.getLineSpacing((unsigned)textSize);
 }
 
 } // namespace

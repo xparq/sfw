@@ -1,5 +1,5 @@
-#ifndef GUI_LAYOUT_HPP
-#define GUI_LAYOUT_HPP
+#ifndef SFW_LAYOUT_HPP
+#define SFW_LAYOUT_HPP
 
 #include "sfw/WidgetContainer.hpp"
 
@@ -8,43 +8,49 @@
 namespace sfw
 {
 
-/**
- * Base class for layouts. Layouts are special widgets which act as containers
- * See Form, HBox and VBox
- */
+/*****************************************************************************
+   Generic widget manager to control the positioning, plus the event dispatching
+   and various state updates (hovered, focused etc.) of its children
+
+   It's used to implement all the actual layout controllers like HBox, VBox,
+   Form etc. (but it's not an abstract base in the C++ sense)
+
+   A Layout is also a Widget.
+ *****************************************************************************/
 class Layout: public WidgetContainer
 {
 protected:
-    Layout();
+	Layout();
 
-    void draw(const gfx::RenderContext& ctx) const override;
+	Layout* toLayout() override { return this; }
 
-    // Callbacks ---------------------------------------------------------------
-    void onStateChanged(WidgetState state) override;
-    void onMouseMoved(float x, float y) override;
-    void onMousePressed(float x, float y) override;
-    void onMouseReleased(float x, float y) override;
-    void onMouseWheelMoved(int delta) override;
-    void onKeyPressed(const sf::Event::KeyEvent& key) override;
-    void onKeyReleased(const sf::Event::KeyEvent& key) override;
-    void onTextEntered(char32_t unichar) override;
-    void onMouseLeave() override;
+	// Set the focus on a child widget, if applicable
+	// Returns true if the widget took the focus, otherwise false.
+	bool focus(Widget* widget);
+	bool focusNext();
+	bool focusPrevious();
+	void unfocus(); // Unfocus last focused child
 
-    inline Layout* toLayout() override { return this; }
+	void hover(Widget* widget, float parent_x, float parent_y); //!! The coords. are a kludge for tooltip support...
+	void unhover(); // Unhover last hovered child
 
-    /**
-     * Set the focus on a widget, if applicable
-     * @return true if the widget took the focus, otherwise false
-     */
-    bool focusWidget(Widget* widget);
-    bool focusNextWidget();
-    bool focusPreviousWidget();
+// ---- Callbacks ------------------------------------------------------------
+	void draw(const gfx::RenderContext& ctx) const override;
+
+	void onStateChanged(WidgetState state) override;
+	void onMouseMoved(float x, float y) override;
+	void onMousePressed(float x, float y) override;
+	void onMouseReleased(float x, float y) override;
+	void onMouseWheelMoved(int delta) override;
+	void onKeyPressed(const sf::Event::KeyEvent& key) override;
+	void onKeyReleased(const sf::Event::KeyEvent& key) override;
+	void onTextEntered(char32_t unichar) override;
 
 private:
-    Widget* m_hoveredWidget;
-    Widget* m_focusedWidget;
+	Widget* m_hoveredWidget;
+	Widget* m_focusedWidget;
 };
 
 } // namespace
 
-#endif // GUI_LAYOUT_HPP
+#endif // SFW_LAYOUT_HPP

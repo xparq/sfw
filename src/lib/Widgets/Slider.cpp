@@ -6,6 +6,10 @@
 #include <algorithm>
 	using std::min, std::max;
 
+#include <string>
+	using std::to_string;
+
+//!!Reconcile this with the diag. stuff; see #284!
 #include <iostream>
 	using std::cerr, std::endl;
 
@@ -116,7 +120,16 @@ Slider* Slider::setRange(float min, float max, float step)
 Slider* Slider::set(float value)
 // Snaps to the closest multiple of step. (Remember: step may be non-integer!)
 {
-	if (value != m_value) // Really changing?
+	//!! Disabling this until clarifying the "enigma" in #317! :) 
+	//!! ...And until finding a clean way to get this back, while also ensuring
+	//!! the an initial set() would count as a real change() (no matter what
+	//!! a C++ default-inited value would be! -> Universally, for each widget!
+	//!! The point here is actually the side-effects, though, so perhaps those
+	//!! should be taken care of during init (construction) independently from
+	//!! set()? But that'd be yet another explicit widget init chore then... :-/
+	//!!
+	//!!if (value != m_value) // Really changing?
+		//!!FIX: But if never actually changed (like ctor-init to 0...), then updateView, setTooltip etc. will never be called?!
 	{
 //cerr << "set("<< value <<")... [" << range().min << ".." << range().max << "], step: "<< step() <<endl;
 
@@ -125,12 +138,13 @@ Slider* Slider::set(float value)
 		        * step();
 //cerr << " - set(): snapped value (before capping): "<< value <<endl;
 
+		// Cap it:
 		value = std::max(range().min, value);
 		value = std::min(range().max, value);
-		//!! NOTE: as FP errors accumulate, it might have grown out-of-bound,
-		//!! but then it has now got reset by the capping that we have to do
-		//!! anyway... However, this doesn't protect against lots of sliding
-		//!! to and fro well within the interval!
+			//!! NOTE: as FP errors accumulate, it might have grown out-of-bound,
+			//!! but then it has now got reset by the capping that we have to do
+			//!! anyway. However, this doesn't protect against deteriorated stepping
+			//!! accuracy due to lots of sliding to-and-fro *within* the interval!
 
 		if (value != m_value) // Still looks like a change? :) (Note: floating-point errors make this hit-and-miss though!)
 		{
@@ -139,12 +153,14 @@ Slider* Slider::set(float value)
 			updateView(); //! This is equivalent to `if (changed()) updateView()`,
 			              //! and also should be in onUpdated(), but for most widgets,
 			              //! the view can change even if the value doesn't (e.g. in
-				      //! onThemeChanged, or a text box may have resize etc. etc.)
+				      //! onThemeChanged, or a widget may be resizable etc. etc.)
 				      //!! So, this should be an entire additional dimension to
 				      //!! widget change control (apart from value, i.e. the "model";
 				      //!! the "view" lives its own life, only _mostly_ depending on
 				      //!! the value!
 		}
+
+		setTooltip(to_string(m_value));
 	}
 	return this;
 }

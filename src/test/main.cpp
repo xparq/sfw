@@ -88,7 +88,8 @@ int main()
 		w->draw_outline(ctx);
 #endif
 	});
-	circlevista->setSize(100,100);
+	circlevista->setSize(100,100)
+		->setTooltip("\"circlevista\" tooltip...");
 
 	// #168: Form supporting any left-hand-side widget as "label"
 	auto labelbox = new VBox;
@@ -412,7 +413,7 @@ int main()
 		if (demo.getWidget("Wallpaper")) ((sfw::CheckBox*)demo.getWidget("Wallpaper"))->set(demo.hasWallpaper());
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
-	themeselect->select(DEFAULT_THEME);
+	themeselect->set(DEFAULT_THEME);
 	right_bar->add(themeselect, "theme-selector");
 
 	// Theme font size slider
@@ -489,7 +490,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 
 
 	// "GUI::close" button -- should NOT close the window:
-	demo.add(sfw::Button("Close the GUI!", [&] { demo.close(); }));
+	demo.add(sfw::Button("Close (deactivate)!", [&] { demo.close(); }))
+		->setTooltip("Hello!");
 
 	// Set this last, otherwise the dynamic GUI resize (on adding new widgets)
 	// may interfere with it!
@@ -508,7 +510,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	sliderForRotation->set(97);
 	sliderForScale->set(1.2f);
 	//!!#160, too:
-	optTxtColor->select("Red");
+	optTxtColor->select("Red"); // Now all ready, safe to trigger the update callback (so, not just set()...)
 	optTxtBg->select("Black");
 
 	//--------------------------------------------------------------------

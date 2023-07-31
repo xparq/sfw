@@ -20,8 +20,8 @@ public:
     Widget* setDrawHook(const DrawHook& drawHook);
 
     // Proxying some protected members:
-    void setSize(const sf::Vector2f& size)  { Widget::setSize(size); }
-    void setSize(float width, float height) { Widget::setSize(width, height); }
+    Widget* setSize(const sf::Vector2f& size)  { return Widget::setSize(size); }
+    Widget* setSize(float width, float height) { return Widget::setSize(width, height); }
     sf::Vector2f getPosition() const { return Widget::getAbsolutePosition(); }
 
 private:

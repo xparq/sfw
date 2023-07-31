@@ -17,8 +17,9 @@ struct SFML //!!extend into some proper backend representation later
 template <>
 struct RenderContext_base<SFML>
 {
-    sf::RenderTarget& target;
-    const sf::RenderStates& props;
+	sf::RenderTarget& target;
+//	const sf::RenderStates& props;
+	sf::RenderStates props; // Allow adjusting this in-place!
 };
 
 using RenderContext = RenderContext_base<SFML>;
@@ -38,8 +39,8 @@ protected:
     void draw([[maybe_unused]] sf::RenderTarget& target,
               [[maybe_unused]] const sf::RenderStates& states) const override {} // It's optional now...
 
-    //!!Sigh... Must define this one, too, otherwise the one above wins, and the
-    //!!one in the base will get ignored :-/
+    //!!Sigh... Must "redefine" this here, too, otherwise the one above wins,
+    //!!and the abstract one in Drawable_base will be ignored! :-/
     void draw([[maybe_unused]] const gfx::RenderContext_base<gfx::SFML>& ctx) const override {}
 };
 
