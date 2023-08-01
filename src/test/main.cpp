@@ -31,8 +31,7 @@ int main()
 	//------------------------------------------------------------------------
 	// Setup the Test GUI...
 
-	using namespace sfw;
-	using OBColor = sfw::OptionsBox<sf::Color>;
+	using OBColor = OptionsBox<sf::Color>;
 
 //	Theme::DEFAULT.basePath = "demo/";
 //	Theme::DEFAULT.fontFile = "font/Vera.ttf"; // relative to basePath!
@@ -51,7 +50,7 @@ int main()
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
 		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
-		  sfw::Wallpaper::Cfg("demo/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,25,25,20)),
+		  Wallpaper::Cfg("demo/wallpaper.jpg", Wallpaper::Center, sf::Color(255,25,25,20)),
 		  11, "font/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
@@ -63,7 +62,7 @@ int main()
 
 	//--------------------------------------------------------------------
 	// Creating the main GUI controller:
-	sfw::GUI demo(window, themes[DEFAULT_THEME], false);
+	GUI demo(window, themes[DEFAULT_THEME], false);
 	if (!demo) {
 		return EXIT_FAILURE; // Errors have already been printed to cerr.
 	}
@@ -102,11 +101,11 @@ int main()
 
 	// #171
 	auto gh171form = test_hbox->add(new Form);
-	gh171form->add("#171 autocast", new sfw::TextBox(50))->set("OK!");
+	gh171form->add("#171 autocast", new TextBox(50))->set("OK!");
 	//#171 + #168 (with an Image*):
-	gh171form->add((new Image("test/example.jpg"))->rescale(0.25), new sfw::TextBox(50))->set("171 + 168 OK!");
+	gh171form->add((new Image("test/example.jpg"))->rescale(0.25), new TextBox(50))->set("171 + 168 OK!");
 	//#171 + #168 + template widget + move
-	gh171form->add(new Label("tempWidget"), sfw::TextBox(70))->set("171/tmp + 168 OK!");
+	gh171form->add(new Label("tempWidget"), TextBox(70))->set("171/tmp + 168 OK!");
 	//#171, template-move also for the "label":
 	gh171form->add(Label("tmpLabel"), Label("#171(tmp,tmp) OK too!"));
 
@@ -207,12 +206,12 @@ int main()
 
 	// A text box to set the text of the example SFML object (created above)
 	/*!! #171: this won't compile yet:
-	form->add("Text", new sfw::TextBox())
+	form->add("Text", new TextBox())
 		->setPlaceholder("Type something!")
 		->set("Hello world!")
 		->setCallback([&](auto* w) { text.setString(w->getString()); });
 	*/
-	form->add("Text", new sfw::TextBox())
+	form->add("Text", new TextBox())
 		->setPlaceholder("Type something!")
 		->set("Hello world!")
 		->setCallback([&](auto* w) { text.setString(w->getString()); });
@@ -225,9 +224,9 @@ int main()
 
 	// Slider + progress bars for rotating
 	auto sliderForRotation = new Slider({.range = {0, 360}});
-	auto pbarRotation1 = new ProgressBar(200.f, sfw::Horizontal, sfw::LabelNone);
-	auto pbarRotation2 = new ProgressBar(200.f, sfw::Horizontal, sfw::LabelOver);
-	auto pbarRotation3 = new ProgressBar(200.f, sfw::Horizontal, sfw::LabelOutside);
+	auto pbarRotation1 = new ProgressBar(200.f, Horizontal, LabelNone);
+	auto pbarRotation2 = new ProgressBar(200.f, Horizontal, LabelOver);
+	auto pbarRotation3 = new ProgressBar(200.f, Horizontal, LabelOutside);
 	sliderForRotation->setCallback([&](auto* w) {
 		text.setRotation(sf::degrees(w->get()));
 		auto pbval = w->get() / 3.6f;
@@ -237,9 +236,9 @@ int main()
 	});
 	// Slider + progress bars for scaling
 	auto sliderForScale = new Slider({.range = {1, 3}, .step = .2f});
-	auto pbarScale1 = new ProgressBar(100, sfw::Vertical, sfw::LabelNone);
-	auto pbarScale2 = new ProgressBar(100, sfw::Vertical, sfw::LabelOver);
-	auto pbarScale3 = new ProgressBar(100, sfw::Vertical, sfw::LabelOutside);
+	auto pbarScale1 = new ProgressBar(100, Vertical, LabelNone);
+	auto pbarScale2 = new ProgressBar(100, Vertical, LabelOver);
+	auto pbarScale3 = new ProgressBar(100, Vertical, LabelOutside);
 	sliderForScale->setCallback([&](auto* w) {
 		float scale = w->get();
 		text.setScale({scale, scale}); // (x, y)
@@ -290,7 +289,7 @@ int main()
 	// NOTE: It's generally unsafe to set the properties of a free-standing
 	//       (newly created, but not-yet-added) widget!
 	//       Only those supported by the constructor are guaranteed to work.
-	form->add("Underlined text", new sfw::CheckBox([&](auto* w) {
+	form->add("Underlined text", new CheckBox([&](auto* w) {
 		int style = text.getStyle();
 		if (w->isChecked()) style |= sf::Text::Underlined;
 		else                style &= ~sf::Text::Underlined;
@@ -298,7 +297,7 @@ int main()
 	}));
 	// ..."templated" add(Widget())->set...() style, setting properties
 	// on the "real" (added) widget:
-	form->add("Bold text", sfw::CheckBox())->setCallback([&](auto* w) {
+	form->add("Bold text", CheckBox())->setCallback([&](auto* w) {
 		int style = text.getStyle();
 		if (w->isChecked()) style |= sf::Text::Bold;
 		else                style &= ~sf::Text::Bold;
@@ -311,7 +310,7 @@ int main()
 	form->add("", pbarRotation3);
 
 	// Attach the vert. progress bars (used for text scaling) to a new box
-	auto vbars = new sfw::HBox();
+	auto vbars = new HBox();
 	//!! Issue #109: Document that manipulating unowned, free-standing layouts is UB!
 	form->add("V. p.bars", vbars);
 	vbars->add(pbarScale1);
@@ -327,16 +326,16 @@ int main()
 
 	//--------------------------------------------------------------------
 	// A panel in the middle
-	auto middle_panel = main_hbox->add(sfw::VBox());
+	auto middle_panel = main_hbox->add(VBox());
 
 	// OK, add the SFML test shapes + adapter widget here
 	middle_panel->add(sfText);
 
 	// Button factory...
-	auto boxfactory = middle_panel->add(sfw::HBox());
-	auto labeller = boxfactory->add(sfw::TextBox(100))->set("Edit Me!")->setPlaceholder("Button label");
-	boxfactory->add(sfw::Button("Create button", [&] {
-		middle_panel->addAfter(boxfactory, new sfw::Button(labeller->get()));
+	auto boxfactory = middle_panel->add(HBox());
+	auto labeller = boxfactory->add(TextBox(100))->set("Edit Me!")->setPlaceholder("Button label");
+	boxfactory->add(Button("Create button", [&] {
+		middle_panel->addAfter(boxfactory, new Button(labeller->get()));
 	}));
 
 	// More buttons...
@@ -353,12 +352,12 @@ int main()
 	sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
 	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
-		buttons_form->add("Native size", new sfw::ImageButton(buttonimg, "All defaults"))
+		buttons_form->add("Native size", new ImageButton(buttonimg, "All defaults"))
 			->setTextSize(20)
 			->setCallback([]/*(auto* w)*/ { toy_anim_on = true; });
 
 
-		buttons_form->add("Customized", new sfw::ImageButton(buttonimg, "Bold"))
+		buttons_form->add("Customized", new ImageButton(buttonimg, "Bold"))
 			->setTextSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
@@ -371,17 +370,17 @@ int main()
 	// Image views...
 
 	// Image directly from file
-	auto vboximg = main_hbox->add(sfw::VBox());
-	vboximg->add(sfw::Label("Image from file:"));
-	vboximg->add(sfw::Image("demo/some image.png"));
+	auto vboximg = main_hbox->add(VBox());
+	vboximg->add(Label("Image from file:"));
+	vboximg->add(Image("demo/some image.png"));
 
 	// Image crop from file
-	vboximg->add(sfw::Label("Crop from file:"));
-	vboximg->add(sfw::Image("demo/some image.png", {{0, 33}, {24, 28}}));
-	vboximg->add(sfw::Label("Image crop varied:"));
+	vboximg->add(Label("Crop from file:"));
+	vboximg->add(Image("demo/some image.png", {{0, 33}, {24, 28}}));
+	vboximg->add(Label("Image crop varied:"));
 
 	// Image from file, cropped dynamically
-	sfw::Image* imgCrop = new sfw::Image("demo/martinet-dragonfly.jpg");
+	Image* imgCrop = new Image("demo/martinet-dragonfly.jpg");
 
 	// Slider & progress bar for cropping an Image widget
 	vboximg->add(Slider({}, 100))->setCallback([&](auto* w) {
@@ -394,21 +393,21 @@ int main()
 		                      {(int)(w->get() * 1.4), (int)w->get()}});
 	});
 
-	auto boxcrop = vboximg->add(new sfw::HBox);
-		boxcrop->add(sfw::Label("Crop square size:"));
-		boxcrop->add(sfw::ProgressBar(40), "cropbar");
+	auto boxcrop = vboximg->add(new HBox);
+		boxcrop->add(Label("Crop square size:"));
+		boxcrop->add(ProgressBar(40), "cropbar");
 
 	vboximg->add(imgCrop);
-	vboximg->add(sfw::Label("(Art: © Édouard Martinet)"))->setStyle(sf::Text::Style::Italic);
+	vboximg->add(Label("(Art: © Édouard Martinet)"))->setStyle(sf::Text::Style::Italic);
 
 
 	//--------------------------------------------------------------------
 	// Another "sidebar" column, for (theme) introspection...
-	auto right_bar = main_hbox->add(sfw::VBox());
+	auto right_bar = main_hbox->add(VBox());
 
 	// Theme selection
-	using OBTheme = sfw::OptionsBox<Theme::Cfg>;
-	right_bar->add(sfw::Label("Change theme:"));
+	using OBTheme = OptionsBox<Theme::Cfg>;
+	right_bar->add(Label("Change theme:"));
 	auto themeselect = new OBTheme([&](auto* w) {
 		const auto& themecfg = w->current();
 		demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
@@ -434,7 +433,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		});
 
 	// Show the current theme texture bitmaps
-	right_bar->add(sfw::Label("Theme textures:"));
+	right_bar->add(Label("Theme textures:"));
 	auto txbox = right_bar->add(new HBox);
 	struct ThemeBitmap : public Image {
 		ThemeBitmap() : Image(Theme::getTexture()) {}
@@ -453,7 +452,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	auto bgform = right_bar->add(new Form);
 
 	// Wallpaper on/off checkbox
-	bgform->add("Wallpaper", sfw::CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
+	bgform->add("Wallpaper", CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
 	                                       demo.hasWallpaper()));
 	// Wallpaper transparency slider
 	bgform->add("Wallpaper α", Slider({.range={0, 255}}, 75))
@@ -494,7 +493,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 
 
 	// "GUI::close" button -- should NOT close the window:
-	demo.add(sfw::Button("Close (deactivate)!", [&] { demo.close(); }))
+	demo.add(Button("Close (deactivate)!", [&] { demo.close(); }))
 		->setTooltip("Hello!");
 
 	// Set this last, otherwise the dynamic GUI resize (on adding new widgets)
@@ -557,7 +556,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 }
 
 //----------------------------------------------------------------------------
-void background_thread_main(sfw::GUI& gui)
+void background_thread_main(GUI& gui)
 {
 	auto rot_slider = getWidget<Slider>("Rotation", gui);
 	if (!rot_slider)

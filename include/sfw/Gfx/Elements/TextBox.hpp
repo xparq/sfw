@@ -5,9 +5,9 @@
 // This helper class can be used to help existing APIs continue to rely
 // on the default font implicitly.
 
-#include "sfw/Theme.hpp" //!!?? For the "current font"; But could it not depend on the Theme actually?
+#include "sfw/Gfx/Text.hpp"
 
 #include "sfw/Gfx/backend.hpp"
-#include GFX_BACKEND_SPECIFIC(Text.hpp)
+#include GFX_BACKEND_SPECIFIC(TextBox.hpp)
 
 #endif // SFW_GFX_TEXT_HPP
