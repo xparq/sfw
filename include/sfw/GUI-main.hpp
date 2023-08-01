@@ -142,7 +142,7 @@ private:
 	// Convert screen pixel coordinates to window position (See the sf::Mouse docs!)
 	sf::Vector2f convertMousePosition(int x, int y) const;
 
-// ---- Callbacks ---------------------------------------------------------
+// ---- Callbacks ------------------------------------------------------------
 	void draw(const gfx::RenderContext& ctx) const override;
 
 	// If the GUI doesn't manage the entire window, and its size hasn't been
@@ -155,7 +155,7 @@ private:
 	// for all the other widgets)
 	void onThemeChanged() override;
 
-// ---- Helpers -----------------------------------------------------------
+// ---- Helpers --------------------------------------------------------------
 
 	// Fill the window if managing (owning) it, else just the GUI rect,
 	// with the current Theme::bgColor, then show the wallpaper, if set
@@ -163,6 +163,7 @@ private:
 	// wallpaper, because the image may be translucent!
 	void renderBackground();
 
+// ---- Data -----------------------------------------------------------------
 	std::error_code m_error;
 	sf::RenderWindow& m_window;
 	bool m_own_window;
@@ -173,6 +174,13 @@ private:
 	sf::Time m_sessionTime;
 	std::unordered_map<std::string, Widget*> widgets;
 	bool m_closed = false;
+
+// ---- Misc. hackery... -----------------------------------------------------
+	// Convenience helper to find the GUI instance easily (assuming the client
+	// app only has one). Init'ed/updated by the GUI::ctor.
+	static GUI* DefaultInstance;
+	// And allow (only) the Widget class to actually use it:
+	friend class Widget;
 };
 
 } // namespace

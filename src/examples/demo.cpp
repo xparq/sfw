@@ -262,7 +262,7 @@ int main()
 	auto buttfactory = buttons_vbox->add(new HBox);
 	auto labeller = buttfactory->add(sfw::TextBox(100))->set("Edit Me!")->setPlaceholder("Button label")
 		->setCallback([&] {
-			if (auto b = (sfw::Button*)demo.getWidget("button spawner"); b) b->click();
+			if (auto b = sfw::getWidget<sfw::Button>("button spawner", demo); b) b->click();
 		});
 	buttfactory->add(sfw::Button("Create button", [&] {
 		buttons_vbox->addAfter(buttfactory, new sfw::Button(labeller->get()));
@@ -273,7 +273,7 @@ int main()
 
 	auto utf8button_tag = "UTF-8 by default:"; // We'll also use this text to find the button.
 	buttons_form->add(utf8button_tag, sfw::Button("Ψ ≠ 99° ± β")); // Note: this source is already UTF-8 encoded!
-	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.getWidget(utf8button_tag))->getText() << "\"\n";
+	cout << "UTF-8 button text got back as: \"" << sfw::getWidget<sfw::Button>(utf8button_tag, demo)->getText() << "\"\n";
 
 	// Bitmap buttons
 	auto imgbuttons_form = left_panel->add(sfw::Form());
@@ -325,9 +325,9 @@ int main()
 	// (`jumpy_thumb_click = true` allows immediately readjusting the pos.
 	// of the slider thumb on clicking it)
 	auto cropslider = (new sfw::Slider({.jumpy_thumb_click = true}, 100))->setCallback([&](auto* w) {
-		((sfw::ProgressBar*)w->getWidget("cropbar"))->set(w->get());
+		sfw::getWidget<sfw::ProgressBar>("cropbar")->set(w->get());
 		// Show the slider value in a text box retrieved by its name:
-		auto tbox = (sfw::TextBox*)w->getWidget("crop%");
+		auto tbox = sfw::getWidget<sfw::TextBox>("crop%");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
 		else tbox->set(w->get() ? to_string((int)w->get()) : "");
 		imgCrop->setCropRect({{(int)(w->get() / 4), (int)(w->get() / 10)},
@@ -357,14 +357,14 @@ int main()
 		if (demo.setTheme(themecfg))
 		{
 			// Update the wallpaper controls:
-			if (auto wptoggle = (sfw::CheckBox*)demo.getWidget("Wallpaper"); wptoggle)
+			if (auto wptoggle = sfw::getWidget<sfw::CheckBox>("Wallpaper"); wptoggle)
 				wptoggle->set(demo.hasWallpaper())     // set() first, as it returns CheckBox*
-				        ->enable(demo.hasWallpaper()); // (enable() would "degrade" to Widget*)
-			if (auto wpalpha = demo.getWidget("Wallpaper α"); wpalpha) // auto -> Widget*
+				        ->enable(demo.hasWallpaper()); // (enable() would degrade to Widget*)
+			if (auto wpalpha = sfw::getWidget("Wallpaper α"); wpalpha) // auto -> Widget*
 				wpalpha->enable(demo.hasWallpaper());
 			
 			// Update the bg. color selector's "Default" value:
-			if (auto bgsel = (OBColor*)demo.getWidget("Bg. color"); bgsel)
+			if (auto bgsel = sfw::getWidget<OBColor>("Bg. color"); bgsel)
 				bgsel->assign("Default", themecfg.bgColor);
 
 			//!! Update the font size slider:
@@ -385,11 +385,11 @@ int main()
 	right_bar->add(sfw::Slider({.range = {8, 18}}, 100), "font size slider")
 		//!! Would be tempting to sync the initial font size directly with
 		//!! the theme selector widget -- but can't: the GUI is not up yet, so:
-		//!! ->set(((OBTheme*)(w->getWidget("theme-selector")))->currentRef().textSize) //! This would fail here!
+		//!! ->set(w->getWidget<OBTheme>("theme-selector")->currentRef().textSize) //! This would fail here!
 		->set((float)themes[DEFAULT_THEME].textSize)
 		->setCallback([&] (auto* w){
-			assert(w->getWidget("theme-selector"));
-			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
+			assert(sfw::getWidget("theme-selector", w));
+			auto& themecfg = sfw::getWidget<OBTheme>("theme-selector", w)->currentRef();
 			themecfg.textSize = (size_t)w->get();
 cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
@@ -422,8 +422,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	bgform->add("Wallpaper α", sfw::Slider({.range={0, 255}}, 75))
 		->set(demo.getWallpaper().getColor().a)
 		->setCallback([&](auto* w) {
-			assert(w->getWidget("theme-selector"));
-			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
+			assert(sfw::getWidget("theme-selector", w));
+			auto& themecfg = sfw::getWidget<OBTheme>("theme-selector", w)->currentRef();
 			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
 			                           themecfg.wallpaper.tint.g,
 			                           themecfg.wallpaper.tint.b,
@@ -455,8 +455,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	// (after setup, as these may trigger callbacks etc.)
 	//
 
-	// Change the font size (to bigger?) to "prime" SFML to avoid #196! :-o
-	if (auto w = (sfw::Slider*)demo.getWidget("font size slider"); w)
+	//!! Change the font size (to bigger?) to "prime" SFML to avoid #196! :-o
+	if (auto w = sfw::getWidget<sfw::Slider>("font size slider", demo); w)
 		w->update(14);
 
 	sliderForRotation->set(104);
@@ -500,7 +500,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 //----------------------------------------------------------------------------
 void background_thread_main(sfw::GUI& gui)
 {
-	auto rot_slider = (sfw::Slider*)gui.getWidget("rotation-slider");
+	auto rot_slider = sfw::getWidget<sfw::Slider>("rotation-slider", gui);
 	if (!rot_slider)
 		return;
 

@@ -16,6 +16,33 @@
 namespace sfw
 {
 
+//----------------------------------------------------------------------------
+// See the header...
+/*static*/ Widget* Widget::getWidget_proxy(const std::string& name, const Widget* w/* = nullptr*/)
+{
+	assert(GUI::DefaultInstance);
+	auto Main = w ? w->getMain() : GUI::DefaultInstance;
+
+	assert(Main);
+	return Main->recall(name);
+}
+
+/*!!Obsolete since #322:
+Widget* Widget::getWidget(const std::string& name) const
+{
+	//!!Log if dangling or 'name' not found!
+
+	if (GUI* Main = getMain(); Main)
+	{
+		return Main->recall(name);
+	}
+	return nullptr;
+}
+!!*/
+
+
+
+//----------------------------------------------------------------------------
 Widget::Widget() :
 	m_focusable(true),
 	m_state(WidgetState::Default),
@@ -118,16 +145,6 @@ std::string Widget::getName(Widget* widget) const
 		return Main->recall(widget ? widget : this);
 	}
 	return "";
-}
-
-
-Widget* Widget::getWidget(const std::string& name) const
-{
-	if (GUI* Main = getMain(); Main)
-	{
-		return Main->recall(name);
-	}
-	return nullptr;
 }
 
 

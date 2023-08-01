@@ -16,6 +16,10 @@ using namespace std;
 namespace sfw
 {
 
+// See the header for more on this:
+GUI* GUI::DefaultInstance = nullptr;
+
+
 //----------------------------------------------------------------------------
 GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the_window):
 	m_error(), // no error by default
@@ -28,6 +32,12 @@ GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the
 
 	// Also register ourselves to our own widget registry:
 	widgets["/"] = this;
+
+	// Add as the "most recent" GUI manager:
+	if (GUI::DefaultInstance) {
+		cerr << "- Note: overriding previous default GUI instance (" << DefaultInstance << " with newly created " << this << ")\n";
+	}
+	GUI::DefaultInstance = this;
 
 	reset();
 }
@@ -262,7 +272,7 @@ void GUI::draw(const gfx::RenderContext& ctx) const
 	auto widget_ctx = ctx;
 	const_traverse([&widget_ctx](const Widget* w) {
 		if (w->m_tooltip) {
-			auto widget_pos = w->parent()->getAbsolutePosition();
+			auto widget_pos = w->getParent()->getAbsolutePosition();
 			//!!SFML-specific:
 			widget_ctx.props.transform = sf::Transform(
 				1, 0, widget_pos.x,

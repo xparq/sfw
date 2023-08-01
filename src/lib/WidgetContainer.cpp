@@ -178,7 +178,7 @@ Widget* WidgetContainer::addAfter(Widget* anchor, Widget* widget, const std::str
 
 Widget* WidgetContainer::addAfter(const std::string& anchor_name, Widget* widget, const std::string& name)
 {
-	Widget* a = getWidget(anchor_name);
+	Widget* a = sfw::getWidget(anchor_name); //!! See #322 for why not just this->...
 	return a ? addAfter(a, widget, name) : add(widget, name);
 }
 
@@ -187,8 +187,8 @@ Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, const std::st
 {
 	if (anchor == nullptr)
 	{
-        // addFirst
-        return insert_after(nullptr, widget, name);
+        	// addFirst
+        	return insert_after(nullptr, widget, name);
 	}
 	else if (is_child(anchor))
 	{
@@ -200,7 +200,7 @@ Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, const std::st
 
 Widget* WidgetContainer::addBefore(const std::string& anchor_name, Widget* widget, const std::string& name)
 {
-	Widget* a = getWidget(anchor_name);
+	Widget* a = sfw::getWidget(anchor_name); //!! See #322 for why not just this->...
 	return a ? addBefore(a, widget, name) : add(widget, name);
 }
 

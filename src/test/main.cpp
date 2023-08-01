@@ -9,7 +9,10 @@
 #include <cassert>
 using namespace std;
 
-void background_thread_main(sfw::GUI& gui);
+// Try/check without most of the sfw:: prefixes:
+using namespace sfw;
+
+void background_thread_main(GUI& gui);
 
 static auto toy_anim_on = false;
 
@@ -112,11 +115,11 @@ int main()
 
 	auto issuebox2 = test_hbox->add(new VBox);
 	// #127 + name lookup
-	issuebox2->add(sfw::Button("Issue #127/void", [&] {
-		((sfw::Button*)(demo.getWidget("test #127")))->setText("Found itself!");
+	issuebox2->add(Button("Issue #127/void", [&] {
+		getWidget<Button>("test #127", demo)->setText("Found itself!");
 	}), "test #127");
-	issuebox2->add(sfw::Button("Issue #127/w", [&](auto* w) { cerr << w << ", " << demo.getWidget("test #127/w") << endl;
-		((sfw::Button*)(w->getWidget("test #127/w")))->setText("Found itself!");
+	issuebox2->add(Button("Issue #127/w", [&](auto* w) { cerr << w << ", " << getWidget("test #127/w", demo) << endl; // use `demo` yet in the print!
+		getWidget<Button>("test #127/w", w)->setText("Found itself!");
 	}), "test #127/w");
 
 	//#174: std::string API
@@ -339,12 +342,12 @@ int main()
 	// More buttons...
 	auto buttons_form = middle_panel->add(new Form);
 
-//	buttons_form->add("Default button", sfw::Button("button"));
-//	cout << "Button text retrieved via name lookup: \"" << ((sfw::Button*)demo.getWidget("Default button"))->getText() << "\"\n";
+//	buttons_form->add("Default button", Button("button"));
+//	cout << "Button text retrieved via name lookup: \"" << getWidget<Button>("Default button")->getText() << "\"\n";
 
 	auto utf8button_tag = "UTF-8 test"; // Will also use it to recall the button!
-	buttons_form->add(utf8button_tag, sfw::Button("hőtűrő LÓTÚRÓ")); // Note: this source is already UTF-8 encoded.
-	cout << "UTF-8 button text got back as: \"" << ((sfw::Button*)demo.getWidget(utf8button_tag))->getText() << "\"\n";
+	buttons_form->add(utf8button_tag, Button("hőtűrő LÓTÚRÓ")); // Note: this source is already UTF-8 encoded.
+	cout << "UTF-8 button text got back as: \"" << getWidget<Button>(utf8button_tag)->getText() << "\"\n";
 
 	// Bitmap button
 	sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
@@ -382,9 +385,9 @@ int main()
 
 	// Slider & progress bar for cropping an Image widget
 	vboximg->add(Slider({}, 100))->setCallback([&](auto* w) {
-		((ProgressBar*)w->getWidget("cropbar"))->set(w->get());
+		getWidget<ProgressBar>("cropbar")->set(w->get());
 		// Show the slider value in a text box retrieved by its name:
-		auto tbox = (sfw::TextBox*)w->getWidget("Text with limit (5)");
+		auto tbox = getWidget<TextBox>("Text with limit (5)");
 		if (!tbox) cerr << "Named TextBox not found! :-o\n";
 		else tbox->set(to_string((int)w->get()));
 		imgCrop->setCropRect({{(int)(w->get() / 4), (int)(w->get() / 10)},
@@ -410,7 +413,7 @@ int main()
 		const auto& themecfg = w->current();
 		demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
 		// Update the wallpaper on/off checkbox:
-		if (demo.getWidget("Wallpaper")) ((sfw::CheckBox*)demo.getWidget("Wallpaper"))->set(demo.hasWallpaper());
+		if (getWidget("Wallpaper")) getWidget<CheckBox>("Wallpaper")->set(demo.hasWallpaper());
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
 	themeselect->set(DEFAULT_THEME);
@@ -423,8 +426,8 @@ int main()
 	right_bar->add(Slider({.range = {8, 18}}, 100))
 		->set((float)themes[DEFAULT_THEME].textSize)
 		->setCallback([&] (auto* w){
-			assert(w->getWidget("theme-selector"));
-			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
+			assert(getWidget("theme-selector"));
+			auto& themecfg = getWidget<OBTheme>("theme-selector")->currentRef();
 			themecfg.textSize = (size_t)w->get();
 cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
@@ -456,14 +459,15 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	bgform->add("Wallpaper α", Slider({.range={0, 255}}, 75))
 		->set(demo.getWallpaper().getColor().a)
 		->setCallback([&](auto* w) {
-			assert(w->getWidget("theme-selector"));
-			auto& themecfg = ((OBTheme*)(w->getWidget("theme-selector")))->currentRef();
+			assert(getWidget("theme-selector"));
+			auto& themecfg = getWidget<OBTheme>("theme-selector")->currentRef();
 			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
 			                           themecfg.wallpaper.tint.g,
 			                           themecfg.wallpaper.tint.b,
 			                           (uint8_t)w->get()};
 			demo.setWallpaperColor(themecfg.wallpaper.tint);
 		});
+//cerr << "wallpap alpha: " << getWidget<Slider>("Wallpaper α")->get() << endl;
 	// Window background color selector
 	bgform->add("Window bg.", (new OBColor(ColorSelect_TEMPLATE))
 		->add("Default", themes[DEFAULT_THEME].bgColor)
@@ -477,7 +481,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	hbox4->add(Label("Clear background"));
 	// + a uselessly convoluted name-lookup through its own widget pointer, to confirm
 	// the get() name fix of #200 (assuming CheckBox still has its "real" get()):
-	hbox4->add(CheckBox([&](auto* w) { Theme::clearBackground = ((CheckBox*)w->getWidget("findme"))->get(); },
+	hbox4->add(CheckBox([&](auto* w) { Theme::clearBackground = getWidget<CheckBox>("findme", w)->get(); },
 	                    true), "findme");
 
 	auto disable_all_box = right_bar->add(new HBox);
@@ -555,7 +559,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 //----------------------------------------------------------------------------
 void background_thread_main(sfw::GUI& gui)
 {
-	auto rot_slider = (sfw::Slider*)gui.getWidget("Rotation");
+	auto rot_slider = getWidget<Slider>("Rotation", gui);
 	if (!rot_slider)
 		return;
 
