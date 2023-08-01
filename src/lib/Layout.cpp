@@ -43,7 +43,7 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 	}
 #endif
 
-	const_for_each_child([&](auto widget) {
+	cforeach([&](auto widget) {
 		if (m_hoveredWidget != widget) 	//! Defer the hovered one, for "cheating" the Z-order; see below...
 			widget->draw(lctx);
 #ifdef DEBUG
@@ -81,7 +81,7 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 		//!!If multiple tooltips are visible and are too close to each other, and the most recent is
 		//!!iterated earlier, it WILL NOT be the topmost! Proper stacking or explicit Z-ordering needed!
 		//!!But, honestly... tooltips! There shouldn't even be more than one. ;)
-		const_for_each_child([&lctx](auto widget) {
+		cforeach([&lctx](auto widget) {
 			if (widget->m_tooltip)
 				widget->m_tooltip->draw(lctx);
 		});
@@ -125,9 +125,9 @@ void Layout::onMouseMoved(float x, float y)
 		return;
 	}
 
-	for (Widget* widget = begin(); widget != end(); widget = next(widget)) //!! Not a nice fit for `for_each_child([&](auto* widget)`
-	                                                                       //!! because it doesn't support breaking the loop (see that
-	                                                                       //!! `continue` and early `return` below)!...
+	for (Widget* widget = begin(); widget != end(); widget = next(widget)) //!! Not a nice fit for `foreach(widget)`, because
+	                                                                       //!! it doesn't support breaking the loop (see that
+	                                                                       //!! early `return` below)...
 	{
 		if (!widget->enabled())
 			continue;
@@ -193,7 +193,7 @@ void Layout::onMousePressed(float x, float y)
 	//
 	if (!m_hoveredWidget)
 	{
-		for (Widget* widget = begin(); widget != end(); widget = next(widget)) //!! Not `for_each_child([&](auto* widget),
+		for (Widget* widget = begin(); widget != end(); widget = next(widget)) //!! Not `foreach(widget) yet (-> #318),
 		                                                                       //!! because of an early break-out!
 		{
 			if (widget->enabled())

@@ -26,8 +26,14 @@ public:
 		return (W*)updated();   // Downcasting only for the proper return type.
 	}
 
-	// Trigger the onUpdated() callback, if the widget's content has been changed,
-	// and then set it to unchanged.
+	// Trigger the onUpdated() callback, if the widget's content has changed,
+	// and then reset it back to unchanged.
+	//!! -> "notify..." (and "onUpdted" -> "EventHandler::invoke_callback(Updated)"
+	//!!    Note though, that this is not just a generic "notify on event" function,
+	//!!    but one specific to botk InputWidget and changing the widget value (the "changed" logic)
+	//!!    Could still be a virtual override of a generic EventHandler::notify, but I don't feel
+	//!!    OK with that.
+	//!!    -> also Widget::onUpdated() -- soon to become EventHandler::invoke_callback!...
 	W* updated()
 	{
 		if (!changed()) return (W*)this;

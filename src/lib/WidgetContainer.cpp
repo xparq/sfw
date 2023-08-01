@@ -17,54 +17,54 @@ namespace sfw
 {
 
 WidgetContainer::WidgetContainer():
-    m_first(nullptr),
-    m_last(nullptr)
+	m_first(nullptr),
+	m_last(nullptr)
 {
 }
 
 
 WidgetContainer::~WidgetContainer()
 {
-    // Deallocate all widgets
-    const Widget* widget = m_first;
-    while (widget != nullptr)
-    {
-        const Widget* next = widget->m_next;
-        delete widget;
-        widget = next;
-    }
+	// Deallocate all widgets
+	const Widget* widget = m_first;
+	while (widget != nullptr)
+	{
+		const Widget* next = widget->m_next;
+		delete widget;
+		widget = next;
+	}
 }
 
 
 //!!Replace this with an std-compliant interface + std::operations! (#162)
 //!!And also provide (template?) variants for different f types!
-void WidgetContainer::for_each_child(const std::function<void(Widget*)>& f)
+void WidgetContainer::foreach(const std::function<void(Widget*)>& f)
 {
-    for (Widget* w = m_first; w != nullptr; w = w->m_next)
-    {
-        f(w);
-    }
+	for (Widget* w = m_first; w != nullptr; w = w->m_next)
+	{
+		f(w);
+	}
 }
-void WidgetContainer::const_for_each_child(const std::function<void(const Widget*)>& f) const
+void WidgetContainer::cforeach(const std::function<void(const Widget*)>& f) const
 {
-    for (const Widget* w = m_first; w != nullptr; w = w->m_next)
-    {
-        f(w);
-    }
+	for (const Widget* w = m_first; w != nullptr; w = w->m_next)
+	{
+		f(w);
+	}
 }
 
 void WidgetContainer::traverse(const std::function<void(Widget*)>& f)
 {
-	for_each_child([&](auto* w) {
+	foreach([&](auto* w) {
 		f(w);
 		w->traverse(f);
 	});
 }
-void WidgetContainer::const_traverse(const std::function<void(const Widget*)>& f) const
+void WidgetContainer::ctraverse(const std::function<void(const Widget*)>& f) const
 {
-	const_for_each_child([&](const auto* w) {
+	cforeach([&](const auto* w) {
 		f(w);
-		w->const_traverse(f);
+		w->ctraverse(f);
 	});
 }
 
@@ -83,81 +83,81 @@ Widget* WidgetContainer::insert_after(Widget* anchor, Widget* widget, const std:
 // This is the common workhorse procedure for all the other various add() methods.
 // Does not check if anchor is in fact a local child!
 {
-    assert(widget);
-    // Only freestanding widgets are to be attached:
-    assert(widget->m_parent == nullptr && "Don't copy an already added widget!");
-    assert(widget->m_next == nullptr);
-    assert(widget->m_previous == nullptr);
+	assert(widget);
+	// Only freestanding widgets are to be attached:
+	assert(widget->m_parent == nullptr && "Don't copy an already added widget!");
+	assert(widget->m_next == nullptr);
+	assert(widget->m_previous == nullptr);
 
-    widget->setParent(this); // So far so good... ;)
+	widget->setParent(this); // So far so good... ;)
 
-    if (empty())
-    {
-        m_first = m_last = widget;
-    }
-    else if (anchor == nullptr) // add as first
-    {
-        // Just verifying !empty:
-        assert(m_first);
-        assert(m_last);
-        // First is healthy?
-        assert(m_first->m_previous == nullptr);
-        assert(m_first->m_next);
+	if (empty())
+	{
+		m_first = m_last = widget;
+	}
+	else if (anchor == nullptr) // add as first
+	{
+		// Just verifying !empty:
+		assert(m_first);
+		assert(m_last);
+		// First is healthy?
+		assert(m_first->m_previous == nullptr);
+		assert(m_first->m_next);
 
-        widget->m_next = m_first;
-        m_first->m_previous = widget;
-    }
-    else if (anchor == m_last) // append (normal `add()`)
-    {
-        assert(anchor); // In case I'd feel like reshuffling the code... ;)
-        // Just verifying !empty:
-        assert(m_last);
-        assert(m_first);
-        // Last is healthy?
-        //assert(m_last->m_previous); <-- anchor *can* also be the first!
-        assert(m_last->m_next == nullptr);
+		widget->m_next = m_first;
+		m_first->m_previous = widget;
+	}
+	else if (anchor == m_last) // append (normal `add()`)
+	{
+		assert(anchor); // In case I'd feel like reshuffling the code... ;)
+		// Just verifying !empty:
+		assert(m_last);
+		assert(m_first);
+		// Last is healthy?
+		//assert(m_last->m_previous); <-- anchor *can* also be the first!
+		assert(m_last->m_next == nullptr);
 
-        m_last->m_next = widget;
-        widget->m_previous = m_last;
+		m_last->m_next = widget;
+		widget->m_previous = m_last;
 
-        m_last = widget;
-    }
-    else // So, we have both a previous and a next one to deal with,
-    {    // but at least don't have to update this->first/last!...
-        // In case I'd feel like reshuffling the code...:
-        assert(anchor);
-        assert(anchor != m_last);
-        // Just verifying !empty:
-        assert(m_last);
-        assert(m_first);
-        // Neighbors...?
-        //assert (anchor->m_previous); <-- anchor *can* be the first!
-        assert(anchor->m_next);
+		m_last = widget;
+	}
+	else // So, we have both a previous and a next one to deal with,
+	{    // but at least don't have to update this->first/last!...
+		// In case I'd feel like reshuffling the code...:
+		assert(anchor);
+		assert(anchor != m_last);
+		// Just verifying !empty:
+		assert(m_last);
+		assert(m_first);
+		// Neighbors...?
+		//assert (anchor->m_previous); <-- anchor *can* be the first!
+		assert(anchor->m_next);
 
-        widget->m_previous = anchor;
-        widget->m_next = anchor->m_next;
+		widget->m_previous = anchor;
+		widget->m_next = anchor->m_next;
 
-        anchor->m_next = widget;
-        widget->m_next->m_previous = widget;
-    }
+		anchor->m_next = widget;
+		widget->m_next->m_previous = widget;
+	}
 
 
-    // Register the widget globally, too
-    if (GUI* Main = getMain(); Main)
-    {
-        Main->remember(widget, name); // Will assign default if name.empty()!
-    }
+	// Register the widget globally, too
+	if (GUI* Main = getMain(); Main)
+	{
+		Main->remember(widget, name); // Will assign default if name.empty()!
+	}
 
-    // Adjust the layout
-    recomputeGeometry();
+	// Adjust the layout
+	recomputeGeometry();
 
-    return widget;
+	return widget;
 }
 
 
 Widget* WidgetContainer::add(Widget* widget, const std::string& name)
 {
-    return insert_after(m_last, widget, name);
+	return insert_after(m_last, widget, name);
 }
 
 

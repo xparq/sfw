@@ -10,7 +10,7 @@ namespace sfw
 void HBox::recomputeGeometry()
 {
     sf::Vector2f pos{}, size{};
-    for_each_child([&](Widget* w) {
+    foreach([&](Widget* w) {
         w->setPosition(pos);
         pos.x += w->getSize().x + Theme::MARGIN;
 

@@ -1,13 +1,13 @@
-#ifndef GUI_WIDGET_HPP
-#define GUI_WIDGET_HPP
+#ifndef SFW_WIDGET_HPP
+#define SFW_WIDGET_HPP
 
 #include "sfw/Event.hpp"
 #include "sfw/WidgetState.hpp"
 
 //!!#include "sfw/Widgets/Tooltip.hpp" // See forw. decl. below instead...
 //!!#include "sfw/WidgetContainer.hpp" // See forw. decl. below instead...
-//!!#include "sfw/Layout.hpp" // See forw. decl. below instead...
-//!!#include "sfw/GUI-main.hpp" // See forw. decl. below instead...
+//!!#include "sfw/Layout.hpp"          // See forw. decl. below instead...
+//!!#include "sfw/GUI-main.hpp"        // See forw. decl. below instead...
 
 #include "sfw/Gfx/Render.hpp"
 
@@ -19,7 +19,7 @@
 
 #ifdef DEBUG
 #
-#  include <SFML/Graphics/Color.hpp>
+#  include <SFML/Graphics/Color.hpp> // for draw_outline()
 #
 #endif
 
@@ -165,14 +165,17 @@ friend class Tooltip; // just to access getMain() via Tooltip::m_owner->!
 
 	// Recursive traversal of all the widget's descendants (if any)
 	// (Does not include the target widget itself.)
-	// Note: this operation is independent from being a widget container,
-	// despite currently only WidgetContainer implementing it, indeed.
+	// Note: this operation is not strictly related to widget *containers*,
+	// despite only WidgetContainer implementing it currently.
 	// This uniform interface is provided here on the Widget level a) for
-	// the convenience of uniform access, and b) to support compound Widget
-	// types that don't want to become a container (i.e. have a hardcoded
-	// internal structure rather than using that of WidgetContainer).
+	// the convenience of uniform access, and b) to support compound widget
+	// types that don't want to become containers per se, but just have an
+	// easily manageable internal structure of sub-widgets.
+	//!! (Not sure this latter makes sense, though: maybe that's OK to just be a container then!
+	//!! Also: complex assemblies may have multiple widget trees, too, not just this -- also
+	//!! implicit... -- one.)
 	virtual void traverse(const std::function<void(Widget*)>&) {}
-	virtual void const_traverse(const std::function<void(const Widget*)>&) const {}
+	virtual void ctraverse(const std::function<void(const Widget*)>&) const {}
 
 private:
 	virtual void recomputeGeometry() {} // Also called by some of the friend classes
@@ -276,4 +279,4 @@ template <class W = Widget> W* getWidget(const std::string& name) { return (W*)W
 
 } // namespace
 
-#endif // GUI_WIDGET_HPP
+#endif // SFW_WIDGET_HPP

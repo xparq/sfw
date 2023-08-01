@@ -61,13 +61,6 @@ public:
 	 */
 	void close();
 
-	/**
-	 * Do things to widgets...
-	 */
-	void foreach(const std::function<void(Widget*)>& f) { return traverse(f); }
-	void const_foreach(const std::function<void(const Widget*)>& f) const { return const_traverse(f); }
-
-
 	/*************************************************************************
 	 Name->widget registry
 

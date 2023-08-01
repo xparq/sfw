@@ -24,7 +24,7 @@ GUI* GUI::DefaultInstance = nullptr;
 GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the_window):
 	m_error(), // no error by default
 	m_window(window),
-	m_own_window(own_the_window),
+	m_own_window(own_the_window), //!!Rename to sg. like manage_host_window
 	m_themeCfg(themeCfg)
 {
 	// "Officially" mark this object as the "Main" in the GUI Widget tree:
@@ -270,7 +270,7 @@ void GUI::draw(const gfx::RenderContext& ctx) const
 	//!!replicate that using that Transform() hack below... :-/ (See also: #315)
 	//!!
 	auto widget_ctx = ctx;
-	const_traverse([&widget_ctx](const Widget* w) {
+	ctraverse([&widget_ctx](const Widget* w) {
 		if (w->m_tooltip) {
 			auto widget_pos = w->getParent()->getAbsolutePosition();
 			//!!SFML-specific:

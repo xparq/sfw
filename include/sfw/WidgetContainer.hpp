@@ -55,7 +55,7 @@ public:
 	Widget* addAfter(Widget* anchor, Widget* widget, const std::string& name = "");
 	Widget* addAfter(const std::string& anchor_name, Widget* widget, const std::string& name = "");
 
-	// STL-like iteration helpers --------------------------------------------
+	// STL-like iteration helpers ----------------------------------------
 	bool empty() const { return !m_first; }
 	Widget* begin() const { return m_first; }
 	Widget* end() const { return nullptr; }
@@ -65,25 +65,25 @@ public:
 	Widget* rbegin() const { return m_last; }
 	//!! Make the entire class STL-compatible, so the std:: algorithms can be used on it! (#162)
 
-protected:
-	// Internal helpers ------------------------------------------------------
-	//!!Some of them might as well be made public!
-	Widget* insert_after(Widget* anchor, Widget* widget, const std::string& name);
-
-	// Check if widget is a (direct or top-level) child of the container
-	bool is_child(const Widget* widget);
-
-	// Enumerate (only) the direct (top-level) children of the container
-	//!!This may also need to be defined in Widget instead, because client
+	// Enumerate (only) the direct descendants children of the container
+	//!!This may (also) need to be defined in Widget instead, because client
 	//!!code shouldn't really care whether some widgets can or cannot have
-	//!!children! A pure tree structure in this regard too could be preferable.
-	void for_each_child(const std::function<void(Widget*)>& f);
-	void const_for_each_child(const std::function<void(const Widget*)>& f) const;
+	//!!children! A homogeneous tree view in this regard would be preferable.
+	// Note: `for (auto i : wcont)` also works, so this is just syntactic sugar!
+	void foreach(const std::function<void(Widget*)>& f);
+	void cforeach(const std::function<void(const Widget*)>& f) const;
 
 	// Recursive traversal of all the contained widgets
-	// (Does not include this container itself.)
+	// Does not include this container itself.
 	void traverse(const std::function<void(Widget*)>& f) override;
-	void const_traverse(const std::function<void(const Widget*)>&) const override;
+	void ctraverse(const std::function<void(const Widget*)>&) const override;
+
+// ---- Internal helpers -----------------------------------------------------
+protected:
+	Widget* insert_after(Widget* anchor, Widget* widget, const std::string& name);
+
+	// Check if `widget` is a direct child node
+	bool is_child(const Widget* widget);
 
 protected:
 	Widget* m_first;
