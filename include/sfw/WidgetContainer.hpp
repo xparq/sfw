@@ -64,14 +64,19 @@ public:
 	Widget* rend() const { return nullptr; }
 	Widget* rbegin() const { return m_last; }
 	//!! Make the entire class STL-compatible, so the std:: algorithms can be used on it! (#162)
+	//!! Requires an iterator class that begin/end can return, supporting op* and ++/-- etc.!
 
-	// Enumerate (only) the direct descendants children of the container
-	//!!This may (also) need to be defined in Widget instead, because client
-	//!!code shouldn't really care whether some widgets can or cannot have
-	//!!children! A homogeneous tree view in this regard would be preferable.
-	// Note: `for (auto i : wcont)` also works, so this is just syntactic sugar!
-	void foreach(const std::function<void(Widget*)>& f);
-	void cforeach(const std::function<void(const Widget*)>& f) const;
+	// Iterate through the children (i.e. only direct descendants) of the container
+	//!!1. This may need to be defined in Widget instead, because client code
+	//!!   shouldn't really care whether some widgets can or cannot have children.
+	//!!   A homogeneous tree view (in this regard) is preferable.
+	//!!2. As soon as `for (auto i : *this)` gets supported, these should become
+	//!!   just syntactic sugar, directly doing the for loops right here! -> #318
+	void foreach  (const std::function<void(Widget*)>& f);
+	void cforeach (const std::function<void(const Widget*)>& f) const;
+	// These can be aborted by f() returning false (making the loop return false, too):
+	bool foreachb (const std::function<bool(Widget*)>& f);
+	bool cforeachb(const std::function<bool(const Widget*)>& f) const;
 
 	// Recursive traversal of all the contained widgets
 	// Does not include this container itself.

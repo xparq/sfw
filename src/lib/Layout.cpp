@@ -43,7 +43,7 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 	}
 #endif
 
-	cforeach([&](auto widget) {
+	cforeach([&](auto* widget) {
 		if (m_hoveredWidget != widget) 	//! Defer the hovered one, for "cheating" the Z-order; see below...
 			widget->draw(lctx);
 #ifdef DEBUG
@@ -67,7 +67,9 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 		}
 #endif
 	});
-	//! Draw the hovered item (often a container) last, to win the Z-order! :)
+
+	//! Draw the hovered item (which is often just a container) last, to win the Z-order! :)
+	//!! But this z-order disturbance may be way too aggressive IRL! Test with real overlapping crap!
 	if (m_hoveredWidget)
 		m_hoveredWidget->draw(lctx);
 
@@ -125,9 +127,10 @@ void Layout::onMouseMoved(float x, float y)
 		return;
 	}
 
-	for (Widget* widget = begin(); widget != end(); widget = next(widget)) //!! Not a nice fit for `foreach(widget)`, because
-	                                                                       //!! it doesn't support breaking the loop (see that
-	                                                                       //!! early `return` below)...
+	for (Widget* widget = begin(); widget != end(); widget = next(widget)) //!! Not a nice fit for foreachb(), as it would
+	                                                                       //!! quickly become way more convoluted than this
+	                                                                       //!! simple form, due to that early return & continue!
+									       //!! -> #318
 	{
 		if (!widget->enabled())
 			continue;
@@ -193,7 +196,7 @@ void Layout::onMousePressed(float x, float y)
 	//
 	if (!m_hoveredWidget)
 	{
-		for (Widget* widget = begin(); widget != end(); widget = next(widget)) //!! Not `foreach(widget) yet (-> #318),
+		for (Widget* widget = begin(); widget != end(); widget = next(widget)) //!! Not a nice fit for foreachb() (-> #318),
 		                                                                       //!! because of an early break-out!
 		{
 			if (widget->enabled())

@@ -35,24 +35,35 @@ WidgetContainer::~WidgetContainer()
 	}
 }
 
-
+//----------------------------------------------------------------------------
 //!!Replace this with an std-compliant interface + std::operations! (#162)
 //!!And also provide (template?) variants for different f types!
 void WidgetContainer::foreach(const std::function<void(Widget*)>& f)
 {
-	for (Widget* w = m_first; w != nullptr; w = w->m_next)
-	{
+	for (Widget* w = m_first; w; w = w->m_next)
 		f(w);
-	}
 }
 void WidgetContainer::cforeach(const std::function<void(const Widget*)>& f) const
 {
-	for (const Widget* w = m_first; w != nullptr; w = w->m_next)
-	{
+	for (const Widget* w = m_first; w; w = w->m_next)
 		f(w);
-	}
 }
 
+bool WidgetContainer::foreachb(const std::function<bool(Widget*)>& f)
+{
+	for (Widget* w = m_first; w; w = w->m_next)
+		if (!f(w)) return false;
+	return true;
+}
+bool WidgetContainer::cforeachb(const std::function<bool(const Widget*)>& f) const
+{
+	for (const Widget* w = m_first; w; w = w->m_next)
+		if (!f(w)) return false;
+	return true;
+}
+
+
+//----------------------------------------------------------------------------
 void WidgetContainer::traverse(const std::function<void(Widget*)>& f)
 {
 	foreach([&](auto* w) {
@@ -69,6 +80,7 @@ void WidgetContainer::ctraverse(const std::function<void(const Widget*)>& f) con
 }
 
 
+//----------------------------------------------------------------------------
 bool WidgetContainer::is_child(const Widget* widget)
 {
 	for (Widget* w = begin(); w != end(); w = next(w))
@@ -79,6 +91,7 @@ bool WidgetContainer::is_child(const Widget* widget)
 }
 
 
+//----------------------------------------------------------------------------
 Widget* WidgetContainer::insert_after(Widget* anchor, Widget* widget, const std::string& name)
 // This is the common workhorse procedure for all the other various add() methods.
 // Does not check if anchor is in fact a local child!
