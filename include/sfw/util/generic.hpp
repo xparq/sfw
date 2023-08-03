@@ -3,7 +3,7 @@
 
 namespace sfw
 {
-	struct _unnamed_enum_Param_thanks_cplusplus_
+	struct Param
 	{
 		enum _symbolic_ : int {
 			Unknown = 0,
@@ -13,11 +13,28 @@ namespace sfw
 		operator int()        { return value; }
 	};
 
-	using _unnamed_enum_Param_thanks_cplusplus_::Unknown,
-	      _unnamed_enum_Param_thanks_cplusplus_::UseDefault;
+	using Param::Unknown,
+	      Param::UseDefault;
 
- 	//!! The extra ceremony is for trying to avoid a CLANG-14 crash! :-o
-	using Param = _unnamed_enum_Param_thanks_cplusplus_;
+/*!! This version with the extra ceremony used to be a workaround for a CLANG-14 crash 
+     (on the GitHub Ubuntu GHA runner), so leaving it here for a while in case someone
+     else also has the misfortune of running into that.
+
+	struct _Param__clang_crash_workaround_
+	{
+		enum _symbolic_ : int {
+			Unknown = 0,
+			UseDefault = -1,
+		} value;
+
+		operator int()        { return value; }
+	};
+
+	using _Param__clang_crash_workaround_::Unknown,
+	      _Param__clang_crash_workaround_::UseDefault;
+
+	using Param = _Param__clang_crash_workaround_;
+!!*/
 
 } // namespace
 

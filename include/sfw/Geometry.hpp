@@ -17,14 +17,24 @@ namespace sfw
 	//!! there's no mandatory `Orientation::` qualifiers, but only for selected
 	//!! names, where that makes sense. Also, implicit num. conversions work.
 	{
-		enum _symbolic_ : int {
-		Unknown = sfw::Param::Unknown, //!! The extra `Param::` is for trying to avoid a CLANG-14 crash! :-o
-		UseDefault = sfw::Param::UseDefault,
+		enum _symbolic_ : int
+		{
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshadow"
+#endif
+		//!! Note: an extra `Param::` for the sfw:: ones was needed to work around a
+		//!! CLANG-14 crash I used to have for a while; see more in util/generic.hpp!
+		Unknown = sfw::Unknown,
+		UseDefault = sfw::UseDefault,
 			// `Default` would be hopelessly ambiguous: should it directly
 			// encode a value (like `Horizontal`), and then remain hardcoded
 			// + possibly too context-specific forever, or should it have a
 			// dedicated pseudo-value meaning "use the actually configured
 			// default for the given usage context"?...
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 		Horizontal = 1,
 		Vertical = Horizontal << 1, // Support Horizontal|Vertical
