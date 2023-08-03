@@ -8,4 +8,4 @@ set "exe=%1" & if "!exe!" == "" set exe=sfw-demo
 
 set mounted_prjdir=/mnt/c/sz/prj/sfw
 
-wsl -d Debian bash --login -c "cd %mounted_prjdir% && export LD_LIBRARY_PATH=%mounted_prjdir%/extern/sfml/linux/lib && ./%exe%"
+wsl bash --login -c "cd %mounted_prjdir% && export LD_LIBRARY_PATH=%mounted_prjdir%/extern/sfml/linux/lib && ./%exe%"
