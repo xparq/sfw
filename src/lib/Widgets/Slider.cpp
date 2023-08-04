@@ -120,7 +120,11 @@ Slider* Slider::setRange(float min, float max, float step)
 Slider* Slider::set(float value)
 // Snaps to the closest multiple of step. (Remember: step may be non-integer!)
 {
-	//!! Disabling this until clarifying the "enigma" in #317! :) 
+	//!!----------------------------------------------------------------------------
+	//!! THIS IS NOW DONE, BUT LEAVING IT STILL HERE AS A MEMENTO...
+	//!!----------------------------------------------------------------------------
+	//!!
+	//!! Disabling this if(...) until clarifying the "enigma" in #317! :)
 	//!! ...And until finding a clean way to get this back, while also ensuring
 	//!! the an initial set() would count as a real change() (no matter what
 	//!! a C++ default-inited value would be! -> Universally, for each widget!
@@ -128,7 +132,12 @@ Slider* Slider::set(float value)
 	//!! should be taken care of during init (construction) independently from
 	//!! set()? But that'd be yet another explicit widget init chore then... :-/
 	//!!
-	//!!if (value != m_value) // Really changing?
+	//!!----------------------------------------------------------------------------
+	//!! (The -- trivial, in hindsight... also, kinda ingenious :) -- solution was
+	//!! just to init m_changed with true, instead of false in InputWidget!)
+	//!!----------------------------------------------------------------------------
+	if (value != m_value) // Really changing?
+	                      //! NOTE: No early return, as we may have things to do even if this is false!
 		//!!FIX: But if never actually changed (like ctor-init to 0...), then updateView, setTooltip etc. will never be called?!
 	{
 //cerr << "set("<< value <<")... [" << range().min << ".." << range().max << "], step: "<< step() <<endl;
@@ -149,17 +158,22 @@ Slider* Slider::set(float value)
 		if (value != m_value) // Still looks like a change? :) (Note: floating-point errors make this hit-and-miss though!)
 		{
 			m_value = value;
-//cerr << " - set(): m_value: "<< m_value <<endl;
-			updateView(); //! This is equivalent to `if (changed()) updateView()`,
-			              //! and also should be in onUpdated(), but for most widgets,
-			              //! the view can change even if the value doesn't (e.g. in
-				      //! onThemeChanged, or a widget may be resizable etc. etc.)
-				      //!! So, this should be an entire additional dimension to
-				      //!! widget change control (apart from value, i.e. the "model";
-				      //!! the "view" lives its own life, only _mostly_ depending on
-				      //!! the value!
+			setChanged();
 		}
 
+	}
+
+//cerr << " - set(): m_value: "<< m_value <<endl;
+	if (changed()) //! Note: this will be true initially even if the values are the same,
+	               //! because InputWidgets are constructed with changed = true!...
+	{
+		updateView();	//! This could be in onUpdated() -- but for most widgets,
+				//! the view can change even if the value doesn't (e.g. in
+				//! onThemeChanged, or a widget may be resizable etc. etc.)
+				//!! So, this should be an entire additional dimension to
+				//!! widget change control (apart from value, i.e. the "model";
+				//!! the "view" lives its own life, only _mostly_ depending on
+				//!! the value!
 		setTooltip(to_string(m_value));
 	}
 	return this;

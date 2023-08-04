@@ -32,24 +32,11 @@ class Tooltip;
 class GUI;
 
 /*****************************************************************************
-  Abstract base class for widgets
 
-  - Every (interactive) widget has a dedicated value of a corresponding
-    type that the widget represents (models, stores, displays etc.).
+    Abstract base for widgets
 
-    This value can be set via user input actions, or programmatically by the
-    constructor, and a dedicated set(...) method (and its overloads, if any).
- 
-    The current value can be queried with the widget's get() method.
-    (Unfortunately C++ doesn't support overloading on return types, so for
-    outward type conversions, separate getXxx() methods may be defined.
-    However, it's better to define the widget's data type explicitly, with
-    conversions in both directions (converting ctors and "cast operators"),
-    and then just use a single set/get method.)
+    See InputWidget as the base for "actually useful" widgets, though. ;)
 
-  - Interactive widgets are typically configured to have callbacks to be
-    invoked when the widget's value gets updated (and finalized/committed,
-    so interim changes can be ignored).
  *****************************************************************************/
 class Widget : public gfx::Drawable, public Event::Handler
 {
@@ -63,17 +50,6 @@ public:
 
 	// Check if a point belongs to the widget
 	bool contains(const sf::Vector2f& point) const;
-
-	// Tracking the value of the widget
-	// Derived real widgets will need to define getter/setters:
-	// - set(V value); // Will call changed() as applicable
-	// - V get();
-	bool changed() const { return m_changed; }
-	Widget* changed(bool newstate = true) { m_changed = newstate; return this; }
-		//!!Rename this to a) not be so ambiguous with the above (const) one, and
-		//!!b) be in line with other similar ones (like enable/disable etc.)!...
-		//!!But change() here would be awkward -- even resorting to setChanged()
-		//!!feels better, but then it's out-of-style (for the new API) again...)
 
 	// Enable/disable processing (user) events
 	// (Not just inputs, but also outputs like triggering user callbacks.)
@@ -185,15 +161,6 @@ private:
 	virtual void onResized() {}
 	virtual void onThemeChanged() {}
 
-	//!!This actually belongs to InputWidget (`protected` exactly for it to be visible
-	//!!there), but not sure how a virtual would mix with that being a template!...
-	//!!Also, it's not even just a dummy callback like the others, but a dispatcher! :-/
-	//!!Needs cleanup...
-	//!! -> Actually, as a generic "callback invoker", even up in EventHandler, like
-	//!!    EventHandler::invoke_callback(which), could hit all the birds with one stone.
-	protected:
-	virtual void onUpdated(); //!! -> "EventHandler::invoke_callback(Updated)", and "updated" -> "notify(Updated)" or sg...
-
 private:
 	WidgetContainer* m_parent = nullptr;
 	Widget* m_previous = nullptr;
@@ -201,7 +168,6 @@ private:
 
 	bool m_focusable;
 	WidgetState m_state;
-	bool m_changed;
 
 	sf::Vector2f m_position;
 	sf::Vector2f m_size;

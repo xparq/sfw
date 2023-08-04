@@ -44,7 +44,7 @@ Button* Button::click()
 {
 	//! This weird kludge won't do antything to the visuals. (That would require
 	//! way more hocus pocus, for just a little gimmick, so... perhaps later.)
-	changed(true);
+	setChanged();
 	updated();
 	return this;
 }

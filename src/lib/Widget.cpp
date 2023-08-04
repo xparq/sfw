@@ -45,8 +45,7 @@ Widget* Widget::getWidget(const std::string& name) const
 //----------------------------------------------------------------------------
 Widget::Widget() :
 	m_focusable(true),
-	m_state(WidgetState::Default),
-	m_changed(false)
+	m_state(WidgetState::Default)
 {
 }
 
@@ -57,7 +56,6 @@ Widget::Widget(Widget&& tmp) :
 	m_next(tmp.m_next),
 	m_focusable(tmp.m_focusable),
 	m_state(tmp.m_state),
-	m_changed(tmp.m_changed),
 	m_position(tmp.m_position),
 	m_size(tmp.m_size),
 	m_transform(tmp.m_transform)
@@ -78,7 +76,6 @@ Widget::Widget(const Widget& other) :
 	m_next(other.m_next),
 	m_focusable(other.m_focusable),
 	m_state(other.m_state),
-	m_changed(other.m_changed),
 	m_position(other.m_position),
 	m_size(other.m_size),
 	m_transform(other.m_transform)
@@ -338,29 +335,6 @@ WidgetState Widget::getState() const
 const sf::Transform& Widget::getTransform() const
 {
 	return m_transform;
-}
-
-
-// Virtuals/Callbacks --------------------------------------------------------
-
-void Widget::onUpdated()
-{
-	using namespace Event::internal;
-	
-	auto callback = m_callbackMap[Event::Update];
-	assert( std::holds_alternative<Callback_w>(callback) || std::holds_alternative<Callback_void>(callback) );
-		//!!?? This may no longer be true after getting something from the map that may not have
-		//!!?? been there! Seems to still work, so probably true, but make it explicit whether the
-		//!!?? map would indeed return a false std::function, properly wrapped in optional<>!...
-
-	if (std::holds_alternative<Callback_w>(callback) && std::get<Callback_w>(callback))
-	{
-		return (std::get<Callback_w>(callback).value()) (this);
-	}
-	else if (std::holds_alternative<Callback_void>(callback) && std::get<Callback_void>(callback))
-	{
-		return (std::get<Callback_void>(callback).value()) ();
-	}
 }
 
 

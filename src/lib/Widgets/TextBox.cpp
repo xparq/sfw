@@ -60,7 +60,7 @@ TextBox* TextBox::set(const std::string& content)
 	m_text.set(sfw::utf8_substr(content, 0, m_maxLength)); // Limit the length
 	setCursorPos(length()); // End(), but it's unclear if it'd be too high-level here...
 
-	changed(); //! Will become more sophisticated later (-> Undo/Redo)
+	setChanged(); //!! Will become more sophisticated with Undo/Redo etc.
 	return this;
 }
 
@@ -506,6 +506,8 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 
 	// "Apply"
 	case sf::Keyboard::Enter:
+		setChanged(); //!! None of the inidividual editing actions update this yet,
+		              //!! so we just force it here for the time being...
 		updated(); //!!TBD: Should it be forced even if !changed()?
 		break;
 

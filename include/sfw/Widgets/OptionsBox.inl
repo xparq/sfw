@@ -62,6 +62,7 @@ template <class T> auto OptionsBox<T>::set(size_t index)
 {
 	if (index != m_currentIndex)
 	{
+		this->setChanged(); //! this-> required here due to C++ cringe...
 		update_selection(index);
 	}
 	return this;

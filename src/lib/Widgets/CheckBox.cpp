@@ -28,7 +28,7 @@ CheckBox::CheckBox(std::function<void(CheckBox*)> callback, bool checked):
 CheckBox* CheckBox::set(bool checked)
 {
 	m_checked = checked;
-	changed(true);
+	setChanged();
 	return this;
 }
 

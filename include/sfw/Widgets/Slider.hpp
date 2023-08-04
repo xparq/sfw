@@ -68,7 +68,7 @@ public:
 	// Current value
 	Slider* set(float value);
 	float   get() const;
-	// Unfortunately, these are also needed to seamlessly support integers, too, without warnings:
+	// Unfortunately, these are also needed to seamlessly support integers, too (without warnings):
 	Slider* set(int value)      { return set((float)value); }
 	Slider* set(unsigned value) { return set((float)value); }
 
