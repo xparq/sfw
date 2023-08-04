@@ -1,11 +1,18 @@
 tmp/
+*.tmp
+*.off
 
 # Smaller external deps. are kept embedded locally, but SFML is not one of those:
 extern/sfml/
 
+# Cruft under src/ & include/ can be hidden with .prefixing:
+# (Too many possible legit .file cases outside of that subtree, which I'd
+# definitely forget, that's why it's confined there. Even this is shaky.)
+src/**/.*
+include/**/.*
+
 # Build artifacts etc.
 #tmp/build/ <- tmp/ is already ignored
-*.tmp
 *.ilk
 *.pdb
 
