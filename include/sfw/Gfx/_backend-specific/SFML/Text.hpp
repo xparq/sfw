@@ -9,7 +9,8 @@ namespace sfw
 
 struct Text : sf::Text
 {
-	Text() : sf::Text(Theme::getFont()) {}
+	Text(const std::string& s = "", unsigned int height = 30)
+		: sf::Text(Theme::getFont(), stdstring_to_SFMLString(s), height) {}
 
 	void set(const std::string& str) { setString(stdstring_to_SFMLString(str)); }
 	std::string get() const { return SFMLString_to_stdstring(getString()); }

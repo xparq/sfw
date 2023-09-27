@@ -90,7 +90,7 @@ struct Color //!!?? or: RGBAColor : Color
 };
 !!*/
 
-sf::Color hex2color(const std::string& hexcolor)
+inline sf::Color hex2color(const std::string& hexcolor)
 {
     sf::Color color = sf::Color::Black;
     if (hexcolor.size() == 7) // #ffffff
