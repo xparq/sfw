@@ -21,7 +21,7 @@ BUILD = $(main_lib) $(main_exe) $(test_exe) $(smoke_test_exe)
 
 SRC_DIR=src
 OUT_DIR=tmp/build/$(TOOLCHAIN)
-LIB_DIR=lib
+LIB_DIR=lib/$(TOOLCHAIN)
 EXE_DIR=
 OBJ_DIR=$(OUT_DIR)/obj
 CXX_MOD_IFC_DIR=$(OUT_DIR)/ifc
