@@ -63,8 +63,8 @@ const sf::String& ImageButton::getText() const
 
 ImageButton* ImageButton::setSize(sf::Vector2f size)
 {
-	m_background.setScale({size.x / m_background.getTexture()->getSize().x,
-	                       size.y / m_background.getTexture()->getSize().y * 3}); // see the ctor for that 3! ;)
+	m_background.setScale({size.x / m_background.getTexture().getSize().x,
+	                       size.y / m_background.getTexture().getSize().y * 3}); // see the ctor for that 3! ;)
 	Widget::setSize(size);
 	return this;
 }
@@ -79,7 +79,7 @@ ImageButton* ImageButton::setFont(const sf::Font& font)
 
 const sf::Font& ImageButton::getFont() const
 {
-	return *m_text.getFont();
+	return m_text.getFont();
 }
 
 
@@ -119,8 +119,8 @@ void ImageButton::draw(const gfx::RenderContext& ctx) const
 
 void ImageButton::onStateChanged(WidgetState state)
 {
-	sf::Vector2i size(m_background.getTexture()->getSize().x,
-	                  m_background.getTexture()->getSize().y / 3);
+	sf::Vector2i size(m_background.getTexture().getSize().x,
+	                  m_background.getTexture().getSize().y / 3);
 	switch (state)
 	{
 	case WidgetState::Default:
