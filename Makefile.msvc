@@ -389,10 +389,10 @@ clean_all:
 #-----------------------------------------------------------------------------
 # Alas, NMAKE can't treat multiline macros as separate commands in build rules,
 # so no use trying this:
-#link_exe = \
+#link_cmd = \
 #	@echo Creating executable: $@... ^
 #	link -nologo $(LINKFLAGS) -out:$@ $(EXT_LIBS) $**
-link_exe = link -nologo $(LINKFLAGS) -out:$@ $(EXT_LIBS) $**
+link_cmd = link -nologo $(LINKFLAGS) -out:$@ $(EXT_LIBS) $**
 
 
 #------------------------
@@ -410,7 +410,7 @@ link_exe = link -nologo $(LINKFLAGS) -out:$@ $(EXT_LIBS) $**
 !if "$(main_exe)" != ""
 $(main_exe): $(obj_dir)\examples\demo.obj $(main_lib)
 	@echo Creating executable: $@...
-	$(link_exe)
+	$(link_cmd)
 !endif
 
 #------------------------------
@@ -418,8 +418,8 @@ $(main_exe): $(obj_dir)\examples\demo.obj $(main_lib)
 #------
 $(test_exe): $(obj_dir)\test\main.obj $(main_lib)
 	@echo Creating executable: $@...
-	$(link_exe)
+	$(link_cmd)
 
 $(smoke_test_exe): $(obj_dir)\test\smoke.obj $(main_lib)
 	@echo Creating executable: $@...
-	$(link_exe)
+	$(link_cmd)
