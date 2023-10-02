@@ -100,29 +100,38 @@ int main()
 	test_hbox->add(new Form)->add(labelbox, new Label("OK!"));
 
 	// #171
-	auto gh171form = test_hbox->add(new Form);
-	gh171form->add("#171 autocast", new TextBox(50))->set("OK!");
+	auto issue_171 = test_hbox->add(new Form);
+	issue_171->add("#171 autocast", new TextBox(50))->set("OK!");
 	//#171 + #168 (with an Image*):
-	gh171form->add((new Image("test/example.jpg"))->rescale(0.25), new TextBox(50))->set("171 + 168 OK!");
+	issue_171->add((new Image("test/example.jpg"))->rescale(0.25), new TextBox(50))->set("171 + 168 OK!");
 	//#171 + #168 + template widget + move
-	gh171form->add(new Label("tempWidget"), TextBox(70))->set("171/tmp + 168 OK!");
+	issue_171->add(new Label("tempWidget"), TextBox(70))->set("171/tmp + 168 OK!");
 	//#171, template-move also for the "label":
-	gh171form->add(Label("tmpLabel"), Label("#171(tmp,tmp) OK too!"));
+	issue_171->add(Label("tmpLabel"), Label("#171(tmp,tmp) OK too!"));
 
 	//!! This is not yet supported (nor separators...):
 	//!!test_hbox->add(new Form)->add("This is just some text on its own.");
 
-	auto issuebox2 = test_hbox->add(new VBox);
+	auto issues_2 = test_hbox->add(new VBox);
 	// #127 + name lookup
-	issuebox2->add(Button("Issue #127/void", [&] {
+	issues_2->add(Button("Issue #127/void", [&] {
 		getWidget<Button>("test #127", demo)->setText("Found itself!");
 	}), "test #127");
-	issuebox2->add(Button("Issue #127/w", [&](auto* w) { cerr << w << ", " << getWidget("test #127/w", demo) << endl; // use `demo` yet in the print!
+	issues_2->add(Button("Issue #127/w", [&](auto* w) { cerr << w << ", " << getWidget("test #127/w", demo) << endl; // use `demo` yet in the print!
 		getWidget<Button>("test #127/w", w)->setText("Found itself!");
 	}), "test #127/w");
+	// #174: std::string API
+	issues_2->add(new TextBox)->setPlaceholder("#174: std áéíÓÖŐ");
 
-	//#174: std::string API
-	issuebox2->add(new TextBox)->setPlaceholder("#174: std áéíÓÖŐ");
+	auto issues_3 = test_hbox->add(new Form);
+	// #333: hex2color with alpha
+	issues_3->add("Shouldn't chg.:");
+	issues_3->add("#333 h2c(α)", CheckBox([](auto* w){ Theme::bgColor =
+		w->checked() ? hex2color("#ff5566") : hex2color("#ff5566ff"); }));
+	issues_3->add("Should change (α 0 vs 80):");
+	issues_3->add("#333 h2c(α)", CheckBox([](auto* w){ Theme::bgColor =
+		w->checked() ? hex2color("#ff556600") : hex2color("#ff556680"); }));
+	issues_3->add("", new Label("right-side content"));
 
 
 	demo.add(new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"

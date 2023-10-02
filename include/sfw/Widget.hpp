@@ -44,9 +44,16 @@ public:
 	// Widget geometry
 	Widget* setPosition(const sf::Vector2f& pos);
 	Widget* setPosition(float x, float y);
-	const sf::Vector2f& getPosition() const;
-	// These can only be queried:
-	const sf::Vector2f& getSize() const;
+	const sf::Vector2f& getPosition() const; //!!?? Should just return Vector2f by val.?
+
+ 	// Don't use these, unless absolutely necessary & signed the waiver!...
+	// (They trigger reflow, so might cause infinite loops if called nonchalantly.)
+	// Widget sizing is fully automatic anyway.
+	Widget* setSize(const sf::Vector2f& size);
+	Widget* setSize(float width, float height);
+	const sf::Vector2f& getSize() const; //!!?? Should just return Vector2f by val.?
+
+	// Queries:
 
 	// Check if a point belongs to the widget
 	bool contains(const sf::Vector2f& point) const;
@@ -97,9 +104,6 @@ friend class Tooltip; // just to access getMain() via Tooltip::m_owner->!
 	//!! with raw pointers); see #320!
 		Widget(Widget&&);
 		Widget(const Widget&);
-
-	Widget* setSize(const sf::Vector2f& size);
-	Widget* setSize(float width, float height);
 
 	sf::Vector2f getAbsolutePosition() const;
 		// Window coordinates, not relative to the GUI Main rect.!

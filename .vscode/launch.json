@@ -1,0 +1,11 @@
+{
+	"configurations": [
+		"name": "demo - MinGW DEBUG",
+		"type": "lldb",
+		"request": "launch",
+		"program": "${workspaceFolder}/sfw-demo-mingw-s-d.exe",
+		"args": [
+		""
+		],
+	],
+}

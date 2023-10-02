@@ -162,6 +162,10 @@ Widget* Widget::setPosition(float x, float y)
 {
 	setPosition(sf::Vector2f(x, y));
 
+	//!! Note: no reflow, unlike in setSize(), as that would cause infinite looping in the current model.
+	//!! Reflowing could guarantee to keep this newly set (local-to-parent) position though,
+	//!! and it would make sense to still trigger it in some (yet to be implemented) cases.
+
 	return this;
 }
 
