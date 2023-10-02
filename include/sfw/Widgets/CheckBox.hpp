@@ -1,5 +1,5 @@
-#ifndef SFW_CHECKBOX_HPP
-#define SFW_CHECKBOX_HPP
+#ifndef _SFW_CHECKBOX_HPP_
+#define _SFW_CHECKBOX_HPP_
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Box.hpp"
@@ -16,40 +16,40 @@ namespace sfw
 class CheckBox: public InputWidget<CheckBox>
 {
 public:
-    CheckBox(bool checked = false);
-    CheckBox(std::function<void(CheckBox*)> callback, bool checked = false);
+	CheckBox(bool checked = false);
+	CheckBox(std::function<void(CheckBox*)> callback, bool checked = false);
 
-    // "Generic-input-level" abstract get/set
-    CheckBox* set(bool checked);
-    bool get() const { return m_checked; }
+	// "Generic-input-level" abstract get/set
+	CheckBox* set(bool checked);
+	bool get() const { return m_checked; }
 
-    // Widget-specific operations
-    CheckBox* check()   { return update(true); }
-    CheckBox* uncheck() { return update(false); }
-    CheckBox* toggle()  { return update(!checked()); }
+	// Widget-specific operations
+	CheckBox* check()   { return update(true); }
+	CheckBox* uncheck() { return update(false); }
+	CheckBox* toggle()  { return update(!checked()); }
 
-    // Widget-specific queries
-    operator bool() const { return checked(); }
-    bool checked() const { return get(); }
-    // Still keeping the legacy style, too:
-    bool isChecked() const { return checked(); }
+	// Widget-specific queries
+	operator bool() const { return checked(); }
+	bool checked() const { return get(); }
+	// Still keeping the legacy style, too:
+	bool isChecked() const { return checked(); }
 
 private:
-    void draw(const gfx::RenderContext& ctx) const override;
+	void draw(const gfx::RenderContext& ctx) const override;
 
-    // Callbacks
-    void onStateChanged(WidgetState state) override;
-    void onThemeChanged() override;
-    void onMouseReleased(float x, float y) override;
-    void onKeyPressed(const sf::Event::KeyEvent& key) override;
+	// Callbacks
+	void onStateChanged(WidgetState state) override;
+	void onThemeChanged() override;
+	void onMouseReleased(float x, float y) override;
+	void onKeyPressed(const sf::Event::KeyEvent& key) override;
 
-    // State
-    Box m_box;
-    CheckMark m_checkmark;
-    bool m_checked;
+	// State
+	Box m_box;
+	CheckMark m_checkmark;
+	bool m_checked;
 };
 
 
 } // namespace
 
-#endif // SFW_CHECKBOX_HPP
+#endif // _SFW_CHECKBOX_HPP_
