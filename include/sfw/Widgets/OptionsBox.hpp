@@ -1,5 +1,5 @@
-#ifndef SFW_OPTIONSBOX_HPP
-#define SFW_OPTIONSBOX_HPP
+#ifndef _SFW_OPTIONSBOX_HPP_
+#define _SFW_OPTIONSBOX_HPP_
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
@@ -72,7 +72,7 @@ private:
 	// -------- Callbacks...
 	void draw(const gfx::RenderContext& ctx) const override;
 
-	void onStateChanged(WidgetState state) override;
+	void onActivationChanged(ActivationState state) override;
 	void onMouseMoved(float x, float y) override;
 	void onMousePressed(float x, float y) override;
 	void onMouseReleased(float x, float y) override;
@@ -110,4 +110,4 @@ private:
 
 #include "OptionsBox.inl"
 
-#endif // SFW_OPTIONSBOX_HPP
+#endif // _SFW_OPTIONSBOX_HPP_

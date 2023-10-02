@@ -82,7 +82,7 @@ void Button::draw(const gfx::RenderContext& ctx) const
 
 // Callbacks -------------------------------------------------------------------
 
-void Button::onStateChanged(WidgetState state)
+void Button::onActivationChanged(ActivationState state)
 {
 	m_box.applyState(state);
 }
@@ -90,7 +90,7 @@ void Button::onStateChanged(WidgetState state)
 
 void Button::onMouseMoved(float x, float y)
 {
-	if (getState() == WidgetState::Pressed)
+	if (getActivationState() == ActivationState::Pressed)
 	{
 		if (contains(sf::Vector2f(x, y)))
 			m_box.press();

@@ -10,7 +10,7 @@ template <class T>
 ItemBox<T>::ItemBox(Box::Type type):
     Box(type)
 {
-    applyState(WidgetState::Default);
+    applyState(ActivationState::Default);
 }
 
 template <class T>
@@ -18,7 +18,7 @@ ItemBox<T>::ItemBox(const T& item, Box::Type type):
     Box(type),
     m_item(item)
 {
-    applyState(WidgetState::Default);
+    applyState(ActivationState::Default);
 }
 
 
@@ -43,7 +43,7 @@ void ItemBox<T>::setTintColor(sf::Color color)
 
 
 template <class T>
-void ItemBox<T>::applyState(WidgetState state)
+void ItemBox<T>::applyState(ActivationState state)
 {
     Box::applyState(state);
     if (m_itemColor)
@@ -52,17 +52,17 @@ void ItemBox<T>::applyState(WidgetState state)
     }
     else switch (state)
     {
-    case WidgetState::Default:
+    case ActivationState::Default:
         m_item.setFillColor(m_type == Click ? Theme::click.textColor : Theme::input.textColor);
         break;
-    case WidgetState::Hovered:
+    case ActivationState::Hovered:
         m_item.setFillColor(m_type == Click ? Theme::click.textColorHover : Theme::input.textColorHover);
         break;
-    case WidgetState::Pressed:
-    case WidgetState::Focused:
+    case ActivationState::Pressed:
+    case ActivationState::Focused:
         m_item.setFillColor(m_type == Click ? Theme::click.textColorFocus : Theme::input.textColorFocus);
         break;
-    case WidgetState::Disabled:
+    case ActivationState::Disabled:
         m_item.setFillColor(m_type == Click ? Theme::click.textColorDisabled : Theme::input.textColorDisabled);
         break;
     }

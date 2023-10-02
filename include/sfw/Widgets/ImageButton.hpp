@@ -1,5 +1,5 @@
-#ifndef SFW_IMAGEBUTTON_HPP
-#define SFW_IMAGEBUTTON_HPP
+#ifndef _SFW_IMAGEBUTTON_HPP_
+#define _SFW_IMAGEBUTTON_HPP_
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
@@ -41,7 +41,7 @@ public:
 private:
 	void draw(const gfx::RenderContext& ctx) const override;
 
-	void onStateChanged(WidgetState state) override;
+	void onActivationChanged(ActivationState state) override;
 	void onMouseMoved(float x, float y) override;
 	void onMousePressed(float x, float y) override;
 	void onMouseReleased(float x, float y) override;
@@ -59,4 +59,4 @@ private:
 
 } // namespace
 
-#endif // SFW_IMAGEBUTTON_HPP
+#endif // _SFW_IMAGEBUTTON_HPP_

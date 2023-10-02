@@ -1,5 +1,5 @@
-#ifndef GUI_SLIDER_HPP
-#define GUI_SLIDER_HPP
+#ifndef _SFW_SLIDER_HPP_
+#define _SFW_SLIDER_HPP_
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/Geometry.hpp"
@@ -94,7 +94,7 @@ private:
 	void onMouseMoved(float x, float y) override;
 	void onMouseReleased(float x, float y) override;
 	void onMouseWheelMoved(int delta) override;
-	void onStateChanged(WidgetState state) override;
+	void onActivationChanged(ActivationState state) override;
 	void onThemeChanged() override;
 
 	// Config:
@@ -123,4 +123,4 @@ inline Slider* Slider::dec(float delta) { return move(-delta); }
 
 } // namespace
 
-#endif // GUI_SLIDER_HPP
+#endif // _SFW_SLIDER_HPP_

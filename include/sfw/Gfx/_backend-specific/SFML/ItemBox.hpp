@@ -1,5 +1,5 @@
-#ifndef GUI_ITEMBOX_SFML_HPP
-#define GUI_ITEMBOX_SFML_HPP
+#ifndef _SFW_ITEMBOX_SFML_HPP_
+#define _SFW_ITEMBOX_SFML_HPP_
 
 #include "sfw/Gfx/Elements/Box.hpp"
 
@@ -26,7 +26,7 @@ public:
     // would usually need an alpha value set accordingly to be practical:
     void setTintColor(sf::Color color);
 
-    void applyState(WidgetState state);
+    void applyState(ActivationState state);
 
     inline T& item() { return m_item; }
     inline const T& item() const { return m_item; }
@@ -45,4 +45,4 @@ private:
 
 #include "ItemBox.inl"
 
-#endif // GUI_ITEMBOX_SFML_HPP
+#endif // _SFW_ITEMBOX_SFML_HPP_

@@ -1,8 +1,8 @@
-#ifndef SFW_WIDGET_HPP
-#define SFW_WIDGET_HPP
+#ifndef _SFW_WIDGET_HPP_
+#define _SFW_WIDGET_HPP_
 
 #include "sfw/Event.hpp"
-#include "sfw/WidgetState.hpp"
+#include "sfw/ActivationState.hpp"
 
 //!!#include "sfw/Widgets/Tooltip.hpp" // See forw. decl. below instead...
 //!!#include "sfw/WidgetContainer.hpp" // See forw. decl. below instead...
@@ -109,8 +109,8 @@ friend class Tooltip; // just to access getMain() via Tooltip::m_owner->!
 		// Window coordinates, not relative to the GUI Main rect.!
 		// (So, even when the GUI itself is offset, it won't affect this.)
 
-	void setState(WidgetState state);
-	WidgetState getState() const;
+	void setActivationState(ActivationState state);
+	ActivationState getActivationState() const;
 
 	// Set/check if the widget can be focused (i.e. process & trigger user events)
 	void setFocusable(bool focusable); //!!setInteractive, as it's all about taking user inputs!
@@ -161,7 +161,7 @@ private:
 	virtual void recomputeGeometry() {} // Also called by some of the friend classes
 
 	// -------- Callbacks... (See event.hpp for the generic ones!)
-	virtual void onStateChanged(WidgetState) {}
+	virtual void onActivationChanged(ActivationState) {}
 	virtual void onResized() {}
 	virtual void onThemeChanged() {}
 
@@ -171,7 +171,7 @@ private:
 	Widget* m_next = nullptr;
 
 	bool m_focusable;
-	WidgetState m_state;
+	ActivationState m_activationState;
 
 	sf::Vector2f m_position;
 	sf::Vector2f m_size;
@@ -249,4 +249,4 @@ template <class W = Widget> W* getWidget(const std::string& name) { return (W*)W
 
 } // namespace
 
-#endif // SFW_WIDGET_HPP
+#endif // _SFW_WIDGET_HPP_

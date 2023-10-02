@@ -62,6 +62,9 @@ UI:
 namespace sfw
 {
 
+using enum ActivationState;
+
+
 Slider::Slider(const Cfg& cfg/*, const Style& style*/, float length) :
 	m_cfg(cfg),
 	m_boxLength(length),
@@ -411,11 +414,11 @@ void Slider::onMouseMoved(float x, float y)
 	}
 	else if (m_thumb.contains(x, y))
 	{
-		m_thumb.applyState(WidgetState::Hovered);
+		m_thumb.applyState(ActivationState::Hovered);
 	}
 	else
 	{
-		m_thumb.applyState(WidgetState::Default);
+		m_thumb.applyState(ActivationState::Default);
 	}
 }
 
@@ -439,9 +442,9 @@ void Slider::onMouseWheelMoved(int delta)
 }
 
 
-void Slider::onStateChanged(WidgetState state)
+void Slider::onActivationChanged(ActivationState state)
 {
-	if (state == WidgetState::Focused || state == WidgetState::Default)
+	if (state == Focused || state == Default)
 	{
 		m_thumb.applyState(state);
 	}

@@ -16,6 +16,9 @@
 namespace sfw
 {
 
+using enum ActivationState;
+
+
 //----------------------------------------------------------------------------
 // See the header...
 /*static*/ Widget* Widget::getWidget_proxy(const std::string& name, const Widget* w/* = nullptr*/)
@@ -45,7 +48,7 @@ Widget* Widget::getWidget(const std::string& name) const
 //----------------------------------------------------------------------------
 Widget::Widget() :
 	m_focusable(true),
-	m_state(WidgetState::Default)
+	m_activationState(Default)
 {
 }
 
@@ -55,7 +58,7 @@ Widget::Widget(Widget&& tmp) :
 	m_previous(tmp.m_previous),
 	m_next(tmp.m_next),
 	m_focusable(tmp.m_focusable),
-	m_state(tmp.m_state),
+	m_activationState(tmp.m_activationState),
 	m_position(tmp.m_position),
 	m_size(tmp.m_size),
 	m_transform(tmp.m_transform)
@@ -75,7 +78,7 @@ Widget::Widget(const Widget& other) :
 	m_previous(other.m_previous),
 	m_next(other.m_next),
 	m_focusable(other.m_focusable),
-	m_state(other.m_state),
+	m_activationState(other.m_activationState),
 	m_position(other.m_position),
 	m_size(other.m_size),
 	m_transform(other.m_transform)
@@ -227,7 +230,7 @@ bool Widget::contains(const sf::Vector2f& point) const
 //----------------------------------------------------------------------------
 bool Widget::focused() const
 {
-	return m_state == WidgetState::Focused || m_state == WidgetState::Pressed;
+	return m_activationState == Focused || m_activationState == Pressed;
 }
 
 
@@ -277,16 +280,16 @@ Widget* Widget::enable(bool state)
 		return this;
 
 	if (state) {
-		if (m_state == WidgetState::Disabled)
+		if (m_activationState == Disabled)
 		{
-			m_state = WidgetState::Default;
-			onStateChanged(m_state);
+			m_activationState = Default;
+			onActivationChanged(m_activationState);
 		}
 	} else {
-		if (m_state != WidgetState::Disabled)
+		if (m_activationState != Disabled)
 		{
-			m_state = WidgetState::Disabled;
-			onStateChanged(m_state);
+			m_activationState = Disabled;
+			onActivationChanged(m_activationState);
 		}
 	}
 	return this;
@@ -294,7 +297,7 @@ Widget* Widget::enable(bool state)
 
 bool Widget::enabled() const
 {
-	return m_state != WidgetState::Disabled;
+	return m_activationState != Disabled;
 }
 
 
@@ -322,16 +325,16 @@ Widget* Widget::setTooltip(const std::string& text)
 
 
 //----------------------------------------------------------------------------
-void Widget::setState(WidgetState state)
+void Widget::setActivationState(ActivationState state)
 {
-	m_state = state;
-	onStateChanged(state);
+	m_activationState = state;
+	onActivationChanged(state);
 }
 
 
-WidgetState Widget::getState() const
+ActivationState Widget::getActivationState() const
 {
-	return m_state;
+	return m_activationState;
 }
 
 

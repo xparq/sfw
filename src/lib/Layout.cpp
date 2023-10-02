@@ -19,6 +19,9 @@
 namespace sfw
 {
 
+using enum ActivationState;
+
+
 Layout::Layout():
 	m_hoveredWidget(nullptr),
 	m_focusedWidget(nullptr)
@@ -34,7 +37,7 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 	gfx::RenderContext lctx{ctx.target, sfml_renderstates};
 
 #ifdef DEBUG
-	if (DEBUG_INSIGHT_KEY_PRESSED && getState() == WidgetState::Hovered) {
+	if (DEBUG_INSIGHT_KEY_PRESSED && getActivationState() == Hovered) {
 		if (auto* root = getMain(); root) {
 //cerr << getAbsolutePosition().x << ", " << getAbsolutePosition().y << endl;
 			root->draw_outline(ctx, sf::Color::Yellow);
@@ -53,12 +56,12 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 		}
 		// Draw an outline around the widget:
 		if (DEBUG_INSIGHT_KEY_PRESSED) {
-			if (widget->getState() == WidgetState::Hovered) {
+			if (widget->getActivationState() == Hovered) {
 				if (auto* root = getMain(); root) {
 					widget->draw_outline(lctx,
 						const_cast<Widget*>(widget)->isLayout() ? sf::Color::White : sf::Color::Blue);
 				}
-			} else if (widget->getState() == WidgetState::Focused) {
+			} else if (widget->getActivationState() == Focused) {
 				if (auto* root = getMain(); root) {
 					widget->draw_outline(lctx,
 						const_cast<Widget*>(widget)->isLayout() ? sf::Color::Cyan : sf::Color::Green);
@@ -98,9 +101,9 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 
 
 //----------------------------------------------------------------------------
-void Layout::onStateChanged(WidgetState state)
+void Layout::onActivationChanged(ActivationState state)
 {
-	if (state == WidgetState::Default)
+	if (state == Default)
 	{
 		// Make sure no child is stuck focused/hovered
 		// NOTE: Both of these happened before this safeguard!
@@ -232,7 +235,7 @@ cerr << "- Oops, missed hover retroactively fixed!\n";
 	}
 	else if (m_focusedWidget && m_focusedWidget->enabled()) // Clicked away from the focused widget?
 	{
-		m_focusedWidget->setState(WidgetState::Default); //!!->unfocus()!
+		m_focusedWidget->setActivationState(Default); //!!->unfocus()!
 		m_focusedWidget = nullptr;
 	}
 }
@@ -245,7 +248,7 @@ void Layout::onMouseReleased(float x, float y)
 	{
 		sf::Vector2f localMousePos = sf::Vector2f(x, y) - m_focusedWidget->getPosition();
 		m_focusedWidget->onMouseReleased(localMousePos.x, localMousePos.y);
-		m_focusedWidget->setState(WidgetState::Focused);
+		m_focusedWidget->setActivationState(Focused);
 	}
 }
 
@@ -320,7 +323,7 @@ bool Layout::focus(Widget* widget)
 			unfocus();
 
 		m_focusedWidget = widget;
-		widget->setState(WidgetState::Focused);
+		widget->setActivationState(Focused);
 		return true;
 	}
 	return false;
@@ -409,7 +412,7 @@ void Layout::unfocus()
 
 	auto widget = m_focusedWidget; // (just an alias for readability & consistency with other contexts)
 
-	widget->setState(WidgetState::Default);
+	widget->setActivationState(Default);
 
 	// Do it recursively for layouts! (!!??Should it be generalized to WidgetContainers??!!)
 	if (widget->isLayout()) ((Layout*)widget)->unfocus();
@@ -432,7 +435,7 @@ void Layout::hover(Widget* widget, float parent_x, float parent_y)
 	m_hoveredWidget = widget;
 
 	// Set it to "Hovered" only if not already focused:
-	widget->setState(widget == m_focusedWidget ? WidgetState::Focused : WidgetState::Hovered);
+	widget->setActivationState(widget == m_focusedWidget ? Focused : Hovered);
 
 	widget->onMouseEnter(); //!!...(localMousePos)
 
@@ -458,7 +461,7 @@ void Layout::unhover()
 //!!??	widget->onMouseMoved(x, y);
 
 	// Set it back to "Focused" if it's been the focused child:
-	widget->setState(widget == m_focusedWidget ? WidgetState::Focused : WidgetState::Default);
+	widget->setActivationState(widget == m_focusedWidget ? Focused : Default);
 
 	widget->onMouseLeave(); //!!...(localMousePos)
 

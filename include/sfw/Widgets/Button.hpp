@@ -1,5 +1,5 @@
-#ifndef SFW_BUTTON_HPP
-#define SFW_BUTTON_HPP
+#ifndef _SFW_BUTTON_HPP_
+#define _SFW_BUTTON_HPP_
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
@@ -35,7 +35,7 @@ private:
 	void recomputeGeometry() override;
 
 	// Callbacks
-	void onStateChanged(WidgetState state) override;
+	void onActivationChanged(ActivationState state) override;
 	void onMouseMoved(float x, float y) override;
 	void onMousePressed(float x, float y) override;
 	void onMouseReleased(float x, float y) override;
@@ -48,4 +48,4 @@ private:
 
 } // namespace
 
-#endif // SFW_BUTTON_HPP
+#endif // _SFW_BUTTON_HPP_

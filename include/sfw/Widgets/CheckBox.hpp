@@ -38,7 +38,7 @@ private:
 	void draw(const gfx::RenderContext& ctx) const override;
 
 	// Callbacks
-	void onStateChanged(WidgetState state) override;
+	void onActivationChanged(ActivationState state) override;
 	void onThemeChanged() override;
 	void onMouseReleased(float x, float y) override;
 	void onKeyPressed(const sf::Event::KeyEvent& key) override;

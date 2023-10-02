@@ -577,7 +577,7 @@ void TextBox::onMouseReleased(float, float)
 
 void TextBox::onMouseMoved(float x, float)
 {
-	if (getState() != WidgetState::Focused)
+	if (getActivationState() != ActivationState::Focused)
 		return;
 
 	// Go to char at mouse, starting/extending selection
@@ -622,12 +622,12 @@ void TextBox::onTextEntered(char32_t unichar)
 }
 
 
-void TextBox::onStateChanged(WidgetState state)
+void TextBox::onActivationChanged(ActivationState state)
 {
 	m_box.applyState(state);
 
 	// Discard selection when focus is lost
-	if (state != WidgetState::Focused)
+	if (state != ActivationState::Focused)
 	{
 		clear_selection();
 	}

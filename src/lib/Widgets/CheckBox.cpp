@@ -52,7 +52,7 @@ void CheckBox::draw(const gfx::RenderContext& ctx) const
 
 // callbacks -------------------------------------------------------------------
 
-void CheckBox::onStateChanged(WidgetState state)
+void CheckBox::onActivationChanged(ActivationState state)
 {
 	m_box.applyState(state);
 }

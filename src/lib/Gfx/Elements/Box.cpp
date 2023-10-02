@@ -12,9 +12,9 @@ namespace sfw
 
 Box::Box(Type type):
     m_type(type),
-    m_state(WidgetState::Pressed)
+    m_activationState(ActivationState::Pressed)
 {
-    applyState(WidgetState::Default);
+    applyState(ActivationState::Default);
 }
 
 // Geometry --------------------------------------------------------------------
@@ -80,12 +80,12 @@ void Box::setFillColor(sf::Color color)
 
 void Box::press()
 {
-    applyState(WidgetState::Pressed);
+    applyState(ActivationState::Pressed);
 }
 
 void Box::release()
 {
-    applyState(WidgetState::Default);
+    applyState(ActivationState::Default);
 }
 
 
@@ -128,9 +128,9 @@ void Box::setSegmentTextureCoords(StripSegment n, float txleft, float txtop, flo
 
 // Visual properties -----------------------------------------------------------
 
-void Box::applyState(WidgetState state)
+void Box::applyState(ActivationState state)
 {
-    if (state == m_state || (state == WidgetState::Hovered && m_state == WidgetState::Focused))
+    if (state == m_activationState || (state == ActivationState::Hovered && m_activationState == ActivationState::Focused))
         return;
 
     sf::FloatRect subrect = (sf::FloatRect)Theme::getTextureRect(m_type, state);
@@ -142,15 +142,15 @@ void Box::applyState(WidgetState state)
     setSegmentTextureCoords(MIDDLE_SEGMENT, x, y + height, width, height);
     setSegmentTextureCoords(BOTTOM_SEGMENT, x, y + height * 2, width, height);
 
-    if (m_state == WidgetState::Pressed) // Any state change happens to cancel the "Pressed" state!
+    if (m_activationState == ActivationState::Pressed) // Any state change happens to cancel the "Pressed" state!
     {
         onRelease();
     }
-    else if (state == WidgetState::Pressed)
+    else if (state == ActivationState::Pressed)
     {
         onPress();
     }
-    m_state = state;
+    m_activationState = state;
 }
 
 

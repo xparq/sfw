@@ -1,7 +1,7 @@
-#ifndef GUI_BOX_HPP
-#define GUI_BOX_HPP
+#ifndef _SFW_BOX_HPP_
+#define _SFW_BOX_HPP_
 
 #include "sfw/Gfx/backend.hpp"
 #include GFX_BACKEND_SPECIFIC(Box.hpp)
 
-#endif // GUI_BOX_HPP
+#endif // _SFW_BOX_HPP_

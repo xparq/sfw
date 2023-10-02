@@ -1,8 +1,8 @@
-﻿#ifndef SFW_WALLPAPER_HPP
-#define SFW_WALLPAPER_HPP
+#ifndef _SFW_WALLPAPER_HPP_
+#define _SFW_WALLPAPER_HPP_
 
 #include "sfw/Gfx/Render.hpp"
-#include "sfw/WidgetState.hpp"
+#include "sfw/ActivationState.hpp"
 
 #include <string>
 
@@ -40,12 +40,12 @@ public:
 	};
 //	using GenericWallpaper::Placement;
 
-	void disable() { state = WidgetState::Disabled; }
-	void enable()  { state = WidgetState::Default; }
-	operator bool() const { return state == WidgetState::Default; }
+	void disable() { state = ActivationState::Disabled; }
+	void enable()  { state = ActivationState::Default; }
+	operator bool() const { return state == ActivationState::Default; }
 
 private:
-	WidgetState state = WidgetState::Default;
+	ActivationState state = ActivationState::Default;
 };
 
 } // namespace
@@ -53,4 +53,4 @@ private:
 #include "sfw/Gfx/backend.hpp"
 #include GFX_BACKEND_SPECIFIC(Wallpaper.hpp)
 
-#endif // SFW_WALLPAPER_HPP
+#endif // _SFW_WALLPAPER_HPP_

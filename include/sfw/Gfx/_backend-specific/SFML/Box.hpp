@@ -1,7 +1,7 @@
-#ifndef GUI_BOX_SFML_HPP
-#define GUI_BOX_SFML_HPP
+#ifndef _SFW_BOX_SFML_HPP_
+#define _SFW_BOX_SFML_HPP_
 
-#include "sfw/WidgetState.hpp"
+#include "sfw/ActivationState.hpp"
 
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/Vertex.hpp>
@@ -61,7 +61,7 @@ public:
      */
     bool contains(float x, float y) const;
 
-    void applyState(WidgetState state);
+    void applyState(ActivationState state);
 
     template <class T>
     void centerItem(T& item)
@@ -129,11 +129,11 @@ private:
     void setSegmentTextureCoords(StripSegment n, float txleft, float txtop, float txwidth, float txheight);
 
 
-    WidgetState m_state;
+    ActivationState m_activationState;
     sf::Vertex m_vertices[VERTEX_COUNT];
     std::optional<sf::Color> m_fillColor;
 };
 
 } // namespace
 
-#endif // GUI_BOX_SFML_HPP
+#endif // _SFW_BOX_SFML_HPP_

@@ -1,5 +1,5 @@
-#ifndef GUI_TEXTBOX_HPP
-#define GUI_TEXTBOX_HPP
+#ifndef _SFW_TEXTBOX_HPP_
+#define _SFW_TEXTBOX_HPP_
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
@@ -104,7 +104,7 @@ private:
 	void onMouseMoved(float x, float y) override;
 	void onMouseWheelMoved(int delta) override;
 	void onTextEntered(char32_t unichar) override;
-	void onStateChanged(WidgetState state) override;
+	void onActivationChanged(ActivationState state) override;
 	void onThemeChanged() override;
 
 	// Config:
@@ -138,4 +138,4 @@ private:
 
 } // namespace
 
-#endif // GUI_TEXTBOX_HPP
+#endif // _SFW_TEXTBOX_HPP_

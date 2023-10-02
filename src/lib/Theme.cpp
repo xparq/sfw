@@ -139,24 +139,24 @@ const sf::Texture& Theme::getTexture()
 }
 
 
-const sf::IntRect& Theme::getTextureRect(Box::Type type, WidgetState state)
+const sf::IntRect& Theme::getTextureRect(Box::Type type, ActivationState state)
 {
 	TextureID id(BOX_DEFAULT);
 	switch (state)
 	{
-	case WidgetState::Default:
+	case ActivationState::Default:
 		id = type == Box::Click ? BOX_DEFAULT : BOX_INPUT_DEFAULT;
 		break;
-	case WidgetState::Hovered:
+	case ActivationState::Hovered:
 		id = type == Box::Click ? BOX_HOVERED : BOX_INPUT_DEFAULT;
 		break;
-	case WidgetState::Pressed:
+	case ActivationState::Pressed:
 		id = type == Box::Click ? BOX_PRESSED : BOX_INPUT_FOCUSED;
 		break;
-	case WidgetState::Focused:
+	case ActivationState::Focused:
 		id = type == Box::Click ? BOX_FOCUSED : BOX_INPUT_FOCUSED;
 		break;
-	case WidgetState::Disabled:
+	case ActivationState::Disabled:
 		id = type == Box::Click ? BOX_DEFAULT : BOX_INPUT_DEFAULT;
 		break;
 	}

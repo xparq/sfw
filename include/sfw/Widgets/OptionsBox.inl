@@ -169,14 +169,14 @@ template <class T> void OptionsBox<T>::update_arrow_pressed_state(ItemBox<Arrow>
 {
 	if (arrow.contains(x, y))
 	{
-		if (this->getState() == WidgetState::Pressed) // See comment at the class def., why this->...
+		if (this->getActivationState() == ActivationState::Pressed) // See comment at the class def., why this->...
 			arrow.press();
 		else
-			arrow.applyState(WidgetState::Hovered);
+			arrow.applyState(ActivationState::Hovered);
 	}
 	else
 	{
-		arrow.applyState(this->focused() ? WidgetState::Focused : WidgetState::Default); // See comment at the class def., why this->...
+		arrow.applyState(this->focused() ? ActivationState::Focused : ActivationState::Default); // See comment at the class def., why this->...
 	}
 }
 
@@ -227,10 +227,10 @@ template <class T> void OptionsBox<T>::onThemeChanged()
 }
 
 
-template <class T> void OptionsBox<T>::onStateChanged(WidgetState state)
+template <class T> void OptionsBox<T>::onActivationChanged(ActivationState state)
 {
 	// Hovered state is handled in the onMouseMoved callback
-	if (state == WidgetState::Default || state == WidgetState::Focused)
+	if (state == ActivationState::Default || state == ActivationState::Focused)
 	{
 		m_arrowLeft.applyState(state);
 		m_arrowRight.applyState(state);

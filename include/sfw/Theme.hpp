@@ -1,5 +1,5 @@
-#ifndef _GUI_THEME_HPP_
-#define _GUI_THEME_HPP_
+#ifndef _SFW_THEME_HPP_
+#define _SFW_THEME_HPP_
 
 #include "sfw/Gfx/Elements/Box.hpp"
 #include "sfw/Gfx/Elements/Wallpaper.hpp"
@@ -59,7 +59,7 @@ public:
 	// Load & access (parts of) the GUI spritesheet
 	static bool loadTexture(const std::string& path);
 	static const sf::Texture& getTexture();
-	static const sf::IntRect& getTextureRect(Box::Type type, WidgetState state);
+	static const sf::IntRect& getTextureRect(Box::Type type, ActivationState state);
 
 		// Convenience helpers:
 		static const sf::IntRect& getCheckMarkTextureRect();
@@ -128,4 +128,4 @@ private:
 
 } // namsepace
 
-#endif // _GUI_THEME_HPP_
+#endif // _SFW_THEME_HPP_

@@ -117,23 +117,23 @@ void ImageButton::draw(const gfx::RenderContext& ctx) const
 
 // Callbacks -------------------------------------------------------------------
 
-void ImageButton::onStateChanged(WidgetState state)
+void ImageButton::onActivationChanged(ActivationState state)
 {
 	sf::Vector2i size(m_background.getTexture().getSize().x,
 	                  m_background.getTexture().getSize().y / 3);
 	switch (state)
 	{
-	case WidgetState::Default:
+	case ActivationState::Default:
 		m_background.setTextureRect(sf::IntRect({0, 0}, {size.x, size.y}));
 		break;
-	case WidgetState::Hovered:
+	case ActivationState::Hovered:
 		m_background.setTextureRect(sf::IntRect({0, size.y}, {size.x, size.y}));
 		break;
-	case WidgetState::Pressed:
-	case WidgetState::Focused:
+	case ActivationState::Pressed:
+	case ActivationState::Focused:
 		m_background.setTextureRect(sf::IntRect({0, size.y * 2}, {size.x, size.y}));
 		break;
-	case WidgetState::Disabled:
+	case ActivationState::Disabled:
 		break;
 	}
 }
