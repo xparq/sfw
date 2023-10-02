@@ -31,7 +31,7 @@ int main()
 	// Setting up the GUI...
 
 	// Just to spare some noise & typing...
-	using sfw::Theme, sfw::hex2color, sfw::VBox, sfw::HBox, sfw::Form;
+	using sfw::Theme, sfw::Color, sfw::VBox, sfw::HBox, sfw::Form;
 	using OBColor = sfw::OptionsBox<sf::Color>;
 
 	// Customizing some theme props. (optional)
@@ -40,36 +40,36 @@ int main()
 //	Theme::DEFAULT.fontFile = "font/Vera.ttf"; // relative to basePath
 
 	Theme::PADDING = 2.f;
-	Theme::click.textColor      = hex2color("#191B18");
-	Theme::click.textColorHover = hex2color("#191B18");
-	Theme::click.textColorFocus = hex2color("#000");
-	Theme::input.textColor = hex2color("#000");
-	Theme::input.textColorHover = hex2color("#000");
-	Theme::input.textColorFocus = hex2color("#000");
-	Theme::input.textColorDisabled = hex2color("#888");
-	Theme::input.textSelectionColor = hex2color("#b0c0c0");
-	Theme::input.textPlaceholderColor = hex2color("#8791AD");
+	Theme::click.textColor      = Color("#191B18");
+	Theme::click.textColorHover = Color("#191B18");
+	Theme::click.textColorFocus = Color("#000");
+	Theme::input.textColor = Color("#000");
+	Theme::input.textColorHover = Color("#000");
+	Theme::input.textColorFocus = Color("#000");
+	Theme::input.textColorDisabled = Color("#888");
+	Theme::input.textSelectionColor = Color("#b0c0c0");
+	Theme::input.textPlaceholderColor = Color("#8791AD");
 
 	// Prepare some dynamically switchable theme config "quick packs" to play with...
 
 	// Raw C++ init lists (with rigid positions):
 	Theme::Cfg themes[] = {
-		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
+		{ "Baseline", "demo/", "texture-sfw-baseline.png", Color("#e6e8e0"),
 		  sfw::Wallpaper::Cfg{"demo/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,255,255,63)},
 		  17, "font/LiberationSans-Regular.ttf" },
-		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
-		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
-		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), {}, 12, "font/Vera.ttf", /*.multiTooltips =*/ true },
+		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  Color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
+		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", Color("#dddbde"), {}, 12, "font/Vera.ttf" },
+		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   Color("#d4d0c8"), {}, 12, "font/Vera.ttf", /*.multiTooltips =*/ true },
 		{ "factory default" },
 	};
 /*	// More flexible (but also more cumbersome) with std::map:
 	Theme::Cfg themes[] = {
 		{ {"name", "Baseline"}, {"base_path", "demo/"}, {"textures", "texture-sfw-baseline.png"},
-		       {"bg_color", {hex2color("#e6e8e0")}, {"wallpaper", {"asset/wallpaper.jpg", sfw::Wallpaper::Center, #ffffff3f}},
+		       {"bg_color", {Color("#e6e8e0")}, {"wallpaper", {"asset/wallpaper.jpg", sfw::Wallpaper::Center, #ffffff3f}},
 		       {"default_font", {"font/Liberation/LiberationSans-Regular.ttf", 17} },
-		{ {"name", "Classic ☺"},              {"base_path", "demo/"}, {"textures", "texture-sfw-classic.png"}, {"bg_color", hex2color("#e6e8e0")}, {"default_font", {"font/Liberation/LiberationSans-Regular.ttf", 12}} },
-		{ {"name", "sfml-widgets's default"}, {"base_path", "demo/"}, {"textures", "texture-sfmlwidgets-default.png"}, {"bg_color", hex2color("#dddbde")}, {"default_font", 12} },
-		{ {"name", "sfml-widgets's Win98"},   {"base_path", "demo/"}, {"textures", "texture-sfmlwidgets-win98.png"}, {"bg_color", hex2color("#d4d0c8")},   {"default_font", 12} },
+		{ {"name", "Classic ☺"},              {"base_path", "demo/"}, {"textures", "texture-sfw-classic.png"}, {"bg_color", Color("#e6e8e0")}, {"default_font", {"font/Liberation/LiberationSans-Regular.ttf", 12}} },
+		{ {"name", "sfml-widgets's default"}, {"base_path", "demo/"}, {"textures", "texture-sfmlwidgets-default.png"}, {"bg_color", Color("#dddbde")}, {"default_font", 12} },
+		{ {"name", "sfml-widgets's Win98"},   {"base_path", "demo/"}, {"textures", "texture-sfmlwidgets-win98.png"}, {"bg_color", Color("#d4d0c8")},   {"default_font", 12} },
 		{ {"name", "factory default"} },
 	};
 *//*	// Ultimately, parsed:
@@ -233,7 +233,7 @@ int main()
 		->add("White", sf::Color::White)
 	;
 
-	// Select smple text color
+	// Select sample text color
 	auto optTxtColor = (new OBColor(ColorSelect_TEMPLATE))
 		->setCallback([&](auto* w) {
 			text.setFillColor(w->current());
@@ -292,7 +292,7 @@ int main()
 			->setTextSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
-			->setTextColor(hex2color("#d0e0c0"))
+			->setTextColor(Color("#d0e0c0"))
 			->setCallback([]/*(auto* w)*/ { toy_anim_on = false; });
 	}
 

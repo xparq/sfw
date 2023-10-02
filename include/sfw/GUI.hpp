@@ -1,5 +1,5 @@
-#ifndef GUI_ALL_HPP
-#define GUI_ALL_HPP
+#ifndef _GUI_ALL_HPP_
+#define _GUI_ALL_HPP_
 
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
@@ -24,6 +24,6 @@
 #include "sfw/Layouts/Form.hpp"
 
 // Misc
-#include "sfw/util/hex2color.hpp"
+#include "sfw/Gfx/Color.hpp" // Likely included by the others, though...
 
-#endif // GUI_ALL_HPP
+#endif // _GUI_ALL_HPP_

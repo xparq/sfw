@@ -1,5 +1,5 @@
-#ifndef GUI_THEME_HPP
-#define GUI_THEME_HPP
+#ifndef _GUI_THEME_HPP_
+#define _GUI_THEME_HPP_
 
 #include "sfw/Gfx/Elements/Box.hpp"
 #include "sfw/Gfx/Elements/Wallpaper.hpp"
@@ -28,7 +28,7 @@ public:
 	{
 		// Note: the ordering is optimized for init lists like
 		//
-		//  { "asset/custom", "MyClassic", "mytextures.png", hex2color("#e6e8e0"), 12, "font/MyFont.ttf" }
+		//  { "asset/custom", "MyClassic", "mytextures.png", Color("#e6e8e0"), 12, "font/MyFont.ttf" }
 		//
 		// Note: these are not "defaults" here, but "unset" markers (and/or diagnostic sentinels)
 		// (except when the type doesn't allow such "off-band" values; then it's indeed a default).
@@ -128,4 +128,4 @@ private:
 
 } // namsepace
 
-#endif // GUI_THEME_HPP
+#endif // _GUI_THEME_HPP_

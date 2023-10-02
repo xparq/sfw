@@ -37,24 +37,24 @@ int main()
 //	Theme::DEFAULT.fontFile = "font/Vera.ttf"; // relative to basePath!
 
 	Theme::PADDING = 2.f;
-	Theme::click.textColor      = hex2color("#191B18");
-	Theme::click.textColorHover = hex2color("#191B18");
-	Theme::click.textColorFocus = hex2color("#000");
-	Theme::input.textColor = hex2color("#000");
-	Theme::input.textColorHover = hex2color("#000");
-	Theme::input.textColorFocus = hex2color("#000");
-	Theme::input.textColorDisabled = hex2color("#888");
-	Theme::input.textSelectionColor = hex2color("#97b1AD");
-	Theme::input.textPlaceholderColor = hex2color("#8791AD");
+	Theme::click.textColor      = Color("#191B18");
+	Theme::click.textColorHover = Color("#191B18");
+	Theme::click.textColorFocus = Color("#000");
+	Theme::input.textColor = Color("#000");
+	Theme::input.textColorHover = Color("#000");
+	Theme::input.textColorFocus = Color("#000");
+	Theme::input.textColorDisabled = Color("#888");
+	Theme::input.textSelectionColor = Color("#97b1AD");
+	Theme::input.textPlaceholderColor = Color("#8791AD");
 
 	// Some dynamically switcahble theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
-		{ "Baseline", "demo/", "texture-sfw-baseline.png", hex2color("#e6e8e0"),
+		{ "Baseline", "demo/", "texture-sfw-baseline.png", Color("#e6e8e0"),
 		  Wallpaper::Cfg("demo/wallpaper.jpg", Wallpaper::Center, sf::Color(255,25,25,20)),
 		  11, "font/LiberationSans-Regular.ttf" },
-		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  hex2color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
-		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", hex2color("#dddbde"), {}, 12, "font/Vera.ttf" },
-		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   hex2color("#d4d0c8"), {}, 12, "font/Vera.ttf" },
+		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  Color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
+		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", Color("#dddbde"), {}, 12, "font/Vera.ttf" },
+		{ "sfml-widgets's Win98",   "demo/", "texture-sfmlwidgets-win98.png",   Color("#d4d0c8"), {}, 12, "font/Vera.ttf" },
 		{ "\"factory default\"", },
 	};
 	const size_t DEFAULT_THEME = 0;
@@ -125,14 +125,14 @@ int main()
 	issues_2->add(new TextBox)->setPlaceholder("#174: std áéíÓÖŐ");
 
 	auto issues_3 = test_hbox->add(new Form);
-	// #333: hex2color with alpha
-	issues_3->add("Shouldn't chg. (no α vs ff):");
-	issues_3->add("#333 h2c(α)", CheckBox([](auto* w){ Theme::bgColor =
-		w->checked() ? hex2color("#ff5566") : hex2color("#ff5566ff"); }));
-	issues_3->add("Should change (α = 0 vs 80):");
-	issues_3->add("#333 h2c(α)", CheckBox([](auto* w){ Theme::bgColor =
-		w->checked() ? hex2color("#ff556600") : hex2color("#ff556680"); }));
-	issues_3->add("", new Label("right-side content"));
+	// #333: Color() with alpha, #335: Form separator lines
+	issues_3->add("Shouldn't chg. (no α vs ff):"); // #335 sep. line
+	issues_3->add("#333 h2c(α)", CheckBox([](auto* w){
+		Theme::bgColor = Color(w->checked() ? "#ff5566" :"#ff5566ff"); }));
+	issues_3->add("Should change (α = 0 vs 80):"); // #335 sep. line
+	issues_3->add("#333 h2c(α)", CheckBox([](auto* w){
+		Theme::bgColor = Color(w->checked() ? "#ff556600" : "#ff556680"); }));
+	issues_3->add("", new Label("#335: empty label OK")); // Still on the right side?
 
 
 	demo.add(new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
@@ -371,7 +371,7 @@ int main()
 			->setTextSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
-			->setTextColor(hex2color("#d0e0c0"))
+			->setTextColor(Color("#d0e0c0"))
 			->setCallback([]/*(auto* w)*/ { toy_anim_on = false; });
 	}
 

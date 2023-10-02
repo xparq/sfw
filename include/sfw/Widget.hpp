@@ -46,7 +46,7 @@ public:
 	Widget* setPosition(float x, float y);
 	const sf::Vector2f& getPosition() const; //!!?? Should just return Vector2f by val.?
 
- 	// Don't use these, unless absolutely necessary & signed the waiver!...
+	// Don't use these, unless absolutely necessary & signed the waiver!...
 	// (They trigger reflow, so might cause infinite loops if called nonchalantly.)
 	// Widget sizing is fully automatic anyway.
 	Widget* setSize(const sf::Vector2f& size);

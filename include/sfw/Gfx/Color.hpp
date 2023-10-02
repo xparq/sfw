@@ -1,5 +1,5 @@
-#ifndef SFW_COLOR_HPP
-#define SFW_COLOR_HPP
+#ifndef _SFW_COLOR_HPP_
+#define _SFW_COLOR_HPP_
 
 #include <cstdint>
 #include <string>
@@ -12,7 +12,7 @@
 
 namespace sfw {
 
-inline sf::Color hex2color(const std::string& hexcolor)
+inline sf::Color Color(const std::string& hexcolor)
 {
 	assert(hexcolor.size() == 7 || hexcolor.size() == 4 || hexcolor.size() == 9 || hexcolor.size() == 5);
 	assert(hexcolor[0] == '#');
@@ -44,14 +44,14 @@ inline sf::Color hex2color(const std::string& hexcolor)
 		color.b = CCOMP(hexcolor, 2, 1) * 17;
 		color.a = CCOMP(hexcolor, 3, 1) * 17;
 		break;
-	default:;		
-	}	
+	default:;
+	}
 #undef CCOMP
 
 	return color;
 }
 
-/*!! Move to Gfx, generalize, make it versatile!
+/*!! Generalize, make it versatile etc.!
 
 struct Color //!!?? or: RGBAColor : Color
 {
@@ -103,7 +103,7 @@ struct Color //!!?? or: RGBAColor : Color
 			color.r = (uint8_t)strtoul(csshexcolor.substr(1, 1).c_str(), nullptr, 16) * 17;
 			color.g = (uint8_t)strtoul(csshexcolor.substr(2, 1).c_str(), nullptr, 16) * 17;
 			color.b = (uint8_t)strtoul(csshexcolor.substr(3, 1).c_str(), nullptr, 16) * 17;
-				color.a = (len == 5) ? (uint8_t)strtoul(csshexcolor.substr(4, 1).c_str(), nullptr, 16) * 17 : Opaque;
+			color.a = (len == 5) ? (uint8_t)strtoul(csshexcolor.substr(4, 1).c_str(), nullptr, 16) * 17 : Opaque;
 		}
 		else
 		{
@@ -132,4 +132,4 @@ struct Color //!!?? or: RGBAColor : Color
 
 } // namespace
 
-#endif // SFW_COLOR_HPP
+#endif // _SFW_COLOR_HPP_
