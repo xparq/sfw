@@ -62,7 +62,8 @@ int main()
 
 	//--------------------------------------------------------------------
 	// Creating the main GUI controller:
-	GUI demo(window, themes[DEFAULT_THEME], false);
+	GUI demo(window, themes[DEFAULT_THEME],
+		false); // <- Don't manage the window (e.g. don't .clear() it, only the GUI rect)!
 	if (!demo) {
 		return EXIT_FAILURE; // Errors have already been printed to cerr.
 	}
@@ -125,10 +126,10 @@ int main()
 
 	auto issues_3 = test_hbox->add(new Form);
 	// #333: hex2color with alpha
-	issues_3->add("Shouldn't chg.:");
+	issues_3->add("Shouldn't chg. (no α vs ff):");
 	issues_3->add("#333 h2c(α)", CheckBox([](auto* w){ Theme::bgColor =
 		w->checked() ? hex2color("#ff5566") : hex2color("#ff5566ff"); }));
-	issues_3->add("Should change (α 0 vs 80):");
+	issues_3->add("Should change (α = 0 vs 80):");
 	issues_3->add("#333 h2c(α)", CheckBox([](auto* w){ Theme::bgColor =
 		w->checked() ? hex2color("#ff556600") : hex2color("#ff556680"); }));
 	issues_3->add("", new Label("right-side content"));
@@ -533,6 +534,12 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	// The event loop
 	while (window.isOpen())
 	{
+		// Draw this first to confirm a translucent GUI bg works:
+		sf::CircleShape s{100};
+		s.setPosition({400, 300});
+		s.setFillColor(sf::Color::Cyan);
+		window.draw(s);
+
 		demo.render();
 		window.display();
 
