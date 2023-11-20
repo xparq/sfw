@@ -341,7 +341,7 @@ mk_main_lib_rule_inc:
 # And this crap is separated here only because echo can't echo TABs:
 	@type << >> $(mainlib_rule_inc)
 	@echo Creating lib: $$@...
-	lib -nologo -out:$$@ $$**
+	lib -nologo -nodefaultlib -out:$$@ $$**
 <<
 !else
 mk_main_lib_rule_inc:
