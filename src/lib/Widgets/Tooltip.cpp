@@ -71,11 +71,11 @@ void Tooltip::show()
 //DEBUG:		setPosition(m_mouseLastPos);
 		auto adjpos = m_mouseLastPos; adjpos. -= m_owner->getAbsolutePosition();
 		m_mouseLastPos -= m_owner->getAbsolutePosition();//!!?? Why is this off?
-cerr << "GUI.MOUSE POS:" << m_mouseLastPos.x << ", " << m_mouseLastPos.y << endl;
-cerr << " - Parent:" << m_owner->getPosition().x << ", " << m_owner->getPosition().y << endl;
-cerr << " - P. ABS:" << m_owner->getAbsolutePosition().x << ", " << m_owner->getAbsolutePosition().y << endl;
-cerr << "- Tooltip's 'relative' MOUSE POS:" << adjpos.x << ", " << adjpos.y << endl;
-//cerr << " - W. TR.:" << m_owner->getPosition().x << ", " << m_owner->getAbsolutePosition().y << endl;
+cerr << "GUI.MOUSE POS:" << m_mouseLastPos.x << ", " << m_mouseLastPos.y << "\n";
+cerr << " - Parent:" << m_owner->getPosition().x << ", " << m_owner->getPosition().y << "\n";
+cerr << " - P. ABS:" << m_owner->getAbsolutePosition().x << ", " << m_owner->getAbsolutePosition().y << "\n";
+cerr << "- Tooltip's 'relative' MOUSE POS:" << adjpos.x << ", " << adjpos.y << "\n";
+//cerr << " - W. TR.:" << m_owner->getPosition().x << ", " << m_owner->getAbsolutePosition().y << "\n";
 !!*/
 		setState(Showing);
 	}
@@ -132,7 +132,7 @@ void Tooltip::initView()
 	auto pos = gM - wA;
 		//!! -> #312
 		pos += gui->getAbsolutePosition();
-//cerr << "LOCAL MOUSE [Tooltip]: " << m.x << ", " << m.y << endl;
+//cerr << "LOCAL MOUSE [Tooltip]: " << m.x << ", " << m.y << "\n";
 
 	pos += offset;
 
@@ -153,18 +153,20 @@ void Tooltip::initView()
 	//!!!!
 	//!!!!---------------------------------------------------------------------------------
 
-
-//cerr << "abspos bottom y: " << abspos.y + size.y << ", abspos x: " << abspos.x << endl;//gui->getSize().y << "\n";
-//cerr << "- size x: " << size.x << ", y: " << size.y << endl;
-//cerr << "- gui.size.x: " << gui->getSize().x << endl;
+//std::cerr << "abspos bottom y: " << abspos.y + size.y << ", abspos x: " << abspos.x << "\n";//gui->getSize().y << "\n";
+//cerr << "- size x: " << size.x << ", y: " << size.y << "\n";
+//cerr << "- gui.size.x: " << gui->getSize().x << "\n";
 	if (abspos.y + size.y > gui->getSize().y)
 	{
 		setPosition({pos.x, getPosition().y -2 * offset.y});
 	}
 	if (abspos.x + size.x > gui->getSize().x)
 	{
-//cerr << "FIX X!\n";
 		setPosition({getPosition().x - size.x, pos.y});
+		if (getPosition().x < 0)
+		{
+			setPosition({0, pos.y});
+		}
 	}
 
 	m_box.size = size;
