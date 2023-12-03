@@ -21,6 +21,16 @@ else
 TOOLCHAIN ?= mingw
 endif
 
+
+#=============================================================================
+# Workaround for #346
+ifeq "$(CC)" "clang++"
+GHA_OLD_CLANG_WORKAROUND := -stdlib=libc++
+endif
+#=============================================================================
+
+
+
 # Use `make SFML_DIR=...` to override:
 SFML_DIR  ?= extern/sfml/$(TOOLCHAIN)
 
@@ -50,7 +60,7 @@ TEST_OBJ       := test/main
 SMOKE_TEST_OBJ := test/smoke
           
 CC        := g++
-CFLAGS    := -I$(SFML_DIR)/include -I./include -std=c++20 -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
+CFLAGS    := -I$(SFML_DIR)/include -I./include -std=c++20 $(GHA_OLD_CLANG_WORKAROUND) -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
 LDFLAGS   := $(LDFLAGS) -L$(SFML_DIR)/lib
 #!! This may also be needed on Debian (not on Ubuntu) -- but just compiled it on my WSL Bullseye without it, so WTF?? --:
 #!! LDFLAGS   := -pthread $(LDFLAGS)
