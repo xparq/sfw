@@ -92,6 +92,12 @@ void GUI::close()
 }
 
 //----------------------------------------------------------------------------
+bool GUI::closed()
+{
+	return m_closed;
+}
+
+//----------------------------------------------------------------------------
 bool GUI::process(const sf::Event& event)
 {
 	thread_local bool event_processing_started = false;
@@ -236,7 +242,7 @@ void GUI::renderBackground() //!!Move this to the renderer!
 	// The wallpaper is an overlay on top of the background color!
 	// (It would become apparent e.g. when trying to change the transparency
 	// of an existing one: it won't work without erasing the prev. first!)
-	if (m_wallpaper)
+	if (hasWallpaper())
 	{
 		m_window.draw(m_wallpaper); // Will (supposedly ;) ) only draw into the GUI rect!
 	}
@@ -444,7 +450,7 @@ void GUI::disableWallpaper()
 
 void GUI::setPosition(const sf::Vector2f& pos)
 {
-	if (m_wallpaper) m_wallpaper.setPosition(pos);
+	if (hasWallpaper()) m_wallpaper.setPosition(pos);
 	Widget::setPosition(pos);
 }
 
