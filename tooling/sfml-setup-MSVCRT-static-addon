@@ -1,0 +1,166 @@
+#!/bin/sh
+# MSVC only! Not using $PLATFORM from the GHA in this script.
+# A valid SFML package has to have been set up already at extern/sfml/msvc.
+# NOTE:	We are supposed to be in the repo's work-tree root. (And that seems
+#	to be the case when being run from a GH Action.)
+#!!
+#!! EVERYTHING'S HARDCODED!
+#!!
+#!! Target SFML lib location, dl. package name, dl. URL, target tmp dir,
+#!! `lib` subdirs, -s-s*.lib pattern, package layout etc...
+#!!
+
+# Tested with WSL bash and BusyBox-w32.
+#
+#! NOTE: BusyBox realpath can't do -Lms for symlinks as used in the companion
+#! `sfml-setup` script, which is meant to run on native Linux with GNU `realpath`
+#! to handle missing subdir parts of a symlink etc.
+#! But we're on Windows now, with SFML already set up, and BB only has to
+#! resolve a relative path, symlinked or not... -- which it can do just fine.
+#
+
+
+TARGET=msvc
+SFML_LIBROOT="extern/sfml/${TARGET}"
+SFML_LIBPACK_DOWNLOAD_URL_BASE="https://x1ab.github.io/download/SFML/3.0-pre/custom/"
+# There's only this one now:
+SFML_LIBPACK_FILE="vc17-64-staticCRT.zip"
+
+# Set this to 'yes' for overwriting existing target libs:
+OVERWRITE=${OVERWRITE:-no}
+
+
+main(){
+	if [ "${OVERWRITE}" != "yes" ]; then
+		echo "- NOTE: Not overwriting existing files."
+		MV="mv -n"
+	else
+		echo "- NOTE: Existing files *WILL BE OVERWRITTEN* silently!"
+		MV=mv
+	fi
+
+	# We need the abs. path as it's gonna be ref'ed from subdirs:
+	SFML_LIBROOT=`realpath ${SFML_LIBROOT}`
+
+	# If $SFML_LIBROOT doesn't exist, bail out...
+	if [ ! -d "$SFML_LIBROOT" ]; then
+		echo "- ERROR: '$SFML_LIBROOT' doesn't exist. Aborting."
+		return 1
+	fi
+
+	# If it doesn't look healthy, also bail out...
+	if [ ! -d "$SFML_LIBROOT/include/SFML" ] || [ ! -d "$SFML_LIBROOT/lib" ] ; then
+		echo "- ERROR: '$SFML_LIBROOT' doesn't look like a valid SFML package!"
+		echo "  Chickening out..."
+		return 2
+	fi
+
+	install
+	retc=$?
+	[ ! $retc -eq 0 ] && return $retc
+
+	return 0
+}
+
+install(){
+#
+# The caller ought to have checked already if the target dir is OK!
+#
+	#
+	echo Download...
+	#
+	_SFML_PACK_NAME="$SFML_LIBPACK_FILE"
+	_SFML_DOWNLOAD_URL="$SFML_LIBPACK_DOWNLOAD_URL_BASE/$_SFML_PACK_NAME"
+	# NOTE: pkg. layout: ./lib, ./include, ...
+
+	#!! Alas, we have nothing like a `setenv` wrapper (yet) to rely on...:
+	_SFML_DOWNLOAD_DIR="./tmp/${_SFML_PACK_NAME}.download.tmp"
+	if [ ! -d "$_SFML_DOWNLOAD_DIR" ]; then
+		echo "- NOTE: temp. download dir '$_SFML_DOWNLOAD_DIR' doesn't exist. Creating..."
+		mkdir -p "$_SFML_DOWNLOAD_DIR"
+	fi
+	if [ ! -d "$_SFML_DOWNLOAD_DIR" ]; then
+		echo "- ERROR: Couldn't create '$_SFML_DOWNLOAD_DIR'! Aborting."
+		return 3
+	fi
+
+	_SFML_DOWNLOADED_PACK="$_SFML_DOWNLOAD_DIR/$_SFML_PACK_NAME"
+
+	sudo apt install wget
+
+	#
+	# If the URL is being redirected via a HTML META REFRESH: bummer!...
+	# wget (or curl) doesn't support that! :-/
+	# So, we need to parse the file and follow the URL manually here... :-/
+	#
+	# Well, currently "parsing" means assuming this exact format, and awking the URL
+	# out of it using -F '=|"'...:
+	#
+	# <meta http-equiv="refresh" content="0; url=..." />
+	#
+	while [ ! -z "$_SFML_DOWNLOAD_URL" ]; do
+
+		echo Running: "wget -q -P \"$_SFML_DOWNLOAD_DIR\" \"$_SFML_DOWNLOAD_URL\" -O \"$_SFML_DOWNLOADED_PACK\""
+		               wget    -P  "$_SFML_DOWNLOAD_DIR"   "$_SFML_DOWNLOAD_URL"  -O  "$_SFML_DOWNLOADED_PACK"
+
+		if [ ! -e "$_SFML_DOWNLOADED_PACK" ]; then
+			echo "- ERROR: Failed to download package '$_SFML_DOWNLOAD_URL'."
+			return 4
+		fi
+
+		unset url
+		grep -iq '<meta http-equiv="refresh"' $_SFML_DOWNLOADED_PACK && \
+			url=`awk -F '=|"' -- '{print $7}' "$_SFML_DOWNLOADED_PACK"`
+		echo $url
+		_SFML_DOWNLOAD_URL=$url
+	done
+
+	#
+	echo Unpack...
+	#
+	# Goto the dl. dir for some ad-hoc poor man's sandboxing... ;)
+	cd "$_SFML_DOWNLOAD_DIR"
+	if [ ! $? -eq 0 ]; then
+	    echo "- ERROR: Failed to enter '"$_SFML_DOWNLOAD_DIR"' - not a dir?!"
+	    return 5
+	fi
+
+	# Only unpack the libs!
+	unzip `basename "$_SFML_DOWNLOADED_PACK"` *.lib
+		# I just couldn't find out a priori whether the GHA runner has unzip or not...
+		# I've read the relevant GitHub pages, googled, asked ChatGPT, read SO posts
+		# -- all inconclusive... Sigh. We'll see from the errors then. :-/
+
+	if [ ! $? -eq 0 ]; then
+		echo "- ERROR: Failed to unpack '$_SFML_DOWNLOADED_PACK'."
+		return 6
+	fi
+
+	#
+	echo Move the addon libs to $SFML_LIBROOT...
+	#
+	if [ $? -eq 0 ] && [ -e "$SFML_LIBROOT/lib" ] && [ -e "$SFML_LIBROOT/include" ]; then
+		${MV} lib/*-s-s*.lib $SFML_LIBROOT/lib/
+		if [ ! $? -eq 0 ]; then
+			echo "- ERROR: Failed to move content to '$SFML_LIBROOT/lib/'! Aborting."
+			return 7
+		fi
+	else
+		echo "- ERROR: Unexpected SFML dir layout ($SFML_LIBROOT)"
+		echo "  No 'lib' or 'include' subdirs!"
+		return 8
+	fi
+
+	return 0
+}
+
+#-----------------------------------------------------------------------------
+dirsave=`pwd`
+main
+retc=$?
+cd $dirsave
+if [ $? -ne 0 ]; then
+	echo "- ERROR: SFML addon-libs setup failed!"
+	exit 1
+fi
+exit 0

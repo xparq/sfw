@@ -3,27 +3,27 @@
 ####
 #### BEWARE! Uses recursive NMAKE invocations, so update the macro below if
 #### you rename this file:
-THIS_MAKEFILE=Makefile.msvc
+THIS_MAKEFILE = Makefile.msvc
 
-TOOLCHAIN=msvc
+TOOLCHAIN = msvc
 
 #-----------------------------------------------------------------------------
 # Config - Project layout
 #-----------------------------------------------------------------------------
-PRJ_NAME=sfw
+PRJ_NAME = sfw
 # Use the lower-case (processed) dir macros for the targets!
-main_lib=$(lib_dir)/$(PRJ_NAME)$(buildmode_file_suffix).lib
-main_exe=$(exe_dir)/$(PRJ_NAME)-demo$(buildmode_file_suffix).exe
-smoke_test_exe=./test/smoke.exe
-test_exe=./test/main$(buildmode_file_suffix).exe
+main_lib = $(lib_dir)/$(PRJ_NAME)$(buildmode_file_suffix).lib
+main_exe = $(exe_dir)/$(PRJ_NAME)-demo$(buildmode_file_suffix).exe
+smoke_test_exe = ./test/smoke.exe
+test_exe = ./test/main$(buildmode_file_suffix).exe
 #test_exe=$(exe_dir)/$(PRJ_NAME)-test$(buildmode_file_suffix).exe
 BUILD = $(main_lib) $(main_exe) $(test_exe) $(smoke_test_exe)
 
-SRC_DIR=src
-OUT_DIR=tmp/build/$(TOOLCHAIN)
-LIB_DIR=lib/$(TOOLCHAIN)
-EXE_DIR=
-OBJ_DIR=$(OUT_DIR)/obj
+SRC_DIR = src
+OUT_DIR = tmp/build/$(TOOLCHAIN)
+LIB_DIR = lib/$(TOOLCHAIN)
+EXE_DIR =
+OBJ_DIR = $(OUT_DIR)/obj
 CXX_MOD_IFC_DIR=$(OUT_DIR)/ifc
 # Put (only) these into the lib (relative to SRC_DIR; leave it empty for "all"):
 LIB_SRC_SUBDIR=lib
@@ -51,7 +51,7 @@ EXT_LIBS=$(sfml_and_deps_libs)
 # Build alternatives (override from the command-line, too, if needed):
 DEBUG=0
 # CRT=dll is always the case with the pre-built SFML libs, so not use changing it!
-CRT=dll
+CRT=static
 SFML=static
 # Custom build options need to be passed along for recursion explicitly:
 custom_build_options = SFML=$(SFML)
@@ -61,12 +61,19 @@ CFLAGS=-W4 -Iinclude
 
 # Output dir/file suffixes for build alternatives
 SFML_linkmode=$(SFML)
-buildmode_dir_suffix=.sfml-$(SFML_linkmode)
-buildmode_debug_dir_suffix=.DEBUG
-buildmode_debug_file_suffix=-d
-# CRT=dll is always the case with the pre-built SFML libs, so not use marking that.
-buildmode_crtdll_dir_suffix=
-buildmode_crtdll_file_suffix=
+buildmode_dir_suffix=.$(SFML_linkmode)SFML
+#buildmode_file_suffix=-$(SFML_linkmode)SFML
+!if "$(SFML_linkmode)" == "dll"
+buildmode_file_suffix=-dllSFML
+!endif
+buildmode_debug_dir_suffix=.d
+buildmode_debug_file_suffix=d
+# NOTE: CRT=dll is always the case with the pre-built SFML libs, so changing that
+# would require custom-built static SFML libs!
+buildmode_crtdll_dir_suffix = -dllCRT
+buildmode_crtdll_file_suffix = -MD
+buildmode_crtstatic_dir_suffix = -staticCRT
+buildmode_crtstatic_file_suffix = -MT
 
 #-------------------------------------
 !if "$(SFML)" == "static"
@@ -76,19 +83,32 @@ CXXFLAGS=-std:c++latest
 # Note: C++ compilation would use $(CFLAGS), too.
 
 # Adapt the various flavors of the SFML libs (as per the debug/link modes)...
-sfml_libs_static=sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib
-sfml_libs_dll=sfml-graphics.lib sfml-window.lib sfml-system.lib
+_sfml_libs = sfml-graphics.lib sfml-window.lib sfml-system.lib
+#sfml_libs_static = sfml-graphics-s.lib sfml-window-s.lib sfml-system-s.lib
+#sfml_libs_dll    = sfml-graphics.lib sfml-window.lib sfml-system.lib
 !if "$(SFML)" == "static"
-sfml_libs=$(sfml_libs_static)
-sfml_and_deps_libs=$(sfml_libs) opengl32.lib freetype.lib\
+
+#sfml_libs = $(sfml_libs_static)
+sfml_libs = $(substi .lib,-s.lib,$(_sfml_libs))
+!if "$(CRT)" == "static"
+# Add another -s if also the CRT is static (as with my custom-built "SFML/MT"):
+sfml_libs = $(substi .lib,-s.lib,$(sfml_libs))
+!endif
+sfml_and_deps_libs = $(sfml_libs) opengl32.lib freetype.lib\
 	user32.lib kernel32.lib gdi32.lib winmm.lib advapi32.lib
+
 !else if "$(SFML)" == "dll"
-sfml_libs=$(sfml_libs_dll)
-sfml_and_deps_libs=$(sfml_libs) opengl32.lib
+
+CRT = dll
+
+sfml_libs = $(_sfml_libs)
+sfml_and_deps_libs = $(sfml_libs) opengl32.lib
+
 !endif
 
+# Add -d for the debug versions:
 !if defined(DEBUG) && $(DEBUG) == 1
-sfml_libs=$(substi .lib,-d.lib,$(sfml_libs))
+sfml_libs = $(substi .lib,-d.lib,$(sfml_libs))
 !endif
 
 
@@ -223,13 +243,16 @@ LINKFLAGS=$(_linkflags_debugmode) $(LINKFLAGS)
 # For the output dirs (currently only the obj. dir), and
 # for the output files (currently the lib/exe files)
 !if "$(CRT)" == "dll"
-buildmode_dir_suffix=$(buildmode_dir_suffix)$(buildmode_crtdll_dir_suffix)
-buildmode_file_suffix=$(buildmode_file_suffix)$(buildmode_crtdll_file_suffix)
+buildmode_dir_suffix  = $(buildmode_dir_suffix)$(buildmode_crtdll_dir_suffix)
+buildmode_file_suffix = $(buildmode_file_suffix)$(buildmode_crtdll_file_suffix)
+!else
+buildmode_dir_suffix  = $(buildmode_dir_suffix)$(buildmode_crtstatic_dir_suffix)
+buildmode_file_suffix = $(buildmode_file_suffix)$(buildmode_crtstatic_file_suffix)
 !endif
 
 !if "$(DEBUG)" == "1"
-buildmode_dir_suffix=$(buildmode_dir_suffix)$(buildmode_debug_dir_suffix)
-buildmode_file_suffix=$(buildmode_file_suffix)$(buildmode_debug_file_suffix)
+buildmode_dir_suffix  = $(buildmode_dir_suffix)$(buildmode_debug_dir_suffix)
+buildmode_file_suffix = $(buildmode_file_suffix)$(buildmode_debug_file_suffix)
 !endif
 
 obj_dir=$(obj_dir)$(buildmode_dir_suffix)
@@ -301,6 +324,11 @@ traverse_src_tree: init
 # "Tasks" (one-off and type-related high-level (meta/admin) rules)...
 #-----------------------------------------------------------------------------
 init: mk_main_target_dirs mk_main_lib_rule_inc
+!if "$(CRT)" == "static"
+	@echo NOTE: "CRT=static" requires the custom-built SFML lib pack.
+	@echo Run `bash tooling/sfml-setup-MSVCRT-static-addon` to add it.
+	@echo.
+!endif
 
 compiling: mk_obj_dirs objs
 
