@@ -9,7 +9,7 @@ namespace sfw
 {
 
 template <class T> OptionsBox<T>::OptionsBox():
-	m_currentIndex((size_t)-1),
+	m_currentIndex(0), // Used to start with the last: (size_t)-1, but #359...
 	m_box(Box::Input),
 	m_arrowLeft(Arrow(Arrow::Left)),
 	m_arrowRight(Arrow(Arrow::Right))
@@ -39,7 +39,10 @@ template <class T> auto OptionsBox<T>::add(const std::string& label, const T& va
 		this->setSize(m_box.getSize()); //! See comment at the class def., why this->...
 	}
 
-	update_selection(m_items.size() - 1);
+// Don't (as per #359):
+//	update_selection(m_items.size() - 1);
+// But update_selection() is still needed to prepare the looks, so:
+	update_selection(m_currentIndex);
 	return this;
 }
 
@@ -80,6 +83,17 @@ template <class T> auto OptionsBox<T>::set(const std::string& label)
 	return this;
 }
 
+template <class T> auto OptionsBox<T>::set(const T& value)
+{
+	for (size_t i = 0; i < m_items.size(); ++i)
+	{
+		if (value == m_items[i].value)
+		{
+			return set(i);
+		}
+	}
+	return this;
+}
 
 template <class T> auto OptionsBox<T>::select(size_t index)
 {
@@ -114,12 +128,12 @@ template <class T> auto OptionsBox<T>::selectLast()
 }
 
 
-template <class T> const T& OptionsBox<T>::current() const
+template <class T> const T& OptionsBox<T>::get() const
 {
 	return m_items[m_currentIndex].value;
 }
 
-template <class T> T& OptionsBox<T>::currentRef()
+template <class T> T& OptionsBox<T>::get()
 {
 	return m_items[m_currentIndex].value;
 }

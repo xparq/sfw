@@ -436,7 +436,7 @@ int main()
 		->set((float)themes[DEFAULT_THEME].textSize)
 		->setCallback([&] (auto* w){
 			assert(getWidget("theme-selector"));
-			auto& themecfg = getWidget<OBTheme>("theme-selector")->currentRef();
+			auto& themecfg = getWidget<OBTheme>("theme-selector")->current();
 			themecfg.textSize = (size_t)w->get();
 cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
@@ -469,7 +469,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		->set(demo.getWallpaper().getColor().a)
 		->setCallback([&](auto* w) {
 			assert(getWidget("theme-selector"));
-			auto& themecfg = getWidget<OBTheme>("theme-selector")->currentRef();
+			auto& themecfg = getWidget<OBTheme>("theme-selector")->current();
 			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
 			                           themecfg.wallpaper.tint.g,
 			                           themecfg.wallpaper.tint.b,

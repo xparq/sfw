@@ -385,11 +385,11 @@ int main()
 	right_bar->add(sfw::Slider({.range = {8, 18}}, 100), "font size slider")
 		//!! Would be tempting to sync the initial font size directly with
 		//!! the theme selector widget -- but can't: the GUI is not up yet, so:
-		//!! ->set(w->getWidget<OBTheme>("theme-selector")->currentRef().textSize) //! This would fail here!
+		//!! ->set(w->getWidget<OBTheme>("theme-selector")->current().textSize) //! This would fail here!
 		->set((float)themes[DEFAULT_THEME].textSize)
 		->setCallback([&] (auto* w){
 			assert(sfw::getWidget("theme-selector", w));
-			auto& themecfg = sfw::getWidget<OBTheme>("theme-selector", w)->currentRef();
+			auto& themecfg = sfw::getWidget<OBTheme>("theme-selector", w)->current();
 			themecfg.textSize = (size_t)w->get();
 cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			demo.setTheme(themecfg);
@@ -423,7 +423,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		->set(demo.getWallpaper().getColor().a)
 		->setCallback([&](auto* w) {
 			assert(sfw::getWidget("theme-selector", w));
-			auto& themecfg = sfw::getWidget<OBTheme>("theme-selector", w)->currentRef();
+			auto& themecfg = sfw::getWidget<OBTheme>("theme-selector", w)->current();
 			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
 			                           themecfg.wallpaper.tint.g,
 			                           themecfg.wallpaper.tint.b,

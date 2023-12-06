@@ -41,8 +41,9 @@ public:
 	auto assign(const std::string& label, const T& value);
 
 	// Change the current item
-	auto set   (size_t index);
-	auto set   (const std::string& label);
+	auto set(size_t index);
+	auto set(const std::string& label);
+	auto set(const T& value); // Would call T::op==!
 
 	OptionsBox<T>* setTextColor(const sf::Color& color);
 	OptionsBox<T>* setFillColor(const sf::Color& color);
@@ -50,8 +51,10 @@ public:
 	// -------- Actions...
 
 	// Select item (by index or label)
-	auto select(size_t index); // Same as update(...), just a more natural verb
-	auto select(const std::string& label); // Same as update(...), just a more natural verb
+	// (Synonym to update(...), which is pretty awkward here.)
+	auto select(size_t index);             
+	auto select(const std::string& label);
+	auto select(const T& value);
 
 	// Actions for Up/Down, Home/End...
 	auto selectNext();
@@ -62,8 +65,11 @@ public:
 	// -------- Queries...
 
 	// Accessing the selected item
-	const T& current() const; // For value & copy semantics (still a const ref for efficiency)
-	T& currentRef(); // For in-place modification
+	const T& get() const;     // Const ref. instead of val., as T can be big!
+	      T& get();           // Non-const, for in-place modification
+	// Just a synonym (for the symmetry with 'select'...):
+	const T& current() const  { return get(); }
+	      T& current()        { return get(); }
 
 	size_t currentIndex() const;
 	const std::string& currentLabel() const;
