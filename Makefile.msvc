@@ -1,4 +1,4 @@
-#### MSVC Jumpstart Makefile, r12                              (Public Domain)
+#### NMAKE syntax (based on NMAKE-Jumpstart r12)
 #### -> https://github.com/xparq/NMAKE-Jumpstart
 ####
 #### BEWARE! Uses recursive NMAKE invocations, so update the macro below if

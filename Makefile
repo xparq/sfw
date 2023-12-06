@@ -30,7 +30,6 @@ endif
 #=============================================================================
 
 
-
 # Use `make SFML_DIR=...` to override:
 SFML_DIR  ?= extern/sfml/$(TOOLCHAIN)
 

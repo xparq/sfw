@@ -14,7 +14,7 @@
 #
 #! NOTE: BusyBox realpath can't do -Lms for symlinks as used in the companion
 #! `sfml-setup` script, which is meant to run on native Linux with GNU `realpath`
-#! to handle missing subdir parts of a symlink etc.
+#! to handle a missing symlink target (and/or subdir part?) etc.
 #! But we're on Windows now, with SFML already set up, and BB only has to
 #! resolve a relative path, symlinked or not... -- which it can do just fine.
 #
@@ -31,6 +31,11 @@ OVERWRITE=${OVERWRITE:-no}
 
 
 main(){
+	if [ ! -e ./tooling ]; then
+		echo - ERROR: This script must be run from the project root dir.
+		exit 254
+	fi
+
 	if [ "${OVERWRITE}" != "yes" ]; then
 		echo "- NOTE: Not overwriting existing files."
 		MV="mv -n"

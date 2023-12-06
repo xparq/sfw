@@ -32,7 +32,7 @@ protected:
 	bool focus(Widget* widget);
 	bool focusNext();
 	bool focusPrevious();
-	void unfocus(); // Remove focus from focused child (recursively), if any
+	void unfocus(); // Remove focus from the focused child (recursively), if any
 
 	void hover(Widget* widget, float parent_x, float parent_y); //!! The coords. are a kludge for tooltip support...
 	void unhover(); // Unhover last hovered child
