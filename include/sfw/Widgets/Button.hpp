@@ -4,6 +4,7 @@
 #include "sfw/InputWidget.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
 #include "sfw/Gfx/Elements/ItemBox.hpp"
+#include "sfw/Gfx/Color.hpp"
 
 #include <string>
 
@@ -26,6 +27,9 @@ public:
 
 	Button* setText(const std::string& text);
 	std::string getText() const;
+
+	Button* setColor(sf::Color); // Overall tint, except the label
+	Button* setTextColor(sf::Color);
 
 	Button* click(); // "Macro" for automation
 

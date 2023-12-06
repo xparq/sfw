@@ -40,6 +40,19 @@ std::string Button::getText() const
 }
 
 
+Button* Button::setColor(sf::Color c)
+{
+	m_box.setTintColor(c);
+	return this;
+}
+
+
+Button* Button::setTextColor(sf::Color c)
+{
+	m_box.setItemColor(c);
+	return this;
+}
+
 Button* Button::click()
 {
 	//! This weird kludge won't do antything to the visuals. (That would require

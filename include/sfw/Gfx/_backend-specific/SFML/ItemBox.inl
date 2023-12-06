@@ -73,13 +73,17 @@ void ItemBox<T>::draw(sf::RenderTarget& target, const sf::RenderStates& states) 
 {
     Box::draw(target, states);
     target.draw(m_item, states);
-
-    // "Tint" the boxes *after* the item has been drawn! (So, alpha is expected to have been set accordingly.)
+    // "Tint" the box *after* the item has been drawn! (So, alpha is expected to have been set accordingly!)
     if (m_tintColor)
     {
+/*
         sf::RectangleShape r(sf::Vector2f(getSize().x - 2 * (float)Theme::borderSize,
                                           getSize().y - 2 * (float)Theme::borderSize));
         r.setPosition(getPosition()); r.move({(float)Theme::borderSize, (float)Theme::borderSize});
+*/
+        sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
+        r.setPosition(getPosition());
+
         r.setFillColor(m_tintColor.value());
         r.setOutlineThickness(0);
         target.draw(r, states);

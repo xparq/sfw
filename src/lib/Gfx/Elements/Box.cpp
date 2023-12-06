@@ -159,12 +159,16 @@ void Box::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
     auto lstates = states;
     lstates.texture = &Theme::getTexture();
     target.draw(m_vertices, VERTEX_COUNT, sf::PrimitiveType::TriangleStrip, lstates);
-    // Override the texture with a filled rect (presumably with some alpha) if fillColor was set:
+    // Overdraw the with a filled rect (presumably with some alpha!) if fillColor was set:
     if (m_fillColor)
     {
+/*
         sf::RectangleShape r(sf::Vector2f(getSize().x - 2 * (float)Theme::borderSize,
                                           getSize().y - 2 * (float)Theme::borderSize));
 	r.setPosition(getPosition()); r.move({(float)Theme::borderSize, (float)Theme::borderSize});
+*/
+        sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
+	r.setPosition(getPosition());
 	r.setFillColor(m_fillColor.value());
 	r.setOutlineThickness(0);
 	target.draw(r, lstates);
