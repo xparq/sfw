@@ -194,8 +194,8 @@ void Layout::onMousePressed(float x, float y)
 	//     despite actually being hovered.
 	//
 	// b)  Albeit the logic below could be changed to send `MousePressed` no matter the
-	//     hover state -- but the target widget would then still need to be found anyway,
-	//     so it's cleaner to take care of the missed hover first, and continue from there.
+	//     hover state -- the target widget would then still need to be found anyway, so
+	//     it's cleaner to take care of the missed hover first, and continue from there.
 	//
 	if (!m_hoveredWidget)
 	{
@@ -237,6 +237,14 @@ cerr << "- Oops, missed hover retroactively fixed!\n";
 	{
 		m_focusedWidget->setActivationState(Default); //!!->unfocus()!
 		m_focusedWidget = nullptr;
+	}
+
+	// Finally, if the click is outside the managed area, give up
+	// the focus, in order to support relaying events between multiple
+	// indepentent GUIs (windows/panes) in an app's event loop (#362)!
+	if (!contains(sf::Vector2f(x, y)))
+	{
+		unfocus();
 	}
 }
 
@@ -310,6 +318,15 @@ void Layout::onTextEntered(char32_t unichar)
 	{
 		m_focusedWidget->onTextEntered(unichar);
 	}
+}
+
+
+// API -----------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+bool Layout::focused() const //override
+{
+	return m_focusedWidget;
 }
 
 //----------------------------------------------------------------------------

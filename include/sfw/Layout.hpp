@@ -19,6 +19,9 @@ namespace sfw
  *****************************************************************************/
 class Layout: public WidgetContainer
 {
+public:
+	bool focused() const override;
+
 protected:
 	Layout();
 
@@ -29,7 +32,7 @@ protected:
 	bool focus(Widget* widget);
 	bool focusNext();
 	bool focusPrevious();
-	void unfocus(); // Unfocus last focused child
+	void unfocus(); // Remove focus from focused child (recursively), if any
 
 	void hover(Widget* widget, float parent_x, float parent_y); //!! The coords. are a kludge for tooltip support...
 	void unhover(); // Unhover last hovered child

@@ -97,7 +97,7 @@ public:
 	static int borderSize; // Recalculated from the actual texture, so don't try setting it directly...
 	static int minWidgetWidth;
 
-	static float PADDING; // Spacing inside widget
+	static float PADDING; // Spacing inside widgets
 	static float MARGIN;  // Spacing between widgets
 
 	static sf::Event::KeyEvent previousWidgetKey;

@@ -65,7 +65,7 @@ public:
 	Widget* disable()        { return enable(false); }
 	bool    disabled() const { return !enabled(); }
 
-	bool focused() const;
+	virtual bool focused() const; // Layouts may need to override it.
 
 	// Set/Reset widget name
 	//
