@@ -26,11 +26,13 @@ inline sf::Color Color(const std::string& hexcolor)
 		color.r = CCOMP(hexcolor, 0, 2);
 		color.g = CCOMP(hexcolor, 1, 2);
 		color.b = CCOMP(hexcolor, 2, 2);
+		color.a = 255;
 		break;
 	case 4: // #rgb
 		color.r = CCOMP(hexcolor, 0, 1) * 17;
 		color.g = CCOMP(hexcolor, 1, 1) * 17;
 		color.b = CCOMP(hexcolor, 2, 1) * 17;
+		color.a = 255;
 		break;
 	case 9: // #rrggbbaa
 		color.r = CCOMP(hexcolor, 0, 2);
