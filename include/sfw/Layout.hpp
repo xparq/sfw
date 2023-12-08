@@ -21,7 +21,8 @@ class Layout: public WidgetContainer
 {
 public:
 	bool focused() const override;
-
+	void unfocus(); // Remove focus from the focused child (recursively)
+	                // Made public to support apps with multiple GUI panels/windows (#368)
 protected:
 	Layout();
 
@@ -32,7 +33,6 @@ protected:
 	bool focus(Widget* widget);
 	bool focusNext();
 	bool focusPrevious();
-	void unfocus(); // Remove focus from the focused child (recursively), if any
 
 	void hover(Widget* widget, float parent_x, float parent_y); //!! The coords. are a kludge for tooltip support...
 	void unhover(); // Unhover last hovered child
