@@ -208,11 +208,12 @@ void Layout::onMousePressed(float x, float y)
 				sf::Vector2f localPos = sf::Vector2f(x, y) - widget->getPosition();
 				if (widget->contains(localPos))
 				{
+//!! This is *still* necessary, even after recursifying hover (to finally
+//!! propagate through a container chain down to the target widget)!... :-o
 					hover(widget, x, y);
-//!! I leave this enabled to see if this is still needed after recursifying hover
-//!! to finally propagate through a container chain down to the target widget...:
+//!! (I HAVE SEEN THIS MESSAGE both in e.g. the OON control panel, and in the sfw test app!)
 #ifdef DEBUG
-cerr << "- Oops, missed hover retroactively fixed!\n";
+cerr << "- [sfw::Layout::onMousePressed] Oops, missed hover retroactively fixed!\n";
 #endif
 					assert(m_hoveredWidget);
 					break;

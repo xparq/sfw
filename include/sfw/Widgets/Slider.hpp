@@ -100,8 +100,10 @@ private:
 	// Config:
 	Cfg m_cfg;
 	float m_boxLength;
-	// Internal ("model") state:
+	// Internal model state:
 	float m_value;
+	// Internal UI control state for dragging:
+	bool m_thumb_pressed = false;
 	// Visual ("view") state:
 	Box m_track;
 	Box m_thumb;

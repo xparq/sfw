@@ -74,13 +74,22 @@ Slider::Slider(const Cfg& cfg/*, const Style& style*/, float length) :
 	m_track(Box::Input),
 	m_thumb(Box::Click)
 {
-	updateGeometry(); // This must come before any other ops, since e.g.
-	                  // track_length() depends on having been properly sized!
-
-	setStep(m_cfg.step); // #364 (special treatment for 0 was skipped for the cfg)
+	//!
+	//! The exec. order below is critical, and brittle... Everything depends
+	//! on the prev. one in non-obvious ways! (-> #365)
+	//!
 
 	// Make sure the initial value is valid:
-	set(range().min);
+	m_value = range().min; //! updateView() requires a valid, in-range m_value, but can't call
+	                       //! set(range().min), as set() depends on everything...
+
+	updateGeometry();      //! track_length() (called by setStep) depends on the widget properly sized
+	                       //! -- but can't do this first, as it calls updateView()...
+
+	// Make sure the configured 'step' is valid (even if it won't be used later)
+	// (-> #364: special treatment for 0 was skipped)
+	setStep(m_cfg.step);
+	                       //! Depends on UpdateGeomentry() having been called already.
 }
 
 
@@ -408,6 +417,7 @@ void Slider::onMousePressed(float x, float y)
 		update(mousepos_to_sliderval(x, y));
 
 	m_thumb.press();
+	m_thumb_pressed = true;
 }
 
 
@@ -415,10 +425,10 @@ void Slider::onMouseMoved(float x, float y)
 {
 	if (focused())
 	{
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		if (m_thumb_pressed) //!! #182: Not `if (sf::Mouse::isButtonPressed(sf::Mouse::Left))`
 		{
 			update(mousepos_to_sliderval(x, y));
-			//!!TODO: Support notify_on_drag: call set instead of update if false.
+			//!!TODO: Support notify_on_drag = false: call set instead of update!
 			//!!      But then it must also call updated() at the end of the drag (-> onMouseReleased).
 		}
 	}
@@ -436,9 +446,11 @@ void Slider::onMouseMoved(float x, float y)
 void Slider::onMouseReleased(float, float)
 {
 	m_thumb.release();
+	m_thumb_pressed = false;
+
 	//!!TODO: Support notify_on_drag = false: do an extra updated() after dragging
 	//!!      (so, it must distinguish between release after just a click (+ "minor" accidental moves?!),
-	//!!      and "real" dragging, obviously -- but the "how" of it isn't obvious to me at all...),
+	//!!      and "real" dragging, obviously -- but the "how" of it isn't that obvious...),
 	//!!      and also make sure the notification is not skipped due to !changed().
 	//!!      (-> onMouseMoved)
 }
