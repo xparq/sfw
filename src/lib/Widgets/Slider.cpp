@@ -9,6 +9,8 @@
 #include <string>
 	using std::to_string;
 
+#include <cassert>
+
 //!!Reconcile this with the diag. stuff; see #284!
 #include <iostream>
 	using std::cerr, std::endl;
@@ -16,11 +18,11 @@
 /*
 MODEL:
 
-- The Slider range can be any closed interval of the [min, max].
+- The Slider range can be any closed interval of [min, max].
   The current value will always be in that range (see later below).
 
   The set of allowed values, apart from the min/max bounds, is restricted
-  to multiples of a `step` cfg. parameter away from min. IOW, the Slider has
+  to multiples of a `step` parameter away from min. IOW, the Slider has
   a value v in the range [min, max], such that
 
     v ∈ [min, max]
@@ -72,10 +74,13 @@ Slider::Slider(const Cfg& cfg/*, const Style& style*/, float length) :
 	m_track(Box::Input),
 	m_thumb(Box::Click)
 {
+	updateGeometry(); // This must come before any other ops, since e.g.
+	                  // track_length() depends on having been properly sized!
+
+	setStep(m_cfg.step); // #364 (special treatment for 0 was skipped for the cfg)
+
 	// Make sure the initial value is valid:
 	set(range().min);
-
-	updateGeometry();
 }
 
 
@@ -333,7 +338,12 @@ cerr	<< "m_value: " << m_value << " of ["<< min() <<".."<< max() <<"]"
 
 
 float Slider::track_length() const
+// Requires that updateGeometry() has been called already!
 {
+	//!! This is not a correct check though! (No general (explicit...)
+	//!! requirement that widgets must have nonzero size...)
+	//!!assert(getSize().x && getSize().y);
+
 	sf::Vector2f frame_thickness = { (float)Theme::borderSize, (float)Theme::borderSize }; // No padding for sliders!
 
 	return m_cfg.orientation == Horizontal
