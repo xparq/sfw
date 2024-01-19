@@ -423,7 +423,7 @@ cerr << endl;
 
 void TextBox::onKeyReleased(const sf::Event::KeyEvent& key)
 {
-	if (key.code == sf::Keyboard::LShift || key.code == sf::Keyboard::RShift)
+	if (key.code == sf::Keyboard::Key::LShift || key.code == sf::Keyboard::Key::RShift)
 	{
 		m_selection.stop();
 	}
@@ -434,8 +434,8 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 {
 	switch (key.code)
 	{
-	case sf::Keyboard::LShift:
-	case sf::Keyboard::RShift:
+	case sf::Keyboard::Key::LShift:
+	case sf::Keyboard::Key::RShift:
 		// If there's a (volatile) selection, here that means it's just been stopped.
 		// Pressing Shift again then could be interpreted as an intent to resume it
 		// (for adjusting its extent), so it's reasonable to allow that.
@@ -471,68 +471,68 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 	// 2. do nothing with it, and then 3. move the cursor a bit and kill it...
 	// (See flip_selection() for more!)
 	//------------------------------------------------------------------------
-	case sf::Keyboard::Left:
+	case sf::Keyboard::Key::Left:
 		if (!flip_selection(key, m_selection.upper(), m_selection.lower()))
 			Backward(key.control);
 		break;
 
-	case sf::Keyboard::Right:
+	case sf::Keyboard::Key::Right:
 		if (!flip_selection(key, m_selection.lower(), m_selection.upper()))
 			Forward(key.control);
 		break;
 
-	case sf::Keyboard::Backspace:
+	case sf::Keyboard::Key::Backspace:
 		if (m_selection) delete_selected(); //!!??Is there a hidden UC with _has_modifiers(key) && m_selection?
 		else if (key.control) DelBackward();
 		else DelPrevChar();
 		break;
 
-	case sf::Keyboard::Delete:
+	case sf::Keyboard::Key::Delete:
 		if (key.shift) Cut();
 		else if (m_selection) delete_selected(); //!!??Is there a hidden UC with _has_modifiers(key) && m_selection?
 		else if (key.control) DelForward();
 		else DelNextChar();
 		break;
 
-	case sf::Keyboard::Home:
-	case sf::Keyboard::Up:
+	case sf::Keyboard::Key::Home:
+	case sf::Keyboard::Key::Up:
 		Home();
 		break;
 
-	case sf::Keyboard::End:
-	case sf::Keyboard::Down:
+	case sf::Keyboard::Key::End:
+	case sf::Keyboard::Key::Down:
 		End();
 		break;
 
 	// "Apply"
-	case sf::Keyboard::Enter:
+	case sf::Keyboard::Key::Enter:
 		setChanged(); //!! None of the inidividual editing actions update this yet,
 		              //!! so we just force it here for the time being...
 		updated(); //!!TBD: Should it be forced even if !changed()?
 		break;
 
 	// Ctrl+A: Select All
-	case sf::Keyboard::A:
+	case sf::Keyboard::Key::A:
 		if (key.control) SelectAll();
 		break;
 
 	// Ctrl+V: Paste
-	case sf::Keyboard::V:
+	case sf::Keyboard::Key::V:
 		if (key.control) Paste();
 		break;
 
 	// Ctrl+C: Copy
-	case sf::Keyboard::C:
+	case sf::Keyboard::Key::C:
 		if (key.control) Copy();
 		break;
 
 	// Ctrl+X: Cut
-	case sf::Keyboard::X:
+	case sf::Keyboard::Key::X:
 		if (key.control) Cut();
 		break;
 
 	// Ctrl+Insert: Copy, Shift+Insert: Paste
-	case sf::Keyboard::Insert:
+	case sf::Keyboard::Key::Insert:
 		if (key.control) Copy();
 		else if (key.shift) Paste();
 		break;
@@ -546,13 +546,13 @@ void TextBox::onKeyPressed(const sf::Event::KeyEvent& key)
 void TextBox::onMouseEnter()
 {
 	assert(getMain());
-	getMain()->setMouseCursor(sf::Cursor::Text);
+	getMain()->setMouseCursor(sf::Cursor::Type::Text);
 }
 
 void TextBox::onMouseLeave()
 {
 	assert(getMain());
-	getMain()->setMouseCursor(sf::Cursor::Arrow);
+	getMain()->setMouseCursor(sf::Cursor::Type::Arrow);
 }
 
 
@@ -582,7 +582,7 @@ void TextBox::onMouseMoved(float x, float)
 
 	// Go to char at mouse, starting/extending selection
 	// (which is handled implicitly by setCursorPos)
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		size_t pos;
 		if (x < Theme::borderSize + Theme::PADDING)
@@ -596,8 +596,8 @@ void TextBox::onMouseMoved(float x, float)
 
 void TextBox::onMouseWheelMoved(int delta)
 {
-	auto ctrl = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) ||
-	            sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
+	auto ctrl = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl) ||
+	            sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl);
 
 	if (delta < 0) Forward(ctrl);
 	else           Backward(ctrl);

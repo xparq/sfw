@@ -84,7 +84,7 @@ void CheckBox::onMouseReleased(float x, float y)
 
 void CheckBox::onKeyPressed(const sf::Event::KeyEvent& key)
 {
-	if (key.code == sf::Keyboard::Space)
+	if (key.code == sf::Keyboard::Key::Space)
 	{
 		toggle();
 	}

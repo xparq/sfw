@@ -130,7 +130,7 @@ void Button::onMouseReleased(float x, float y)
 
 void Button::onKeyPressed(const sf::Event::KeyEvent& key)
 {
-	if (key.code == sf::Keyboard::Enter || key.code == sf::Keyboard::Space)
+	if (key.code == sf::Keyboard::Key::Enter || key.code == sf::Keyboard::Key::Space)
 	{
 		m_box.press();
 		onUpdated();
@@ -140,7 +140,7 @@ void Button::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void Button::onKeyReleased(const sf::Event::KeyEvent& key)
 {
-	if (key.code == sf::Keyboard::Enter)
+	if (key.code == sf::Keyboard::Key::Enter)
 	{
 		m_box.release();
 	}

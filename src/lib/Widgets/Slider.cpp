@@ -376,33 +376,33 @@ void Slider::draw(const gfx::RenderContext& ctx) const
 
 void Slider::onKeyPressed(const sf::Event::KeyEvent& key)
 {
-	auto faster = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-	           || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
+	auto faster = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)
+	           || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl);
 
 	auto delta = faster ? 2 * step() : step(); //!!Less hamfist!...
 	auto delta_redir = m_cfg.invert ? -delta : delta;
 	switch (key.code)
 	{
-	case sf::Keyboard::Left:
+	case sf::Keyboard::Key::Left:
 		if (m_cfg.orientation == Horizontal) dec(delta_redir);
 		else if (m_cfg.use_all_arrow_keys)   dec(delta);
 		break;
-	case sf::Keyboard::Right:
+	case sf::Keyboard::Key::Right:
 		if (m_cfg.orientation == Horizontal) inc(delta_redir);
 		else if (m_cfg.use_all_arrow_keys)   inc(delta);
 		break;
-	case sf::Keyboard::Down:
+	case sf::Keyboard::Key::Down:
 		if (m_cfg.orientation == Vertical)   dec(delta_redir);
 		else if (m_cfg.use_all_arrow_keys)   dec(delta);
 		break;
-	case sf::Keyboard::Up:
+	case sf::Keyboard::Key::Up:
 		if (m_cfg.orientation == Vertical)   inc(delta_redir);
 		else if (m_cfg.use_all_arrow_keys)   inc(delta);
 		break;
-	case sf::Keyboard::Home:
+	case sf::Keyboard::Key::Home:
 		update(range().min);
 		break;
-	case sf::Keyboard::End:
+	case sf::Keyboard::Key::End:
 		update(range().max);
 		break;
 	default:
@@ -425,7 +425,7 @@ void Slider::onMouseMoved(float x, float y)
 {
 	if (focused())
 	{
-		if (m_thumb_pressed) //!! #182: Not `if (sf::Mouse::isButtonPressed(sf::Mouse::Left))`
+		if (m_thumb_pressed) //!! #182: Not `if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))`
 		{
 			update(mousepos_to_sliderval(x, y));
 			//!!TODO: Support notify_on_drag = false: call set instead of update!

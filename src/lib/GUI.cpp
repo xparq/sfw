@@ -75,7 +75,7 @@ bool GUI::reset()
 	//! Can't set a wallpaper just yet, as the size may be unknown yet!
 	//! Widgets are yet to be added! See onResized()!
 
-	m_cursorType = sf::Cursor::Arrow;
+	m_cursorType = sf::Cursor::Type::Arrow;
 
 	return (bool)*this;
 }
@@ -124,7 +124,7 @@ bool GUI::process(const sf::Event& event)
 	}
 
 	case sf::Event::MouseButtonPressed:
-		if (event.mouseButton.button == sf::Mouse::Left)
+		if (event.mouseButton.button == sf::Mouse::Button::Left)
 		{
 			sf::Vector2f mouse = convertMousePosition(event.mouseButton.x, event.mouseButton.y);
 			onMousePressed(mouse.x, mouse.y);
@@ -132,7 +132,7 @@ bool GUI::process(const sf::Event& event)
 		break;
 
 	case sf::Event::MouseButtonReleased:
-		if (event.mouseButton.button == sf::Mouse::Left)
+		if (event.mouseButton.button == sf::Mouse::Button::Left)
 		{
 			sf::Vector2f mouse = convertMousePosition(event.mouseButton.x, event.mouseButton.y);
 			onMouseReleased(mouse.x, mouse.y);

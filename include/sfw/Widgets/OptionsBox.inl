@@ -295,22 +295,22 @@ template <class T> void OptionsBox<T>::onKeyPressed(const sf::Event::KeyEvent& k
 {
 	switch (key.code)
 	{
-	case sf::Keyboard::Left:
-	case sf::Keyboard::Up:
+	case sf::Keyboard::Key::Left:
+	case sf::Keyboard::Key::Up:
 		selectPrevious();
 		m_arrowLeft.press();
 		break;
-	case sf::Keyboard::Right:
-	case sf::Keyboard::Down:
+	case sf::Keyboard::Key::Right:
+	case sf::Keyboard::Key::Down:
 		selectNext();
 		m_arrowRight.press();
 		break;
-	case sf::Keyboard::Home:
-	case sf::Keyboard::PageUp:
+	case sf::Keyboard::Key::Home:
+	case sf::Keyboard::Key::PageUp:
 		selectFirst();
 		break;
-	case sf::Keyboard::End:
-	case sf::Keyboard::PageDown:
+	case sf::Keyboard::Key::End:
+	case sf::Keyboard::Key::PageDown:
 		selectLast();
 		break;
 	default: ; // (Just for GCC to shut up...)
@@ -321,14 +321,14 @@ template <class T> void OptionsBox<T>::onKeyReleased(const sf::Event::KeyEvent& 
 {
 	switch (key.code)
 	{
-	case sf::Keyboard::Left:
-	case sf::Keyboard::Up:
+	case sf::Keyboard::Key::Left:
+	case sf::Keyboard::Key::Up:
 		m_arrowLeft.release();
 		// Without this the focus rect would be lost on the arrow (#137):
 		update_arrow_pressed_state(m_arrowLeft, -1, -1); // -1,-1 to avoid the "hover" state
 		break;
-	case sf::Keyboard::Right:
-	case sf::Keyboard::Down:
+	case sf::Keyboard::Key::Right:
+	case sf::Keyboard::Key::Down:
 		m_arrowRight.release();
 		// Without this the focus rect would be lost on the arrow (#137):
 		update_arrow_pressed_state(m_arrowRight, -1, -1); // -1,-1 to avoid the "hover" state

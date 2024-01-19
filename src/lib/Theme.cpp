@@ -73,8 +73,8 @@ float Theme::MARGIN = 4.f;
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 // Note: desig. init would zero the missing fields, which is fine for us, but not for GCC. :-/
 #endif
-sf::Event::KeyEvent Theme::nextWidgetKey =     { .code = sf::Keyboard::Tab };
-sf::Event::KeyEvent Theme::previousWidgetKey = { .code = sf::Keyboard::Tab, .shift = true };
+sf::Event::KeyEvent Theme::nextWidgetKey =     { .code = sf::Keyboard::Key::Tab };
+sf::Event::KeyEvent Theme::previousWidgetKey = { .code = sf::Keyboard::Key::Tab, .shift = true };
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
@@ -92,7 +92,7 @@ sf::Cursor& Theme::getDefaultCursor()
 	                     //!! Theme is also static, so no "additional" harm done...
 	                     //!! But if it does support RAII with stacked state restore,
 	                     //!! then this should not be static!
-	if (!c.loadFromSystem(sf::Cursor::Arrow))
+	if (!c.loadFromSystem(sf::Cursor::Type::Arrow))
 	{
 		//!! loadFromSystem is `nodiscard`...
 	}

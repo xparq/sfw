@@ -10,7 +10,7 @@
 	using std::cerr, std::endl;
 
 	namespace {
-		static auto DEBUG_INSIGHT_KEY = sf::Keyboard::LAlt;
+		static auto DEBUG_INSIGHT_KEY = sf::Keyboard::Key::LAlt;
 		static auto DEBUG_INSIGHT_KEY_PRESSED = false;
 	}
 
@@ -119,7 +119,7 @@ void Layout::onActivationChanged(ActivationState state)
 void Layout::onMouseMoved(float x, float y)
 {
 	// Focused widgets still receive MouseMove events even when not hovered, when the mouse button is pressed
-	if (m_focusedWidget && m_focusedWidget->enabled() && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (m_focusedWidget && m_focusedWidget->enabled() && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		m_focusedWidget->onMouseMoved(x - m_focusedWidget->getPosition().x, y - m_focusedWidget->getPosition().y);
 		// "Unmark" it as the currently hovered child if wandering off of it, though:

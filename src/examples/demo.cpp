@@ -484,7 +484,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		while (window.pollEvent(event) && demo.process(event) )
 		{
 			// Just for convenience, close on Esc, too:
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Escape)
 				demo.close();
 		}
 	}

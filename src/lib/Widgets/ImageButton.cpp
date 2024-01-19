@@ -143,7 +143,7 @@ void ImageButton::onMouseMoved(float x, float y)
 {
 	if (focused())
 	{
-		if (contains({x, y}) && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		if (contains({x, y}) && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 			press();
 		else
 			release();
@@ -169,7 +169,7 @@ void ImageButton::onMouseReleased(float x, float y)
 
 void ImageButton::onKeyPressed(const sf::Event::KeyEvent& key)
 {
-	if (key.code == sf::Keyboard::Enter)
+	if (key.code == sf::Keyboard::Key::Enter)
 	{
 		press();
 		onUpdated();
@@ -179,7 +179,7 @@ void ImageButton::onKeyPressed(const sf::Event::KeyEvent& key)
 
 void ImageButton::onKeyReleased(const sf::Event::KeyEvent& key)
 {
-	if (key.code == sf::Keyboard::Enter)
+	if (key.code == sf::Keyboard::Key::Enter)
 	{
 		release();
 	}

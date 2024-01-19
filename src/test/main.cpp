@@ -556,7 +556,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 			// don't want to close with the gui in this setup:
 			if (event.type == sf::Event::Closed ||
 			    // Just for convenience, also close on Esc:
-			    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
+			    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Escape))
 			{
 				//demo.close(); // No need to close it manually: window.close() will make it inactive!
 				window.close(); // Not demo.close if the GUI doesn't own the window!
