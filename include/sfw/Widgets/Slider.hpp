@@ -12,7 +12,7 @@ namespace sfw
    Slider widget with vertical or horizontal appearance
  ****************************************************************************/
 
-	namespace SliderConfig_GCC_CLANG_bug_workaround // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
+	namespace _Slider_Config_GCC_CLANG_bug_workaround // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
 	{
 		struct Range
 		{
@@ -46,8 +46,8 @@ namespace sfw
 class Slider: public InputWidget<Slider>
 {
 public:
-	using Cfg = SliderConfig_GCC_CLANG_bug_workaround::Cfg;
-	using Range = SliderConfig_GCC_CLANG_bug_workaround::Range;
+	using Cfg = _Slider_Config_GCC_CLANG_bug_workaround::Cfg;
+	using Range = _Slider_Config_GCC_CLANG_bug_workaround::Range;
 
 public:
 	Slider(const Cfg& cfg = Cfg()/*, const Style& style = Style()*/);

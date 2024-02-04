@@ -21,25 +21,33 @@ enum LabelPlacement
 
    Static output-only widget: can't be interacted with, or trigger events.
 */
+
+
+	namespace _ProgressBar_GCC_CLANG_bug_workaround // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
+	{
+		struct Range
+		{
+			float min = 0, max = 100;
+			float size() const { return max - min; }
+		};
+		struct Cfg
+		{
+			float length = 200; // Widget width or height (in pixels), depending on orientation
+			Range range = {0, 100};
+			std::string unit = "!usedefault!"; //!! This `unit` field will be superceded by a versatile formatting pattern in teh future!
+	//		float step = 1;
+			Orientation orientation = Horizontal;
+	//		bool invert = false; // Default direction: down/left < up/right
+	//!!		std::string label; //!! Will be a formatting pattern, obsoleting `unit`!
+			LabelPlacement label_placement = LabelOver;
+		};
+	}
+
 class ProgressBar: public Widget
 {
 public:
-	struct Range
-	{
-		float min = 0, max = 100;
-		float size() const { return max - min; }
-	};
-	struct Cfg
-	{
-		float length = 200; // Widget width or height (in pixels), depending on orientation
-		Range range = {0, 100};
-		std::string unit = "!usedefault!"; //!! This `unit` field will be superceded by a versatile formatting pattern in teh future!
-//		float step = 1;
-		Orientation orientation = Horizontal;
-//		bool invert = false; // Default direction: down/left < up/right
-//!!		std::string label; //!! Will be a formatting pattern, obsoleting `unit`!
-		LabelPlacement label_placement = LabelOver;
-	};
+	using Cfg   = _ProgressBar_GCC_CLANG_bug_workaround::Cfg;
+	using Range = _ProgressBar_GCC_CLANG_bug_workaround::Range;
 
 	ProgressBar(const Cfg& cfg = Cfg()/*, const Style& style = Style()*/);
 
