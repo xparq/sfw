@@ -3,141 +3,200 @@
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
+#include <algorithm> // min, max
+
 namespace sfw
 {
 
-ProgressBar::ProgressBar(float length, Orientation orientation, LabelPlacement labelPlacement):
-    m_orientation(orientation),
-    m_boxLength(length),
-    m_labelPlacement(labelPlacement),
-    m_value(0.f),
-    m_box(Box::Input)
-{
-    set(m_value);
-    setFocusable(false);
 
-    updateGeometry();
+ProgressBar::ProgressBar(const Cfg& cfg/*, const Style& style*/) :
+	m_cfg(cfg)
+{
+	setFocusable(false); // Should be inherited from StaticWidget or sg.
+
+	// Make sure the initial value is valid:
+	m_value = min(); //!!?? set(min());
+
+	// Assume % as the default unit, but only if the default range has been kept:
+	if (m_cfg.unit == "!usedefault!")
+	    m_cfg.unit = ((min() == 0 && max() == 100)) ? "%" : "";
+
+	updateGeometry();
+}
+
+
+ProgressBar::ProgressBar(float length, Orientation orientation, LabelPlacement labelPlacement) :
+	ProgressBar({
+		.length = length,
+		.orientation = orientation,
+		.label_placement = labelPlacement
+	})
+{
 }
 
 
 ProgressBar* ProgressBar::set(float value)
 {
-    m_value = value;
+	if (value != m_value) // Really changing?
+	{
+		value = std::max(min(), value);
+		value = std::min(max(), value);
+		m_value = value;
 
-    updateGeometry();
-
-    return this;
+		updateGeometry();
+	}
+	return this;
 }
 
 
 float ProgressBar::get() const
 {
-    return m_value;
+	return m_value;
+}
+
+
+ProgressBar* ProgressBar::setRange(float min, float max, std::string unit)
+{
+	m_cfg.range.min = std::min(min, max);
+	m_cfg.range.max = std::max(min, max);
+
+	m_cfg.unit = unit;
+
+	return this;
 }
 
 
 void ProgressBar::draw(const gfx::RenderContext& ctx) const
 {
-    auto sfml_renderstates = ctx.props;
-    sfml_renderstates.transform *= getTransform();
-    ctx.target.draw(m_box, sfml_renderstates);
-    sfml_renderstates.texture = &Theme::getTexture();
-    ctx.target.draw(m_bar, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
-    if (m_labelPlacement != LabelNone)
-        ctx.target.draw(m_label, sfml_renderstates);
+	auto sfml_renderstates = ctx.props;
+	sfml_renderstates.transform *= getTransform();
+	ctx.target.draw(m_box, sfml_renderstates);
+	sfml_renderstates.texture = &Theme::getTexture();
+	ctx.target.draw(m_bar, _VERTEX_COUNT_, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
+	if (m_cfg.label_placement != LabelNone)
+		ctx.target.draw(m_label, sfml_renderstates);
 }
 
 
 void ProgressBar::onThemeChanged()
 {
-    updateGeometry();
+	updateGeometry();
 }
 
 void ProgressBar::updateGeometry()
 {
-    // Bar...
+	// Bar...
 
-    if (m_orientation == Horizontal)
-    {
-        m_box.setSize(m_boxLength, Theme::getBoxHeight());
-    }
-    else
-    {
-        m_box.setSize(Theme::getBoxHeight(), m_boxLength);
-        if (m_labelPlacement == LabelOver)
-            m_label.setRotation(sf::degrees(90.f));
-    }
+	if (m_cfg.orientation == Horizontal)
+	{
+		m_box.setSize(m_cfg.length, Theme::getBoxHeight());
+	}
+	else
+	{
+		m_box.setSize(Theme::getBoxHeight(), m_cfg.length);
+		if (m_cfg.label_placement == LabelOver)
+		m_label.setRotation(sf::degrees(90.f));
+	}
 
-    m_label.setString("100%");
-    m_label.setFont(Theme::getFont());
-    m_label.setFillColor(Theme::input.textColor);
-    m_label.setCharacterSize((unsigned)Theme::textSize);
+	m_label.setString("100%"); // Dummy value for "measurements" (size heuristics) only!
+	m_label.setFont(Theme::getFont());
+	m_label.setFillColor(Theme::input.textColor);
+	m_label.setCharacterSize((unsigned)Theme::textSize);
 
-    // Build bar
-    const float x1 = Theme::PADDING;
-    const float y1 = Theme::PADDING;
-    const float x2 = (m_orientation == Horizontal ? m_boxLength : Theme::getBoxHeight()) - Theme::PADDING;
-    const float y2 = (m_orientation == Horizontal ? Theme::getBoxHeight() : m_boxLength) - Theme::PADDING;
-    m_bar[0].position = {x1, y1};
-    m_bar[1].position = {x1, y2};
-    m_bar[2].position = {x2, y1};
-    m_bar[3].position = {x2, y2};
+	// Setup the widget box...
 
-    sf::FloatRect rect = (sf::FloatRect)Theme::getProgressBarTextureRect();
-    m_bar[0].texCoords = sf::Vector2f(rect.left, rect.top);
-    m_bar[1].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
-    m_bar[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
-    m_bar[3].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
+	const float x1 = Theme::PADDING;
+	const float y1 = Theme::PADDING;
+	const float x2 = (m_cfg.orientation == Horizontal ? m_cfg.length : Theme::getBoxHeight()) - Theme::PADDING;
+	const float y2 = (m_cfg.orientation == Horizontal ? Theme::getBoxHeight() : m_cfg.length) - Theme::PADDING;
+	m_bar[TopLeft]    .position = {x1, y1};
+	m_bar[BottomLeft] .position = {x1, y2};
+	m_bar[TopRight]   .position = {x2, y1};
+	m_bar[BottomRight].position = {x2, y2};
 
-    float labelWidth = m_label.getLocalBounds().width;
-    float labelHeight = m_label.getLocalBounds().height;
-    if (m_labelPlacement == LabelOutside)
-    {
-        if (m_orientation == Horizontal)
-        {
-            // Place label on the right of the bar
-            m_label.setPosition({m_boxLength + Theme::PADDING, Theme::PADDING});
-            setSize({m_boxLength + Theme::PADDING + labelWidth, m_box.getSize().y});
-        }
-        else
-        {
-            // Place label below the bar
-            setSize({m_box.getSize().x, m_boxLength + Theme::PADDING + labelHeight});
-        }
-    }
-    else
-    {
-        setSize(m_box.getSize());
-    }
+	sf::FloatRect rect = (sf::FloatRect)Theme::getProgressBarTextureRect();
+	m_bar[TopLeft]    .texCoords = sf::Vector2f(rect.left, rect.top);
+	m_bar[BottomLeft] .texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
+	m_bar[TopRight]   .texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
+	m_bar[BottomRight].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
 
-    // Label...
+	// Extend the widget box if the label will be outside the bar...
+	float labelWidth  = m_label.getLocalBounds().width;
+	float labelHeight = m_label.getLocalBounds().height;
+	if (m_cfg.label_placement == LabelOutside)
+	{
+		if (m_cfg.orientation == Horizontal)
+		{
+			// Place the label at the right side of the bar
+			m_label.setPosition({m_cfg.length + Theme::PADDING, Theme::PADDING});
+			setSize({m_cfg.length + Theme::PADDING + labelWidth, m_box.getSize().y});
+		}
+		else
+		{
+			// Put it below the bar
+			setSize({m_box.getSize().x, m_cfg.length + Theme::PADDING + labelHeight});
+		}
+	}
+	else
+	{
+		setSize(m_box.getSize());
+	}
 
-    m_label.setString(std::to_string((int)m_value) + "%");
-    if (m_orientation == Horizontal)
-    {
-        float x = Theme::PADDING + (m_box.getSize().x - Theme::PADDING * 2) * m_value / 100;
-        m_bar[2].position.x = m_bar[3].position.x = x;
-        if (m_labelPlacement == LabelOver)
-        {
-            m_box.centerTextHorizontally(m_label);
-        }
-    }
-    else
-    {
-        float fullHeight = m_box.getSize().y - Theme::PADDING * 2;
-        float y = fullHeight * m_value / 100;
-        m_bar[0].position.y = m_bar[2].position.y = (fullHeight - y) + Theme::PADDING;
-        if (m_labelPlacement == LabelOver)
-        {
-            m_box.centerVerticalTextVertically(m_label);
-        }
-        else if (m_labelPlacement == LabelOutside)
-        {
-            // Re-center label horizontally (text width can change)
-            float labelX = (m_box.getSize().x - m_label.getLocalBounds().width) / 2;
-            m_label.setPosition({labelX, m_box.getSize().y + Theme::PADDING});
-        }
-    }
+	// Update the indicator bar & the label...
+
+	m_label.setString(std::to_string(int(round(m_value))) + m_cfg.unit);
+
+	auto bar_length = val_to_barlength(m_value);
+	if (m_cfg.orientation == Horizontal)
+	{
+		m_bar[TopRight].position.x = m_bar[BottomRight].position.x
+			= m_bar[TopLeft].position.x + bar_length;
+	
+		if (m_cfg.label_placement == LabelOver)
+		{
+			m_box.centerTextHorizontally(m_label);
+		}
+		// No need to reposition if LabelOutside.
+	}
+	else
+	{
+		m_bar[TopLeft].position.y = m_bar[TopRight].position.y
+			= m_bar[BottomLeft].position.y - bar_length;
+
+		if (m_cfg.label_placement == LabelOver)
+		{
+			m_box.centerVerticalTextVertically(m_label);
+		}
+		else if (m_cfg.label_placement == LabelOutside)
+		{
+			// Refresh horizontal label pos. in case its width has changed
+			float labelX = (m_box.getSize().x - m_label.getLocalBounds().width) / 2;
+			m_label.setPosition({labelX, m_box.getSize().y + Theme::PADDING});
+		}
+	}
+}
+
+
+float ProgressBar::track_length() const
+// Requires that the widget has been sized (i.e. updateGeometry() has been called)!
+{
+	return m_cfg.length - 2 * Theme::PADDING;
+}
+
+
+float ProgressBar::val_to_barlength(float v) const
+// Convert v to the length of the filled bar
+{
+	float dv = v - min();
+/*cerr	<< "m_value: " << m_value << " of ["<< min() <<".."<< max() <<"]"
+	<< ", v: " << v
+	<< ", dv: " << dv
+//	<< ", step: " << step()
+//	<< ", range().size(): " << range().size()
+	<< endl;*/	
+	assert(dv >= 0);
+
+	return round(track_length() * dv / range().size());
 }
 
 } // namespace

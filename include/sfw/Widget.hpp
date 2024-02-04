@@ -15,7 +15,7 @@
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Window/Event.hpp>
 
-#include <string>
+#include <string> // (Other widget headers are exempt from reincluding this.)
 
 #ifdef DEBUG
 #

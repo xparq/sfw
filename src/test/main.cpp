@@ -233,16 +233,16 @@ int main()
 	//! the widget later by the crop slider (somewhere below)!
 
 	// Slider + progress bars for rotating
-	auto sliderForRotation = new Slider({.range = {0, 360}});
-	auto pbarRotation1 = new ProgressBar(200.f, Horizontal, LabelNone);
-	auto pbarRotation2 = new ProgressBar(200.f, Horizontal, LabelOver);
-	auto pbarRotation3 = new ProgressBar(200.f, Horizontal, LabelOutside);
+	auto sliderForRotation = new Slider({.range={0, 360}});
+	auto pbarRotation1 = new ProgressBar({.length=200, .range={0, 360}, .label_placement=LabelNone});
+	auto pbarRotation2 = new ProgressBar({.length=200, .range={0, 360}, .label_placement=LabelOver});
+	auto pbarRotation3 = new ProgressBar({.length=200, .range={0, 360}, .label_placement=LabelOutside});
 	sliderForRotation->setCallback([&](auto* w) {
-		text.setRotation(sf::degrees(w->get()));
-		auto pbval = w->get() / 3.6f;
-		pbarRotation1->set(pbval);
-		pbarRotation2->set(pbval);
-		pbarRotation3->set(pbval);
+		auto degrees = w->get();
+		text.setRotation(sf::degrees(degrees));
+		pbarRotation1->set(degrees);
+		pbarRotation2->set(degrees);
+		pbarRotation3->set(degrees);
 	});
 	// Slider + progress bars for scaling
 	auto sliderForScale = new Slider({.range = {1, 3}, .step = .2f});
@@ -393,7 +393,7 @@ int main()
 	Image* imgCrop = new Image("demo/martinet-dragonfly.jpg");
 
 	// Slider & progress bar for cropping an Image widget
-	vboximg->add(Slider({}, 100))->setCallback([&](auto* w) {
+	vboximg->add(Slider({.length = 100}))->setCallback([&](auto* w) {
 		getWidget<ProgressBar>("cropbar")->set(w->get());
 		// Show the slider value in a text box retrieved by its name:
 		auto tbox = getWidget<TextBox>("Text with limit (5)");
@@ -432,7 +432,7 @@ int main()
 	// (Also directly changes the font size of the theme cfg. data stored in the
 	// "theme-selector" widget, so that it remembers the updated size (for each theme)!)
 	right_bar->add(Label("Theme font size (use the m. wheel):"));
-	right_bar->add(Slider({.range = {8, 18}}, 100))
+	right_bar->add(Slider({.length = 100, .range = {8, 18}}))
 		->set((float)themes[DEFAULT_THEME].textSize)
 		->setCallback([&] (auto* w){
 			assert(getWidget("theme-selector"));
@@ -450,7 +450,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		void onThemeChanged() override { setTexture(Theme::getTexture()); } // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
 	};
 	auto themeBitmap = new ThemeBitmap; //ThemeBitmap(2); // start with 2x zoom
-	txbox->add(Slider({.range = {1, 5}, .orientation = Vertical, .invert = true}, 100))
+	txbox->add(Slider({.length = 100, .range = {1, 5}, .orientation = Vertical, .invert = true}))
 		->setCallback([&](auto* w) { themeBitmap->scale(w->get()); })
 		->setIntervals(2) // divide the range into 2 intervals, yielding stops at: 1, 3, 5
 		->update(4.f); // use update(), not set(), to trigger the callback!
@@ -465,7 +465,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	bgform->add("Wallpaper", CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
 	                                       demo.hasWallpaper()));
 	// Wallpaper transparency slider
-	bgform->add("Wallpaper α", Slider({.range={0, 255}}, 75))
+	bgform->add("Wallpaper α", Slider({.length = 75, .range = {0, 255}}))
 		->set(demo.getWallpaper().getColor().a)
 		->setCallback([&](auto* w) {
 			assert(getWidget("theme-selector"));
@@ -520,8 +520,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	// OK, GUI Setup done. Set some "high-level" defaults
 	// (after setup, as these may trigger callbacks)
 	//
-	sliderForRotation->set(97);
-	sliderForScale->set(1.2f);
+	sliderForRotation->update(97);
+	sliderForScale->update(1.2f);
 	//!!#160, too:
 	optTxtColor->select("Red"); // Now all ready, safe to trigger the update callback (so, not just set()...)
 	optTxtBg->select("Black");

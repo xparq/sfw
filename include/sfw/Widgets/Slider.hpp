@@ -22,12 +22,12 @@ namespace sfw
 
 		struct Cfg
 		{
+			float length = 200; // Widget width or height (in pixels), depending on orientation
 			Range range = {0, 100};
 			float step = 1;
 			Orientation orientation = Horizontal;
 
-			// Direction by default: up/right > down/left
-			bool invert = false;
+			bool invert = false; // Default direction: down/left < up/right
 			//!!bool invert_h = false;
 			//!!bool invert_v = false;
 			//!! Should ensure consistency among ^these^, while still allowing
@@ -50,15 +50,23 @@ public:
 	using Range = SliderConfig_GCC_CLANG_bug_workaround::Range;
 
 public:
-	Slider(const Cfg& cfg = Cfg()/*, const Style& style = Style()*/, float length = 200);
+	Slider(const Cfg& cfg = Cfg()/*, const Style& style = Style()*/);
+	//!! DEPRECATED:
+	Slider(const Cfg& cfg        /*, const Style& style = Style()*/, float length);
 
-	// Value increment, or number of intervals
+	// Granularity (value increment/stepping, number of intervals...)
+	//
+	//!! NOTE: Changing the granularity does NOT update the current value to enforce consistency!
+	//
 	Slider* setStep(float step); // step = 0 -> auto-adjust for continuous tracking
 	float   step() const;
 	Slider* setIntervals(float n);
 	float   intervals() const;
 
-	// Value range
+	// Range
+	//
+	//!! NOTE: Changing the range does NOT update the current value to enforce consistency!
+	//
 	Slider*      setRange(float min, float max, bool continuous = true);
 	Slider*      setRange(float min, float max, float step);
 	const Range& range() const;

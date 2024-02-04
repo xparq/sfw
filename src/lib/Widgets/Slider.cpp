@@ -3,8 +3,7 @@
 #include "sfw/util/diagnostics.hpp"
 
 #include <cmath>
-#include <algorithm>
-	using std::min, std::max;
+#include <algorithm> // min, max
 
 #include <string>
 	using std::to_string;
@@ -66,6 +65,11 @@ namespace sfw
 
 using enum ActivationState;
 
+
+Slider::Slider(const Cfg& cfg/*, const Style& style = Style()*/) :
+	Slider(cfg, cfg.length)
+{
+}
 
 Slider::Slider(const Cfg& cfg/*, const Style& style*/, float length) :
 	m_cfg(cfg),
@@ -155,7 +159,8 @@ Slider* Slider::set(float value)
 	//!!----------------------------------------------------------------------------
 	if (value != m_value) // Really changing?
 	                      //! NOTE: No early return, as we may have things to do even if this is false!
-		//!!FIX: But if never actually changed (like ctor-init to 0...), then updateView, setTooltip etc. will never be called?!
+	                      //!!FIX: But if never actually changed (like ctor-init to 0...),
+	                      //!!     then updateView, setTooltip etc. will never be called?!
 	{
 //cerr << "set("<< value <<")... [" << range().min << ".." << range().max << "], step: "<< step() <<endl;
 
@@ -347,7 +352,7 @@ cerr	<< "m_value: " << m_value << " of ["<< min() <<".."<< max() <<"]"
 
 
 float Slider::track_length() const
-// Requires that updateGeometry() has been called already!
+// Requires that the widget has been sized (i.e. updateGeometry() has been called)!
 {
 	//!! This is not a correct check though! (No general (explicit...)
 	//!! requirement that widgets must have nonzero size...)

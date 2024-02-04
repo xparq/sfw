@@ -171,19 +171,19 @@ int main()
 		->set("Hello world!");
 
 	// Slider + progress bar for scaling
-	auto sliderForSize = new sfw::Slider({.range = {1, 3}, .step = .2f}, 175);
-	auto pbarScale = new sfw::ProgressBar(175, sfw::Horizontal, sfw::LabelOver);
+	auto sliderForSize = new sfw::Slider({.length = 175, .range = {1, 3}, .step = .2f});
+	auto pbarScale = new sfw::ProgressBar({.length = 175});
 	sliderForSize->setCallback([&](auto* w) {
 		float scale = w->get();
 		text.setScale({scale, scale}); // (x, y)
 		pbarScale->set((w->get() - 1) / 2.f * 100);
 	});
 	// Slider + progress bar for rotating
-	auto sliderForRotation = new sfw::Slider({.range = {0, 360}, .orientation = sfw::Vertical}, 75);
-	auto pbarRotation = new sfw::ProgressBar(75.f, sfw::Vertical, sfw::LabelOver);
+	auto sliderForRotation = new sfw::Slider({.length = 75, .range = {0, 360}, .orientation = sfw::Vertical});
+	auto pbarRotation = new sfw::ProgressBar({.length = 75, .range = {0, 360}, .orientation = sfw::Vertical});
 	sliderForRotation->setCallback([&](auto* w) {
 		text.setRotation(sf::degrees(w->get()));
-		pbarRotation->set(w->get() / 3.6f);
+		pbarRotation->set(w->get());
 	});
 
 	// Add the scaling slider + its horizontal progress bar
@@ -324,7 +324,7 @@ int main()
 	// Slider & progress bar for cropping an Image widget
 	// (`jumpy_thumb_click = true` allows immediately readjusting the pos.
 	// of the slider thumb on clicking it)
-	auto cropslider = (new sfw::Slider({.jumpy_thumb_click = true}, 100))->setCallback([&](auto* w) {
+	auto cropslider = (new sfw::Slider({.length = 100, .jumpy_thumb_click = true}))->setCallback([&](auto* w) {
 		sfw::getWidget<sfw::ProgressBar>("cropbar")->set(w->get());
 		// Show the slider value in a text box retrieved by its name:
 		auto tbox = sfw::getWidget<sfw::TextBox>("crop%");
@@ -382,7 +382,7 @@ int main()
 	// (Also directly changes the font size of the theme cfg. data stored in the
 	// "theme-selector" widget, so that it remembers the updated size (for each theme)!)
 	right_bar->add(sfw::Label("Theme font size (use the m. wheel):")); // Move that remark to a tooltip!
-	right_bar->add(sfw::Slider({.range = {8, 18}}, 100), "font size slider")
+	right_bar->add(sfw::Slider({.length = 100, .range = {8, 18}}), "font size slider")
 		//!! Would be tempting to sync the initial font size directly with
 		//!! the theme selector widget -- but can't: the GUI is not up yet, so:
 		//!! ->set(w->getWidget<OBTheme>("theme-selector")->current().textSize) //! This would fail here!
@@ -403,7 +403,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		void onThemeChanged() override { setTexture(Theme::getTexture()); } // note: e.g. the ARROW is at {{0, 42}, {6, 6}}
 	};
 	auto themeBitmap = new ThemeBitmap; //ThemeBitmap(2); // start with 2x zoom
-	txbox->add(sfw::Slider({.range = {0, 4}, .orientation = sfw::Vertical, .invert = true}, 100)) // height = 100
+	txbox->add(sfw::Slider({.length = 100, .range = {0, 4}, .orientation = sfw::Vertical, .invert = true})) // height = 100
 		->setCallback([&](auto* w) { themeBitmap->scale(1 + w->get()); })
 		->update(3); // use update(), not set(), to trigger the callback!
 	txbox->add(themeBitmap);
@@ -419,7 +419,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	           )->enable(demo.hasWallpaper()); // Only enable if there actually is a wallpaper!
 
 	// Wallpaper transparency slider
-	bgform->add("Wallpaper α", sfw::Slider({.range={0, 255}}, 75))
+	bgform->add("Wallpaper α", sfw::Slider({.length = 65, .range={0, 255}}))
 		->set(demo.getWallpaper().getColor().a)
 		->setCallback([&](auto* w) {
 			assert(sfw::getWidget("theme-selector", w));
@@ -459,8 +459,8 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	if (auto w = sfw::getWidget<sfw::Slider>("font size slider", demo); w)
 		w->update(14);
 
-	sliderForRotation->set(104);
-	sliderForSize->set(1.2f);
+	sliderForRotation->update(104);
+	sliderForSize->update(1.2f);
 	// Colors of the example text + rect:
 	optTxtColor->select("Red"); // Now all ready, safe to trigger the update callback (so, not just set()...)
 	optTxtBg->select("Black");

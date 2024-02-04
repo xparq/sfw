@@ -1,55 +1,93 @@
-#ifndef GUI_PROGRESS_BAR_HPP
-#define GUI_PROGRESS_BAR_HPP
+#ifndef SFW_PROGRESS_BAR_HPP
+#define SFW_PROGRESS_BAR_HPP
 
 #include "sfw/Widget.hpp"
+#include "sfw/Geometry.hpp"
 #include "sfw/Gfx/Elements/Box.hpp"
 #include "sfw/Gfx/Elements/Text.hpp"
-#include "sfw/Geometry.hpp"
 
 namespace sfw
 {
 
 enum LabelPlacement
 {
-    LabelNone,   // Do no display the label
-    LabelOver,   // Display the label over the progress bar
-    LabelOutside // Display the label outside the progress bar
+	LabelNone,   // Don't display the label
+	LabelOver,   // Label over (inside) the progress bar
+	LabelOutside // Label next to or below the bar
 };
 
-/**
- * This widget provides a horizontal progress bar.
- * Passive widget: cannot be focused or trigger event
- */
+/*
+   Basic horizontal/vertical progress bar
+
+   Static output-only widget: can't be interacted with, or trigger events.
+*/
 class ProgressBar: public Widget
 {
 public:
-    /**
-     * @param length: bar length bar in pixels (Horizontal or Vertical, according to orientation)
-     * @param orientation: orientation of the progress bar (Horizontal or Vertical)
-     * @param labelPlacement: where to place the label (XXX%)
-     */
-    ProgressBar(float length = 200.f, Orientation orientation = Horizontal, LabelPlacement labelPlacement = LabelOver);
+	struct Range
+	{
+		float min = 0, max = 100;
+		float size() const { return max - min; }
+	};
+	struct Cfg
+	{
+		float length = 200; // Widget width or height (in pixels), depending on orientation
+		Range range = {0, 100};
+		std::string unit = "!usedefault!"; //!! This `unit` field will be superceded by a versatile formatting pattern in teh future!
+//		float step = 1;
+		Orientation orientation = Horizontal;
+//		bool invert = false; // Default direction: down/left < up/right
+//!!		std::string label; //!! Will be a formatting pattern, obsoleting `unit`!
+		LabelPlacement label_placement = LabelOver;
+	};
 
-    /// [0..100]
-    ProgressBar* set(float value);
-    float get() const;
+	ProgressBar(const Cfg& cfg = Cfg()/*, const Style& style = Style()*/);
+
+	//!! DEPRECATED:
+	/**
+	 * @param length: Widget length in pixels (becomes width or height, according to orientation)
+	 * @param orientation: Horizontal or Vertical
+	 * @param labelPlacement: Where (or if) to show the label
+	 */
+	ProgressBar(float length = 200.f, Orientation orientation = Horizontal, LabelPlacement labelPlacement = LabelOver);
+
+
+	ProgressBar* set(float value); // Percent (0 <= value <= 100) by default; see setRange()!
+	float get() const;
+
+	ProgressBar* setRange(float min, float max, std::string unit = "");
+	const Range& range() const;
+	float min() const;
+	float max() const;
 
 private:
-    void draw(const gfx::RenderContext& ctx) const override;
-    // Callbacks
-    void onThemeChanged() override;
-    // Helpers
-    void updateGeometry();
+	void draw(const gfx::RenderContext& ctx) const override;
+	// Callbacks
+	void onThemeChanged() override;
+	// Helpers
+	void updateGeometry();
+	float track_length() const;
+	float val_to_barlength(float v) const;
 
-    Orientation m_orientation;
-    float m_boxLength;
-    LabelPlacement m_labelPlacement;
-    float m_value;
-    Box m_box;
-    sf::Vertex m_bar[4];
-    Text m_label;
-};
+	enum VertexIndex : unsigned { TopLeft, BottomLeft, TopRight, BottomRight, _VERTEX_COUNT_ };
 
-} // namespace
+	Cfg m_cfg;
 
-#endif // GUI_PROGRESS_BAR_HPP
+	float m_value;
+
+	Box m_box;
+	sf::Vertex m_bar[_VERTEX_COUNT_];
+	Text m_label;
+}; // ProgressBar
+
+
+//----------------------------------------------------------------------------
+inline const ProgressBar::Range& ProgressBar::range() const { return m_cfg.range; }
+//inline float ProgressBar::step() const { return m_cfg.step; }
+//inline float ProgressBar::intervals() const { return m_cfg.range.size() / step(); }
+inline float ProgressBar::min() const { return m_cfg.range.min; }
+inline float ProgressBar::max() const { return m_cfg.range.max; }
+
+} // namespace sfw
+
+#endif // SFW_PROGRESS_BAR_HPP
