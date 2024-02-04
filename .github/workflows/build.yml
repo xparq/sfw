@@ -16,7 +16,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cc: [clang++, g++]
+#!! Clang can no longer share the same prepackaged SFML libs with GCC!
+#!! And my setup script doesn't care about that yet, so, disabling:
+#        cc: [clang++, g++]
+        cc: [g++]
         target: [linux]
     steps:
       - uses: actions/checkout@v3
