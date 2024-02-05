@@ -34,10 +34,11 @@ enum LabelPlacement
 		{
 			float length = 200; // Widget width or height (in pixels), depending on orientation
 			Range range = {0, 100};
-			std::string unit = "!usedefault!"; //!! This `unit` field will be superceded by a versatile formatting pattern in teh future!
 	//		float step = 1;
 			Orientation orientation = Horizontal;
 	//		bool invert = false; // Default direction: down/left < up/right
+			bool clamp = true; // Setting out-of-range values is disabled by default
+			std::string unit = "!usedefault!"; //!! This `unit` field will be superceded by a versatile formatting pattern in teh future!
 	//!!		std::string label; //!! Will be a formatting pattern, obsoleting `unit`!
 			LabelPlacement label_placement = LabelOver;
 		};

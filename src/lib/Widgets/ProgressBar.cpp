@@ -12,9 +12,8 @@ namespace sfw
 ProgressBar::ProgressBar(const Cfg& cfg/*, const Style& style*/) :
 	m_cfg(cfg)
 {
-	setFocusable(false); // Should be inherited from StaticWidget or sg.
+	setFocusable(false); //!! Should be inherited from sg. like OutputWidget or StaticWidget...
 
-	// Make sure the initial value is valid:
 	m_value = min(); //!!?? set(min());
 
 	// Assume % as the default unit, but only if the default range has been kept:
@@ -39,8 +38,11 @@ ProgressBar* ProgressBar::set(float value)
 {
 	if (value != m_value) // Really changing?
 	{
-		value = std::max(min(), value);
-		value = std::min(max(), value);
+		if (m_cfg.clamp) // See updateGeometry() for safeguarding against unclamped values!
+		{
+			value = std::max(min(), value);
+			value = std::min(max(), value);
+		}
 		m_value = value;
 
 		updateGeometry();
@@ -85,7 +87,11 @@ void ProgressBar::onThemeChanged()
 
 void ProgressBar::updateGeometry()
 {
-	// Bar...
+	//-----------------------------------------------
+	// Configure the visuals (once per init/reconf.)
+	//-----------------------------------------------
+
+	// Widget box...
 
 	if (m_cfg.orientation == Horizontal)
 	{
@@ -98,12 +104,7 @@ void ProgressBar::updateGeometry()
 		m_label.setRotation(sf::degrees(90.f));
 	}
 
-	m_label.setString("100%"); // Dummy value for "measurements" (size heuristics) only!
-	m_label.setFont(Theme::getFont());
-	m_label.setFillColor(Theme::input.textColor);
-	m_label.setCharacterSize((unsigned)Theme::textSize);
-
-	// Setup the widget box...
+	// Indicator bar...
 
 	const float x1 = Theme::PADDING;
 	const float y1 = Theme::PADDING;
@@ -121,6 +122,15 @@ void ProgressBar::updateGeometry()
 	m_bar[BottomRight].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
 
 	// Extend the widget box if the label will be outside the bar...
+
+	m_label.setString(stdstring_to_SFMLString("100" + m_cfg.unit)); // Shaky heuristics to find the maximum width the label might need...
+	                                       //!! Will certainly become incorrect with patterns later, but
+	                                       //!! it's already hopeless with arbitrary ranges (#287) now!
+	                                       //!! Anyway, the entire LabelOutside feature is kinda pathetic, TBH...
+	m_label.setFont(Theme::getFont());
+	m_label.setFillColor(Theme::input.textColor);
+	m_label.setCharacterSize((unsigned)Theme::textSize);
+
 	float labelWidth  = m_label.getLocalBounds().width;
 	float labelHeight = m_label.getLocalBounds().height;
 	if (m_cfg.label_placement == LabelOutside)
@@ -142,11 +152,22 @@ void ProgressBar::updateGeometry()
 		setSize(m_box.getSize());
 	}
 
-	// Update the indicator bar & the label...
+	//------------------------------------------------------------
+	// Visual updates/adjustments needed after every state change
+	//!! Should be a different function!
+	//------------------------------------------------------------
 
-	m_label.setString(std::to_string(int(round(m_value))) + m_cfg.unit);
+	// Indicator bar & label...
 
-	auto bar_length = val_to_barlength(m_value);
+	auto clamped_value = m_value;
+	if (!m_cfg.clamp) // If not clamped by set(), we need to do its job here!...
+	{
+		clamped_value = std::max(min(), std::min(max(), m_value));
+	}
+
+	m_label.setString(stdstring_to_SFMLString(std::to_string(int(round(m_value))) + m_cfg.unit)); //! The label should still show the original value,
+	                                                                     //! that's the whole point of clamp = false!
+	auto bar_length = val_to_barlength(clamped_value);
 	if (m_cfg.orientation == Horizontal)
 	{
 		m_bar[TopRight].position.x = m_bar[BottomRight].position.x

@@ -235,8 +235,9 @@ int main()
 	// Slider + progress bars for rotating
 	auto sliderForRotation = new Slider({.range={0, 360}});
 	auto pbarRotation1 = new ProgressBar({.length=200, .range={0, 360}, .label_placement=LabelNone});
-	auto pbarRotation2 = new ProgressBar({.length=200, .range={0, 360}, .label_placement=LabelOver});
-	auto pbarRotation3 = new ProgressBar({.length=200, .range={0, 360}, .label_placement=LabelOutside});
+	auto pbarRotation2 = new ProgressBar({.length=200, .range={0, 360}, .unit="°", .label_placement=LabelOver});
+	auto pbarRotation3 = new ProgressBar({.length=200, .range={0, 100}, .clamp=false, //! Test no-clamp, too!
+	                                                                    .unit="°", .label_placement=LabelOutside});
 	sliderForRotation->setCallback([&](auto* w) {
 		auto degrees = w->get();
 		text.setRotation(sf::degrees(degrees));

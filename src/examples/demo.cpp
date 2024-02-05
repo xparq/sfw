@@ -179,8 +179,8 @@ int main()
 		pbarScale->set((w->get() - 1) / 2.f * 100);
 	});
 	// Slider + progress bar for rotating
-	auto sliderForRotation = new sfw::Slider({.length = 75, .range = {0, 360}, .orientation = sfw::Vertical});
-	auto pbarRotation = new sfw::ProgressBar({.length = 75, .range = {0, 360}, .orientation = sfw::Vertical});
+	auto sliderForRotation = new sfw::Slider({.length=75, .range={0, 360}, .orientation=sfw::Vertical});
+	auto pbarRotation = new sfw::ProgressBar({.length=75, .range={0, 360}, .orientation=sfw::Vertical, .unit="°"});
 	sliderForRotation->setCallback([&](auto* w) {
 		text.setRotation(sf::degrees(w->get()));
 		pbarRotation->set(w->get());
