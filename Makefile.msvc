@@ -57,7 +57,7 @@ SFML=static
 custom_build_options = SFML=$(SFML)
 
 # Comp. flags:
-CFLAGS=-W4 -Iinclude
+CFLAGS=-W4 -Iinclude -Zc:preprocessor
 
 # Output dir/file suffixes for build alternatives
 SFML_linkmode=$(SFML)

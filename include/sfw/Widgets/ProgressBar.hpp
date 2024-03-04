@@ -58,7 +58,7 @@ public:
 	 * @param orientation: Horizontal or Vertical
 	 * @param labelPlacement: Where (or if) to show the label
 	 */
-	ProgressBar(float length = 200.f, Orientation orientation = Horizontal, LabelPlacement labelPlacement = LabelOver);
+	ProgressBar(float length, Orientation orientation = Horizontal, LabelPlacement labelPlacement = LabelOver);
 
 
 	ProgressBar* set(float value); // Percent (0 <= value <= 100) by default; see setRange()!

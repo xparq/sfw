@@ -135,6 +135,11 @@ int main()
 	issues_3->add("", new Label("#335: empty label OK")); // Still on the right side?
 
 
+	// #347...
+	auto issue_347 = test_hbox->add(new Form);
+	issue_347->add("guarded box", TextBox(50));
+	
+
 	demo.add(new Label("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"
 	                   "(proper separators are not yet supported...)"
 	                   "––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––"))->setStyle(sf::Text::Style::Italic);
@@ -344,7 +349,7 @@ int main()
 
 	// Button factory...
 	auto boxfactory = middle_panel->add(HBox());
-	auto labeller = boxfactory->add(TextBox(100))->set("Edit Me!")->setPlaceholder("Button label");
+	auto labeller = boxfactory->add(TextBox(100), "editme")->set("Edit Me!")->setPlaceholder("Button label");
 	boxfactory->add(Button("Create button", [&] {
 		middle_panel->addAfter(boxfactory, new Button(labeller->get()));
 	}));
@@ -526,6 +531,81 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	//!!#160, too:
 	optTxtColor->select("Red"); // Now all ready, safe to trigger the update callback (so, not just set()...)
 	optTxtBg->select("Black");
+
+
+	//--------------------------------------------------------------------
+	// Guarded widget access...
+	//
+	sfw::apply<&TextBox::set>("guarded box", "It works!");
+
+	// Tricks with a user-defined string literal:
+	sfw::apply_W<"guarded box"_W, &TextBox::set>("It works!");
+	((TextBox*)"guarded box"_W)->set("It works!");
+	((TextBox&)"guarded box"_W).set("It works!");
+	"guarded box"_W.call<&TextBox::set>("It works!");
+
+	// WidgetPtr(name).call<method>(args...):
+	WidgetPtr("guarded box").call<&TextBox::set>("It works!");
+	// Or could be:
+	//	W("guarded box").call<&TextBox::set>("It works!");
+	//	call<"guarded box"_W, &TextBox::set>("It works!");
+
+	//!! Can't do this, though: "guarded box"_W<TextBox>->set("It works!");
+
+	//!! Can't smuggle that <CheckBox> over to WidgetPtr this way! :-/
+	//!!	with<CheckBox>(WidgetPtr("findme"), &CheckBox::set, false); // free-func getter
+
+	with("findme", &CheckBox::set, false); // free-func getter
+	cerr	<< "Checkbox state - unchecked, but known to exist (should be false): "
+		<< with("findme", &CheckBox::get).value()
+		<< '\n'; // free-func getter
+
+	cerr	<< "Checkbox state - explicitly error-checked (same as above): ";
+	if (auto result = with("findme", &CheckBox::get); result)
+		cerr << result.value() << '\n';
+	else
+		cerr << "- this widget doesn't exist!\n";
+
+	cerr	<< "State of a nonexistent slider (should be empty, plus error(s)...):\n";
+	if (auto result = with("*this widget does not exist*",
+		&Slider::get); result)
+		cerr << "- WOW: this widget still exists?! WTF???\n";
+	else
+		cerr << "- OK, this widget doesn't exist!\n";
+
+	SFW_UPDATE_WIDGET(CheckBox, "findme", set, true);
+	//!!with(Widget::get<CheckBox>("findme"), &CheckBox::set, true); // Widget-static getter
+	//!!Widget::with<CheckBox>("findme", &CheckBox::set, true); // Widget-static accessor
+
+	with("editme", &TextBox::set, "hijacked! :-o");
+	//!! But, alas, the templated update(...) won't compile here:
+	//!!with(getWidget<TextBox>("editme"), &TextBox::set, "hijacked! :-o");
+	//!!with(getWidget<TextBox>("editme"), &TextBox::update<TextBox>, "hijacked! :-o");
+	auto save_old = with_default("editme", &TextBox::get, "<WIDGET NOT FOUND!>");
+	with("editme", &TextBox::set, "hijacked! :-o");
+	cout	<< "SFW_QUERY_WIDGET_WITH_DEFAULT(TextBox, \"editme\", get...), should be \"hijacked! :-o\": "
+		<< SFW_QUERY_WIDGET_WITH_DEFAULT(TextBox, "editme", get, "<WIDGET NOT FOUND!>") << '\n';
+
+	with("editme", &TextBox::set, save_old);
+	SFW_UPDATE_WIDGET(TextBox, "editme", set, save_old); // Redundant; just verifying that it compiles.
+
+	//!! Wet-dream proxy classes... -- surprise, surprise: not really feasible. :-/
+	//!! It would require either an universal dummy "null" instance for every widget
+	//!! class, which is safe for their every method(!), and also a dedicated uniform
+	//!! constructor..., or, well, exceptions, to break the -> chaining done by the compiler!
+	//!!WidgetPtr<CheckBox>("findme")->set(true);
+	//!!WidgetRef<CheckBox>("findme").set(true);
+	//!!WidgetRef<CheckBox>("findme").get_or(false);
+	//!!Widget<CheckBox>("findme").set(true); // Perhaps even this, for the fearless!... ;)
+	//!!Widget<CheckBox>("findme").get_or(false);
+
+	// Null access prevented?
+	with("!!! FAKE 1 !!!", &TextBox::get);
+	cout << "Content of nonexistent textbox: "
+	     << with_default("!!! FAKE 2 !!!", &TextBox::get, "<WIDGET NOT FOUND!>") << '\n';
+
+	std::ignore = SFW_QUERY_WIDGET(TextBox, "MACRO_TEST... (VARIADIC)", get); //!! No default, so should be error-checked!
+	SFW_UPDATE_WIDGET(TextBox, "MACRO_TEST... (VARIADIC)", set, "crap");
 
 	//--------------------------------------------------------------------
 	// Start another thread for some unrelated job

@@ -12,6 +12,7 @@
 #include <SFML/Window/Cursor.hpp>
 #include <SFML/System/Clock.hpp>
 
+#include <string_view>
 #include <string>
 #include <unordered_map>
 #include <system_error>
@@ -82,7 +83,7 @@ public:
 	   type, see its implementation.
 	 *************************************************************************/
 	bool remember(Widget* widget, std::string name, bool override_existing = true);
-	Widget* recall(const std::string& name) const;
+	Widget* recall(std::string_view name) const;
 	std::string recall(const Widget*) const;
 
 	/**

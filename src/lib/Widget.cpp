@@ -21,7 +21,7 @@ using enum ActivationState;
 
 //----------------------------------------------------------------------------
 // See the header...
-/*static*/ Widget* Widget::getWidget_proxy(const std::string& name, const Widget* w/* = nullptr*/)
+/*static*/ Widget* Widget::getWidget_proxy(std::string_view name, const Widget* w/* = nullptr*/)
 {
 	assert(GUI::DefaultInstance);
 	auto Main = w ? w->getMain() : GUI::DefaultInstance;

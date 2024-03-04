@@ -339,10 +339,12 @@ bool GUI::remember(Widget* widget, string name, bool override_existing)
 }
 
 //----------------------------------------------------------------------------
-Widget* GUI::recall(const std::string& name) const
+Widget* GUI::recall(std::string_view name) const
 {
-	auto widget_iter = widgets.find(name);
-	if (widget_iter == widgets.end()) cerr << "- Warning: widget \"" << name << "\" not found!\n";
+	string name__cpp_double_bullshit{name}; // a) Can't just map.find(string_viuw), b) can't just string = string_view
+
+	auto widget_iter = widgets.find(name__cpp_double_bullshit);
+	if (widget_iter == widgets.end()) cerr << "- Warning: widget \"" << name__cpp_double_bullshit << "\" not found!\n";
 //if (widget_iter != widgets.end()) cerr << "recall: found widget: \"" << widget_iter->first << "\" == "<< (void*)widget_iter->second <<"\n";
 	return widget_iter != widgets.end() ? widget_iter->second : (Widget*)nullptr;
 }
