@@ -19,12 +19,18 @@ jobs:
 #!! Clang can no longer share the same prepackaged SFML libs with GCC!
 #!! And my setup script doesn't care about that yet, so, disabling:
 #        cc: [clang++, g++]
-        cc: [g++]
+#!! Also, as it turns out, the default g++ version is 11 on GitHub!... :-/
+#!!     cc: [g++]
+        cc: [g++-13]
         target: [linux]
     steps:
       - uses: actions/checkout@v3
       - name: Install SFML dependencies...
         run: |
+          cat /etc/os-release; cat /etc/issue
+          g++-13 --version
+          # Bummer: Ubuntu 22.04 still doesn't have GNU make 4.4 (e.g. for .WAIT)! :-o :-/
+          make --version
           sudo apt install libgl-dev
           # The rest is only needed for static builds:
           sudo apt install libx11-dev
@@ -50,4 +56,4 @@ jobs:
 
       - name: Smoke test...
         run: |
-          ./test/smoke
+          ./test/smoke-linux

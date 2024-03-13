@@ -17,16 +17,11 @@ include/**/.*
 *.pdb
 
 # Test/demo binaries
-*-demo
-*-test
-*-demo-d
-*-test-d
-test/smoke
-test/main
-test/main-*
+*.exe
+*-linux
+test/**/*-linux
 test/**/*.exe
 # Ignore these in the root & test only (may have some in tooling/ etc.)
-/*.exe
 
 # Lib
 lib/
