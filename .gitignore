@@ -1,6 +1,7 @@
 tmp/
 *.tmp
 *.off
+*.old
 
 # Smaller external deps. are kept embedded locally, but SFML is not one of those:
 extern/sfml/
@@ -19,6 +20,8 @@ include/**/.*
 # Test/demo binaries
 *.exe
 *-linux
+*-linux-s
+*-d-s
 test/**/*-linux
 test/**/*.exe
 # Ignore these in the root & test only (may have some in tooling/ etc.)

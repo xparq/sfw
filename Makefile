@@ -118,8 +118,8 @@ EXAMPLE_EXES   = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(DEMO_DIR)/%$(TOOLCHA
 
 #!! This junk is needed to stop GNU make automatically deleting the object files! :-o
 #!! (Except it didn't work; see comments at the "Main rules" section!...)
-#_test_objs     = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(OBJDIR)/$(TESTS_TAGDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(OBJ_SUFFIX)))
-#_example_objs  = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(OBJ_SUFFIX)))
+_test_objs     = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(OBJDIR)/$(TESTS_TAGDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(OBJ_SUFFIX))
+_example_objs  = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(OBJ_SUFFIX))
           
 
 # Tag the executables with "-mingw", or nothing, respectively:
@@ -167,16 +167,17 @@ LIBFILE_STATIC  := $(LIBDIR)/$(libname_prefix)$(LIBNAME)$(libext_static)
 #-----------------------------------------------------------------------------
 define link_cmd =
 	@echo "$(TERM_YELLOW)Linking $@$(TERM_NO_COLOR)"
-	$(LINKER) $< $(LDFLAGS)
-	@echo "$(TERM_GREEN)Done.$(TERM_NO_COLOR)"
+	@$(LINKER) $< $(LDFLAGS)
 endef
+#!! Wow, couldn't just comment out the last line of link_cmd, so moved here:
+#	@echo "$(TERM_GREEN)Done.$(TERM_NO_COLOR)"
 
 
 #-----------------------------------------------------------------------------
 # Main rules...
 #-----------------------------------------------------------------------------
 # Stop GNU make butchering incremental builds by default:
-#OBJS = $(LIBOBJ) $(_test_objs) $(_example_objs)
+OBJS = $(LIBOBJ) $(_test_objs) $(_example_objs)
 #$(info OBJS = $(OBJS))
 #!! Didn't work:
 #.PRECIOUS: $(OBJS)
@@ -237,7 +238,7 @@ $(OBJDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(objext): $(SRCDIR)/%.cpp
 	@$(MKDIR) $(shell dirname $@)
 #	$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
 #	$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
-	$(CXX) $(CXXFLAGS) $(CLIBFLAGS) $(CEXEFLAGS) -c $<
+	@$(CXX) $(CXXFLAGS) $(CLIBFLAGS) $(CEXEFLAGS) -c $<
 
 # Link each test source (via its .o) into a separate executable:
 $(TEST_DIR)/%$(exeext): $(OBJDIR)/$(TESTS_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
@@ -248,3 +249,18 @@ $(TEST_DIR)/%$(exeext): $(OBJDIR)/$(TESTS_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
 $(DEMO_DIR)/%$(exeext): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
 	@$(MKDIR) $(shell dirname $@)
 	$(link_cmd)
+
+
+#-----------------------------------------------------------------------------
+# Header dependencies...
+#-----------------------------------------------------------------------------
+
+-include $(OBJS:%$(objext)=%.d)
+
+# Copied from the DarkPlaces Quake clone makefile, as a hommage:
+# hack to deal with no-longer-needed .h files
+%.h:
+	@echo
+	@echo "NOTE: file $@ mentioned in dependencies missing, continuing..."
+#	@echo "HINT: consider 'make clean'"
+	@echo

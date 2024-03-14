@@ -43,8 +43,8 @@ CXX = ${CXX.$(TOOLCHAIN)}
 
 _compflags_warnings.gcclike := -Wall -pedantic -Wextra -Wshadow -Wwrite-strings
 CFLAGS_COMMON = -I. -Iinclude
-CFLAGS_COMMON.linux = -o "$@" $(_compflags_warnings.gcclike) -O3 -fPIC
-CFLAGS_COMMON.mingw = -o "$@" $(_compflags_warnings.gcclike) -O3
+CFLAGS_COMMON.linux = -o "$@" -MMD $(_compflags_warnings.gcclike) -O3 -fPIC
+CFLAGS_COMMON.mingw = -o "$@" -MMD $(_compflags_warnings.gcclike) -O3
 CFLAGS_COMMON.msvc  = -Fo"$@" -nologo -W4 -O2
 CFLAGS_COMMON.msvc.static =
 CFLAGS_COMMON.msvc.shared =
