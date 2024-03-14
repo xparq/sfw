@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-    name: Multi-Build (GCC & CLANG, only on Linux yet!)
+    name: Multi-Build (Only GCC on Linux is enabled currently!)
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -41,7 +41,7 @@ jobs:
       - name: Download & setup SFML/master...
         run: ./tooling/sfml-setup ${{ matrix.target }}
       - name: Build (Ubuntu only! Windows is being manually tested locally for now...)
-        run: make CC=${{ matrix.cc }} TOOLCHAIN=${{ matrix.target }}
+        run: make CXX=${{ matrix.cc }} TOOLCHAIN=${{ matrix.target }}
 
       - name: Smoke test - Set PATH for the SFML shared libs...
         run: echo "LD_LIBRARY_PATH=${{ github.workspace }}/${{ env.SFML_DIR }}/lib" >> $GITHUB_ENV

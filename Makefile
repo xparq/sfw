@@ -13,13 +13,7 @@
 #   issues with shared-linking it on a WSL Debian, but can't recall what exactly...]
 #-----------------------------------------------------------------------------
 
-# "Detect" default GCC/CLANG flavor ("mingw" on Windows, "linux" otherwise;
-# rather hamfisted, but OK for now) -- use `make TOOLCHAIN=...` to override!):
-ifeq "$(shell echo ${WINDIR})" ""
-TOOLCHAIN ?= linux
-else
-TOOLCHAIN ?= mingw
-endif
+include tooling/build/Make-toolcfg.inc
 
 #-----------------------------------------------------------------------------
 # Build options...
@@ -39,8 +33,6 @@ SFML_DIR      ?= extern/sfml/$(TOOLCHAIN)
 
 NAME      := sfw
 LIBNAME   := $(NAME)
-
-DEMO       = $(NAME)-demo
 
 # What to run for the `test` rule:
 TEST       = $(TEST_DIR)/main
@@ -69,31 +61,36 @@ GHA_OLD_CLANG_WORKAROUND := -stdlib=libc++
 endif
 #=============================================================================
 
-CC        := g++
-CFLAGS    := -I$(SFML_DIR)/include -I./include -std=c++23 $(GHA_OLD_CLANG_WORKAROUND) -pedantic -Wall -Wextra -Wshadow -Wwrite-strings -O2
-LDFLAGS   := $(LDFLAGS) -L$(SFML_DIR)/lib
+CFLAGS_COMMON += -I$(SFML_DIR)/include $(GHA_OLD_CLANG_WORKAROUND)
 #!! This may also be needed on Debian (not on Ubuntu) -- but just compiled it on my WSL Bullseye without it, so WTF?? --:
 #!! LDFLAGS   := -pthread $(LDFLAGS)
 
 # Switch various params. according to the host platform (i.e. the list
 # of "auxilary" libs for static build, terminal control etc.)
 #!!Incorrectly merged condition of build (host) platform and toolchain!
-ifeq "$(shell echo ${WINDIR})" ""
-# --- Not Windows (assuming "something Linux-like"):
-AUXLIBS       := -lGL -lX11 -lXrandr -lXcursor -ludev
-EXE_SUFFIX    :=
-#!!OBJ_SUFFIX    := .o
+ifneq "$(BUILDENV_OS)" "windows"
+# --- Not Windows (assuming "Linux-like & GCC-like"):
 TERM_YELLOW   := \033[1;33m
 TERM_GREEN    := \033[1;32m
 TERM_NO_COLOR := \033[0m
+AUXLIBS       := -lGL -lX11 -lXrandr -lXcursor -ludev
+LDFLAGS       += -L./$(LIBDIR) -l$(LIBNAME) -L$(SFML_DIR)/lib
 else
 # --- Windows:
+TERM_YELLOW   :=
+TERM_GREEN    :=
+TERM_NO_COLOR :=
+ifneq "$(TOOLCHAIN)" "msvc"
 AUXLIBS       := -lopengl32 -lwinmm -lgdi32
-EXE_SUFFIX    := .exe
-#!!OBJ_SUFFIX    := .o
+LDFLAGS       += -L./$(LIBDIR) -l$(LIBNAME) -L$(SFML_DIR)/lib
+else
+# --- MSVC:
+AUXLIBS       := user32.lib kernel32.lib gdi32.lib winmm.lib advapi32.lib opengl32.lib
+LDFLAGS       += /LIBPATH:./$(LIBDIR) $(LIBFILE_STATIC) /LIBPATH:$(SFML_DIR)/lib
+endif
 endif
 #!! See comment above; also, only GCC style is supported yet! (See e.g. OON for a less caveman-like example!)
-OBJ_SUFFIX    := .o
+OBJ_SUFFIX    := $(objext)
 
 #-----------------------------------------------------------------------------
 # Prepare the artifact lists...
@@ -101,11 +98,11 @@ OBJ_SUFFIX    := .o
 
 #!! Only *.cpp yet!...
 #! Note: that cd is to omit the $(SRCDIR) root from the results for easier mapping to $(OBJDIR).
-LIBSRC     := $(shell cd "$(SRCDIR)"; find "$(LIB_TAGDIR)" -name "*.cpp" -type f) # ... -not \( -path "$(EXCLUDE_SRCDIR)*" -type d -prune \) ...
+LIBSRC     := $(shell $(CD) "$(SRCDIR)"; $(FIND) "$(LIB_TAGDIR)" -name "*.cpp" -type f) # ... -not \( -path "$(EXCLUDE_SRCDIR)*" -type d -prune \) ...
 #$(info LIBSRC = $(LIBSRC))
-TESTSRC    := $(shell cd "$(SRCDIR)"; find "$(TESTS_TAGDIR)" -name "*.cpp" -type f)
+TESTSRC    := $(shell $(CD) "$(SRCDIR)"; $(FIND) "$(TESTS_TAGDIR)" -name "*.cpp" -type f)
 #$(info TESTSRC = $(TESTSRC))
-EXAMPLESRC := $(shell cd "$(SRCDIR)"; find "$(EXAMPLES_TAGDIR)" -name "*.cpp" -type f)
+EXAMPLESRC := $(shell $(CD) "$(SRCDIR)"; $(FIND) "$(EXAMPLES_TAGDIR)" -name "*.cpp" -type f)
 #$(info EXAMPLESRC = $(EXAMPLESRC))
 #$(error x)
 
@@ -114,10 +111,10 @@ EXAMPLES_SRCDIR := $(SRCDIR)/$(EXAMPLES_TAGDIR)
 
 LIBOBJ         = $(LIBSRC:%.cpp=$(OBJDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(OBJ_SUFFIX))
 #!! These aren't derived directly from ...SRC to allow decoupling the exes from single source files later:
-_test_srcs     = $(shell find $(TEST_SRCDIR) -name "*.cpp" -type f)
-TEST_EXES      = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(TEST_DIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(EXE_SUFFIX))
-_example_srcs  = $(shell    find $(EXAMPLES_SRCDIR) -name "*.cpp" -type f)
-EXAMPLE_EXES   = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(DEMO_DIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(EXE_SUFFIX))
+_test_srcs     = $(shell $(FIND) $(TEST_SRCDIR) -name "*.cpp" -type f)
+TEST_EXES      = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(TEST_DIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(exeext))
+_example_srcs  = $(shell $(FIND) $(EXAMPLES_SRCDIR) -name "*.cpp" -type f)
+EXAMPLE_EXES   = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(DEMO_DIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(exeext))
 
 #!! This junk is needed to stop GNU make automatically deleting the object files! :-o
 #!! (Except it didn't work; see comments at the "Main rules" section!...)
@@ -126,37 +123,51 @@ EXAMPLE_EXES   = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(DEMO_DIR)/%$(TOOLCHA
           
 
 # Tag the executables with "-mingw", or nothing, respectively:
-TOOLCHAIN_TAG := $(if $(findstring linux,$(TOOLCHAIN)),-linux,-mingw)
+#!!OLD: TOOLCHAIN_TAG := $(if $(findstring linux,$(TOOLCHAIN)),-linux,-mingw)
+TOOLCHAIN_TAG := -$(TOOLCHAIN)
 
 FILE_SUFFIX_DEBUG_1                      := -d
 DIR_SUFFIX_DEBUG_1                       := .d
 FILE_SUFFIX_SFML_LINKMODE_shared_DEBUG_1 := -d
 FILE_SUFFIX_SFML_LINKMODE_static_DEBUG_0 := -s
 FILE_SUFFIX_SFML_LINKMODE_static_DEBUG_1 := -s-d
-CC_FLAGS_SFML_LINKMODE_static_DEBUG_0    := -DNDEBUG -DSFML_STATIC
-CC_FLAGS_SFML_LINKMODE_static_DEBUG_1    := -DDEBUG -DSFML_STATIC
-CC_FLAGS_SFML_LINKMODE_shared_DEBUG_0    := -DNDEBUG
-CC_FLAGS_SFML_LINKMODE_shared_DEBUG_1    := -DDEBUG
-LINK_FLAGS_SFML_LINKMODE_static_DEBUG_0  := -static -lsfml-graphics-s   -lsfml-window-s   -lsfml-system-s   -lfreetype $(AUXLIBS)
-LINK_FLAGS_SFML_LINKMODE_static_DEBUG_1  := -static -lsfml-graphics-s-d -lsfml-window-s-d -lsfml-system-s-d -lfreetype $(AUXLIBS)
-LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_0  := -lsfml-graphics -lsfml-window -lsfml-system       $(AUXLIBS)
-LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_1  := -lsfml-graphics-d -lsfml-window-d -lsfml-system-d $(AUXLIBS)
 
-FILE_SUFFIX :=           $(FILE_SUFFIX_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
-CFLAGS      :=    $(CFLAGS) $(CC_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
-LDFLAGS     := $(LDFLAGS) $(LINK_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
+_sfml_lib_names := sfml-graphics sfml-window sfml-system
+_sfml_lib_names_static := $(patsubst %,%-s,$(_sfml_lib_names))
+_sfml_lib_names_debug := $(patsubst %,%-d,$(_sfml_lib_names))
+_sfml_lib_names_static_debug := $(patsubst %,%-s-d,$(_sfml_lib_names))
+
+CC_FLAGS_SFML_LINKMODE_static_DEBUG_0    := -DSFML_STATIC
+CC_FLAGS_SFML_LINKMODE_static_DEBUG_1    := -DSFML_STATIC
+CC_FLAGS_SFML_LINKMODE_shared_DEBUG_0    :=
+CC_FLAGS_SFML_LINKMODE_shared_DEBUG_1    :=
+LINK_FLAGS_SFML_LINKMODE_static_DEBUG_0  := $(patsubst %,-l%,$(_sfml_lib_names_static))  -lfreetype  $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_static_DEBUG_1  := $(patsubst %,-l%,$(_sfml_lib_names_static_debug))  -lfreetype  $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_0  := $(patsubst %,-l%,$(_sfml_lib_names))  $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_1  := $(patsubst %,-l%,$(_sfml_lib_names_debug))  $(AUXLIBS)
+ifeq "$(TOOLCHAIN)" "msvc"
+# Add an extra -s to the static libs for my custom SFML build for MSVC/CRTstatic!...
+LINK_FLAGS_SFML_LINKMODE_static_DEBUG_0  := $(patsubst %,%-s.lib,$(_sfml_lib_names_static))  freetype.lib $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_static_DEBUG_1  := $(patsubst %,%-s-d.lib,$(_sfml_lib_names_static))  freetype.lib $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_0  := $(patsubst %,%.lib,$(_sfml_lib_names))  $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_1  := $(patsubst %,%.lib,$(_sfml_lib_names_debug))  $(AUXLIBS)
+endif
+
+FILE_SUFFIX   := $(FILE_SUFFIX_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
+CFLAGS_COMMON +=    $(CC_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
+LDFLAGS       +=  $(LINK_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
 
 # Under GCC the same lib (i.e. compilation mode) seems to work just fine 
 # for linking with both the static and dynamic SFML libs, so enough to just
 # dispatch for debug mode:
 OBJDIR   := $(OUTDIR)/o$(DIR_SUFFIX_DEBUG_$(DEBUG))
 LIBNAME  := $(LIBNAME)$(FILE_SUFFIX_DEBUG_$(DEBUG))
-LIBFILE  := $(LIBDIR)/lib$(LIBNAME).a
+LIBFILE_STATIC  := $(LIBDIR)/$(libname_prefix)$(LIBNAME)$(libext_static)
 
 #-----------------------------------------------------------------------------
 define link_cmd =
 	@echo "$(TERM_YELLOW)Linking $@$(TERM_NO_COLOR)"
-	$(CC) $< $(CFLAGS) -L./$(LIBDIR) -l$(LIBNAME) $(LDFLAGS) -o $@
+	$(LINKER) $< $(LDFLAGS)
 	@echo "$(TERM_GREEN)Done.$(TERM_NO_COLOR)"
 endef
 
@@ -182,24 +193,25 @@ $(info Build option SFML_LINKMODE = $(SFML_LINKMODE))
 .PHONY: lib test_exes examples run_tests clean
 all: lib test_exes examples #run_test
 
-lib: $(LIBFILE)
+lib: $(LIBFILE_STATIC)
 test_exes: $(TEST_EXES)
 examples: $(EXAMPLE_EXES)
 
-$(LIBFILE): $(LIBOBJ)
-	@echo "$(TERM_YELLOW)Creating library$(TERM_NO_COLOR) $@"
-	@mkdir -p $(LIBDIR)
-	@ar crvf $@ $^
+$(LIBFILE_STATIC): $(LIBOBJ)
+	@$(ECHO) "$(TERM_YELLOW)Creating library$(TERM_NO_COLOR) $@"
+	@$(MKDIR) $(LIBDIR)
+	@$(LIBTOOL_STATIC) $(LIBTOOL_STATIC_FLAGS) $^
+#	@ar crvf $@ $^
 
 run_tests: test_exes
-	@echo "$(TERM_YELLOW)Running tests...$(TERM_NO_COLOR) $(TEST_EXE)"
+	@$(ECHO) "$(TERM_YELLOW)Running tests...$(TERM_NO_COLOR) $(TEST_EXE)"
 	@$(TEST_EXE)
 
 #!! OBSOLETE:
 #clean:
-#	@echo "$(TERM_YELLOW)Removing$(TERM_NO_COLOR) $(OBJDIR) & $(LIBFILE)"
+#	@echo "$(TERM_YELLOW)Removing$(TERM_NO_COLOR) $(OBJDIR) & $(LIBFILE_STATIC)"
 #	-@rm -r $(OBJDIR)
-#	-@rm -r $(LIBFILE)
+#	-@rm -r $(LIBFILE_STATIC)
 #
 #mrproper: clean
 #	@echo "$(TERM_YELLOW)Removing$(TERM_NO_COLOR) $(DEMO_EXE)"
@@ -215,17 +227,24 @@ run_tests: test_exes
 
 # Common rule to compile any of the obj files (mirroring the source tree in
 # $(OBJDIR), and tagging the targets according to the build mode):
-$(OBJDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX).o: $(SRCDIR)/%.cpp
-	@echo "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) $<"
-	@mkdir -p $(shell dirname $@)
-	@$(CC) $(CFLAGS) -c $< -o $@
+#!!
+#!! The lib sources would still need to be done separately, as those
+#!! need different options! (E.g. no default lib vs. -MT[d]/-MD[d] etc.;
+#!! see CLIBFLAGS vs. CEXEFLAGS!)
+#!!
+$(OBJDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(objext): $(SRCDIR)/%.cpp
+	@$(ECHO) "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) $<"
+	@$(MKDIR) $(shell dirname $@)
+#	$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
+#	$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $(CLIBFLAGS) $(CEXEFLAGS) -c $<
 
 # Link each test source (via its .o) into a separate executable:
-$(TEST_DIR)/%$(EXE_SUFFIX): $(OBJDIR)/$(TESTS_TAGDIR)/%.o $(LIBFILE)
-	@mkdir -p $(shell dirname $@)
+$(TEST_DIR)/%$(exeext): $(OBJDIR)/$(TESTS_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
+	@$(MKDIR) $(shell dirname $@)
 	$(link_cmd)
 
 # Link each example source (via its .o) into a separate executable:
-$(DEMO_DIR)/%$(EXE_SUFFIX): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%.o $(LIBFILE)
-	@mkdir -p $(shell dirname $@)
+$(DEMO_DIR)/%$(exeext): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
+	@$(MKDIR) $(shell dirname $@)
 	$(link_cmd)
