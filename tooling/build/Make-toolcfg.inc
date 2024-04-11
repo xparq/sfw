@@ -8,7 +8,7 @@ BUILDENV_OS ?= $(if $(or $(shell echo $(windir)),$(shell echo $(WINDIR))),$(if $
 # rather hamfisted, but OK for now) -- use `make TOOLCHAIN=...` to override!):
 TOOLCHAIN ?= $(if $(or $(shell echo $(windir)),$(shell echo $(WINDIR))),$(if $(or $(shell echo $(VCToolsVersion)),$(shell echo $(VCToolsVersion))),msvc,mingw),linux)
 
-$(info Assuming TOOLCHAIN = $(TOOLCHAIN) ($(BUILDENV_OS)))
+$(info Assuming OS/TOOLCHAIN = $(BUILDENV_OS)/$(TOOLCHAIN))
 
 
 #-----------------------------------------------------------------------------
@@ -69,10 +69,11 @@ CXXFLAGS.mingw  = -std=c++23
 CXXFLAGS.msvc   = -std:c++latest -EHsc -Zc:preprocessor
 CXXFLAGS += $(CFLAGS_COMMON) ${CXXFLAGS.$(TOOLCHAIN)}
 
-# Compiler options to use only when compiling objects for the lib:
+# Compiler options to use only when compiling code for the lib:
 CLIBFLAGS.linux  =
 CLIBFLAGS.mingw  =
-CLIBFLAGS.msvc.static = -Zl # Omit default lib
+CLIBFLAGS.msvc.static = $(if $(findstring static,$(CRT_LINKMODE)),-MT,-MD)
+#!!                     -Zl # Omit default lib
 CLIBFLAGS.msvc.shared = -LD # Create DLL <-!! Likely irrelevant here, as it's a flag for linking!
 CLIBFLAGS.msvc   = ${CLIBFLAGS.msvc.$(LIB_MODE)}
 CLIBFLAGS = ${CLIBFLAGS.$(TOOLCHAIN)}
@@ -80,8 +81,9 @@ CLIBFLAGS = ${CLIBFLAGS.$(TOOLCHAIN)}
 # Compiler options for compiling & linking the tests/examples:
 CEXEFLAGS.linux  =
 CEXEFLAGS.mingw  =
-CEXEFLAGS.msvc.debug_0  = -MT
-CEXEFLAGS.msvc.debug_1  = -MTd
+CLIBFLAGS.msvc_common   = $(if $(findstring static,$(CRT_LINKMODE)),-MT,-MD)
+CEXEFLAGS.msvc.debug_0  = $(CLIBFLAGS.msvc_common)
+CEXEFLAGS.msvc.debug_1  = $(CLIBFLAGS.msvc_common)d
 CEXEFLAGS.msvc = ${CEXEFLAGS.msvc.debug_$(DEBUG)}
 CEXEFLAGS = ${CEXEFLAGS.$(TOOLCHAIN)}
 

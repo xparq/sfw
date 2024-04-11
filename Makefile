@@ -18,14 +18,24 @@ include tooling/build/Make-toolcfg.inc
 #-----------------------------------------------------------------------------
 # Build options...
 #
-# - DEBUG must be 0 or 1 (default: 0)
-# - CC: g++ or clang++ (default: g++)
-# - SFML_LINKMODE must be static or shared (default: shared for linux, else static)
-# - SFML_DIR must point to a pre-built SFML package dir matching $(TOOLCHAIN)
+# - DEBUG: 0 (default) or 1 (also selects the SFML debug libs if 1!)
+# - CC: g++ (default) or clang++
+# - SFML_DIR: pre-built SFML package dir for the current toolchain
+# - SFML_LINKMODE: static (default for windows) or shared (default for linux)
+#!! Note: With GCC/Clang there seems to be no need to compile separately for SFML
+#!! shared vs. static mode, so enough to just dispatch for DEBUG there!
+#!! ?? Was this also true on native Linux, or was it only tested with W64devkit?!
+#!! ?? And what about Clang?
+#!! (I vaguely recall the separation only relevant for Windows DLLs, so likely
+#!! both true (and then the VPAT/VTAG logic should obey!), but be sure + explicit!)
+# - CRT_LINKMODE: static (default) or shared (MSVC CRT lib; i.e. CL /MT or /MD)
+#!! ?? Again, how does this translate to GCC/Clang?
 #-----------------------------------------------------------------------------
 DEBUG         ?= 0
-SFML_LINKMODE ?= $(if $(findstring linux,$(TOOLCHAIN)),shared,static)
 SFML_DIR      ?= extern/sfml/$(TOOLCHAIN)
+SFML_LINKMODE ?= $(if $(findstring linux,$(TOOLCHAIN)),shared,static)
+#!! Only used for MSVC currently (to select -MD/-MT):
+CRT_LINKMODE  ?= static
 
 #-----------------------------------------------------------------------------
 # Project layout...
@@ -45,8 +55,11 @@ LIB_TAGDIR     := lib
 TESTS_TAGDIR    := test
 EXAMPLES_TAGDIR := examples
 
-OUTDIR    := tmp/build/$(TOOLCHAIN)
-OBJDIR    := $(OUTDIR)
+# Note the `=` below (and also that `tmp` is project-local):
+OUTDIR     = tmp/build/$(VROOT)
+OBJDIR     = $(OUTDIR)/o#!!... $(objext) <-- but this already has a dot prefix! :-/
+
+
 TEST_DIR  := test
 DEMO_DIR  := .
 
@@ -89,8 +102,6 @@ AUXLIBS       := user32.lib kernel32.lib gdi32.lib winmm.lib advapi32.lib opengl
 LDFLAGS       += /LIBPATH:./$(LIBDIR) $(LIBFILE_STATIC) /LIBPATH:$(SFML_DIR)/lib
 endif
 endif
-#!! See comment above; also, only GCC style is supported yet! (See e.g. OON for a less caveman-like example!)
-OBJ_SUFFIX    := $(objext)
 
 #-----------------------------------------------------------------------------
 # Prepare the artifact lists...
@@ -109,7 +120,18 @@ EXAMPLESRC := $(shell $(CD) "$(SRCDIR)"; $(FIND) "$(EXAMPLES_TAGDIR)" -name "*.c
 TEST_SRCDIR     := $(SRCDIR)/$(TESTS_TAGDIR)
 EXAMPLES_SRCDIR := $(SRCDIR)/$(EXAMPLES_TAGDIR)
 
-LIBOBJ         = $(LIBSRC:%.cpp=$(OBJDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(OBJ_SUFFIX))
+# Tag the executables with "-mingw", or nothing, respectively:
+#!!OLD: TOOLCHAIN_TAG := $(if $(findstring linux,$(TOOLCHAIN)),-linux,-mingw)
+TOOLCHAIN_TAG := -$(TOOLCHAIN)
+
+# Mind the `=` vs. `:=` in the section below...
+
+VROOT = $(TOOLCHAIN)/v.$(FILE_SUFFIX)#!! ...$(DIR_SUFFIX) <-- Use dots and/or subdirs instead of [-...[-...]]
+#!!??VDIR = ...$(TOOLCHAIN_TAG)$(FILE_SUFFIX)
+VTAG  = $(TOOLCHAIN_TAG)$(FILE_SUFFIX)
+VTAG_NOTC = $(FILE_SUFFIX)
+
+LIBOBJ         = $(LIBSRC:%.cpp=$(OBJDIR)/%$(objext))
 #!! These aren't derived directly from ...SRC to allow decoupling the exes from single source files later:
 _test_srcs     = $(shell $(FIND) $(TEST_SRCDIR) -name "*.cpp" -type f)
 TEST_EXES      = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(TEST_DIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(exeext))
@@ -118,16 +140,13 @@ EXAMPLE_EXES   = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(DEMO_DIR)/%$(TOOLCHA
 
 #!! This junk is needed to stop GNU make automatically deleting the object files! :-o
 #!! (Except it didn't work; see comments at the "Main rules" section!...)
-_test_objs     = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(OBJDIR)/$(TESTS_TAGDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(OBJ_SUFFIX))
-_example_objs  = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(OBJ_SUFFIX))
+_test_objs     = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(OBJDIR)/$(TESTS_TAGDIR)/%$(objext))
+_example_objs  = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext))
           
 
-# Tag the executables with "-mingw", or nothing, respectively:
-#!!OLD: TOOLCHAIN_TAG := $(if $(findstring linux,$(TOOLCHAIN)),-linux,-mingw)
-TOOLCHAIN_TAG := -$(TOOLCHAIN)
+#!!FILE_SUFFIX_DEBUG_1                      := -DBG
+#!!DIR_SUFFIX_DEBUG_1                       := .DBG
 
-FILE_SUFFIX_DEBUG_1                      := -d
-DIR_SUFFIX_DEBUG_1                       := .d
 FILE_SUFFIX_SFML_LINKMODE_shared_DEBUG_1 := -d
 FILE_SUFFIX_SFML_LINKMODE_static_DEBUG_0 := -s
 FILE_SUFFIX_SFML_LINKMODE_static_DEBUG_1 := -s-d
@@ -147,22 +166,26 @@ LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_0  := $(patsubst %,-l%,$(_sfml_lib_names))
 LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_1  := $(patsubst %,-l%,$(_sfml_lib_names_debug))  $(AUXLIBS)
 ifeq "$(TOOLCHAIN)" "msvc"
 # Add an extra -s to the static libs for my custom SFML build for MSVC/CRTstatic!...
-LINK_FLAGS_SFML_LINKMODE_static_DEBUG_0  := $(patsubst %,%-s.lib,$(_sfml_lib_names_static))  freetype.lib $(AUXLIBS)
-LINK_FLAGS_SFML_LINKMODE_static_DEBUG_1  := $(patsubst %,%-s-d.lib,$(_sfml_lib_names_static))  freetype.lib $(AUXLIBS)
+ifeq "$(CRT_LINKMODE)" "static"
+_s := -s
+endif
+LINK_FLAGS_SFML_LINKMODE_static_DEBUG_0  := $(patsubst %,%$(_s).lib,$(_sfml_lib_names_static))  freetype.lib $(AUXLIBS)
+LINK_FLAGS_SFML_LINKMODE_static_DEBUG_1  := $(patsubst %,%$(_s)-d.lib,$(_sfml_lib_names_static))  freetype.lib $(AUXLIBS)
 LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_0  := $(patsubst %,%.lib,$(_sfml_lib_names))  $(AUXLIBS)
 LINK_FLAGS_SFML_LINKMODE_shared_DEBUG_1  := $(patsubst %,%.lib,$(_sfml_lib_names_debug))  $(AUXLIBS)
 endif
 
-FILE_SUFFIX   := $(FILE_SUFFIX_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
+# If MSVC then add -MD for shared CRT, -MT for static CRT.
+ifeq "$(TOOLCHAIN)" "msvc"
+_crtmode_tag := $(if $(findstring static,$(CRT_LINKMODE)),-MT,-MD)
+endif
+FILE_SUFFIX   := $(_crtmode_tag)$(FILE_SUFFIX_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
 CFLAGS_COMMON +=    $(CC_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
 LDFLAGS       +=  $(LINK_FLAGS_SFML_LINKMODE_$(SFML_LINKMODE)_DEBUG_$(DEBUG))
 
-# Under GCC the same lib (i.e. compilation mode) seems to work just fine 
-# for linking with both the static and dynamic SFML libs, so enough to just
-# dispatch for debug mode:
-OBJDIR   := $(OUTDIR)/o$(DIR_SUFFIX_DEBUG_$(DEBUG))
-LIBNAME  := $(LIBNAME)$(FILE_SUFFIX_DEBUG_$(DEBUG))
+LIBNAME  := $(LIBNAME)$(VTAG_NOTC)
 LIBFILE_STATIC  := $(LIBDIR)/$(libname_prefix)$(LIBNAME)$(libext_static)
+#!!LIBFILE_SHARED  := ...
 
 #-----------------------------------------------------------------------------
 define link_cmd =
@@ -188,6 +211,7 @@ OBJS = $(LIBOBJ) $(_test_objs) $(_example_objs)
 
 $(info Build option DEBUG = $(DEBUG))
 $(info Build option SFML_LINKMODE = $(SFML_LINKMODE))
+$(info Build option CRT_LINKMODE = $(CRT_LINKMODE))
 #$(info TEST_EXES = $(TEST_EXES))
 #$(info EXAMPLE_EXES = $(EXAMPLE_EXES))
 
@@ -233,20 +257,21 @@ run_tests: test_exes
 #!! need different options! (E.g. no default lib vs. -MT[d]/-MD[d] etc.;
 #!! see CLIBFLAGS vs. CEXEFLAGS!)
 #!!
-$(OBJDIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(objext): $(SRCDIR)/%.cpp
+$(OBJDIR)/%$(objext): $(SRCDIR)/%.cpp
 	@$(ECHO) "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) $<"
 	@$(MKDIR) $(shell dirname $@)
 #	$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
 #	$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
+#!! Interim hack with CEXEFLAGS overriding CLIBFLAGS for now (see the TODO note above!):
 	@$(CXX) $(CXXFLAGS) $(CLIBFLAGS) $(CEXEFLAGS) -c $<
 
 # Link each test source (via its .o) into a separate executable:
-$(TEST_DIR)/%$(exeext): $(OBJDIR)/$(TESTS_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
+$(TEST_DIR)/%$(VTAG)$(exeext): $(OBJDIR)/$(TESTS_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
 	@$(MKDIR) $(shell dirname $@)
 	$(link_cmd)
 
 # Link each example source (via its .o) into a separate executable:
-$(DEMO_DIR)/%$(exeext): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
+$(DEMO_DIR)/%$(VTAG)$(exeext): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
 	@$(MKDIR) $(shell dirname $@)
 	$(link_cmd)
 
@@ -264,3 +289,12 @@ $(DEMO_DIR)/%$(exeext): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext) $(LIBFILE_STATIC
 	@echo "NOTE: file $@ mentioned in dependencies missing, continuing..."
 #	@echo "HINT: consider 'make clean'"
 	@echo
+
+
+ifeq "1" "0"
+$(info VROOT: $(VROOT))
+$(info VTAG: $(VTAG))
+$(info OBJDIR: $(OBJDIR))
+$(info LIBNAME: $(LIBNAME))
+$(error ABORT)
+endif
