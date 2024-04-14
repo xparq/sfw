@@ -18,6 +18,7 @@ include tooling/build/Make-toolcfg.inc
 #-----------------------------------------------------------------------------
 # Build options...
 #
+# - LIB_MODE: static (shared (would mean DLL on windows) not yet supported)
 # - DEBUG: 0 (default) or 1 (also selects the SFML debug libs if 1!)
 # - CC: g++ (default) or clang++
 # - SFML_DIR: pre-built SFML package dir for the current toolchain
@@ -31,6 +32,7 @@ include tooling/build/Make-toolcfg.inc
 # - CRT_LINKMODE: static (default) or shared (MSVC CRT lib; i.e. CL /MT or /MD)
 #!! ?? Again, how does this translate to GCC/Clang?
 #-----------------------------------------------------------------------------
+LIB_MODE      ?= static
 DEBUG         ?= 0
 SFML_DIR      ?= extern/sfml/$(TOOLCHAIN)
 SFML_LINKMODE ?= $(if $(findstring linux,$(TOOLCHAIN)),shared,static)
@@ -51,7 +53,7 @@ TEST       = $(TEST_DIR)/main
 LIBDIR      := lib/$(TOOLCHAIN)
 SRCDIR      := src
 #! Direct subdirs of $(SRCDIR) with explicitly supported different build semantics:
-LIB_TAGDIR     := lib
+LIB_TAGDIR      := lib
 TESTS_TAGDIR    := test
 EXAMPLES_TAGDIR := examples
 
@@ -250,20 +252,20 @@ run_tests: test_exes
 # Inference rules...
 #-----------------------------------------------------------------------------
 
-# Common rule to compile any of the obj files (mirroring the source tree in
-# $(OBJDIR), and tagging the targets according to the build mode):
-#!!
-#!! The lib sources would still need to be done separately, as those
-#!! need different options! (E.g. no default lib vs. -MT[d]/-MD[d] etc.;
-#!! see CLIBFLAGS vs. CEXEFLAGS!)
-#!!
-$(OBJDIR)/%$(objext): $(SRCDIR)/%.cpp
+# Compile units for the lib
+#! Done separately (see below), as they (may) need different options.
+#! (E.g. no default lib vs. -MT[d]/-MD[d] etc.; see CLIBFLAGS vs. CEXEFLAGS.)
+$(OBJDIR)/$(LIB_TAGDIR)/%$(objext): $(SRCDIR)/$(LIB_TAGDIR)/%.cpp
 	@$(ECHO) "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) $<"
 	@$(MKDIR) $(shell dirname $@)
-#	$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
-#	$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
-#!! Interim hack with CEXEFLAGS overriding CLIBFLAGS for now (see the TODO note above!):
-	@$(CXX) $(CXXFLAGS) $(CLIBFLAGS) $(CEXEFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
+
+# Compile the rest (i.e. tests or examples):
+#!! Could split this too by TESTS_TAGDIR/EXAMPLES_TAGDIR:
+$(OBJDIR)/%$(objext): $(SRCDIR)/%.cpp
+	@$(ECHO) "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) test/example: $<"
+	@$(MKDIR) $(shell dirname $@)
+	$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
 
 # Link each test source (via its .o) into a separate executable:
 $(TEST_DIR)/%$(VTAG)$(exeext): $(OBJDIR)/$(TESTS_TAGDIR)/%$(objext) $(LIBFILE_STATIC)

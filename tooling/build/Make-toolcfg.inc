@@ -72,19 +72,18 @@ CXXFLAGS += $(CFLAGS_COMMON) ${CXXFLAGS.$(TOOLCHAIN)}
 # Compiler options to use only when compiling code for the lib:
 CLIBFLAGS.linux  =
 CLIBFLAGS.mingw  =
-CLIBFLAGS.msvc.static = $(if $(findstring static,$(CRT_LINKMODE)),-MT,-MD)
-#!!                     -Zl # Omit default lib
-CLIBFLAGS.msvc.shared = -LD # Create DLL <-!! Likely irrelevant here, as it's a flag for linking!
+#!!CLIBFLAGS.msvc.static = -Zl # Omit default lib
+CLIBFLAGS.msvc.static  = $(if $(findstring static,$(CRT_LINKMODE)),-MT,-MD)$(if $(findstring 1,$(DEBUG)),d,)
+#!!                  `+=` would add a space, `:=` would not pick up CRT_LINKMODE!... :-/
+CLIBFLAGS.msvc.shared  = -LD # Create DLL <-!! Likely irrelevant here, as it's a flag for linking!
 CLIBFLAGS.msvc   = ${CLIBFLAGS.msvc.$(LIB_MODE)}
 CLIBFLAGS = ${CLIBFLAGS.$(TOOLCHAIN)}
 
-# Compiler options for compiling & linking the tests/examples:
+# Compiler options for tests/examples:
 CEXEFLAGS.linux  =
 CEXEFLAGS.mingw  =
-CLIBFLAGS.msvc_common   = $(if $(findstring static,$(CRT_LINKMODE)),-MT,-MD)
-CEXEFLAGS.msvc.debug_0  = $(CLIBFLAGS.msvc_common)
-CEXEFLAGS.msvc.debug_1  = $(CLIBFLAGS.msvc_common)d
-CEXEFLAGS.msvc = ${CEXEFLAGS.msvc.debug_$(DEBUG)}
+CEXEFLAGS.msvc   = $(if $(findstring static,$(CRT_LINKMODE)),-MT,-MD)$(if $(findstring 1,$(DEBUG)),d,)
+#!!            `+=` would add a space, `:=` would not pick up CRT_LINKMODE!... :-/
 CEXEFLAGS = ${CEXEFLAGS.$(TOOLCHAIN)}
 
 # Lib builder

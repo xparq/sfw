@@ -6,4 +6,4 @@
 @echo off
 PATH=%~dP0tooling;%~dP0tooling\build;%PATH%
 
-make %*
+tooling\wtime make %*
