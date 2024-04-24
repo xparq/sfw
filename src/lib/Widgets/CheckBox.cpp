@@ -18,19 +18,20 @@ CheckBox::CheckBox(bool checked_state):
 	onThemeChanged(); //!!kludge to force geom. recalc.!
 }
 
+//!!C++: Nope...: CheckBox::CheckBox(Event::Callback& callback, bool checked/* = false*/):
 CheckBox::CheckBox(std::function<void(CheckBox*)> callback, bool checked):
 	CheckBox(checked)
 {
 	setCallback(callback);
 }
 
-/* See #339, why this couldn't be added...
+//!!/* See #339, why this couldn't be added...
 CheckBox::CheckBox(std::function<void()> callback, bool checked):
 	CheckBox(checked)
 {
 	setCallback(callback);
 }
-*/
+//!!*/
 
 CheckBox* CheckBox::set(bool checked)
 {

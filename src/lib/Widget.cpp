@@ -4,8 +4,10 @@
 #include "sfw/Widgets/Tooltip.hpp"
 #include "sfw/util/diagnostics.hpp"
 
-#include <cassert>
 #include <cmath>
+#include <iostream>
+	using std::cerr, std::endl;
+#include <cassert>
 
 #ifdef DEBUG
 #
@@ -17,32 +19,6 @@ namespace sfw
 {
 
 using enum ActivationState;
-
-
-//----------------------------------------------------------------------------
-// See the header...
-/*static*/ Widget* Widget::getWidget_proxy(std::string_view name, const Widget* w/* = nullptr*/)
-{
-	assert(GUI::DefaultInstance);
-	auto Main = w ? w->getMain() : GUI::DefaultInstance;
-
-	assert(Main);
-	return Main->recall(name);
-}
-
-/*!!Obsolete since #322:
-Widget* Widget::getWidget(const std::string& name) const
-{
-	//!!Log if dangling or 'name' not found!
-
-	if (GUI* Main = getMain(); Main)
-	{
-		return Main->recall(name);
-	}
-	return nullptr;
-}
-!!*/
-
 
 
 //----------------------------------------------------------------------------
@@ -123,7 +99,9 @@ Widget* Widget::getRoot() const
 GUI* Widget::getMain() const
 {
 	//!! Well, it's halfway between "undefined" and "bug" to call this on free-standing widgets...
-	//!! But forbidding it would prevent adding children to them, criplling usability too much!
+	//!! (This would just return null for those!)
+	//!! But forbidding it would prevent adding children to them [!!?? WHY EXACTLY,?], criplling
+	//!! usability too much! :-/
 	//!!   assert(getParent() && getParent() != this ? getParent()->getRoot() : getParent());
 	return (GUI*)(getParent() && getParent() != this ? getParent()->getRoot() : getParent());
 }
@@ -358,5 +336,25 @@ void Widget::draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor,
 	ctx.target.draw(r);
 }
 #endif
+
+
+//----------------------------------------------------------------------------
+/*static*/ Widget* Widget::find_proxied(std::string_view name, const Widget* w/* = nullptr*/)
+// (See the header for details.)
+//----------------------------------------------------------------------------
+{
+	assert(GUI::DefaultInstance);
+	auto Main = w ? w->getMain() : GUI::DefaultInstance;
+	// assert(Main); is not enough here: calling this fn. with a dangling
+	// w shouldn't crash the process! Just log/report & return null!
+	if (Main) {
+		return Main->recall(name); // This already reports if 'name' is not found.
+	} else {
+		cerr << "- ERROR: Lookup (for \""<<name<<"\") via unmanaged widget "<<WidgetPtr(w)<<"!" << endl;
+			//! GUI::DefaultInstance should not be null here! (-> assert above)
+		return nullptr;
+	}
+}
+
 
 } // namespace

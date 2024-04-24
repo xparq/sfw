@@ -7,6 +7,7 @@
 #include "sfw/Gfx/Elements/ItemBox.hpp"
 
 #include <string>
+#include <utility> // forward
 
 namespace sfw
 {
@@ -68,8 +69,8 @@ public:
 	const T& get() const;     // Const ref. instead of val., as T can be big!
 	      T& get();           // Non-const, for in-place modification
 	// Just a synonym (for the symmetry with 'select'...):
-	const T& current() const  { return get(); }
-	      T& current()        { return get(); }
+	const T& current() const  { return std::forward<const T&>(get()); }
+	      T& current()        { return std::forward<      T&>(get()); }
 
 	size_t currentIndex() const;
 	const std::string& currentLabel() const;

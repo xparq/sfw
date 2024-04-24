@@ -18,6 +18,9 @@ class CheckBox: public InputWidget<CheckBox>
 public:
 	CheckBox(bool checked = false);
 	CheckBox(std::function<void(CheckBox*)> callback, bool checked = false);
+	CheckBox(std::function<void()> callback, bool checked = false);
+	//!!CheckBox(Event::Callback& callback, bool checked = false);
+		//!! Nah, C++ won't auto-convert Callback to either of its variants for setCallback(...) :-/
 
 	// "Generic-input-level" abstract get/set
 	CheckBox* set(bool checked);

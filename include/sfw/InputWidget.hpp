@@ -3,10 +3,19 @@
 
 #include "sfw/Widget.hpp"
 
+//!!#include <concepts>
+
 namespace sfw
 {
 
 template <class W> class InputWidget : public Widget
+
+//!! Unfortunately, since the widget arg. W actually derives from this class(!),
+//!! not Widget, we can't just tack a type constraint here, as it won't compile:
+//!!template <std::derived_from<Widget> W> class InputWidget : public Widget
+//!! And, of course, the (self-referential) real thing can't even be expressed in C++:
+//!!template <std::derived_from<InputWidget<W> W> class InputWidget : public Widget
+
 /*****************************************************************************
   Base class of widgets that are intended to receive user input (data)
   
@@ -128,9 +137,10 @@ public:
 	//!!Needs cleanup...
 	//!! -> Actually, as a generic "callback invoker", even up in EventHandler, like
 	//!!    EventHandler::invoke_callback(which), could hit all the birds with one stone.
-protected:
 
 // Virtuals/Callbacks --------------------------------------------------------
+protected:
+
 	virtual void onUpdated() //!! -> "EventHandler::invoke_callback(Updated)", and "updated" -> "notify(Updated)" or sg...
 	{
 		using namespace Event::internal;

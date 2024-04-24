@@ -191,7 +191,9 @@ Widget* WidgetContainer::addAfter(Widget* anchor, Widget* widget, const std::str
 
 Widget* WidgetContainer::addAfter(const std::string& anchor_name, Widget* widget, const std::string& name)
 {
-	Widget* a = sfw::getWidget(anchor_name); //!! See #322 for why not just this->...
+	Widget* a = Widget::find_proxied(anchor_name); //!! See #322 for why not just this->widget...
+	                                       //!!?? So, why exactly? I can't deduce the reason from #322 a year later! :-/
+//!!??	Widget* a = this->widget(anchor_name);
 	return a ? addAfter(a, widget, name) : add(widget, name);
 }
 
@@ -213,7 +215,9 @@ Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, const std::st
 
 Widget* WidgetContainer::addBefore(const std::string& anchor_name, Widget* widget, const std::string& name)
 {
-	Widget* a = sfw::getWidget(anchor_name); //!! See #322 for why not just this->...
+	Widget* a = Widget::find_proxied(anchor_name); //!! See #322 for why not just this->widget...
+	                                         //!!?? So, why exactly? I can't deduce the reason from #322 a year later! :-/
+//!!??	Widget* a = this->widget(anchor_name);
 	return a ? addBefore(a, widget, name) : add(widget, name);
 }
 
