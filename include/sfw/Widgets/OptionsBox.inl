@@ -197,11 +197,11 @@ template <class T> void OptionsBox<T>::update_arrow_pressed_state(ItemBox<Arrow>
 
 template <class T> void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
 {
-	auto sfml_renderstates = ctx.props;
-	sfml_renderstates.transform *= this->getTransform(); // See comment at the class def., why this->...
-	ctx.target.draw(m_box, sfml_renderstates);
-	ctx.target.draw(m_arrowLeft, sfml_renderstates);
-	ctx.target.draw(m_arrowRight, sfml_renderstates);
+	auto lctx = ctx;
+	lctx.props.transform *= this->getTransform(); // See comment at the class def., why this->...
+	m_box.draw(lctx);
+	m_arrowLeft.draw(lctx);
+	m_arrowRight.draw(lctx);
 }
 
 

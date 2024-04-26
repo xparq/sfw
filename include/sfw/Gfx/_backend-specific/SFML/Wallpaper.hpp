@@ -1,7 +1,8 @@
-#ifndef SFW_WALLPAPER_SFML_HPP
-#define SFW_WALLPAPER_SFML_HPP
+#ifndef _DOCIU4Y578TB87SX45T687045N78H3565456UHY_
+#define _DOCIU4Y578TB87SX45T687045N78H3565456UHY_
 
-#include <SFML/Graphics/Drawable.hpp>
+#include "sfw/Gfx/Render.hpp"
+
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Vertex.hpp>
@@ -13,7 +14,7 @@ namespace sfw
 /**
  * Draw an image, possibly stretched, onto a rectangle
  */
-class Wallpaper: public GenericWallpaper, public sf::Drawable, public sf::Transformable
+class Wallpaper: public GenericWallpaper, public gfx::Drawable, public sf::Transformable
 {
 	static constexpr sf::IntRect NullRect = {{0,0}, {0,0}};
 
@@ -60,16 +61,17 @@ public:
 	Wallpaper* setColor(const sf::Color& color);
 	sf::Color  getColor() const;
 
-private:
-//    void draw(const gfx::RenderContext& ctx) const override;
-	void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
+public: //! <- NOT private, because draw() may be accessed directly (statically),
+        //!    rather than just polymorphically (dynamically) via a pointer!
+	void draw(const gfx::RenderContext& ctx) const override;
 
+private:
 	sf::Texture m_texture;
 	sf::Vector2f m_baseSize;
 	float m_scalingFactor = 1.f;
 	sf::Vertex m_vertices[4];
 };
 
-} // namespace
+} // namespace sfw
 
-#endif // SFW_WALLPAPER_SFML_HPP
+#endif // _DOCIU4Y578TB87SX45T687045N78H3565456UHY_

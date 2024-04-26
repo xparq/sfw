@@ -1,5 +1,5 @@
-#ifndef GUI_MAIN_HPP
-#define GUI_MAIN_HPP
+#ifndef _KUNYWET5GX94358T645N345TF678RWE5TG67F4B57_
+#define _KUNYWET5GX94358T645N345TF678RWE5TG67F4B57_
 
 #include "sfw/Theme.hpp"
 #include "sfw/Gfx/Render.hpp"
@@ -181,6 +181,6 @@ private:
 	friend class Widget;
 };
 
-} // namespace
+} // namespace sfw
 
-#endif // GUI_MAIN_HPP
+#endif // _KUNYWET5GX94358T645N345TF678RWE5TG67F4B57_

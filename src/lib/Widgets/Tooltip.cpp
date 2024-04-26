@@ -1,5 +1,5 @@
 ﻿#include "sfw/Widgets/Tooltip.hpp"
-#include "sfw/GUI-main.hpp"
+#include "sfw/GUI-main.hpp" // sessionTime() etc.
 
 #include <SFML/Window/Mouse.hpp>
 
@@ -87,7 +87,7 @@ void Tooltip::arm(float, float)
 // If already visible, restart from the Showing ("sustain") phase,
 // cancelling a pending fadeout
 
-	if (auto gui = getMain(); gui)
+	if (getMain()) // Are we actually part of a GUI? (There should be a more self-descriptive query for this!!)
 	{
 		// Restart from `Showing`, if already shown/fading:
 		if (visible())
@@ -179,11 +179,11 @@ void Tooltip::draw(const gfx::RenderContext& ctx) const
 {
 	if (visible())
 	{
-		auto sfml_renderstates = ctx.props;
-		sfml_renderstates.transform *= getTransform();
+		auto lctx = ctx;
+		lctx.props.transform *= getTransform();
 		
-		ctx.target.draw(m_box, sfml_renderstates);
-		ctx.target.draw(m_text, sfml_renderstates);
+		m_box.draw(lctx);
+		m_text.draw(lctx);
 	}
 }
 
@@ -223,4 +223,4 @@ void Tooltip::onTick()
 }
 
 
-} // namespace
+} // namespace sfw

@@ -13,68 +13,71 @@ namespace sfw
 
 CheckMark::CheckMark()
 {
-    sf::FloatRect rect = (sf::FloatRect)Theme::getCheckMarkTextureRect();
-    m_vertices[0].texCoords = sf::Vector2f(rect.left, rect.top);
-    m_vertices[1].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
-    m_vertices[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
-    m_vertices[3].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
+	sf::FloatRect rect = (sf::FloatRect)Theme::getCheckMarkTextureRect();
+	m_vertices[0].texCoords = sf::Vector2f(rect.left, rect.top);
+	m_vertices[1].texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
+	m_vertices[2].texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
+	m_vertices[3].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
 
-    updateGeometry(0, 0);
+	updateGeometry(0, 0);
 }
 
 
 void CheckMark::setPosition(sf::Vector2f pos)
 {
-    // OpenGL will render things kinda funny otherwise:
-    pos.x = roundf(pos.x);
-    pos.y = roundf(pos.y);
+	// OpenGL will render things kinda funny otherwise:
+	pos.x = roundf(pos.x);
+	pos.y = roundf(pos.y);
 
-    updateGeometry(pos.x, pos.y);
+	updateGeometry(pos.x, pos.y);
 }
 
 
 void CheckMark::move(sf::Vector2f delta)
 {
-    for (int i = 0; i < 4; ++i)
-    {
-        m_vertices[i].position.x += delta.x;
-        m_vertices[i].position.y += delta.y;
-    }
+	for (int i = 0; i < 4; ++i)
+	{
+		m_vertices[i].position.x += delta.x;
+		m_vertices[i].position.y += delta.y;
+	}
 }
 
 
-void CheckMark::setSize(float) { }
+void CheckMark::setSize(float)
+{
+	//!! NOT IMPLEMENTED
+}
 
 
 sf::Vector2f CheckMark::getSize() const
 {
-    const sf::IntRect& rect = Theme::getCheckMarkTextureRect();
-    return sf::Vector2f((float)rect.width, (float)rect.height);
+	const sf::IntRect& rect = Theme::getCheckMarkTextureRect();
+	return sf::Vector2f((float)rect.width, (float)rect.height);
 }
 
 
 void CheckMark::setColor(const sf::Color& color)
 {
-    for (int i = 0; i < 4; ++i)
-        m_vertices[i].color = color;
+	for (int i = 0; i < 4; ++i)
+		m_vertices[i].color = color;
 }
 
 
-void CheckMark::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
+void CheckMark::draw(const gfx::RenderContext& ctx) const // override
 {
-    auto lstates = states;
-    lstates.texture = &Theme::getTexture();
-    target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, lstates);
+	auto lstates = ctx.props;
+	lstates.texture = &Theme::getTexture();
+	ctx.target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, lstates);
 }
 
 
 void CheckMark::updateGeometry(float x, float y)
 {
-    const sf::IntRect& rect = Theme::getCheckMarkTextureRect();
-    m_vertices[0].position = sf::Vector2f(x, y);
-    m_vertices[1].position = sf::Vector2f(x, y + rect.height);
-    m_vertices[2].position = sf::Vector2f(x + rect.width, y);
-    m_vertices[3].position = sf::Vector2f(x + rect.width, y + rect.height);
+	const sf::IntRect& rect = Theme::getCheckMarkTextureRect();
+	m_vertices[0].position = sf::Vector2f(x, y);
+	m_vertices[1].position = sf::Vector2f(x, y + rect.height);
+	m_vertices[2].position = sf::Vector2f(x + rect.width, y);
+	m_vertices[3].position = sf::Vector2f(x + rect.width, y + rect.height);
 }
 
-} // namespace
+} // namespace sfw

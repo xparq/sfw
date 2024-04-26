@@ -1,5 +1,7 @@
-#ifndef SFW_GFX_TEXT_SFML_HPP
-#define SFW_GFX_TEXT_SFML_HPP
+#ifndef _8CC78TY678W78F49W678TNT62X438T6EW4T78CV456_
+#define _8CC78TY678W78F49W678TNT62X438T6EW4T78CV456_
+
+#include "sfw/Gfx/Render.hpp"
 
 #include <SFML/Graphics/Text.hpp>
 #include "sfw/util/shim/sfml.hpp"
@@ -7,15 +9,18 @@
 namespace sfw
 {
 
-struct Text : sf::Text
+class Text : public sf::Text, public gfx::Drawable
 {
+public:
 	Text(const std::string& s = "", unsigned int height = 30)
 		: sf::Text(Theme::getFont(), stdstring_to_SFMLString(s), height) {}
 
 	void set(const std::string& str) { setString(stdstring_to_SFMLString(str)); }
 	std::string get() const { return SFMLString_to_stdstring(getString()); }
+
+	void draw(const gfx::RenderContext& ctx) const override { ctx.target.draw((sf::Text&)*this, ctx.props); }
 };
 
-} // namespace
+} // namespace sfw
 
-#endif // SFW_GFX_TEXT_SFML_HPP
+#endif // _8CC78TY678W78F49W678TNT62X438T6EW4T78CV456_

@@ -244,7 +244,8 @@ void GUI::renderBackground() //!!Move this to the renderer!
 	// of an existing one: it won't work without erasing the prev. first!)
 	if (hasWallpaper())
 	{
-		m_window.draw(m_wallpaper); // Will (supposedly ;) ) only draw into the GUI rect!
+		gfx::RenderContext ctx(m_window);
+		m_wallpaper.draw(ctx); // Will (supposedly ;) ) only draw into the GUI rect!
 	}
 }
 

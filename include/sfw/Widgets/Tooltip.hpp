@@ -78,4 +78,4 @@ private:
 
 } // namespace
 
-	#endif // SFW_TOOLTIP_HPP
+#endif // SFW_TOOLTIP_HPP

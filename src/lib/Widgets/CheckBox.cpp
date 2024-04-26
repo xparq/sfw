@@ -43,11 +43,11 @@ CheckBox* CheckBox::set(bool checked)
 
 void CheckBox::draw(const gfx::RenderContext& ctx) const
 {
-	auto sfml_renderstates = ctx.props;
-	sfml_renderstates.transform *= getTransform();
-	ctx.target.draw(m_box, sfml_renderstates);
+	auto lctx = ctx;
+	lctx.props.transform *= getTransform();
+	m_box.draw(lctx);
 	if (checked())
-		ctx.target.draw(m_checkmark, sfml_renderstates);
+		m_checkmark.draw(lctx);
 }
 
 
@@ -91,4 +91,4 @@ void CheckBox::onKeyPressed(const sf::Event::KeyEvent& key)
 	}
 }
 
-} // namespace
+} // namespace sfw

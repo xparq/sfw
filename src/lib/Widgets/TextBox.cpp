@@ -677,7 +677,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 {
 	auto sfml_renderstates = ctx.props;
 	sfml_renderstates.transform *= getTransform();
-	ctx.target.draw(m_box, sfml_renderstates);
+	m_box.draw({ctx.target, sfml_renderstates});
 
 	// Crop the text with GL Scissor
 	glEnable(GL_SCISSOR_TEST);
@@ -696,7 +696,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 
 	if (m_text.getString().isEmpty())
 	{
-		ctx.target.draw(m_placeholder, sfml_renderstates);
+		m_placeholder.draw({ctx.target, sfml_renderstates});
 	}
 	else
 	{
@@ -704,7 +704,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 		if (m_selection)
 			ctx.target.draw(m_selectionMarker, sfml_renderstates);
 		// Draw the text
-		ctx.target.draw(m_text, sfml_renderstates);
+		m_text.draw({ctx.target, sfml_renderstates});
 	}
 
 	glDisable(GL_SCISSOR_TEST);

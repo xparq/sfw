@@ -72,11 +72,11 @@ void ProgressBar::draw(const gfx::RenderContext& ctx) const
 {
 	auto sfml_renderstates = ctx.props;
 	sfml_renderstates.transform *= getTransform();
-	ctx.target.draw(m_box, sfml_renderstates);
+	m_box.draw({ctx.target, sfml_renderstates});
 	sfml_renderstates.texture = &Theme::getTexture();
 	ctx.target.draw(m_bar, _VERTEX_COUNT_, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
 	if (m_cfg.label_placement != LabelNone)
-		ctx.target.draw(m_label, sfml_renderstates);
+		m_label.draw({ctx.target, sfml_renderstates});
 }
 
 

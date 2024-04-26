@@ -213,7 +213,7 @@ void Layout::onMousePressed(float x, float y)
 					hover(widget, x, y);
 //!! (I HAVE SEEN THIS MESSAGE both in e.g. the OON control panel, and in the sfw test app!)
 #ifdef DEBUG
-cerr << "- [sfw::Layout::onMousePressed] Oops, missed hover retroactively fixed!\n";
+cerr << "- [sfw::Layout::onMousePressed] Missed hover event retroactively triggered!\n";
 #endif
 					assert(m_hoveredWidget);
 					break;

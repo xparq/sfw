@@ -258,14 +258,14 @@ run_tests: test_exes
 $(OBJDIR)/$(LIB_TAGDIR)/%$(objext): $(SRCDIR)/$(LIB_TAGDIR)/%.cpp
 	@$(ECHO) "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) $<"
 	@$(MKDIR) $(shell dirname $@)
-	$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
+	@$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
 
 # Compile the rest (i.e. tests or examples):
 #!! Could split this too by TESTS_TAGDIR/EXAMPLES_TAGDIR:
 $(OBJDIR)/%$(objext): $(SRCDIR)/%.cpp
 	@$(ECHO) "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) test/example: $<"
 	@$(MKDIR) $(shell dirname $@)
-	$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
+	@$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
 
 # Link each test source (via its .o) into a separate executable:
 $(TEST_DIR)/%$(VTAG)$(exeext): $(OBJDIR)/$(TESTS_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
@@ -284,11 +284,10 @@ $(DEMO_DIR)/%$(VTAG)$(exeext): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext) $(LIBFILE
 
 -include $(OBJS:%$(objext)=%.d)
 
-# Copied from the DarkPlaces Quake clone makefile, as a hommage:
-# hack to deal with no-longer-needed .h files
-%.h:
+# Hack to deal with stale dependencies (adopted from the DarkPlaces Quake clone makefile):
+%.h %.hpp %.inl:
 	@echo
-	@echo "NOTE: file $@ mentioned in dependencies missing, continuing..."
+	@echo "NOTE: Ignoring missing '$@' mentioned in dependencies..."
 #	@echo "HINT: consider 'make clean'"
 	@echo
 

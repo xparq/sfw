@@ -88,9 +88,9 @@ void Button::recomputeGeometry()
 
 void Button::draw(const gfx::RenderContext& ctx) const
 {
-	auto sfml_renderstates = ctx.props;
-	sfml_renderstates.transform *= getTransform();
-	ctx.target.draw(m_box, sfml_renderstates);
+	auto lctx = ctx;
+	lctx.props.transform *= getTransform();
+	m_box.draw(lctx);
 }
 
 // Callbacks -------------------------------------------------------------------
@@ -147,4 +147,4 @@ void Button::onKeyReleased(const sf::Event::KeyEvent& key)
 }
 
 
-} // namespace
+} // namespace sfw

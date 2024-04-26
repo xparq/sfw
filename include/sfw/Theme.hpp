@@ -37,7 +37,7 @@ public:
 		const char* textureFile = nullptr;
 		sf::Color bgColor = sf::Color::White; // no "unset" color, so must use a sensible default here
 		Wallpaper::Cfg wallpaper = {};
-		size_t textSize = 0;
+		size_t textSize = 0; //!!?? uint16_t: a) fixed (-> ABI compat.!), b) smaller, c) but may need annoying extra casts, d) uint_least16_t is the guaranteed type actually...
 		const char* fontFile = nullptr;
 		bool multiTooltips = false;
 

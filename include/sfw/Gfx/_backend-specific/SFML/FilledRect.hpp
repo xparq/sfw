@@ -1,5 +1,5 @@
-﻿#ifndef SFW_GFX_FILLEDRECT_SFML_HPP
-#define SFW_GFX_FILLEDRECT_SFML_HPP
+﻿#ifndef _OIU345YTNDC84675TOB678WTBN5MC94285N7_
+#define _OIU345YTNDC84675TOB678WTBN5MC94285N7_
 
 #include "sfw/Gfx/Render.hpp"
 
@@ -37,11 +37,12 @@ struct FilledRect_Impl : public gfx::Drawable
 		Self(s, fill_color, fill_color)
 	{}
 
-protected:
 	//----------------------------------------------------------------------------
-	void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override
+public: //! <- NOT private, because draw() may be accessed directly (statically),
+        //!    rather than just polymorphically (dynamically) via a pointer!
+	void draw(const gfx::RenderContext& ctx) const override
 	{
-		auto lstates = states;
+		auto lstates = ctx.props;
 
 		sf::RectangleShape r(size);
 		r.setPosition(position);
@@ -49,12 +50,12 @@ protected:
 		r.setOutlineColor(colorBorder);
 		r.setOutlineThickness(1);
 
-		target.draw(r, lstates);
+		ctx.target.draw(r, lstates);
 	}
 
-//!!#undef Self
 }; // class
+#undef Self
 
-} // namespace
+} // namespace sfw
 
-#endif // SFW_GFX_FILLEDRECT_SFML_HPP
+#endif // _OIU345YTNDC84675TOB678WTBN5MC94285N7_

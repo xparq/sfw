@@ -1,18 +1,20 @@
-#ifndef _SFW_ACTIVATIONSTATE_HPP_
-#define _SFW_ACTIVATIONSTATE_HPP_
+#ifndef _OIDW4Y5UODNYFTGY8UC0384M79V5T87Y4785467_
+#define _OIDW4Y5UODNYFTGY8UC0384M79V5T87Y4785467_
 
 namespace sfw
 {
 
 enum class ActivationState
 {
-	Default,
+	Idle,
 	Hovered,
 	Pressed,
 	Focused,
-	Disabled
+	Disabled,
+
+	Default = Idle
 };
 
-} // namespace
+} // namespace sfw
 
-#endif // _SFW_ACTIVATIONSTATE_HPP_
+#endif // _OIDW4Y5UODNYFTGY8UC0384M79V5T87Y4785467_

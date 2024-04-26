@@ -135,7 +135,6 @@ sf::Vector2f Wallpaper::getSize() const
 }
 
 
-/*!!
 void Wallpaper::draw(const gfx::RenderContext& ctx) const
 {
 	auto sfml_renderstates = ctx.props;
@@ -143,13 +142,5 @@ void Wallpaper::draw(const gfx::RenderContext& ctx) const
 	sfml_renderstates.texture = &m_texture;
 	ctx.target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
 }
-!!*/
-void Wallpaper::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
-{
-	auto lstates = states;
-	lstates.transform *= getTransform();
-	lstates.texture = &m_texture;
-	target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, lstates);
-}
 
-} // namespace
+} // namespace sfw

@@ -111,7 +111,7 @@ void ImageButton::draw(const gfx::RenderContext& ctx) const
 	sfml_renderstates.transform *= getTransform();
 	ctx.target.draw(m_background, sfml_renderstates);
 	sfml_renderstates.transform *= m_background.getTransform(); // Follow the scaling (etc.) of the image!
-	ctx.target.draw(m_text, sfml_renderstates);
+	m_text.draw({ctx.target, sfml_renderstates});
 }
 
 

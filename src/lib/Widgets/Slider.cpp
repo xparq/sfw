@@ -369,11 +369,11 @@ float Slider::track_length() const
 
 void Slider::draw(const gfx::RenderContext& ctx) const
 {
-	auto sfml_renderstates = ctx.props;
-	sfml_renderstates.transform *= getTransform();
-	ctx.target.draw(m_track, sfml_renderstates);
-	ctx.target.draw(m_progression, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
-	ctx.target.draw(m_thumb, sfml_renderstates);
+	auto lctx = ctx;
+	lctx.props.transform *= getTransform();
+	m_track.draw(lctx);
+	lctx.target.draw(m_progression, 4, sf::PrimitiveType::TriangleStrip, lctx.props);
+	m_thumb.draw(lctx);
 }
 
 
