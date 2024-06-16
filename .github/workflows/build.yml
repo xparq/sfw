@@ -12,7 +12,7 @@ env:
 jobs:
   build:
     name: Multi-Build (Only GCC on Linux is enabled currently!)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -20,15 +20,14 @@ jobs:
 #!! And my setup script doesn't care about that yet, so, disabling:
 #        cc: [clang++, g++]
 #!! Also, as it turns out, the default g++ version is 11 on GitHub!... :-/
-#!!     cc: [g++]
-        cc: [g++-13]
+        cc: [g++]
         target: [linux]
     steps:
       - uses: actions/checkout@v3
       - name: Install SFML dependencies...
         run: |
           cat /etc/os-release; cat /etc/issue
-          g++-13 --version
+          g++ --version
           # Bummer: Ubuntu 22.04 still doesn't have GNU make 4.4 (e.g. for .WAIT)! :-o :-/
           make --version
           sudo apt install libgl-dev
