@@ -1,7 +1,7 @@
 #ifndef _YGM78SY487Y3G45YNV87M475D70YRT7YHVM579H_
 #define _YGM78SY487Y3G45YNV87M475D70YRT7YHVM579H_
 
-#include "sfw/Gfx/Render.hpp"
+#include "sfw/gfx/Render.hpp"
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Color.hpp>

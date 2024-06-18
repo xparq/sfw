@@ -57,8 +57,8 @@ namespace sfw::Event
 		virtual void onMouseWheelMoved(int) {}
 		virtual void onMouseEnter() {}
 		virtual void onMouseLeave() {}
-		virtual void onKeyPressed(const sf::Event::KeyEvent&) {}
-		virtual void onKeyReleased(const sf::Event::KeyEvent&) {}
+		virtual void onKeyPressed(const sf::Event::KeyChanged&) {}
+		virtual void onKeyReleased(const sf::Event::KeyChanged&) {}
 		virtual void onTextEntered(char32_t) {}
 		virtual void onTick() {}
 	};

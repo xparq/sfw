@@ -1,10 +1,10 @@
-#ifndef _SFW_THEME_HPP_
-#define _SFW_THEME_HPP_
+#ifndef _SUIOHTCY78Y678E4785T36T6B67X34574NY7T_
+#define _SUIOHTCY78Y678E4785T36T6B67X34574NY7T_
 
-#include "sfw/Gfx/Elements/Box.hpp"
-#include "sfw/Gfx/Elements/Wallpaper.hpp"
+#include "sfw/gfx/element/Box.hpp"
+#include "sfw/gfx/element/Wallpaper.hpp"
 
-//!!#include "sfw/Widgets/Tooltip/Style.hpp"
+//!!#include "sfw/widget/Tooltip/Style.hpp"
 
 #include <SFML/Window.hpp>
 #include <SFML/Window/Event.hpp>
@@ -100,8 +100,8 @@ public:
 	static float PADDING; // Spacing inside widgets
 	static float MARGIN;  // Spacing between widgets
 
-	static sf::Event::KeyEvent previousWidgetKey;
-	static sf::Event::KeyEvent nextWidgetKey;
+	static sf::Event::KeyChanged previousWidgetKey;
+	static sf::Event::KeyChanged nextWidgetKey;
 
 	// Auto-initialized to default cursor
 	static sf::Cursor& cursor;
@@ -128,4 +128,4 @@ private:
 
 } // namsepace
 
-#endif // _SFW_THEME_HPP_
+#endif // _SUIOHTCY78Y678E4785T36T6B67X34574NY7T_

@@ -73,8 +73,8 @@ float Theme::MARGIN = 4.f;
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 // Note: desig. init would zero the missing fields, which is fine for us, but not for GCC. :-/
 #endif
-sf::Event::KeyEvent Theme::nextWidgetKey =     { .code = sf::Keyboard::Key::Tab };
-sf::Event::KeyEvent Theme::previousWidgetKey = { .code = sf::Keyboard::Key::Tab, .shift = true };
+sf::Event::KeyChanged Theme::nextWidgetKey =     { .code = sf::Keyboard::Key::Tab };
+sf::Event::KeyChanged Theme::previousWidgetKey = { .code = sf::Keyboard::Key::Tab, .shift = true };
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif

@@ -1,7 +1,7 @@
 #ifndef _DOCIU4Y578TB87SX45T687045N78H3565456UHY_
 #define _DOCIU4Y578TB87SX45T687045N78H3565456UHY_
 
-#include "sfw/Gfx/Render.hpp"
+#include "sfw/gfx/Render.hpp"
 
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Texture.hpp>

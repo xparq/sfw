@@ -47,7 +47,7 @@ public:
 } // namespace sfw::gfx
 
 
-#include "sfw/Gfx/backend.hpp"
+#include "sfw/gfx/backend.hpp"
 #include GFX_BACKEND_SPECIFIC(Render.hpp)
 
 

@@ -5,8 +5,8 @@
 #include <string>
 #include <cassert>
 
-//!! Auto-dispatch for the current backend instead (-> Gfx/backend.hpp):
-//!! Also, don't just move this to Gfx/Color -- at lesat definitely not
+//!! Auto-dispatch for the current backend instead (-> gfx/backend.hpp):
+//!! Also, don't just move this to gfx/Color -- at lesat definitely not
 //!! directly into that class (which shouldn't have all these deps)!...
 #include <SFML/Graphics/Color.hpp>
 

@@ -1,8 +1,8 @@
 #include "sfw/Layout.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/Widgets/Tooltip.hpp"
-#include "sfw/Gfx/Render.hpp"
-#include "sfw/util/shim/sfml.hpp" // for sf::Event::KeyEvent::==
+#include "sfw/widget/Tooltip.hpp"
+#include "sfw/gfx/Render.hpp"
+#include "sfw/util/adapter/sfml.hpp" // for sf::Event::KeyChanged::==
 
 #ifdef DEBUG
 #   include "sfw/GUI-main.hpp"
@@ -271,7 +271,7 @@ void Layout::onMouseWheelMoved(int delta)
 }
 
 
-void Layout::onKeyPressed(const sf::Event::KeyEvent& key)
+void Layout::onKeyPressed(const sf::Event::KeyChanged& key)
 {
 	//!! Handle hotkeys (with bottom-up context bubbling, somehow inverting the top-down
 	//!! logic of the event flow from Main -> container(s) -> leaf widget) -> #277
@@ -300,7 +300,7 @@ void Layout::onKeyPressed(const sf::Event::KeyEvent& key)
 }
 
 
-void Layout::onKeyReleased(const sf::Event::KeyEvent& key)
+void Layout::onKeyReleased(const sf::Event::KeyChanged& key)
 {
 	if (m_focusedWidget)
 	{

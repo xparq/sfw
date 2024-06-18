@@ -2,7 +2,7 @@
 #define _OEFGUNDRYBFUNTXM7834C5T687BT8F793CN3M57_
 
 #include "sfw/ActivationState.hpp"
-#include "sfw/Gfx/Render.hpp"
+#include "sfw/gfx/Render.hpp"
 
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/System/Vector2.hpp>

@@ -45,8 +45,8 @@ protected:
 	void onMousePressed(float x, float y) override;
 	void onMouseReleased(float x, float y) override;
 	void onMouseWheelMoved(int delta) override;
-	void onKeyPressed(const sf::Event::KeyEvent& key) override;
-	void onKeyReleased(const sf::Event::KeyEvent& key) override;
+	void onKeyPressed(const sf::Event::KeyChanged& key) override;
+	void onKeyReleased(const sf::Event::KeyChanged& key) override;
 	void onTextEntered(char32_t unichar) override;
 
 private:

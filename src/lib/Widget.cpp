@@ -1,7 +1,7 @@
 #include "sfw/Widget.hpp"
 #include "sfw/WidgetContainer.hpp"
 #include "sfw/GUI-main.hpp"
-#include "sfw/Widgets/Tooltip.hpp"
+#include "sfw/widget/Tooltip.hpp"
 #include "sfw/util/diagnostics.hpp"
 
 #include <cmath>

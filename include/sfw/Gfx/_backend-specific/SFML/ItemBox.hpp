@@ -1,7 +1,7 @@
 #ifndef _SEUORTY847S6Y87EWY8704MTOGS87TG7N896_
 #define _SEUORTY847S6Y87EWY8704MTOGS87TG7N896_
 
-#include "sfw/Gfx/Elements/Box.hpp"
+#include "sfw/gfx/element/Box.hpp"
 
 #include <SFML/Graphics/Color.hpp>
 

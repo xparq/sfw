@@ -55,7 +55,7 @@ SRCDIR      := src
 #! Direct subdirs of $(SRCDIR) with explicitly supported different build semantics:
 LIB_TAGDIR      := lib
 TESTS_TAGDIR    := test
-EXAMPLES_TAGDIR := examples
+EXAMPLES_TAGDIR := example
 
 # Note the `=` below (and also that `tmp` is project-local):
 OUTDIR     = tmp/build/$(VROOT)
@@ -289,7 +289,7 @@ $(DEMO_DIR)/%$(VTAG)$(exeext): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext) $(LIBFILE
 	@echo
 	@echo "NOTE: Ignoring missing '$@' mentioned in dependencies..."
 #	@echo "HINT: consider 'make clean'"
-	@echo
+#	@echo
 
 
 ifeq "1" "0"

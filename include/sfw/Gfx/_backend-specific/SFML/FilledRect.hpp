@@ -1,7 +1,7 @@
 ﻿#ifndef _OIU345YTNDC84675TOB678WTBN5MC94285N7_
 #define _OIU345YTNDC84675TOB678WTBN5MC94285N7_
 
-#include "sfw/Gfx/Render.hpp"
+#include "sfw/gfx/Render.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Color.hpp>

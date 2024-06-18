@@ -1,6 +1,6 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/Widgets/Tooltip.hpp"
+#include "sfw/widget/Tooltip.hpp"
 #include "sfw/util/diagnostics.hpp"
 
 //!! Stuff for clearing the bg. when not owning the entire window

@@ -1,7 +1,7 @@
 #ifndef _CNJERHKDNGF6C98O423576TGB87RT9NM23745T6Y807RE5T_
 #define _CNJERHKDNGF6C98O423576TGB87RT9NM23745T6Y807RE5T_
 
-#include "sfw/Gfx/Render.hpp"
+#include "sfw/gfx/Render.hpp"
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Color.hpp>

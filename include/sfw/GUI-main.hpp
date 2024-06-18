@@ -2,11 +2,11 @@
 #define _KUNYWET5GX94358T645N345TF678RWE5TG67F4B57_
 
 #include "sfw/Theme.hpp"
-#include "sfw/Gfx/Render.hpp"
+#include "sfw/gfx/Render.hpp"
 #include "sfw/Widget.hpp"
 #include "sfw/WidgetPtr.hpp"
-#include "sfw/Layouts/VBox.hpp"
-#include "sfw/Gfx/Elements/Wallpaper.hpp"
+#include "sfw/layout/VBox.hpp"
+#include "sfw/gfx/element/Wallpaper.hpp"
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
