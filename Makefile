@@ -285,11 +285,12 @@ $(DEMO_DIR)/%$(VTAG)$(exeext): $(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext) $(LIBFILE
 -include $(OBJS:%$(objext)=%.d)
 
 # Hack to deal with stale dependencies (adopted from the DarkPlaces Quake clone makefile):
-%.h %.hpp %.inl:
-	@echo
+%.h%: #!! Also adding `%.hpp %.inl` didn't work: just made all the EXISTING headers trigger this rule!... :-o
 	@echo "NOTE: Ignoring missing '$@' mentioned in dependencies..."
 #	@echo "HINT: consider 'make clean'"
 #	@echo
+%.inl:
+	@echo "NOTE: Ignoring missing '$@' mentioned in dependencies..."
 
 
 ifeq "1" "0"
