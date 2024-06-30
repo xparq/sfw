@@ -1,0 +1,1 @@
+#define SFW_CFG_GFX_BACKEND SFML

@@ -1,10 +1,13 @@
-#ifndef SFW_SHIMS_HPP
-#define SFW_SHIMS_HPP
+#ifndef _LASKDRUHTNIUSCE5H7Y7N4W0987YW4U58MSDHFMYKJHN_
+#define _LASKDRUHTNIUSCE5H7Y7N4W0987YW4U58MSDHFMYKJHN_
 
 //!!----------------------------------------------------------------------------
-//!! This should also be moved to something SFML-specific:
+//!! This should also be moved to an SFML-backed Event adapter:
 
 #include <SFML/Window/Event.hpp>
+
+namespace sf //! Inject to sf:: for innocent client code to actually find it (via ADL)!
+{
 // FFS, still no default == (at least for PODs), even in c++20?! :-/
 // (https://stackoverflow.com/a/27837789/1479945)
 inline bool operator==(const sf::Event::KeyChanged& key1, const sf::Event::KeyChanged& key2)
@@ -17,6 +20,7 @@ inline bool operator==(const sf::Event::KeyChanged& key1, const sf::Event::KeyCh
         && key1.system == key2.system
     ;
 }
+} // namespace sf
 
 inline bool SFML_keypress_has_modifiers(const sf::Event::KeyChanged& key)
 // Is there a sane way already to check this?
@@ -58,4 +62,4 @@ inline std::string SFMLString_to_stdstring(const sf::String& sfstr)
 }
 
 
-#endif // SFW_SHIMS_HPP
+#endif // _LASKDRUHTNIUSCE5H7Y7N4W0987YW4U58MSDHFMYKJHN_

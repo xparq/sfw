@@ -7,8 +7,8 @@
 #include "sfw/WidgetPtr.hpp"
 #include "sfw/layout/VBox.hpp"
 #include "sfw/gfx/element/Wallpaper.hpp"
+#include "sfw/math/Vector.hpp"
 
-#include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Cursor.hpp>
@@ -33,18 +33,40 @@ public:
 	GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg = Theme::DEFAULT,
 		bool own_the_window = true);
 
+	bool setTheme(const sfw::Theme::Cfg& themeCfg);
+
 	/**
-	 * Return true if no errors & has not been closed.
+	 * Broadcast an onThemeChanged notification to all widgets, so they
+	 * can react to changes made directly to the current (static) theme
+	 * rather than having an entirely new theme selected by setTheme().
+	 *
+	 *!! Temp./interim hack until having Theme::set(prop, value), or at
+	 *!! least Theme::notify(event), doing the notification implicitly!
+	 */
+	void themeChanged();
+
+	/**
+	 * Overloaded Widget::setPosition() for wallpaper support (etc.)
+	 */
+	void setPosition(const fVec2& pos);
+	void setPosition(float x, float y);
+
+	//!!bool setSize(fVec2 size);
+	//!! For now, only the inherited version is available, which isn't aware of
+	//!! the case of managing a host window
+
+	/**
+	 * Current GUI rectangle size: if the GUI manages (owns) the (host) window,
+	 * then the size of that, otherwise the current size the rectangle the GUI
+	 * actually occupies
+	 */
+	fVec2 getSize() const;
+
+	/**
+	 * Returns true if no errors & the GUI has not been closed or deactivated.
 	 */
 	bool active();
 	operator bool() { return active(); }
-
-	bool setTheme(const sfw::Theme::Cfg& themeCfg);
-	/**
-	 * Broadcast the onThemeChanged notification so widgets can pick up any
-	 * manual changes made directly to the current (static) theme props.
-	 */
-	void themeChanged();
 
 	/**
 	 * Process events from the backend (i.e. SFML)
@@ -87,13 +109,8 @@ public:
 	Widget* recall(std::string_view name) const;
 	std::string recall(const Widget*) const;
 
-	/**
-	 * Change the mouse pointer for the GUI window
-	 */
-	void setMouseCursor(sf::Cursor::Type cursorType);
-
-	// Get mouse cursor position (in "GUI Main" coordinates)
-	sf::Vector2f getMousePosition() const;
+	// Get mouse cursor position in coordinates local to the main GUI window
+	fVec2 getMousePosition() const;
 
 	/**
 	 * Set/manage wallpaper image
@@ -112,21 +129,13 @@ public:
 	 */
 	void setWallpaperColor(sf::Color tint);
 
-	/**
-	 * Overloaded Widget::setPosition() for wallpaper support (etc.)
-	 */
-	void setPosition(const sf::Vector2f& pos);
-	void setPosition(float x, float y);
-
-	/**
-	 * Current GUI rectangle size: if the GUI manages (owns) the (host) window,
-	 * then the size of that, otherwise the current size the rectangle the GUI
-	 * actually occupies
-	 */
-	sf::Vector2f getSize() const;
-
 	// Accumulated session time (minus while !active()), in seconds
 	float sessionTime() const;
+
+	/**
+	 * Change the mouse pointer for the GUI window
+	 */
+	void setMouseCursor(sf::Cursor::Type cursorType);
 
 private:
 	/**
@@ -137,8 +146,9 @@ private:
 	 */
 	bool reset();
 
-	// Convert screen pixel coordinates to window position (See the sf::Mouse docs!)
-	sf::Vector2f convertMousePosition(int x, int y) const;
+	// Convert screen pixel coordinates to window (canvas) position (See SFML's sf::Mouse docs!)
+	fVec2 convertMousePosition(iVec2 mouse_pos)          const;
+	fVec2 convertMousePosition(int mouse_x, int mouse_y) const { return convertMousePosition({mouse_x, mouse_y});}
 
 // ---- Callbacks ------------------------------------------------------------
 	void draw(const gfx::RenderContext& ctx) const override;

@@ -1,7 +1,7 @@
-#ifndef SFW_ITEMBOX_HPP
-#define SFW_ITEMBOX_HPP
+#ifndef _LKSDURHF874E5T8O6734T8B679TX3785N_
+#define _LKSDURHF874E5T8O6734T8B679TX3785N_
 
-#include "sfw/gfx/backend.hpp"
-#include GFX_BACKEND_SPECIFIC(ItemBox.hpp)
+#include "sfw/adapter/dispatch.hpp"
+#include SFW_ADAPTER_IMPL(gfx/element, ItemBox.hpp)
 
-#endif // SFW_ITEMBOX_HPP
+#endif // _LKSDURHF874E5T8O6734T8B679TX3785N_

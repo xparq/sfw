@@ -16,6 +16,10 @@ include/**/.*
 #tmp/build/ <- tmp/ is already ignored
 *.ilk
 *.pdb
+*.ii
+*.o
+*.obj
+*.s
 
 # Test/demo binaries
 *.exe

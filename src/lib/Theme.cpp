@@ -6,6 +6,7 @@
 
 namespace sfw
 {
+using namespace geometry;
 
 Theme::Cfg Theme::DEFAULT =
 {
@@ -80,8 +81,8 @@ sf::Event::KeyChanged Theme::previousWidgetKey = { .code = sf::Keyboard::Key::Ta
 #endif
 
 sf::Font Theme::m_font;
-sf::Texture Theme::m_texture;
-sf::IntRect Theme::m_subrects[_TEXTURE_ID_COUNT];
+/*!!sfw::gfx::!!*/Texture Theme::m_texture;
+iRect Theme::m_subrects[_TEXTURE_ID_COUNT];
 sf::Cursor& Theme::cursor = getDefaultCursor();
 
 
@@ -108,19 +109,20 @@ bool Theme::loadFont(const std::string& filename)
 
 bool Theme::loadTexture(const std::string& filename)
 {
-	if (m_texture.loadFromFile(filename))
+	if (m_texture.load(filename))
 	{
-		sf::IntRect subrect;
-		subrect.width = m_texture.getSize().x;
-		subrect.height = m_texture.getSize().y / _TEXTURE_ID_COUNT;
+		iRect subrect;
+		//!! Alas, rect.width()/height() are NOT lvalues; need to use the alt. setter API:
+		subrect.width(m_texture.size().x());
+		subrect.height(m_texture.size().y() / _TEXTURE_ID_COUNT);
 
 		for (int i = 0; i < _TEXTURE_ID_COUNT; ++i)
 		{
 			m_subrects[i] = subrect;
-			subrect.top += subrect.height;
+			subrect.top() += subrect.height();
 		}
 
-		borderSize = subrect.width / 3;
+		borderSize = subrect.width() / 3;
 		return true;
 	}
 	return false;
@@ -139,7 +141,7 @@ const sf::Texture& Theme::getTexture()
 }
 
 
-const sf::IntRect& Theme::getTextureRect(Box::Type type, ActivationState state)
+const iRect& Theme::getTextureRect(Box::Type type, ActivationState state)
 {
 	TextureID id(BOX_DEFAULT);
 	switch (state)
@@ -164,19 +166,19 @@ const sf::IntRect& Theme::getTextureRect(Box::Type type, ActivationState state)
 }
 
 
-const sf::IntRect& Theme::getCheckMarkTextureRect()
+const iRect& Theme::getCheckMarkTextureRect()
 {
 	return m_subrects[CHECKMARK];
 }
 
 
-const sf::IntRect& Theme::getArrowTextureRect()
+const iRect& Theme::getArrowTextureRect()
 {
 	return m_subrects[ARROW];
 }
 
 
-const sf::IntRect& Theme::getProgressBarTextureRect()
+const iRect& Theme::getProgressBarTextureRect()
 {
 	return m_subrects[PROGRESS_BAR];
 }
@@ -193,4 +195,4 @@ int Theme::getLineSpacing()
 	return (int)m_font.getLineSpacing((unsigned)textSize);
 }
 
-} // namespace
+} // namespace sfw

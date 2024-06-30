@@ -26,6 +26,7 @@ public:
 protected:
 	Layout();
 
+	// Override the generic Widget API (which just returns null):
 	Layout* toLayout() override { return this; }
 
 	// Set the focus on a child widget, if applicable

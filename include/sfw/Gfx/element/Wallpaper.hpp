@@ -1,5 +1,5 @@
-#ifndef _SFW_WALLPAPER_HPP_
-#define _SFW_WALLPAPER_HPP_
+#ifndef _HY389N475YTNC38945768723Q4YT78W45_
+#define _HY389N475YTNC38945768723Q4YT78W45_
 
 #include "sfw/gfx/Render.hpp"
 #include "sfw/ActivationState.hpp"
@@ -50,7 +50,7 @@ private:
 
 } // namespace
 
-#include "sfw/gfx/backend.hpp"
-#include GFX_BACKEND_SPECIFIC(Wallpaper.hpp)
+#include "sfw/adapter/dispatch.hpp"
+#include SFW_ADAPTER_IMPL(gfx/element, Wallpaper.hpp)
 
-#endif // _SFW_WALLPAPER_HPP_
+#endif // _HY389N475YTNC38945768723Q4YT78W45_

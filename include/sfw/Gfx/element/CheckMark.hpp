@@ -1,7 +1,7 @@
-#ifndef SFW_CHECKMARK_HPP
-#define SFW_CHECKMARK_HPP
+#ifndef _LJSYRT7824C5897Y34875TCDJRTYIJU46796GH7_
+#define _LJSYRT7824C5897Y34875TCDJRTYIJU46796GH7_
 
-#include "sfw/gfx/backend.hpp"
-#include GFX_BACKEND_SPECIFIC(CheckMark.hpp)
+#include "sfw/adapter/dispatch.hpp"
+#include SFW_ADAPTER_IMPL(gfx/element, CheckMark.hpp)
 
-#endif // SFW_CHECKMARK_HPP
+#endif // _LJSYRT7824C5897Y34875TCDJRTYIJU46796GH7_

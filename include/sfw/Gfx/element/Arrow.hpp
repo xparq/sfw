@@ -1,7 +1,7 @@
-#ifndef SFW_ARROW_HPP
-#define SFW_ARROW_HPP
+#ifndef _ODIU4WE5OYHNUDHSRGUIFYHB87ERHO78GD4N87RGT_
+#define _ODIU4WE5OYHNUDHSRGUIFYHB87ERHO78GD4N87RGT_
 
-#include "sfw/gfx/backend.hpp"
-#include GFX_BACKEND_SPECIFIC(Arrow.hpp)
+#include "sfw/adapter/dispatch.hpp"
+#include SFW_ADAPTER_IMPL(gfx/element, Arrow.hpp)
 
-#endif // SFW_ARROW_HPP
+#endif // _ODIU4WE5OYHNUDHSRGUIFYHB87ERHO78GD4N87RGT_

@@ -2,11 +2,15 @@
 #define _DOCIU4Y578TB87SX45T687045N78H3565456UHY_
 
 #include "sfw/gfx/Render.hpp"
+#include "sfw/math/Vector.hpp"
+#include "sfw/geometry/Rectangle.hpp"
+#include "sfw/gfx/element/Texture.hpp"
 
 #include <SFML/Graphics/Transformable.hpp>
-#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/Color.hpp>
+
+#include <string_view>
 
 namespace sfw
 {
@@ -16,7 +20,7 @@ namespace sfw
  */
 class Wallpaper: public GenericWallpaper, public gfx::Drawable, public sf::Transformable
 {
-	static constexpr sf::IntRect NullRect = {{0,0}, {0,0}};
+	static constexpr geometry::iRect NullRect{};
 
 public:
 	struct Cfg
@@ -35,21 +39,21 @@ public:
 
 
 	Wallpaper();
-	Wallpaper(const std::string& filename, const sf::IntRect& r = NullRect);
-	Wallpaper(const sf::Image& Wallpaper,  const sf::IntRect& r = NullRect);
-	Wallpaper(const sf::Texture& texture,  const sf::IntRect& r = NullRect);
+	Wallpaper(std::string_view filename,   const geometry::iRect& r = NullRect);
+	Wallpaper(const sf::Image& image,      const geometry::iRect& r = NullRect);
+	Wallpaper(const sfw::Texture& texture, const geometry::iRect& r = NullRect);
 
-	Wallpaper* setImage(const std::string& filename, const sf::IntRect& r = NullRect);
-	Wallpaper* setImage(const sf::Image& image,      const sf::IntRect& r = NullRect);
-	Wallpaper* setImage(const sf::Texture& texture,  const sf::IntRect& r = NullRect);
+	Wallpaper* setImage(std::string_view filename,   const geometry::iRect& r = NullRect);
+	Wallpaper* setImage(const sf::Image& image,      const geometry::iRect& r = NullRect);
+	Wallpaper* setImage(const sfw::Texture& texture, const geometry::iRect& r = NullRect);
 
-	const sf::Texture& texture() const { return m_texture; }
+	const sfw::Texture& texture() const { return m_texture; }
 
-	Wallpaper*   setSize(sf::Vector2f size);
-	sf::Vector2f getSize() const;
+	Wallpaper* setSize(iVec2 size);
+	iVec2      getSize() const;
 
-	Wallpaper*  setCropRect(const sf::IntRect& r);
-	sf::IntRect getCropRect() const;
+	Wallpaper*      setCropRect(const geometry::iRect& r);
+	geometry::iRect getCropRect() const;
 
 	// Scaling based on the original image size
 
@@ -66,8 +70,8 @@ public: //! <- NOT private, because draw() may be accessed directly (statically)
 	void draw(const gfx::RenderContext& ctx) const override;
 
 private:
-	sf::Texture m_texture;
-	sf::Vector2f m_baseSize;
+	sfw::/*!!gfx::!!*/Texture m_texture;
+	iVec2 m_baseSize;
 	float m_scalingFactor = 1.f;
 	sf::Vertex m_vertices[4];
 };

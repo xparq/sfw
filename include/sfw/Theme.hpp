@@ -3,6 +3,7 @@
 
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/element/Wallpaper.hpp"
+//#include "sfw/geometry/Rectangle.hpp" // Definitely done already by those rectangular things above. ;)
 
 //!!#include "sfw/widget/Tooltip/Style.hpp"
 
@@ -59,12 +60,12 @@ public:
 	// Load & access (parts of) the GUI spritesheet
 	static bool loadTexture(const std::string& path);
 	static const sf::Texture& getTexture();
-	static const sf::IntRect& getTextureRect(Box::Type type, ActivationState state);
+	static const geometry::iRect& getTextureRect(Box::Type type, ActivationState state);
 
 		// Convenience helpers:
-		static const sf::IntRect& getCheckMarkTextureRect();
-		static const sf::IntRect& getArrowTextureRect();
-		static const sf::IntRect& getProgressBarTextureRect();
+		static const geometry::iRect& getCheckMarkTextureRect();
+		static const geometry::iRect& getArrowTextureRect();
+		static const geometry::iRect& getProgressBarTextureRect();
 
 	// Default widget height based on text size
 	static float getBoxHeight();
@@ -122,10 +123,10 @@ private:
 	};
 
 	static sf::Font m_font;
-	static sf::Texture m_texture;
-	static sf::IntRect m_subrects[_TEXTURE_ID_COUNT];
+	static sfw::/*!!gfx::!!*/Texture m_texture;
+	static geometry::iRect m_subrects[_TEXTURE_ID_COUNT];
 }; // class
 
-} // namsepace
+} // namsepace sfw
 
 #endif // _SUIOHTCY78Y678E4785T36T6B67X34574NY7T_

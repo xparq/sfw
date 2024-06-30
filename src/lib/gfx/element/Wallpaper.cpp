@@ -5,30 +5,31 @@
 
 namespace sfw
 {
+using namespace geometry;
 
 Wallpaper::Wallpaper()
 {
 }
 
-Wallpaper::Wallpaper(const std::string& filename, const sf::IntRect& r): Wallpaper()
+Wallpaper::Wallpaper(std::string_view filename, const iRect& r): Wallpaper()
 {
 	setImage(filename, r);
 }
 
-Wallpaper::Wallpaper(const sf::Image& image, const sf::IntRect& r): Wallpaper()
+Wallpaper::Wallpaper(const sf::Image& image, const iRect& r): Wallpaper()
 {
 	setImage(image, r);
 }
 
-Wallpaper::Wallpaper(const sf::Texture& texture, const sf::IntRect& r): Wallpaper()
+Wallpaper::Wallpaper(const sfw::Texture& texture, const iRect& r): Wallpaper()
 {
 	setImage(texture, r);
 }
 
 
-Wallpaper* Wallpaper::setImage(const std::string& filename, const sf::IntRect& r)
+Wallpaper* Wallpaper::setImage(std::string_view filename, const iRect& r)
 {
-	if (m_texture.loadFromFile(filename, r))
+	if (m_texture.load(filename, r))
 	{
 		setImage(m_texture);
 	}
@@ -37,16 +38,16 @@ Wallpaper* Wallpaper::setImage(const std::string& filename, const sf::IntRect& r
 	return this;
 }
 
-Wallpaper* Wallpaper::setImage(const sf::Image& image, const sf::IntRect& r)
+Wallpaper* Wallpaper::setImage(const sf::Image& image, const iRect& r)
 {
-	if (m_texture.loadFromImage(image, r)) //!!?? What does SFML do with a null/invalid rect?!
+	if (m_texture.set(image, r)) //!!?? What does SFML do with a null/invalid rect?!
 	{
 		setImage(m_texture);
 	}
 	return this;
 }
 
-Wallpaper* Wallpaper::setImage(const sf::Texture& texture, const sf::IntRect& crop)
+Wallpaper* Wallpaper::setImage(const sfw::Texture& texture, const iRect& crop)
 {
 	// Don't copy over itself (but still alow cropping even then)
 	if (&m_texture != &texture)
@@ -55,18 +56,22 @@ Wallpaper* Wallpaper::setImage(const sf::Texture& texture, const sf::IntRect& cr
 	}
 
 	// Set the "crop window" to the full native texture size if crop == Null
-	setCropRect(crop == NullRect ? sf::IntRect{{0, 0}, {(int)m_texture.getSize().x, (int)m_texture.getSize().y}}
+	setCropRect(crop == NullRect ? iRect(iVec2{0, 0}, iVec2{(int)m_texture.getSize().x, (int)m_texture.getSize().y}) //!! Direct use of the SFML API! Also: sf::Texture.getSize() is unsigned...
 	                             : crop);
+
+	//!! This braced version failed to compile, BTW:
+	//!!setCropRect(crop == NullRect ? iRect{iVec2{0, 0}, iVec2{(int)m_texture.getSize().x, (int)m_texture.getSize().y}} : crop);
+
 	return this;
 }
 
 
-Wallpaper* Wallpaper::setCropRect(const sf::IntRect& r)
+Wallpaper* Wallpaper::setCropRect(const iRect& r)
 {
-	float left = (float) (r.left ? r.left : 0);
-	float top  = (float) (r.top  ? r.top  : 0);
-	float width  = (float) (r.width ? r.width  : m_texture.getSize().x);
-	float height = (float) (r.width ? r.height : m_texture.getSize().y);
+	float left = (float) (r.left() ? r.left() : 0);
+	float top  = (float) (r.top()  ? r.top()  : 0);
+	float width  = (float) (r.width() ? r.width()  : m_texture.getSize().x);
+	float height = (float) (r.width() ? r.height() : m_texture.getSize().y);
 
 	if (width  > m_texture.getSize().x) width  = (float)m_texture.getSize().x;
 	if (height > m_texture.getSize().y) height = (float)m_texture.getSize().y;
@@ -83,10 +88,9 @@ Wallpaper* Wallpaper::setCropRect(const sf::IntRect& r)
 	return this;
 }
 
-sf::IntRect Wallpaper::getCropRect() const
+iRect Wallpaper::getCropRect() const
 {
-	return sf::IntRect(sf::Vector2i(m_vertices[0].texCoords),
-	                   sf::Vector2i(m_vertices[3].texCoords - m_vertices[0].texCoords));
+	return iRect(iVec2(m_vertices[0].texCoords), iVec2(m_vertices[3].texCoords - m_vertices[0].texCoords)); //!! Implicit conversion from SFML Vector2!
 }
 
 
@@ -118,20 +122,22 @@ sf::Color Wallpaper::getColor() const
 }
 
 
-Wallpaper* Wallpaper::setSize(sf::Vector2f size)
+Wallpaper* Wallpaper::setSize(iVec2 size)
 {
 	m_vertices[0].position = {0, 0};
-	m_vertices[1].position = {0, size.y};
-	m_vertices[2].position = {size.x, 0};
-	m_vertices[3].position = {size.x, size.y};
+	m_vertices[1].position = {0, (float)size.y()};
+	m_vertices[2].position = {(float)size.x(), 0};
+	m_vertices[3].position = {(float)size.x(), (float)size.y()};
 
 	return this;
 }
 
-sf::Vector2f Wallpaper::getSize() const
+iVec2 Wallpaper::getSize() const
 {
-	return { m_vertices[3].position.x - m_vertices[0].position.x,
-	         m_vertices[3].position.y - m_vertices[0].position.y };
+	return { (int)m_vertices[3].position.x - (int)m_vertices[0].position.x,
+	         (int)m_vertices[3].position.y - (int)m_vertices[0].position.y };
+//!! USE THIS (+ conv.):
+//!!	return m_vertices[3].position - m_vertices[0].position;
 }
 
 
@@ -139,7 +145,7 @@ void Wallpaper::draw(const gfx::RenderContext& ctx) const
 {
 	auto sfml_renderstates = ctx.props;
 	sfml_renderstates.transform *= getTransform();
-	sfml_renderstates.texture = &m_texture;
+	sfml_renderstates.texture = &m_texture.native();
 	ctx.target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
 }
 

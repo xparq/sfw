@@ -1,4 +1,0 @@
-#define SFW_CFG_GFX_USE_SFML 1
-// This should be auto-computed somewhere else based on the CFG_... macro
-// above, but... Life is short!
-#define SFW_GFX_BACKEND SFML

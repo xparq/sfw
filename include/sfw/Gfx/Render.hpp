@@ -47,8 +47,8 @@ public:
 } // namespace sfw::gfx
 
 
-#include "sfw/gfx/backend.hpp"
-#include GFX_BACKEND_SPECIFIC(Render.hpp)
+#include "sfw/adapter/dispatch.hpp"
+#include SFW_ADAPTER_IMPL(gfx/Render)
 
 
 #endif // _DMNE98475Y687D348057NHY6378945HY6B0V45978Y9TG898_

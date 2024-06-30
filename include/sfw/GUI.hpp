@@ -4,7 +4,7 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
 
-#include "sfw/geometry/Orientation.hpp" //!!LEGACY: Shouldn't be (pre-)included here!
+//!!#include "sfw/geometry/Orientation.hpp" //!!LEGACY: Shouldn't be (pre-)included here!
 
 // Widgets
 #include "sfw/widget/Button.hpp"
@@ -25,6 +25,6 @@
 #include "sfw/layout/Form.hpp"
 
 // Misc
-#include "sfw/gfx/Color.hpp" // Likely included by the others, though...
+//!!#include "sfw/gfx/Color.hpp" //!! Likely included by the others, though...
 
 #endif // _GUI_ALL_HPP_

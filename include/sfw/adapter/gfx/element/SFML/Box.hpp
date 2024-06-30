@@ -3,11 +3,11 @@
 
 #include "sfw/ActivationState.hpp"
 #include "sfw/gfx/Render.hpp"
+#include "sfw/math/Vector.hpp"
 
+#include <SFML/Graphics/Color.hpp> //!! Use our own adapter class!
+#include <SFML/Graphics/Text.hpp> //!! Use our own adapter class!
 #include <SFML/Graphics/Vertex.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Text.hpp>
 
 #include <cmath>
 #include <optional>
@@ -29,14 +29,14 @@ public:
 
 	Box(Type type = Click);
 
-	const sf::Vector2f& getPosition() const;
+	fVec2 getPosition() const;
 
 	void setPosition(float x, float y);
 
 	void setSize(float width, float height);
-	void setSize(const sf::Vector2f& size) { return setSize(size.x, size.y); }
+	void setSize(const fVec2& size) { return setSize(size.x(), size.y()); }
 
-	sf::Vector2f getSize() const;
+	fVec2 getSize() const;
 
 	// Fill the interior of the box with a color, overriding its texture
 	// The edges will NOT be affected!
@@ -53,12 +53,12 @@ public:
 	template <class T>
 	void centerItem(T& item)
 	{
-		sf::Vector2f size = getSize();
-		sf::Vector2f itemSize = item.getSize();
+		fVec2 size = getSize();
+		fVec2 itemSize = item.getSize();
 		// Center item
 		item.setPosition(
-			{roundf(getPosition().x + (size.x - itemSize.x) / 2),
-			 roundf(getPosition().y + (size.y - itemSize.y) / 2)}
+			{roundf(getPosition().x() + (size.x() - itemSize.x()) / 2),
+			 roundf(getPosition().y() + (size.y() - itemSize.y()) / 2)}
 		);
 	}
 

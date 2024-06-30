@@ -2,8 +2,8 @@
 #define _YGM78SY487Y3G45YNV87M475D70YRT7YHVM579H_
 
 #include "sfw/gfx/Render.hpp"
+#include "sfw/math/Vector.hpp"
 
-#include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 
@@ -15,11 +15,11 @@ class CheckMark: public gfx::Drawable
 public:
 	CheckMark();
 
-	void setPosition(sf::Vector2f pos);
-	void move(sf::Vector2f delta);
+	void setPosition(fVec2 pos);
+	void move(fVec2 delta);
 
 	void setSize(float size);
-	sf::Vector2f getSize() const;
+	fVec2 getSize() const;
 	void setColor(const sf::Color& color);
 
 public: //! <- NOT private, because draw() may be accessed directly (statically),

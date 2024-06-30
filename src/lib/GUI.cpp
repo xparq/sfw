@@ -114,54 +114,47 @@ bool GUI::process(const sf::Event& event)
 
 	if (!active()) return false;
 
-	switch (event.type)
+	if (auto mouseMoved = event.getIf<sf::Event::MouseMoved>())
 	{
-	case sf::Event::MouseMoved:
-	{
-		sf::Vector2f mouse = convertMousePosition(event.mouseMove.x, event.mouseMove.y);
-		onMouseMoved(mouse.x, mouse.y);
-		break;
+		fVec2 mouse = convertMousePosition(mouseMoved->position);
+		onMouseMoved(mouse.x(), mouse.y());
 	}
-
-	case sf::Event::MouseButtonPressed:
-		if (event.mouseButton.button == sf::Mouse::Button::Left)
+	else if (auto mouseWheel = event.getIf<sf::Event::MouseWheelScrolled>())
+	{
+		onMouseWheelMoved((int)mouseWheel->delta);
+	}
+	else if (auto mouseButtonPress = event.getIf<sf::Event::MouseButtonPressed>())
+	{
+		if (mouseButtonPress->button == sf::Mouse::Button::Left)
 		{
-			sf::Vector2f mouse = convertMousePosition(event.mouseButton.x, event.mouseButton.y);
-			onMousePressed(mouse.x, mouse.y);
+			fVec2 mouse = convertMousePosition(mouseButtonPress->position);
+			onMousePressed(mouse.x(), mouse.y());
 		}
-		break;
-
-	case sf::Event::MouseButtonReleased:
-		if (event.mouseButton.button == sf::Mouse::Button::Left)
+	}
+	else if (auto mouseButtonRelease = event.getIf<sf::Event::MouseButtonReleased>()) // -> https://github.com/SFML/SFML/issues/2990#issuecomment-2195516979
+	{
+		if (mouseButtonRelease->button == sf::Mouse::Button::Left)
 		{
-			sf::Vector2f mouse = convertMousePosition(event.mouseButton.x, event.mouseButton.y);
-			onMouseReleased(mouse.x, mouse.y);
+			fVec2 mouse = convertMousePosition(mouseButtonRelease->position);
+			onMouseReleased(mouse.x(), mouse.y());
 		}
-		break;
-
-	case sf::Event::MouseWheelScrolled:
-		onMouseWheelMoved((int)event.mouseWheelScroll.delta);
-		break;
-
-	case sf::Event::KeyPressed:
-		onKeyPressed(event.key);
-		break;
-
-	case sf::Event::KeyReleased:
-		onKeyReleased(event.key);
-		break;
-
-	case sf::Event::TextEntered:
-		onTextEntered(event.text.unicode);
-		break;
-
-	case sf::Event::Closed:
-	close();
+	}
+	else if (auto keyPress = event.getIf<sf::Event::KeyPressed>())
+	{
+		onKeyPressed(*keyPress);
+	}
+	else if (auto keyRelease = event.getIf<sf::Event::KeyReleased>()) // -> https://github.com/SFML/SFML/issues/2990#issuecomment-2195516979
+	{
+		onKeyReleased(*keyRelease);
+	}
+	else if (auto input = event.getIf<sf::Event::TextEntered>())
+	{
+		onTextEntered(input->unicode);
+	}
+	else if (event.is<sf::Event::Closed>())
+	{
+		close();
 		return false;
-	break;
-
-	default:
-		break;
 	}
 
 	return true;
@@ -361,17 +354,15 @@ string GUI::recall(const Widget* w) const
 
 
 //----------------------------------------------------------------------------
-sf::Vector2f GUI::getMousePosition() const
+fVec2 GUI::getMousePosition() const
 {
-	auto pixpos = sf::Mouse::getPosition(m_window);
-	return convertMousePosition(pixpos.x, pixpos.y);
+	return convertMousePosition(sf::Mouse::getPosition(m_window));
 }
 
-//----------------------------------------------------------------------------
-sf::Vector2f GUI::convertMousePosition(int x, int y) const
+fVec2 GUI::convertMousePosition(iVec2 mouse_pos) const
 {
-	sf::Vector2f mouse = m_window.mapPixelToCoords(sf::Vector2i(x, y));
-	mouse -= getPosition();
+	fVec2 mouse = m_window.mapPixelToCoords(sf::Vector2i(mouse_pos.x(), mouse_pos.y())); //!!?? Any better way to cvt. ivect to fvect?
+	mouse -= fVec2(getPosition()); //!! getPosition still uses sf::Vector directly!
 	return mouse;
 }
 
@@ -403,7 +394,7 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf:
 	// This may also get called way too early, even before any widgets
 	// are added (i.e. from the initial setTheme() via the ctor!), so
 	// better not waste time/resources then:
-	if (!getSize().x || !getSize().y)
+	if (!getSize().x() || !getSize().y())
 		return;
 
 	if (filename.empty())
@@ -451,7 +442,7 @@ void GUI::disableWallpaper()
 }
 
 
-void GUI::setPosition(const sf::Vector2f& pos)
+void GUI::setPosition(const fVec2& pos)
 {
 	if (hasWallpaper()) m_wallpaper.setPosition(pos);
 	Widget::setPosition(pos);
@@ -459,14 +450,17 @@ void GUI::setPosition(const sf::Vector2f& pos)
 
 void GUI::setPosition(float x, float y)
 {
-	setPosition(sf::Vector2f(x, y));
+	setPosition(fVec2(x, y));
 }
 
 
-sf::Vector2f GUI::getSize() const
+fVec2 GUI::getSize() const
 {
-	return m_own_window ? sf::Vector2f{(float)m_window.getSize().x, (float)m_window.getSize().y}
-	                    : Widget::getSize();
+	return m_own_window ? fVec2((float)m_window.getSize().x, (float)m_window.getSize().y)
+	                    : fVec2(Widget::getSize());
+//!! OR:
+//!!	return m_own_window ? sf::Vector2f((float)m_window.getSize().x, (float)m_window.getSize().y)
+//!!	                    : Widget::getSize();
 }
 
 float GUI::sessionTime() const
@@ -490,7 +484,7 @@ void GUI::onResized()
 #ifdef DEBUG
 //cerr <<"resized to " <<getSize().x <<" x "<<getSize().y <<" /" <<sessionTime() <<endl;
 #endif
-	m_wallpaper.setSize(getSize());
+	m_wallpaper.setSize(iVec2((int)getSize().x(), (int)getSize().y())); //!!... So sad... :-/
 }
 
 

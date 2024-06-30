@@ -1,5 +1,5 @@
-#ifndef SFW_GFX_TEXT_HPP
-#define SFW_GFX_TEXT_HPP
+#ifndef _LWIFCEURYUYIDSHRTJMHNSDJFHGBWHJKERBG35498678495_
+#define _LWIFCEURYUYIDSHRTJMHNSDJFHGBWHJKERBG35498678495_
 //----------------------------------------------------------------------------
 // 2c99b33@SFML removed the default sf::Text ctor with no font.
 // This helper class can be used to help existing APIs continue to rely
@@ -7,7 +7,7 @@
 
 #include "sfw/gfx/Text.hpp"
 
-#include "sfw/gfx/backend.hpp"
-#include GFX_BACKEND_SPECIFIC(TextBox.hpp)
+#include "sfw/adapter/dispatch.hpp"
+#include SFW_ADAPTER_IMPL(gfx/element, TextBox.hpp)
 
-#endif // SFW_GFX_TEXT_HPP
+#endif // _LWIFCEURYUYIDSHRTJMHNSDJFHGBWHJKERBG35498678495_

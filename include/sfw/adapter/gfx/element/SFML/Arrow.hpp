@@ -2,9 +2,9 @@
 #define _CNJERHKDNGF6C98O423576TGB87RT9NM23745T6Y807RE5T_
 
 #include "sfw/gfx/Render.hpp"
+#include "sfw/math/Vector.hpp"
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Color.hpp> //!! Use our own adapter class!
 #include <SFML/Graphics/Vertex.hpp>
 
 namespace sfw
@@ -25,11 +25,11 @@ public:
 
 	void setFillColor(const sf::Color& color);
 
-	void move(sf::Vector2f delta);
+	void move(fVec2 delta);
 
-	void setPosition(sf::Vector2f pos);
+	void setPosition(fVec2 pos);
 
-	sf::Vector2f getSize() const;
+	fVec2 getSize() const;
 
 public: //! <- NOT private, because draw() may be accessed directly (statically),
         //!    rather than just polymorphically (dynamically) via a pointer!

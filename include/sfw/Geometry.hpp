@@ -1,5 +1,5 @@
-﻿#ifndef _FU3589077GVHM0DFYH8946UM89UE5898BFI_
-#define _FU3589077GVHM0DFYH8946UM89UE5898BFI_
+﻿#ifndef _GFU3589077GVHM0DFYH8946UM89UE5898BFI_
+#define _GFU3589077GVHM0DFYH8946UM89UE5898BFI_
 
 /*!!
 - Grab the build config and use header dispatching to include the appropriate
@@ -13,4 +13,4 @@
 #include "sfw/geometry/Rectangle.hpp"
 !!*/
 
-#endif // _FU3589077GVHM0DFYH8946UM89UE5898BFI_
+#endif // _GFU3589077GVHM0DFYH8946UM89UE5898BFI_

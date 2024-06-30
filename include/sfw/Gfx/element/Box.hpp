@@ -1,7 +1,7 @@
-#ifndef _SFW_BOX_HPP_
-#define _SFW_BOX_HPP_
+#ifndef _DKUMESYRTB874DY870F4W9SEDRHN87_
+#define _DKUMESYRTB874DY870F4W9SEDRHN87_
 
-#include "sfw/gfx/backend.hpp"
-#include GFX_BACKEND_SPECIFIC(Box.hpp)
+#include "sfw/adapter/dispatch.hpp"
+#include SFW_ADAPTER_IMPL(gfx/element, Box.hpp)
 
-#endif // _SFW_BOX_HPP_
+#endif // _DKUMESYRTB874DY870F4W9SEDRHN87_
