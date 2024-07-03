@@ -15,6 +15,13 @@ $(info Assuming OS/TOOLCHAIN = $(BUILDENV_OS)/$(TOOLCHAIN))
 # Tool config...
 #
 
+# Set "VERBOSE=1" on the command line to disable muting.
+# (Only used with the compile & link commands for now!)
+ifndef VERBOSE
+MUTE = @
+endif
+
+
 ifeq "$(BUILDENV_OS)" "windows"
 #!!$(info BUILDENV_OS: $(BUILDENV_OS))
 #!!Doesn't seem to be picked up by make: SHELL := busybox
@@ -59,6 +66,7 @@ CFLAGS_COMMON.msvc.debug_1 = -DDEBUG -Zi
 
 CFLAGS_COMMON += ${CFLAGS_COMMON.$(TOOLCHAIN)} 
 CFLAGS_COMMON += ${CFLAGS_COMMON.$(TOOLCHAIN).debug_$(DEBUG)} 
+CFLAGS_COMMON += $(CFLAGS_)
 
 CFLAGS.linux =
 CFLAGS.mingw =

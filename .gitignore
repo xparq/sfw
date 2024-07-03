@@ -3,6 +3,8 @@ tmp/
 *.off
 *.old
 
+study/
+
 # Smaller external deps. are kept embedded locally, but SFML is not one of those:
 extern/sfml/
 

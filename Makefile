@@ -192,7 +192,7 @@ LIBFILE_STATIC  := $(LIBDIR)/$(libname_prefix)$(LIBNAME)$(libext_static)
 #-----------------------------------------------------------------------------
 define link_cmd =
 	@echo "$(TERM_YELLOW)Linking $@$(TERM_NO_COLOR)"
-	@$(LINKER) $< $(LDFLAGS)
+	$(MUTE)$(LINKER) $< $(LDFLAGS)
 endef
 #!! Wow, couldn't just comment out the last line of link_cmd, so moved here:
 #	@echo "$(TERM_GREEN)Done.$(TERM_NO_COLOR)"
@@ -216,6 +216,7 @@ $(info Build option SFML_LINKMODE = $(SFML_LINKMODE))
 $(info Build option CRT_LINKMODE = $(CRT_LINKMODE))
 #$(info TEST_EXES = $(TEST_EXES))
 #$(info EXAMPLE_EXES = $(EXAMPLE_EXES))
+$(info Extra compiler flags (CFLAGS_) = $(CFLAGS_))
 
 .PHONY: lib test_exes examples run_tests clean
 all: lib test_exes examples #run_test
@@ -258,14 +259,14 @@ run_tests: test_exes
 $(OBJDIR)/$(LIB_TAGDIR)/%$(objext): $(SRCDIR)/$(LIB_TAGDIR)/%.cpp
 	@$(ECHO) "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) $<"
 	@$(MKDIR) $(shell dirname $@)
-	@$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
+	$(MUTE)$(CXX) $(CXXFLAGS) $(CLIBFLAGS) -c $<
 
 # Compile the rest (i.e. tests or examples):
 #!! Could split this too by TESTS_TAGDIR/EXAMPLES_TAGDIR:
 $(OBJDIR)/%$(objext): $(SRCDIR)/%.cpp
 	@$(ECHO) "$(TERM_YELLOW)Compiling$(TERM_NO_COLOR) test/example: $<"
 	@$(MKDIR) $(shell dirname $@)
-	@$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
+	$(MUTE)$(CXX) $(CXXFLAGS) $(CEXEFLAGS) -c $<
 
 # Link each test source (via its .o) into a separate executable:
 $(TEST_DIR)/%$(VTAG)$(exeext): $(OBJDIR)/$(TESTS_TAGDIR)/%$(objext) $(LIBFILE_STATIC)
