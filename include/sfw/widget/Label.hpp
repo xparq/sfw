@@ -1,24 +1,26 @@
-#ifndef GUI_LABEL_HPP
-#define GUI_LABEL_HPP
+#ifndef _D2IOLUEYU5WT7D2Y0F876GGY78FRTHGUWEF34G57_
+#define _D2IOLUEYU5WT7D2Y0F876GGY78FRTHGUWEF34G57_
+
 
 #include "sfw/Widget.hpp"
 #include "sfw/gfx/element/Text.hpp"
 
-#include <string>
+#include <string_view>
+
 
 namespace sfw
 {
 
 /**
  * Widget for displaying a simple text
- * Passive widget: cannot be focused or trigger event
+ * Passive widget: can't react to inputs or trigger events
  */
 class Label: public Widget
 {
 public:
-    explicit Label(const std::string& text = "");
+    explicit Label(std::string_view text = "");
 
-    Label* setText(const std::string& text);
+    Label* setText(std::string_view text);
     std::string getText() const;
 
     Label* setFillColor(const sf::Color& color);
@@ -37,8 +39,10 @@ private:
     void onThemeChanged() override;
 
     Text m_text;
-};
 
-} // namespace
+}; // class Label
 
-#endif // GUI_LABEL_HPP
+} // namespace sfw
+
+
+#endif // _D2IOLUEYU5WT7D2Y0F876GGY78FRTHGUWEF34G57_

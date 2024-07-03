@@ -2,7 +2,7 @@
 #include "sfw/Theme.hpp"
 #include "sfw/widget/Tooltip.hpp"
 #include "sfw/gfx/Render.hpp"
-#include "sfw/util/adapter/sfml.hpp" // for sf::Event::KeyChanged::==
+#include "sfw/adapter/sfml.hpp" // for sf::Event::KeyChanged::==
 
 #ifdef DEBUG
 #   include "sfw/GUI-main.hpp"
@@ -15,6 +15,7 @@
 	}
 
 #endif
+
 
 namespace sfw
 {
@@ -121,7 +122,7 @@ void Layout::onMouseMoved(float x, float y)
 	// Focused widgets still receive MouseMove events even when not hovered, when the mouse button is pressed
 	if (m_focusedWidget && m_focusedWidget->enabled() && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
-		m_focusedWidget->onMouseMoved(x - m_focusedWidget->getPosition().x, y - m_focusedWidget->getPosition().y);
+		m_focusedWidget->onMouseMoved(x - m_focusedWidget->getPosition().x(), y - m_focusedWidget->getPosition().y());
 		// "Unmark" it as the currently hovered child if wandering off of it, though:
 		if (!m_focusedWidget->contains({x, y}))
 		{
@@ -139,7 +140,7 @@ void Layout::onMouseMoved(float x, float y)
 			continue;
 
 		// Translate mouse pos. to child-local
-		sf::Vector2f localPos = sf::Vector2f(x, y) - widget->getPosition();
+		auto localPos = fVec2(x, y) - widget->getPosition();
 
 		if (widget->contains(localPos))
 		{
@@ -160,7 +161,7 @@ cerr << "LOCAL MOUSE [Layout]: " << m.x << ", " << m.y << endl;
 			       //! or at least call onMouseMoved internally to trigger the recursion, but
 			       //! it doesn't have `localPos` handy, so best to just do that here:
 			{
-				widget->onMouseMoved(localPos.x, localPos.y);
+				widget->onMouseMoved(localPos.x(), localPos.y());
 
 				//! NOTE: If tooltip cancellation would ever be moved (back) here:
 				//! Not checking for visible() would prevent tooltips from *appearing* at all,
@@ -205,7 +206,7 @@ void Layout::onMousePressed(float x, float y)
 			if (widget->enabled())
 			{
 				// Translate mouse pos. to child-local
-				sf::Vector2f localPos = sf::Vector2f(x, y) - widget->getPosition();
+				auto localPos = fVec2(x, y) - widget->getPosition();
 				if (widget->contains(localPos))
 				{
 //!! This is *still* necessary, even after recursifying hover (to finally
@@ -231,8 +232,8 @@ cerr << "- [sfw::Layout::onMousePressed] Missed hover event retroactively trigge
 				//! It might not have taken it, but never mind, carry on regardless...
 		}
 		// Send event to widget
-		sf::Vector2f mouse = sf::Vector2f(x, y) - m_hoveredWidget->getPosition();
-		m_hoveredWidget->onMousePressed(mouse.x, mouse.y);
+		auto mouse = fVec2(x, y) - m_hoveredWidget->getPosition();
+		m_hoveredWidget->onMousePressed(mouse.x(), mouse.y());
 	}
 	else if (m_focusedWidget && m_focusedWidget->enabled()) // Clicked away from the focused widget?
 	{
@@ -243,7 +244,7 @@ cerr << "- [sfw::Layout::onMousePressed] Missed hover event retroactively trigge
 	// Finally, if the click is outside the managed area, give up
 	// the focus, in order to support relaying events between multiple
 	// indepentent GUIs (windows/panes) in an app's event loop (#362)!
-	if (!contains(sf::Vector2f(x, y)))
+	if (!contains({x, y}))
 	{
 		unfocus();
 	}
@@ -255,8 +256,8 @@ void Layout::onMouseReleased(float x, float y)
 	// If there's a focused widget, it should see this event
 	if (m_focusedWidget && m_focusedWidget->enabled())
 	{
-		sf::Vector2f localMousePos = sf::Vector2f(x, y) - m_focusedWidget->getPosition();
-		m_focusedWidget->onMouseReleased(localMousePos.x, localMousePos.y);
+		auto localMousePos = fVec2(x, y) - m_focusedWidget->getPosition();
+		m_focusedWidget->onMouseReleased(localMousePos.x(), localMousePos.y());
 		m_focusedWidget->setActivationState(Focused);
 	}
 }
@@ -494,4 +495,5 @@ void Layout::unhover()
 	                           //!!m_hovered still set for the (last) tooltip, so this would kill the fadeout!... :-/
 }
 
-} // namespace
+
+} // namespace sfw

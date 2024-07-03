@@ -230,11 +230,11 @@ void Slider::updateGeometry()
 		for (int i = 0; i < 4; ++i)
 		{
 			m_progression[i].color = Theme::bgColor;
-			m_progression[i].position.x = m_track.getPosition().x + Theme::borderSize;
-			m_progression[i].position.y = m_track.getPosition().y + Theme::borderSize;
+			m_progression[i].position.x = m_track.getPosition().x() + Theme::borderSize;
+			m_progression[i].position.y = m_track.getPosition().y() + Theme::borderSize;
 		}
-		m_progression[1].position.y += m_track.getSize().y - Theme::borderSize * 2;
-		m_progression[3].position.y += m_track.getSize().y - Theme::borderSize * 2;
+		m_progression[1].position.y += m_track.getSize().y() - Theme::borderSize * 2; //!! Sigh mixing two different APIs... :-/
+		m_progression[3].position.y += m_track.getSize().y() - Theme::borderSize * 2; //!! Sigh mixing two different APIs... :-/
 	}
 	else
 	{
@@ -247,11 +247,11 @@ void Slider::updateGeometry()
 		for (int i = 0; i < 4; ++i)
 		{
 			m_progression[i].color = Theme::bgColor;
-			m_progression[i].position.x = m_track.getPosition().x + Theme::borderSize;
-			m_progression[i].position.y = m_track.getPosition().y + Theme::borderSize;
+			m_progression[i].position.x = m_track.getPosition().x() + Theme::borderSize; //!! Sigh mixing two different APIs... :-/
+			m_progression[i].position.y = m_track.getPosition().y() + Theme::borderSize; //!! Sigh mixing two different APIs... :-/
 		}
-		m_progression[2].position.x += m_track.getSize().x - Theme::borderSize * 2;
-		m_progression[3].position.x += m_track.getSize().x - Theme::borderSize * 2;
+		m_progression[2].position.x += m_track.getSize().x() - Theme::borderSize * 2; //!! Sigh mixing two different APIs... :-/
+		m_progression[3].position.x += m_track.getSize().x() - Theme::borderSize * 2; //!! Sigh mixing two different APIs... :-/
 	}
 
 	updateView();
@@ -285,11 +285,11 @@ float Slider::mousepos_to_sliderval(float x, float y) const
 
 	if (m_cfg.orientation == Horizontal)
 	{
-		pixel_distance = x - frame_thickness.x - m_thumb.getSize().x / 2;
+		pixel_distance = x - frame_thickness.x - m_thumb.getSize().x() / 2;
 	}
 	else
 	{
-		pixel_distance = y - frame_thickness.y - m_thumb.getSize().y / 2;
+		pixel_distance = y - frame_thickness.y - m_thumb.getSize().y() / 2;
 		pixel_distance = track_len - pixel_distance; // The default direction is "inc up" (max val at min y)!
 	}
 	// Cap distance to track length
@@ -361,8 +361,8 @@ float Slider::track_length() const
 	sf::Vector2f frame_thickness = { (float)Theme::borderSize, (float)Theme::borderSize }; // No padding for sliders!
 
 	return m_cfg.orientation == Horizontal
-		? getSize().x - m_thumb.getSize().x - frame_thickness.x * 2
-		: getSize().y - m_thumb.getSize().y - frame_thickness.y * 2
+		? getSize().x() - m_thumb.getSize().x() - frame_thickness.x * 2
+		: getSize().y() - m_thumb.getSize().y() - frame_thickness.y * 2
 	;
 }
 

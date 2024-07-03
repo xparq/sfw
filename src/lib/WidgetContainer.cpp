@@ -1,7 +1,7 @@
 #include "sfw/WidgetContainer.hpp"
 
 #include "sfw/GUI-main.hpp"
-#include "sfw/util/adapter/sfml.hpp"
+#include "sfw/adapter/sfml.hpp"
 
 #include <cassert>
 #include <string>
@@ -12,6 +12,7 @@
 #ifdef DEBUG
 #include <iostream>
 #endif
+
 
 namespace sfw
 {
@@ -81,7 +82,7 @@ void WidgetContainer::ctraverse(const std::function<void(const Widget*)>& f) con
 
 
 //----------------------------------------------------------------------------
-bool WidgetContainer::is_child(const Widget* widget)
+bool WidgetContainer::is_child(const Widget* widget) const
 {
 	for (Widget* w = begin(); w != end(); w = next(w))
 	{
@@ -92,7 +93,7 @@ bool WidgetContainer::is_child(const Widget* widget)
 
 
 //----------------------------------------------------------------------------
-Widget* WidgetContainer::insert_after(Widget* anchor, Widget* widget, const std::string& name)
+Widget* WidgetContainer::insert_after(Widget* anchor, Widget* widget, std::string_view name)
 // This is the common workhorse procedure for all the other various add() methods.
 // Does not check if anchor is in fact a local child!
 {
@@ -168,13 +169,13 @@ Widget* WidgetContainer::insert_after(Widget* anchor, Widget* widget, const std:
 }
 
 
-Widget* WidgetContainer::add(Widget* widget, const std::string& name)
+Widget* WidgetContainer::add(Widget* widget, std::string_view name)
 {
 	return insert_after(m_last, widget, name);
 }
 
 
-Widget* WidgetContainer::addAfter(Widget* anchor, Widget* widget, const std::string& name)
+Widget* WidgetContainer::addAfter(Widget* anchor, Widget* widget, std::string_view name)
 {
 	if (anchor == nullptr)
 	{
@@ -189,7 +190,7 @@ Widget* WidgetContainer::addAfter(Widget* anchor, Widget* widget, const std::str
 	else return add(widget, name);
 }
 
-Widget* WidgetContainer::addAfter(const std::string& anchor_name, Widget* widget, const std::string& name)
+Widget* WidgetContainer::addAfter(std::string_view anchor_name, Widget* widget, std::string_view name)
 {
 	Widget* a = Widget::find_proxied(anchor_name); //!! See #322 for why not just this->widget...
 	                                       //!!?? So, why exactly? I can't deduce the reason from #322 a year later! :-/
@@ -198,7 +199,7 @@ Widget* WidgetContainer::addAfter(const std::string& anchor_name, Widget* widget
 }
 
 
-Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, const std::string& name)
+Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, std::string_view name)
 {
 	if (anchor == nullptr)
 	{
@@ -213,7 +214,7 @@ Widget* WidgetContainer::addBefore(Widget* anchor, Widget* widget, const std::st
 	else return add(widget, name);
 }
 
-Widget* WidgetContainer::addBefore(const std::string& anchor_name, Widget* widget, const std::string& name)
+Widget* WidgetContainer::addBefore(std::string_view anchor_name, Widget* widget, std::string_view name)
 {
 	Widget* a = Widget::find_proxied(anchor_name); //!! See #322 for why not just this->widget...
 	                                         //!!?? So, why exactly? I can't deduce the reason from #322 a year later! :-/
@@ -221,4 +222,4 @@ Widget* WidgetContainer::addBefore(const std::string& anchor_name, Widget* widge
 	return a ? addBefore(a, widget, name) : add(widget, name);
 }
 
-} // namespace
+} // namespace sfw

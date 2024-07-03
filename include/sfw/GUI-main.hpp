@@ -105,7 +105,7 @@ public:
 	 - The registry stores non-const widget pointers (to allow any widget
 	   operations to be applied directly on a retrieved pointer).
 	 *************************************************************************/
-	bool remember(Widget* widget, std::string name, bool override_existing = true);
+	bool remember(Widget* widget, std::string_view name = "", bool override_existing = true);
 	Widget* recall(std::string_view name) const;
 	std::string recall(const Widget*) const;
 

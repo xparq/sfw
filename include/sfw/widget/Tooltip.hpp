@@ -1,5 +1,6 @@
-﻿#ifndef SFW_TOOLTIP_HPP
-#define SFW_TOOLTIP_HPP
+﻿#ifndef _LKDJRHNWEIURYHBUYHGNSDUIHFGIUXCFH5MV689RT895V_
+#define _LKDJRHNWEIURYHBUYHGNSDUIHFGIUXCFH5MV689RT895V_
+
 
 #include "sfw/Widget.hpp"
 
@@ -10,6 +11,7 @@
 #include <SFML/Graphics/Color.hpp>
 
 #include <string>
+
 
 namespace sfw {
 
@@ -76,6 +78,7 @@ private:
 	float m_timeStateChange;
 };
 
-} // namespace
+} // namespace sfw
 
-#endif // SFW_TOOLTIP_HPP
+
+#endif // _LKDJRHNWEIURYHBUYHGNSDUIHFGIUXCFH5MV689RT895V_

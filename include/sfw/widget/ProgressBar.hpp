@@ -1,10 +1,12 @@
-#ifndef SFW_PROGRESS_BAR_HPP
-#define SFW_PROGRESS_BAR_HPP
+#ifndef _KJWHMIUWERHIUCHIUJHCKFLJHBFDKLUHDVCTIXOHFG_
+#define _KJWHMIUWERHIUCHIUJHCKFLJHBFDKLUHDVCTIXOHFG_
+
 
 #include "sfw/Widget.hpp"
 #include "sfw/geometry/Orientation.hpp"
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/element/Text.hpp"
+
 
 namespace sfw
 {
@@ -99,4 +101,5 @@ inline float ProgressBar::max() const { return m_cfg.range.max; }
 
 } // namespace sfw
 
-#endif // SFW_PROGRESS_BAR_HPP
+
+#endif // _KJWHMIUWERHIUCHIUJHCKFLJHBFDKLUHDVCTIXOHFG_

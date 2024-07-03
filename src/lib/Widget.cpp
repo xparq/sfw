@@ -127,45 +127,41 @@ std::string Widget::getName(Widget* widget) const
 
 
 //----------------------------------------------------------------------------
-Widget* Widget::setPosition(const sf::Vector2f& pos)
+Widget* Widget::setPosition(fVec2 pos)
 {
-	m_position = {roundf(pos.x), roundf(pos.y)};
+	return setPosition(pos.x(), pos.y());
+}
+
+Widget* Widget::setPosition(float x, float y)
+{
+	//!! Note: no reflow, unlike in setSize(), as that would cause infinite looping in the current model.
+	//!! Reflowing could guarantee to keep this newly set (local-to-parent) position though,
+	//!! and it would make sense to still trigger it in some (yet to be implemented) cases.
+
+	m_position = {roundf(x), roundf(y)};
 	m_transform = sf::Transform(
-		1, 0, m_position.x, // translate x
-		0, 1, m_position.y, // translate y
+		1, 0, m_position.x(), // translate x
+		0, 1, m_position.y(), // translate y
 		0, 0, 1
 	);
 
 	return this;
 }
 
-Widget* Widget::setPosition(float x, float y)
-{
-	setPosition(sf::Vector2f(x, y));
-
-	//!! Note: no reflow, unlike in setSize(), as that would cause infinite looping in the current model.
-	//!! Reflowing could guarantee to keep this newly set (local-to-parent) position though,
-	//!! and it would make sense to still trigger it in some (yet to be implemented) cases.
-
-	return this;
-}
-
-
-const sf::Vector2f& Widget::getPosition() const
+fVec2 Widget::getPosition() const
 {
 	return m_position;
 }
 
 
-sf::Vector2f Widget::getAbsolutePosition() const
+fVec2 Widget::getAbsolutePosition() const
 {
-	sf::Vector2f position = m_position;
+	fVec2 position = m_position;
 
 	for (const Widget* base = this; !base->isRoot();)
 	{
 		base = base->getParent();
-		position.x += base->m_position.x;
-		position.y += base->m_position.y;
+		position += base->m_position;
 	}
 
 	return position;
@@ -173,10 +169,16 @@ sf::Vector2f Widget::getAbsolutePosition() const
 
 
 //----------------------------------------------------------------------------
-Widget* Widget::setSize(const sf::Vector2f& size)
+Widget* Widget::setSize(fVec2 size)
 {
-	auto new_size = sf::Vector2f(roundf(size.x), roundf(size.y));
-	if (m_size.x != new_size.x || m_size.y != new_size.y)
+	return setSize(size.x(), size.y());
+}
+
+Widget* Widget::setSize(float width, float height)
+{
+	auto new_size = fVec2(roundf(width), roundf(height));
+//!! OLD:if (m_size.x() != new_size.x() || m_size.y() != new_size.y())
+	if (m_size != new_size)
 	{
 		m_size = new_size;
 		onResized();
@@ -185,23 +187,22 @@ Widget* Widget::setSize(const sf::Vector2f& size)
 	return this;
 }
 
-
-Widget* Widget::setSize(float width, float height)
-{
-	return setSize(sf::Vector2f(width, height));
-}
-
-
-const sf::Vector2f& Widget::getSize() const
+fVec2 Widget::getSize() const
 {
 	return m_size;
 }
 
 
 //----------------------------------------------------------------------------
-bool Widget::contains(const sf::Vector2f& point) const
+bool Widget::contains(fVec2 point) const
 {
-	return point.x > 0.f && point.x < m_size.x && point.y > 0.f && point.y < m_size.y;
+	return contains(point.x(), point.y());
+}
+
+bool Widget::contains(float x, float y) const
+{
+	return x > 0 && x < m_size.x()
+	    && y > 0 && y < m_size.y();
 }
 
 
@@ -328,8 +329,7 @@ const sf::Transform& Widget::getTransform() const
 #ifdef DEBUG
 void Widget::draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor, sf::Color fillcolor/* = Transparent*/) const
 {
-	sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
-	r.setPosition(getAbsolutePosition());
+	auto r = sf::RectangleShape(getSize()); r.setPosition(getAbsolutePosition());
 	r.setFillColor(fillcolor);
 	r.setOutlineThickness(2);
 	r.setOutlineColor(outlinecolor);
@@ -357,4 +357,4 @@ void Widget::draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor,
 }
 
 
-} // namespace
+} // namespace sfw

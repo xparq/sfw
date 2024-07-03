@@ -11,11 +11,16 @@ using namespace std;
 
 // Try/check without most of the sfw:: prefixes:
 using namespace sfw;
+using namespace sfw::geometry;
 
+
+//============================================================================
 void background_thread(GUI& gui);
 
 static auto toy_anim_on = false;
 
+
+//============================================================================
 int main()
 try {
 	//------------------------------------------------------------------------
@@ -79,8 +84,10 @@ try {
 	// (See the rest of #167 later below, at the other DrawHost widget!)
 	auto circlevista = new DrawHost([&](auto* w, auto ctx) {
 		sf::CircleShape circ(50);
-		sf::Texture backdrop;
-                if (!backdrop.loadFromFile("test/example.jpg")) return;
+		sfw::Texture backdrop;
+                if (!backdrop.load("test/example.jpg")) { cerr << "Failed to load test/example.jpg!\n";
+			return;
+		}
 		circ.setTexture(&backdrop);
 		circ.setTextureRect({{10, 10}, {100, 100}});
 
@@ -151,35 +158,33 @@ try {
 	//!!
 	//!! Plus, a light (template-based?) interface would also be needed
 	//!! for accessging them from the outside in a somewhat civilized way!
-		sf::Text text(Theme::getFont(), "Hello world!");
+		sfw::Text text("Hello world!");
 		sf::RectangleShape textrect;
 
-	auto sfText = new DrawHost([&](auto* raw_w, auto ctx) {
-		// Get current (raw, untransformed) text size
-		//! Note: the text string & style attributes may have been
-		//! changed by other widgets!
-		auto tbounds = text.getLocalBounds();
-		//! sf::Text's bound-rect is not 0-based! :-o (-> SFML #216)
-		sf::Vector2f mysterious_sfml_offset = {tbounds.left, tbounds.top};
-		sf::Vector2f tsize = {tbounds.width + tbounds.left, tbounds.height + tbounds.top};
-		// Get boundrect of the transformed (rotated, scaled etc.) text
-		// for sizing the wrapper widget
-		sf::FloatRect bgRect{{0,0}, {tsize.x * 1.2f, tsize.y * 3.5f}};
-		auto actualBoundRect = text.getTransform().transformRect(bgRect);
+	auto sfText = new DrawHost([&](auto* widget, auto ctx) { // This entire function is a draw() hook!
+
+		//! Note: other widgets will update the sample text & its style!
+
+		// Set a rect. large enough to contain the entire transformed (rotated, scaled etc.) text.
+		// That will also be the (variable!) size of the widget.
+		//! (Note: sf::Text's bound-rect would not be 0-based, throwing off
+		//! any unsuspecting geometry operations! (-> SFML #216)
+		//! But with sfw::Text we don't need to deal with that here.)
+		fRect bgrect({}, {text.size().x() * 1.2f, text.size().y() * 3.5f});
+		fVec2 containerSize = text.getTransform().transformRect(bgrect).size; //!! Confusing mix of SFW and SFML APIs! :-/
 //!!??		auto actualBoundRect = xform.transformRect(textrect.getGlobalBounds());
 //!!?? Why's getGlobalBounds different here?!
 //!!?? It does make the widget resize correctly -- which is the only place this
 //!!?? rect is used --, but then the shape itself will stay the same size, and the
 //!!?? rotation would be totally off! :-o It's all just queries! WTF?! :-ooo
 
-		auto* w = (DrawHost*)raw_w;
+		//!!--------------------------------------------------------------------------------------
+		//!! Umm... *GROSS*! Triggers a full GUI layout reflow, right from a draw() call!... :-o
+		widget->setSize(containerSize + 2 * Theme::PADDING);
+		//!!--------------------------------------------------------------------------------------
 
-		//!! Umm... This is *GROSS*! Basically triggers a full GUI resize, right from draw()! :-oo
-		w->setSize((actualBoundRect.width  + 2 * Theme::PADDING),
-		           (actualBoundRect.height + 2 * Theme::PADDING));
-
-		//!! Must position the shapes after setSize, as setSize may move the widget
-		//!! out from the content we manually hack here, leaving the appearance off
+		//!! Must position the shapes after widget->setSize, as that may move the widget
+		//!! out from under the content we manually hack here, leaving the appearance off
 		//!! for the current frame! :-o (A very visible artifact, as I've learned!...)
 		//!! Well, another disadvantage of calling setSize during draw()!...
 		//!! Fortunately, this one can be tackled by doing this after setSize:
@@ -187,20 +192,18 @@ try {
 		// Sync the bg. rect to various "externalia":
 		textrect.setScale(text.getScale());
 		textrect.setRotation(text.getRotation());
-		textrect.setSize(bgRect.getSize());
+		textrect.setSize(bgrect.size());
 		textrect.setOrigin({textrect.getSize().x / 2, textrect.getSize().y / 2});
-		textrect.setPosition({w->getSize().x / 2, w->getSize().y / 2});
+		textrect.setPosition(widget->getSize() / 2);
 
-		text.setOrigin({tsize.x / 2 + mysterious_sfml_offset.x,
-                                tsize.y / 2 + mysterious_sfml_offset.y}); //! sf::Text's bound-rect is not 0-based! :-o
-		text.setPosition({w->getSize().x / 2, w->getSize().y / 2});
+		text.center({{}, widget->getSize()}); //! Also changes its origin (to the center of the bounding box)!
 
 		auto sfml_renderstates = ctx.props;
-		sfml_renderstates.transform *= w->getTransform();
+		sfml_renderstates.transform *= widget->getTransform();
 		ctx.target.draw(textrect, sfml_renderstates);
-		ctx.target.draw(text, sfml_renderstates);
+		text.draw(gfx::RenderContext{ctx.target, sfml_renderstates});
 #ifdef DEBUG
-		w->draw_outline(ctx);
+		widget->draw_outline(ctx);
 #endif
 	});
 
@@ -360,8 +363,8 @@ try {
 	cout << "UTF-8 button text got back as: \"" << demo.find_widget<Button>(utf8button_tag)->getText() << "\"\n";
 
 	// Bitmap button
-	sf::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
-	if (buttonimg.loadFromFile("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
+	sfw::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
+	if (buttonimg.load("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
 		buttons_form->add("Native size", new ImageButton(buttonimg, "All defaults"))
 			->setTextSize(20)
@@ -560,20 +563,20 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		demo.render();
 		window.display();
 
-		sf::Event event;
 		// Pass events to the GUI & check for closing or failure
 		//!! Can't shortcut it when the GUI doesn't own the window, so when
 		//!! it gets deactivated it wouldn't block the rest of the world, too:
 		//!!while (window.pollEvent(event) && demo.process(event) || )
-		while (window.pollEvent(event))
+		while (const auto event = window.pollEvent())
 		{
-			demo.process(event);
+			if (!event) this_thread::sleep_for(10ms); //!!?? But... but... if the while's rolling, it's always true, right?!
+			                                          //!!?? But then what does pollEvent() do/return when the event queue is empty?!
+			demo.process(event.value());
 
-			// Handle the window closing separately, as we
-			// don't want to close with the gui in this setup:
-			if (event.type == sf::Event::Closed ||
-			    // Just for convenience, also close on Esc:
-			    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Escape))
+			// Handle the window-closing explicitly, as we've configured
+			// the GUI manager to not do that in this setup:
+			if (event->is<sf::Event::Closed>() || // And also close on Esc:
+			   (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape))
 			{
 				window.close(); // Not demo.close() if the GUI doesn't own the window!
 				                // Also: window.close() will indirectly disable the GUI.

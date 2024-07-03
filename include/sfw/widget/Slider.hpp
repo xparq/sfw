@@ -1,9 +1,11 @@
-#ifndef _SFW_SLIDER_HPP_
-#define _SFW_SLIDER_HPP_
+#ifndef _WLIFDJTIORFJIBTFOJHM9I45U983U49R8IOTH345_
+#define _WLIFDJTIORFJIBTFOJHM9I45U983U49R8IOTH345_
+
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/geometry/Orientation.hpp"
 #include "sfw/gfx/element/Box.hpp"
+
 
 namespace sfw
 {
@@ -131,6 +133,7 @@ inline Slider* Slider::dec() { return move(-step()); }
 inline Slider* Slider::inc(float delta) { return move(delta); }
 inline Slider* Slider::dec(float delta) { return move(-delta); }
 
-} // namespace
+} // namespace sfw
 
-#endif // _SFW_SLIDER_HPP_
+
+#endif // _WLIFDJTIORFJIBTFOJHM9I45U983U49R8IOTH345_

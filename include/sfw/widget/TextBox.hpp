@@ -1,5 +1,6 @@
-#ifndef _SFW_TEXTBOX_HPP_
-#define _SFW_TEXTBOX_HPP_
+#ifndef _DF394857TTGD74FE5TWURGYBTYFN8734TY785HYTGR6UH_
+#define _DF394857TTGD74FE5TWURGYBTYFN8734TY785HYTGR6UH_
+
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/gfx/element/Text.hpp"
@@ -7,11 +8,13 @@
 #include "sfw/TextSelection.hpp"
 
 #include <string>
+#include <string_view>
 
 #include <SFML/System/String.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Clock.hpp>
+
 
 namespace sfw
 {
@@ -136,6 +139,7 @@ private:
 	mutable sf::Clock m_cursorTimer;
 };
 
-} // namespace
+} // namespace sfw
 
-#endif // _SFW_TEXTBOX_HPP_
+
+#endif // _DF394857TTGD74FE5TWURGYBTYFN8734TY785HYTGR6UH_

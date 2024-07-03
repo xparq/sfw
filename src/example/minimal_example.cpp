@@ -32,10 +32,9 @@ int main()
         window.display();
 
         // Process events, one by one, waiting until the next one comes
-        if (sf::Event event; window.waitEvent(event))
-        {
-            // Pass events to the GUI
-            gui.process(event);
+        if (const std::optional<sf::Event> event = window.waitEvent(); event)
+	{
+            gui.process(*event); // Pass it to the GUI!
 
             // Your own custom event processing here...
         }

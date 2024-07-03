@@ -1,39 +1,42 @@
-#ifndef GUI_IMAGE_HPP
-#define GUI_IMAGE_HPP
+#ifndef _DCMUSDTJYHNYU340E79TNY78RYTM7G98DFVIUGHJ_
+#define _DCMUSDTJYHNYU340E79TNY78RYTM7G98DFVIUGHJ_
+
 
 #include "sfw/Widget.hpp"
+#include "sfw/geometry/Rectangle.hpp"
+#include "sfw/gfx/element/Texture.hpp"
 
-#include <string>
+#include <string_view>
 
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Vertex.hpp>
+
 
 namespace sfw
 {
 
 /**
- * Widget for displaying a picture
- * Passive widget: cannot be focused or trigger event
+ * Widget for displaying (part of) a picture
+ * Passive widget: can't react to inputs or trigger events
  */
 class Image: public Widget
 {
-    static constexpr sf::IntRect NullRect = {{0,0}, {0,0}};
+    static constexpr geometry::iRect NullRect{};
 
 public:
     Image();
-    Image(const std::string& filename, const sf::IntRect& r = NullRect);
-    Image(const sf::Image& image,      const sf::IntRect& r = NullRect);
-    Image(const sf::Texture& texture,  const sf::IntRect& r = NullRect);
+    Image(std::string_view filename,  const geometry::iRect& r = NullRect);
+    Image(const sf::Image& image,     const geometry::iRect& r = NullRect);
+    Image(const /*!!gfx::!!*/Texture& texture, const geometry::iRect& r = NullRect);
 
-    Image* setTexture(const std::string& filename, const sf::IntRect& r = NullRect);
-    Image* setTexture(const sf::Image& image,      const sf::IntRect& r = NullRect);
-    Image* setTexture(const sf::Texture& texture,  const sf::IntRect& r = NullRect);
+    Image* setTexture(std::string_view filename,  const geometry::iRect& r = NullRect);
+    Image* setTexture(const sf::Image& image,     const geometry::iRect& r = NullRect);
+    Image* setTexture(const /*!!gfx::!!*/Texture& texture, const geometry::iRect& r = NullRect);
 
-    const sf::Texture& texture() const { return m_texture; }
+    const /*!!gfx::!!*/Texture& texture() const { return m_texture; }
 
-    Image* setCropRect(const sf::IntRect& r);
-    sf::IntRect cropRect() const;
+    Image* setCropRect(const geometry::iRect& r);
+    geometry::iRect cropRect() const;
 
     Image* scale(float factor);
     float  scale() const { return m_scalingFactor; }
@@ -46,12 +49,13 @@ private:
     void draw(const gfx::RenderContext& ctx) const override;
     void onResized() override;
 
-    sf::Texture m_texture;
-    sf::Vector2f m_baseSize;
+    /*!!gfx::!!*/Texture m_texture;
+    fVec2 m_baseSize;
     float m_scalingFactor = 1.f;
     sf::Vertex m_vertices[4];
 };
 
-} // namespace
+} // namespace sfw
 
-#endif // GUI_IMAGE_HPP
+
+#endif // _DCMUSDTJYHNYU340E79TNY78RYTM7G98DFVIUGHJ_

@@ -5,8 +5,8 @@
 
 #include "sfw/util/diagnostics.hpp"
 
-namespace sfw {
 
+namespace sfw {
 
 //----------------------------------------------------------------------------
 Tooltip::Tooltip(Widget* owner, std::string text):
@@ -117,15 +117,12 @@ void Tooltip::initView()
 	if (!gui)  //!! Should be assert()! This fn. shouldn't be called "offline"!
 		return;
 
-	auto padding = sf::Vector2f{3, 2};
+	auto padding  = fVec2(3, 2); //!! Just an experimental hack "for now"! :-o
+	auto size     = m_text.size() + 2.f * padding; // SFML text size hackery `+ textarea.top` -- BUT IT WAS THERE ONLY FOR THE y dim.(!) --: now part of size()!
 
-	auto textrect = m_text.getLocalBounds();
-	auto size = sf::Vector2f{textrect.width + 2*padding.x,
-	                        textrect.height + 2*padding.y + textrect.top}; // SFML text size hackery :-/
-
-	auto offset = sf::Vector2f(-10, 20);
+	auto offset   = fVec2(-10, 20);
 //!! Or below the widget:
-//!!	auto offset = sf::Vector2f(16, size.y + 3);
+//!!	auto offset = fVec2(16, size.y + 3);
 
 	auto wA = m_owner->getParent()->getAbsolutePosition(); // The owner's pos. is relative to its parent!
 	auto gM = gui->getMousePosition();
@@ -156,21 +153,21 @@ void Tooltip::initView()
 //std::cerr << "abspos bottom y: " << abspos.y + size.y << ", abspos x: " << abspos.x << "\n";//gui->getSize().y << "\n";
 //cerr << "- size x: " << size.x << ", y: " << size.y << "\n";
 //cerr << "- gui.size.x: " << gui->getSize().x << "\n";
-	if (abspos.y + size.y > gui->getSize().y)
+	if (abspos.y() + size.y() > gui->getSize().y())
 	{
-		setPosition({pos.x, getPosition().y -2 * offset.y});
+		setPosition({pos.x(), getPosition().y() -2 * offset.y()});
 	}
-	if (abspos.x + size.x > gui->getSize().x)
+	if (abspos.x() + size.x() > gui->getSize().x())
 	{
-		setPosition({getPosition().x - size.x, pos.y});
-		if (getPosition().x < 0)
+		setPosition({getPosition().x() - size.x(), pos.y()});
+		if (getPosition().x() < 0)
 		{
-			setPosition({0, pos.y});
+			setPosition({0, pos.y()});
 		}
 	}
 
 	m_box.size = size;
-	m_text.setPosition({padding.x, padding.y});
+	m_text.setPosition({padding.x(), padding.y()});
 }
 
 

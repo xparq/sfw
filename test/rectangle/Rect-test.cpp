@@ -24,7 +24,9 @@ iRect     ir0_b  = {};
 
 auto r0_p2 = Rect<int>({}, {});   static_assert(is_same_v<decltype(r0_p2),    Rect<int>>);
 auto r0_b2 = Rect<int>{{}, {}};   static_assert(is_same_v<decltype(r0_b2),    Rect<int>>);
-iRect NullRect = {{0,0}, {0,0}};  static_assert(is_same_v<decltype(NullRect), Rect<int>>);
+iRect NullRect1 = {};             static_assert(is_same_v<decltype(NullRect1), Rect<int>>);
+iRect NullRect2 = {{}, {}};       static_assert(is_same_v<decltype(NullRect2), Rect<int>>);
+iRect NullRect3 = {{0,0}, {0,0}}; static_assert(is_same_v<decltype(NullRect3), Rect<int>>);
 
 
 //----------------------------------------------------------------------------

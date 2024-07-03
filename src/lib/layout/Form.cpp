@@ -6,6 +6,7 @@
 #include <algorithm>
 	using std::max;
 
+
 namespace sfw
 {
 
@@ -15,14 +16,14 @@ Form::Form():
 }
 
 
-Widget* Form::add(const std::string& str, Widget* widget, const std::string& widgetname_override)
+Widget* Form::add(std::string_view str, Widget* widget, std::string_view widgetname_override)
 {
 	Label* label = new Label(str);
-	return add(label, widget, widgetname_override.empty() ? (std::string)str : widgetname_override);
+	return add(label, widget, widgetname_override.empty() ? str : widgetname_override);
 }
 
 
-Widget* Form::add(Widget* label, Widget* widget, const std::string& widgetName, const std::string& labelWidgetName)
+Widget* Form::add(Widget* label, Widget* widget, std::string_view widgetName, std::string_view labelWidgetName)
 {
 	//-------------------------------------------------------------------\
 	// If no widget, `label` will be used as a (free-width) separator line.
@@ -47,14 +48,14 @@ Widget* Form::add(Widget* label, Widget* widget, const std::string& widgetName, 
 	}
 	else // Make sure that normal labels have non-0 size:
 	{
-		if (auto size = label->getSize(); size.x == 0)
-			label->setSize(1, size.y); // Its size is very likely redunant anyway!
+		if (auto size = label->getSize(); size.x() == 0)
+			label->setSize(1, size.y()); // Its size is very likely redunant anyway!
 	}
 	//-------------------------------------------------------------------/
 
-	if (label->getSize().x > m_labelColumnWidth)
+	if (label->getSize().x() > m_labelColumnWidth)
 	{
-		m_labelColumnWidth = label->getSize().x;
+		m_labelColumnWidth = label->getSize().x();
 	}
 	Layout::add(label, labelWidgetName);
 	Layout::add(widget, widgetName);
@@ -66,7 +67,7 @@ void Form::recomputeGeometry()
 {
 	if (empty()) return;
 
-	sf::Vector2f size{};
+	fVec2 size;
 	m_labelColumnWidth = 0;
 	const auto minLineHeight = Theme::getBoxHeight();
 	auto column_gap = Theme::MARGIN;
@@ -81,17 +82,17 @@ void Form::recomputeGeometry()
 	{
 		auto lineHeight = minLineHeight;
 		// Check the "label" widget
-		lineHeight = max(lineHeight, label->getSize().y);
-		m_labelColumnWidth = max(m_labelColumnWidth, label->getSize().x);
+		lineHeight = max(lineHeight, label->getSize().y());
+		m_labelColumnWidth = max(m_labelColumnWidth, label->getSize().x());
 		// Check the "content" widget
-		lineHeight = max(lineHeight, content->getSize().y);
-		size.x = max(size.x, content->getSize().x);
+		lineHeight = max(lineHeight, content->getSize().y());
+		size.x() = max(size.x(), content->getSize().x());
 
-		size.y += lineHeight + Theme::MARGIN;
+		size.y() += lineHeight + Theme::MARGIN;
 	}
 
 	// Add max. label width + gap...
-	size.x += m_labelColumnWidth + column_gap;
+	size.x() += m_labelColumnWidth + column_gap;
 	setSize(size);
 
 	//---------------------------------
@@ -105,7 +106,7 @@ void Form::recomputeGeometry()
 		label->setPosition(0, y);
 
 		// Special-casing separator lines:
-		if (label->getSize().x == 0) {
+		if (label->getSize().x() == 0) {
 			content->setPosition(0, y);
 			//!! Might do other things to a separator `content` (e.g. restyling)...
 		} else {
@@ -113,11 +114,11 @@ void Form::recomputeGeometry()
 		}
 
 		auto lineHeight = minLineHeight;
-		lineHeight = max(lineHeight, label->getSize().y);
-		lineHeight = max(lineHeight, content->getSize().y);
+		lineHeight = max(lineHeight, label->getSize().y());
+		lineHeight = max(lineHeight, content->getSize().y());
 		y += lineHeight + Theme::MARGIN;
 	}
 }
 
 
-} // namespace
+} // namespace sfw

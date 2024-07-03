@@ -1,20 +1,21 @@
 #include "sfw/widget/ImageButton.hpp"
 #include "sfw/Theme.hpp"
 
+#include <SFML/Graphics/Text.hpp> //!! Most Text ops. here are still direct SFML calls!
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Text.hpp>
 
 #include <cmath>
 	using std::round;
 
+
 namespace sfw
 {
 
-ImageButton::ImageButton(const sf::Texture& texture, const std::string& label):
-	m_background(texture), // no default sf::Sprite ctor
+ImageButton::ImageButton(const /*!!gfx::!!*/Texture& texture, std::string_view label):
+	m_background(texture), // No default sf::Sprite ctor! :-/
 	m_pressed(false)
 {
-	setTexture(texture);
+	setTexture(texture); // Must call it for the geometry calculations! (The m_bg ctor is not enough!)
 	m_text.setFont(Theme::getFont());
 	m_text.setCharacterSize((unsigned)Theme::textSize);
 
@@ -22,10 +23,10 @@ ImageButton::ImageButton(const sf::Texture& texture, const std::string& label):
 }
 
 
-ImageButton* ImageButton::setTexture(const sf::Texture& texture)
+ImageButton* ImageButton::setTexture(const /*!!gfx::!!*/Texture& texture)
 {
-	int width = texture.getSize().x;
-	int height = texture.getSize().y / 3; // default, hover, focus
+	int width  = texture.size().x();
+	int height = texture.size().y() / 3; // default, hover, focus
 
 	m_background.setTexture(texture);
 	m_background.setTextureRect(sf::IntRect({0, 0}, {width, height}));
@@ -35,7 +36,7 @@ ImageButton* ImageButton::setTexture(const sf::Texture& texture)
 }
 
 
-ImageButton* ImageButton::setText(const std::string& label)
+ImageButton* ImageButton::setText(std::string_view label)
 {
 	m_text.set(label);
 	centerText();
@@ -61,15 +62,15 @@ const sf::String& ImageButton::getText() const
 }
 */
 
-ImageButton* ImageButton::setSize(sf::Vector2f size)
+ImageButton* ImageButton::setSize(fVec2 size)
 {
-	m_background.setScale({size.x / m_background.getTexture().getSize().x,
-	                       size.y / m_background.getTexture().getSize().y * 3}); // see the ctor for that 3! ;)
+	m_background.setScale({size.x() / m_background.getTexture().getSize().x,
+	                       size.y() / m_background.getTexture().getSize().y * 3}); // see the ctor for that 3! ;)
 	Widget::setSize(size);
 	return this;
 }
 
-ImageButton* ImageButton::setFont(const sf::Font& font)
+ImageButton* ImageButton::setFont(const /*!!gfx::!!*/Font& font)
 {
 	m_text.setFont(font);
 	centerText();
@@ -77,7 +78,7 @@ ImageButton* ImageButton::setFont(const sf::Font& font)
 }
 
 
-const sf::Font& ImageButton::getFont() const
+const /*!!gfx::!!*/Font& ImageButton::getFont() const
 {
 	return m_text.getFont();
 }
@@ -119,19 +120,19 @@ void ImageButton::draw(const gfx::RenderContext& ctx) const
 
 void ImageButton::onActivationChanged(ActivationState state)
 {
-	sf::Vector2i size(m_background.getTexture().getSize().x,
-	                  m_background.getTexture().getSize().y / 3);
+	iVec2 size(m_background.getTexture().getSize().x,
+	           m_background.getTexture().getSize().y / 3);
 	switch (state)
 	{
 	case ActivationState::Default:
-		m_background.setTextureRect(sf::IntRect({0, 0}, {size.x, size.y}));
+		m_background.setTextureRect(sf::IntRect({0, 0}, size));
 		break;
 	case ActivationState::Hovered:
-		m_background.setTextureRect(sf::IntRect({0, size.y}, {size.x, size.y}));
+		m_background.setTextureRect(sf::IntRect({0, size.y()}, size));
 		break;
 	case ActivationState::Pressed:
 	case ActivationState::Focused:
-		m_background.setTextureRect(sf::IntRect({0, size.y * 2}, {size.x, size.y}));
+		m_background.setTextureRect(sf::IntRect({0, size.y() * 2}, size));
 		break;
 	case ActivationState::Disabled:
 		break;
@@ -207,10 +208,8 @@ void ImageButton::release()
 
 void ImageButton::centerText()
 {
-	auto [boxwidth, boxheight] = getSize();
-	sf::FloatRect t = m_text.getLocalBounds();
-	m_text.setOrigin({t.left + round(t.width / 2.f), t.top + round(t.height / 2.f)});
-	m_text.setPosition({boxwidth / 2, boxheight / 2});
+	m_text.center({{}, getSize()});
 }
 
-} // namespace
+
+} // namespace sfw

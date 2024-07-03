@@ -32,9 +32,10 @@ public:
 	fVec2 getPosition() const;
 
 	void setPosition(float x, float y);
+	void setPosition(const fVec2& pos)  { return setPosition(pos.x(), pos.y()); }
 
 	void setSize(float width, float height);
-	void setSize(const fVec2& size) { return setSize(size.x(), size.y()); }
+	void setSize(const fVec2& size)     { return setSize(size.x(), size.y()); }
 
 	fVec2 getSize() const;
 

@@ -1,41 +1,45 @@
-#ifndef _SFW_IMAGEBUTTON_HPP_
-#define _SFW_IMAGEBUTTON_HPP_
+#ifndef _IODUIWEHDGJHDJKFHGNDJKHGNIUWHER8UIGH45_
+#define _IODUIWEHDGJHDJKFHGNDJKHGNIUWHER8UIGH45_
+
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/gfx/element/Text.hpp"
+#include "sfw/gfx/element/Texture.hpp"
+#include "sfw/gfx/element/Font.hpp"
 
-#include <string>
+#include <string_view>
 
-#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Font.hpp>
+
 
 namespace sfw
 {
 
 /*===========================================================================
-Push-button with an image
-===========================================================================*/
+  Push-button with a texture and a text label
+  (See Button!)
+ ===========================================================================*/
 class ImageButton: public InputWidget<ImageButton>
 {
 public:
-	ImageButton(const sf::Texture& texture, const std::string& label = "");
+	ImageButton(const /*!!gfx::!!*/Texture& texture, std::string_view label = "");
 
-	ImageButton* setText(const std::string& label);
-	std::string getText() const;
+	ImageButton* setText(std::string_view label);
+	std::string  getText() const;
 
-	ImageButton* setSize(sf::Vector2f size);
+	ImageButton* setSize(fVec2 size);
 		// The default button size is the same as that of the image, but
 		// an explicit setSize call will rescale the image to the new size.
+	//!!?? Shouldn't this be virtual then?! Not even the base Widget setSize is!
 
-	ImageButton* setFont(const sf::Font& font);
-	const sf::Font& getFont() const;
+	ImageButton* setFont(const /*!!gfx::!!*/Font& font);
+	const /*!!gfx::!!*/Font& getFont() const;
 
 	ImageButton* setTextSize(size_t size);
 	ImageButton* setTextStyle(sf::Text::Style style);
 	ImageButton* setTextColor(sf::Color color);
 
-	ImageButton* setTexture(const sf::Texture& texture);
+	ImageButton* setTexture(const /*!!gfx::!!*/Texture& texture);
 		// Also resets the scaling; see setSize!
 
 private:
@@ -52,11 +56,13 @@ private:
 	void press();
 	void release();
 
-	Text m_text;
+	/*!!gfx::!!*/Text m_text;
 	sf::Sprite m_background;
 	bool m_pressed;
-};
 
-} // namespace
+}; // class ImageButton
 
-#endif // _SFW_IMAGEBUTTON_HPP_
+} // namespace sfw
+
+
+#endif // _IODUIWEHDGJHDJKFHGNDJKHGNIUWHER8UIGH45_

@@ -1,6 +1,9 @@
 ﻿//----------------------------------------------------------------------------
 // Platform-independent vector type wrapper (the interface half of the adapter
 // -- see the ..._Impl class for the implementation half, #included below)
+//
+// Define SFW_VECTOR_STREAMABLE to add << and >> (otherwise they are no-ops).
+//
 //----------------------------------------------------------------------------
 
 #ifndef _CMOIWD756B87NC2X45TORIUTLBYGH67845NET_
@@ -13,6 +16,9 @@
 //!!   generic "util" stuff), making it part of this new set of concepts!
 //!!
 #include "sfw/util/cpp/types.hpp" // Scalar
+
+#include <cmath> // round
+
 
 namespace sfw//!!::math
 {
@@ -45,6 +51,12 @@ namespace sfw//!!::math
 
 		// The default op= is fine!
 
+		// The default op== too, but that's not gonna be generated automatically... :-/
+		bool operator ==  (const Vector_Interface<Impl>&) const = default;
+		// OTOH, the meaningless <=> WOULD, so that needs to be deleted:
+		auto operator <=> (const Vector_Interface<Impl>&) const = delete;
+		// (Ironically,, op== WOULD be made automatically available from a <=>, but well...)
+
 		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
 		constexpr auto adapter() const { return static_cast<const Impl*>(this); }
 
@@ -53,9 +65,16 @@ namespace sfw//!!::math
 		constexpr auto& x()       { return adapter()->_x(); }
 		constexpr auto& y()       { return adapter()->_y(); }
 
-		constexpr operator       Impl::native_type& ()       { return Impl::native(); }
-		constexpr operator const Impl::native_type& () const { return Impl::native(); }
-	};
+		constexpr operator       typename Impl::native_type& ()       { return Impl::native(); }
+		constexpr operator const typename Impl::native_type& () const { return Impl::native(); }
+
+		constexpr operator bool () { return (bool)x() || (bool)y(); }
+
+		// A common chore (e.g. to avoid subpixel AA-blurring with OpenGL):
+		constexpr auto  round() const { return Vector_Interface(std::round(x()), std::round(y())); }
+		constexpr auto& round()       { std::round(x()); std::round(y()); return *this; }
+
+	}; // class Vector_Interface
 
 
 //----------------------------------------------------------------------------
@@ -97,18 +116,20 @@ namespace sfw//!!::math
 	//!! There should be automatic dispatching on object size (sizeof(v) > sizeof(void*, or e.g. twice that size) 
 	//!! for switching to const Vector& instead of by-val!
 
-	_VECTOR_OP operator == (V a, V b) { return a.native() == b.native(); }
-
 	_VECTOR_OP operator + (V a, V b) { return V( a.x() + b.x(), a.y() + b.y() ); }
 	_VECTOR_OP operator - (V a, V b) { return V( a.x() - b.x(), a.y() - b.y() ); }
 
 	// Dot prod.
-	_VECTOR_OP operator * (V a, V b) { return V::number_type( a.x() * b.x() + a.y() * b.y() ); } //!!?? Braces with V::number_type{...} fail! Why exactly?
+	_VECTOR_OP operator * (V a, V b) { //static_assert(false, "WHO'S TRIGGERING THIS ACCIDENTALLY?! :) ");
+		return typename V::number_type( a.x() * b.x() + a.y() * b.y() ); }
+		//!!?? Braces with V::number_type{...} failed to compile! Why exactly?
 
-	// Scalar ops.
-	_VECTOR_OP operator + (V v, Scalar auto scalar) { return V( v.x() + scalar, v.y() + scalar ); }
+	// Binary scalar ops.
+	_VECTOR_OP operator + (V v, Scalar auto scalar) { return V( v.x() + scalar, v.y() + scalar ); } // Commutative!
+	_VECTOR_OP operator + (Scalar auto scalar, V v) { return V( v.x() + scalar, v.y() + scalar ); }
 	_VECTOR_OP operator - (V v, Scalar auto scalar) { return V( v.x() - scalar, v.y() - scalar ); }
-	_VECTOR_OP operator * (V v, Scalar auto scalar) { return V( v.x() * scalar, v.y() * scalar ); }
+	_VECTOR_OP operator * (V v, Scalar auto scalar) { return V( v.x() * scalar, v.y() * scalar ); } // Commutative!
+	_VECTOR_OP operator * (Scalar auto scalar, V v) { return V( v.x() * scalar, v.y() * scalar ); }
 	_VECTOR_OP operator / (V v, Scalar auto scalar) { return V( v.x() / scalar, v.y() / scalar ); }
 
  	// Unary -
@@ -123,7 +144,6 @@ namespace sfw//!!::math
 	_VECTOR_OP & operator -= (V& self, V v) { self.x() -= v.x(); self.y() -= v.y(); return self; }
 	_VECTOR_OP & operator *= (V& self, V v) { self.x() *= v.x(); self.y() *= v.y(); return self; }
 	_VECTOR_OP & operator /= (V& self, V v) { self.x() /= v.x(); self.y() /= v.y(); return self; }
-
 	// Scalar ops.
 	_VECTOR_OP & operator += (V& self, Scalar auto scalar) { self.x() += scalar; self.y() += scalar; return self; }
 	_VECTOR_OP & operator -= (V& self, Scalar auto scalar) { self.x() -= scalar; self.y() -= scalar; return self; }
@@ -145,14 +165,23 @@ namespace sfw//!!::math
 //----------------------------------------------------------------------------
 #ifdef SFW_VECTOR_STREAMABLE
 # include <iostream>
-namespace sfw//!!::math
-{
+  namespace sfw//!!::math
+  {
 	_VECTOR_OP & operator << (std::ostream& out, V v) { out <<"("<< v.x() <<", "<< v.y() <<")"; return out; }
 	_VECTOR_OP & operator >> (std::istream& in,  V v) {
 		static_assert(false, "Vector op<< is not implemented yet!"); //!! It's far less trivial than writing. :-/
 		return in;
 	}
-} // namespace sfw//!!::math
+  } // namespace sfw//!!::math
+
+#else  // SFW_VECTOR_STREAMABLE
+
+  #include <iosfwd> // ostream, istream are not classes, can't be forward declared! :-/
+  namespace sfw//!!::math
+  {
+	_VECTOR_OP & operator << (std::ostream& out, V) { return out; }
+	_VECTOR_OP & operator >> (std::istream& in,  V) { return in;  }
+  }
 #endif // SFW_VECTOR_STREAMABLE
 
 

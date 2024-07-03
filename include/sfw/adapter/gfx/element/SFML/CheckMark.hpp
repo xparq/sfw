@@ -1,6 +1,7 @@
 #ifndef _YGM78SY487Y3G45YNV87M475D70YRT7YHVM579H_
 #define _YGM78SY487Y3G45YNV87M475D70YRT7YHVM579H_
 
+
 #include "sfw/gfx/Render.hpp"
 #include "sfw/math/Vector.hpp"
 
@@ -30,8 +31,10 @@ private:
 	void updateGeometry(float x, float y);
 
 	sf::Vertex m_vertices[4];
-};
+
+}; // class CheckMark
 
 } // namespace sfw
+
 
 #endif // _YGM78SY487Y3G45YNV87M475D70YRT7YHVM579H_

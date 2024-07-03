@@ -1,12 +1,14 @@
-#ifndef GUI_WIDGETCONTAINER_HPP
-#define GUI_WIDGETCONTAINER_HPP
+#ifndef _CUG8934F6G7Y9238RTYGO47SJRYBG3875CRTY4567HB_
+#define _CUG8934F6G7Y9238RTYGO47SJRYBG3875CRTY4567HB_
+
 
 #include "sfw/Widget.hpp"
 
-#include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 #include <functional>
+
 
 namespace sfw
 {
@@ -24,7 +26,7 @@ public:
 	 * @return Pointer to the new widget
 	 */
 	template <class W> requires std::is_base_of_v<Widget, W>
-	W* add(W&& tmp_widget, const std::string& name = "")
+	W* add(W&& tmp_widget, std::string_view name = "")
 		{ return (W*)(Widget*)add((Widget*)new W(std::move(tmp_widget)), name); }
 
 	/**
@@ -33,13 +35,13 @@ public:
 	 * The optional `name` param. facilitates widget lookup by mnemonic.
 	 * @return Pointer to the attached widget
 	 */
-	Widget* add(Widget* widget, const std::string& name = "");
+	Widget* add(Widget* widget, std::string_view name = "");
 
 	/**
 	 * Also for any Widget subclasses, without tedious casting in client code
 	 */
 	template <class W> requires std::is_base_of_v<Widget, W>
-	W* add(W* widget, const std::string& name = "")
+	W* add(W* widget, std::string_view name = "")
 		{ return (W*) (Widget*) add((Widget*)widget, name); }
 
 	/**
@@ -50,10 +52,10 @@ public:
 	 * Note: the anchor widget isn't `const` because its next/prev pointers
 	 * will be updated.
 	 */
-	Widget* addBefore(Widget* anchor, Widget* widget, const std::string& name = "");
-	Widget* addBefore(const std::string& anchor_name, Widget* widget, const std::string& name = "");
-	Widget* addAfter(Widget* anchor, Widget* widget, const std::string& name = "");
-	Widget* addAfter(const std::string& anchor_name, Widget* widget, const std::string& name = "");
+	Widget* addBefore(Widget* anchor, Widget* widget, std::string_view name = "");
+	Widget* addBefore(std::string_view anchor_name, Widget* widget, std::string_view name = "");
+	Widget* addAfter(Widget* anchor, Widget* widget, std::string_view name = "");
+	Widget* addAfter(std::string_view anchor_name, Widget* widget, std::string_view name = "");
 
 	// STL-like iteration helpers ----------------------------------------
 	bool empty() const { return !m_first; }
@@ -85,16 +87,17 @@ public:
 
 // ---- Internal helpers -----------------------------------------------------
 protected:
-	Widget* insert_after(Widget* anchor, Widget* widget, const std::string& name);
+	Widget* insert_after(Widget* anchor, Widget* widget, std::string_view name);
 
 	// Check if `widget` is a direct child node
-	bool is_child(const Widget* widget);
+	bool is_child(const Widget* widget) const;
 
 protected:
 	Widget* m_first;
 	Widget* m_last;
 };
 
-} // namespace
+} // namespace sfw
 
-#endif // GUI_WIDGETCONTAINER_HPP
+
+#endif // _CUG8934F6G7Y9238RTYGO47SJRYBG3875CRTY4567HB_

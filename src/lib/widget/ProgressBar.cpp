@@ -1,13 +1,15 @@
 #include "sfw/widget/ProgressBar.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/geometry/Rectangle.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
 #include <algorithm> // min, max
 
+
 namespace sfw
 {
-
+using namespace geometry;
 
 ProgressBar::ProgressBar(const Cfg& cfg/*, const Style& style*/) :
 	m_cfg(cfg)
@@ -115,36 +117,39 @@ void ProgressBar::updateGeometry()
 	m_bar[TopRight]   .position = {x2, y1};
 	m_bar[BottomRight].position = {x2, y2};
 
-	sf::FloatRect rect = (sf::FloatRect)Theme::getProgressBarTextureRect();
-	m_bar[TopLeft]    .texCoords = sf::Vector2f(rect.left, rect.top);
-	m_bar[BottomLeft] .texCoords = sf::Vector2f(rect.left, rect.top + rect.height);
-	m_bar[TopRight]   .texCoords = sf::Vector2f(rect.left + rect.width, rect.top);
-	m_bar[BottomRight].texCoords = sf::Vector2f(rect.left + rect.width, rect.top + rect.height);
+	auto brect = fRect(Theme::getProgressBarTextureRect());
+	m_bar[TopLeft]    .texCoords = {brect.left(),                brect.top()};
+	m_bar[BottomLeft] .texCoords = {brect.left(),                brect.top() + brect.height()};
+	m_bar[TopRight]   .texCoords = {brect.left() + brect.width(), brect.top()};
+	m_bar[BottomRight].texCoords = {brect.left() + brect.width(), brect.top() + brect.height()};
 
 	// Extend the widget box if the label will be outside the bar...
 
-	m_label.setString(stdstring_to_SFMLString("100" + m_cfg.unit)); // Shaky heuristics to find the maximum width the label might need...
-	                                       //!! Will certainly become incorrect with patterns later, but
-	                                       //!! it's already hopeless with arbitrary ranges (#287) now!
-	                                       //!! Anyway, the entire LabelOutside feature is kinda pathetic, TBH...
+	m_label.setString(stdstring_to_SFMLString("100" + m_cfg.unit));
+		// Shaky heuristics to find the maximum width the label might need.
+		//!! Will certainly become incorrect with patterns later, but
+		//!! it's already hopeless with arbitrary ranges (#287) now!
+		//!! Anyway, the entire LabelOutside feature is kinda useless, TBH.
+		//!! (Not that the other modes won't need care at all.)
+
 	m_label.setFont(Theme::getFont());
 	m_label.setFillColor(Theme::input.textColor);
 	m_label.setCharacterSize((unsigned)Theme::textSize);
 
-	float labelWidth  = m_label.getLocalBounds().width;
-	float labelHeight = m_label.getLocalBounds().height;
+	float labelWidth  = m_label.size().x();
+	float labelHeight = m_label.size().y();
 	if (m_cfg.label_placement == LabelOutside)
 	{
 		if (m_cfg.orientation == Horizontal)
 		{
 			// Place the label at the right side of the bar
-			m_label.setPosition({m_cfg.length + Theme::PADDING, Theme::PADDING});
-			setSize({m_cfg.length + Theme::PADDING + labelWidth, m_box.getSize().y});
+			m_label.reposition({m_cfg.length + Theme::PADDING, Theme::PADDING});
+			setSize({m_cfg.length + Theme::PADDING + labelWidth, m_box.getSize().y()});
 		}
 		else
 		{
 			// Put it below the bar
-			setSize({m_box.getSize().x, m_cfg.length + Theme::PADDING + labelHeight});
+			setSize({m_box.getSize().x(), m_cfg.length + Theme::PADDING + labelHeight});
 		}
 	}
 	else
@@ -170,8 +175,9 @@ void ProgressBar::updateGeometry()
 	auto bar_length = val_to_barlength(clamped_value);
 	if (m_cfg.orientation == Horizontal)
 	{
-		m_bar[TopRight].position.x = m_bar[BottomRight].position.x
-			= m_bar[TopLeft].position.x + bar_length;
+		m_bar[TopRight].position.x =
+			m_bar[BottomRight].position.x =
+				m_bar[TopLeft].position.x + bar_length;
 	
 		if (m_cfg.label_placement == LabelOver)
 		{
@@ -181,8 +187,9 @@ void ProgressBar::updateGeometry()
 	}
 	else
 	{
-		m_bar[TopLeft].position.y = m_bar[TopRight].position.y
-			= m_bar[BottomLeft].position.y - bar_length;
+		m_bar[TopLeft].position.y =
+			m_bar[TopRight].position.y =
+				m_bar[BottomLeft].position.y - bar_length;
 
 		if (m_cfg.label_placement == LabelOver)
 		{
@@ -191,8 +198,8 @@ void ProgressBar::updateGeometry()
 		else if (m_cfg.label_placement == LabelOutside)
 		{
 			// Refresh horizontal label pos. in case its width has changed
-			float labelX = (m_box.getSize().x - m_label.getLocalBounds().width) / 2;
-			m_label.setPosition({labelX, m_box.getSize().y + Theme::PADDING});
+			m_label.reposition({(m_box.getSize().x() - m_label.size().x()) / 2,
+			                     m_box.getSize().y() + Theme::PADDING});
 		}
 	}
 }
@@ -220,4 +227,5 @@ float ProgressBar::val_to_barlength(float v) const
 	return round(track_length() * dv / range().size());
 }
 
-} // namespace
+
+} // namespace sfw

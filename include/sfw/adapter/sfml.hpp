@@ -35,6 +35,7 @@ inline bool SFML_keypress_has_modifiers(const sf::Event::KeyChanged& key)
 //----------------------------------------------------------------------------
 #include <SFML/System/String.hpp>
 #include <string>
+#include <string_view>
 
 //!! This would require an iterator to `end` -- but if they mean an utf-8 iterator,
 //!! rather than byte (`char`), then I can't give it to them this way, here, now...
@@ -53,6 +54,13 @@ inline sf::String stdstring_to_SFMLString(const std::string& stdstr)
 	//! Wow, OK, it didn't crash, and even seems to work fine! :-o
 	//! So they do need plain "byte iterators" for this then?! Phew...
 }	//! (Can't quite make sense of that, but whatever -- let's celebrate! :) )
+
+//!! Note: string_view IS NOT NULL-TERMINATED! :-o
+inline sf::String stdstringview_to_SFMLString(std::string_view sv)
+{
+	return sf::String::fromUtf8(sv.begin(), sv.end());
+}
+
 
 //!!See above about not trying to be too utf8-smart for nothing...
 inline std::string SFMLString_to_stdstring(const sf::String& sfstr)

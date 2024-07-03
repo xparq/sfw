@@ -1,6 +1,6 @@
 #include "sfw/widget/Button.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/util/adapter/sfml.hpp"
+#include "sfw/adapter/sfml.hpp"
 
 #include <algorithm>
 	using std::max;
@@ -8,28 +8,28 @@
 namespace sfw
 {
 
-Button::Button(const std::string& text)
+Button::Button(const std::string_view text)
 {
 	onThemeChanged(); //!!Calling it this way is a temp. kludge (for DRY). Also: it has to happen before the rest of the init.
 	setText(text); // Will resize, too
 }
 
-Button::Button(const std::string& text, std::function<void()> callback):
+Button::Button(const std::string_view text, std::function<void()> callback):
 	Button(text)
 {
 	setCallback(callback);
 }
 
-Button::Button(const std::string& text, std::function<void(Button*)> callback):
+Button::Button(const std::string_view text, std::function<void(Button*)> callback):
 	Button(text)
 {
 	setCallback(callback);
 }
 
 
-Button* Button::setText(const std::string& text)
+Button* Button::setText(std::string_view text)
 {
-	m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(text));
+	m_box.item().setString(/*sfw::*/stdstringview_to_SFMLString(text));
 	recomputeGeometry();
 	return this;
 }
@@ -76,7 +76,7 @@ void Button::onThemeChanged()
 
 void Button::recomputeGeometry()
 {
-	int fittingWidth = (int)(m_box.item().getLocalBounds().width + Theme::PADDING * 2 + Theme::borderSize * 2);
+	int fittingWidth = (int)(m_box.contentSize().x() + Theme::PADDING * 2 + Theme::borderSize * 2);
 	int width = max(fittingWidth, Theme::minWidgetWidth);
 
 	m_box.setSize((float)width, Theme::getBoxHeight());

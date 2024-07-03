@@ -1,13 +1,15 @@
-#ifndef _SFW_OPTIONSBOX_HPP_
-#define _SFW_OPTIONSBOX_HPP_
+#ifndef _FCOY8IWU4EY5T28704WDY87FVXC485Y894UYN89V5HJ8945C457_
+#define _FCOY8IWU4EY5T28704WDY87FVXC485Y894UYN89V5HJ8945C457_
+
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/gfx/element/Text.hpp"
 #include "sfw/gfx/element/Arrow.hpp"
 #include "sfw/gfx/element/ItemBox.hpp"
 
-#include <string>
+#include <string_view>
 #include <utility> // forward
+
 
 namespace sfw
 {
@@ -36,14 +38,14 @@ public:
 	// -------- Setup...
 
 	// Append new item to the list
-	auto add(const std::string& label, const T& value);
+	auto add(std::string_view label, const T& value);
 
 	// Change the value of an existing item (i.e. key = value)
-	auto assign(const std::string& label, const T& value);
+	auto assign(std::string_view label, const T& value);
 
 	// Change the current item
 	auto set(size_t index);
-	auto set(const std::string& label);
+	auto set(std::string_view label);
 	auto set(const T& value); // Would call T::op==!
 
 	OptionsBox<T>* setTextColor(const sf::Color& color);
@@ -54,7 +56,7 @@ public:
 	// Select item (by index or label)
 	// (Synonym to update(...), which is pretty awkward here.)
 	auto select(size_t index);             
-	auto select(const std::string& label);
+	auto select(std::string_view label);
 	auto select(const T& value);
 
 	// Actions for Up/Down, Home/End...
@@ -100,7 +102,7 @@ private:
 		std::string label;
 		T value;
 
-		Item(const std::string& text, const T& value);
+		Item(std::string_view text, const T& value);
 	};
 
 	typedef std::vector<Item> ItemVector;
@@ -113,8 +115,8 @@ private:
 	ItemBox<Arrow> m_arrowRight; // Control for "Select Next"
 };
 
-} // namespace
+} // namespace sfw
 
 #include "OptionsBox.inl"
 
-#endif // _SFW_OPTIONSBOX_HPP_
+#endif // _FCOY8IWU4EY5T28704WDY87FVXC485Y894UYN89V5HJ8945C457_

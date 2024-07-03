@@ -3,6 +3,9 @@
 
 #include <string>
 	using std::string;
+#include <string_view>
+	using std::string_view;
+
 
 namespace sfw
 {
@@ -37,11 +40,11 @@ bool Theme::Cfg::apply()
 	// Save the config params first, for later reference... (!!Should later become the full, normative theme config itself!)
 	Theme::cfg = *this;
 
-	if (!Theme::loadFont(string(basePath) + fontFile))
+	if (string path = string(basePath) + fontFile; !Theme::loadFont(path))
 	{
 		return false; // SFML has already explained the situation...
 	}
-	if (!Theme::loadTexture(string(basePath) + textureFile))
+	if (string path = string(basePath) + textureFile; !Theme::loadTexture(path))
 	{
 		return false; // SFML has already explained the situation...
 	}
@@ -57,15 +60,18 @@ bool Theme::Cfg::apply()
 Theme::Cfg Theme::cfg; //!! Mostly unused yet, but slowly migrating to it...
 
 size_t Theme::textSize = Theme::DEFAULT.textSize;
+
+//!! LEGACY:
 Theme::Style Theme::click;
 Theme::Style Theme::input;
 
-sf::Color Theme::bgColor = sf::Color::White;
+sf::Color      Theme::bgColor = sf::Color::White;
 Wallpaper::Cfg Theme::wallpaper{};
-bool Theme::clearBackground = true;
+bool           Theme::clearBackground = true;
 
-int Theme::borderSize = 1; //! Will get reset based on the loaded texture, so no use setting it here!
-int Theme::minWidgetWidth = 86;
+//!! CONSOLIDATE:
+int   Theme::borderSize = 1; //! Will get reset based on the loaded texture, so no use setting it here!
+int   Theme::minWidgetWidth = 86;
 float Theme::PADDING = 1.f;
 float Theme::MARGIN = 4.f;
 
@@ -80,34 +86,41 @@ sf::Event::KeyChanged Theme::previousWidgetKey = { .code = sf::Keyboard::Key::Ta
 #pragma GCC diagnostic pop
 #endif
 
-sf::Font Theme::m_font;
-/*!!sfw::gfx::!!*/Texture Theme::m_texture;
-iRect Theme::m_subrects[_TEXTURE_ID_COUNT];
-sf::Cursor& Theme::cursor = getDefaultCursor();
+/*!!gfx::!!*/Font     Theme::m_font;
+/*!!gfx::!!*/Texture  Theme::m_texture;
+iRect                 Theme::m_subrects[_TEXTURE_ID_COUNT];
+
+const sf::Cursor&     Theme::mousePointer = getDefaultMousePointer();
 
 
 //============================================================================
-sf::Cursor& Theme::getDefaultCursor()
+const sf::Cursor& Theme::getDefaultMousePointer()
 {
-	static sf::Cursor c; //!! Basically a singleton system resource anyway, and
-	                     //!! Theme is also static, so no "additional" harm done...
-	                     //!! But if it does support RAII with stacked state restore,
-	                     //!! then this should not be static!
-	if (!c.loadFromSystem(sf::Cursor::Type::Arrow))
+	//! Creates and copies a whole new cursor instance on every call! :-/
+	//! (Fortuantely, it's only even called once, though...)
+
+	static const auto c = sf::Cursor::loadFromSystem(sf::Cursor::Type::Arrow); // std::optional, actually
+		//!! Basically a singleton system resource anyway, and
+	        //!! Theme is also static, so no "additional" harm done...
+	        //!! But if it does support RAII with stacked state restore,
+	        //!! then this should not be static!
+	if (!c)
 	{
-		//!! loadFromSystem is `nodiscard`...
+		//!! Hopefully even a failed load...() will at least keep the default!... :)
+		throw ("Failed to set the default mouse pointer!"); //!!?? WTF...
+		//!! [[unreachable]]
 	}
-	return c;
+	return c.value();
 }
 
 
-bool Theme::loadFont(const std::string& filename)
+bool Theme::loadFont(string_view filename)
 {
-	return m_font.loadFromFile(filename);
+	return m_font.load(filename);
 }
 
 
-bool Theme::loadTexture(const std::string& filename)
+bool Theme::loadTexture(string_view filename)
 {
 	if (m_texture.load(filename))
 	{
@@ -129,13 +142,13 @@ bool Theme::loadTexture(const std::string& filename)
 }
 
 
-const sf::Font& Theme::getFont()
+const /*!!gfx::!!*/Font& Theme::getFont()
 {
 	return m_font;
 }
 
 
-const sf::Texture& Theme::getTexture()
+const /*!!gfx::!!*/Texture& Theme::getTexture()
 {
 	return m_texture;
 }
@@ -190,9 +203,9 @@ float Theme::getBoxHeight()
 }
 
 
-int Theme::getLineSpacing()
+float Theme::getLineSpacing()
 {
-	return (int)m_font.getLineSpacing((unsigned)textSize);
+	return m_font.lineSpacing((unsigned)textSize);
 }
 
 } // namespace sfw

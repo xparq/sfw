@@ -275,8 +275,8 @@ void GUI::draw(const gfx::RenderContext& ctx) const
 			auto widget_pos = w->getParent()->getAbsolutePosition();
 			//!!SFML-specific:
 			widget_ctx.props.transform = sf::Transform(
-				1, 0, widget_pos.x,
-				0, 1, widget_pos.y,
+				1, 0, widget_pos.x(),
+				0, 1, widget_pos.y(),
 				0, 0, 1);
 
 			w->m_tooltip->draw(widget_ctx);
@@ -286,49 +286,60 @@ void GUI::draw(const gfx::RenderContext& ctx) const
 
 
 //----------------------------------------------------------------------------
-bool GUI::remember(Widget* widget, string name, bool override_existing)
+bool GUI::remember(Widget* widget, string_view name, bool override_existing)
 {
+	string id; // Well, the relation between names and IDs is implicitly defined by this code below...
+
 	if (name.empty())
 	{
-		// Make the default name hex, for a more climactic debug experience...:
+		// Use the hex widget address as the default ID, for a more climactic debug experience...:
 		char defname[17] = {0}; to_chars(defname, std::end(defname), (size_t)(void*)widget, 16);
-		name = string(defname);
-		// Paranoid sanity-checking of this default name
-		if (widgets[name] != nullptr)
+		id = string(defname);
+
+		// Even the "unique" object addressed can collide, after some creating/deleting, with a stale widget registry,
+		// which sohuld itself be an error then, but what if the earlier name came from client code?! :-o
+		if (widgets[id] != nullptr)
 		{
-			cerr << "- Warning: Widget ["<<name<<"] has already been registered with this default name.\n";
-			assert(widgets[name] == widget);
+			cerr << "- Warning: Trying to (re-?)register widget with exising default ID \""<<id<<"\"!\n"; //! Actually: :-o
+			assert(widgets[id] == widget); //!! Let's consider it an error for now, if it was another widget!
 			return true;
 		}
 	}
-	else if (auto other_it = widgets.find(name); other_it != widgets.end()) // Someone has this name aleady?
-	{
-		Widget* other = other_it->second;
-		if (other == widget)
-		{
-			cerr << "- Warning: Repeated registration of widget as \"" << name << "\".\n";
-			return true;
-		}
+	else {
+		id = string(name);
 
-		if (!override_existing)
+		// Handle the cases when the name has already been registered:
+		if (auto other_it = widgets.find(id); other_it != widgets.end())
 		{
-			cerr << "- Warning: Refusing to override the name (\"" << name << "\") of another widget.\n";
-			return false;
-		}
-		else
-		{
-			cerr << "- Warning: Another widget has already been registered as \"" << name << "\".\n"
-			     << "  Overriding...\n";
+			Widget* other = other_it->second;
+			if (other == widget)
+			{
+				cerr << "- Warning: Repeated registration of widget \"" << id << "\".\n";
+				return true;
+			}
 
-			// Forget the name of the other widget:
-			[[maybe_unused]] auto result_of_forgetting = remember(other, "");
-			assert(result_of_forgetting);
+			if (!override_existing)
+			{
+				cerr << "- Warning: Refusing to override the name (\"" << id << "\") of another widget.\n";
+				return false;
+			}
+			else
+			{
+				cerr << "- Warning: Another widget has already been registered as \"" << id << "\".\n"
+				<< "  Overriding...\n";
 
-			// Fall through to assign `name` to `widget`...
+				// Forget the name of the other widget:
+				[[maybe_unused]] auto result_of_forgetting = remember(other, "");
+				assert(result_of_forgetting);
+
+				// Fall through to assign `id` to `widget`...
+			}
 		}
 	}
-	
-	widgets[name] = widget;
+
+	assert (!id.empty());
+
+	widgets[id] = widget;
 	return true;
 }
 
@@ -371,9 +382,9 @@ void GUI::setMouseCursor(sf::Cursor::Type cursorType)
 {
 	if (cursorType != m_cursorType)
 	{
-		if (Theme::cursor.loadFromSystem(cursorType))
+		if (Theme::mousePointer.loadFromSystem(cursorType))
 		{
-			m_window.setMouseCursor(Theme::cursor);
+			m_window.setMouseCursor(Theme::mousePointer);
 			m_cursorType = cursorType;
 		}
 	}

@@ -1,12 +1,14 @@
-#ifndef _SFW_BUTTON_HPP_
-#define _SFW_BUTTON_HPP_
+#ifndef _MDEIURFYHHTNUIWHWIDMUTFHYIUEG9849836798435GY7G_
+#define _MDEIURFYHHTNUIWHWIDMUTFHYIUEG9849836798435GY7G_
+
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/gfx/element/Text.hpp"
 #include "sfw/gfx/element/ItemBox.hpp"
 #include "sfw/gfx/Color.hpp"
 
-#include <string>
+#include <string_view>
+
 
 namespace sfw
 {
@@ -21,11 +23,11 @@ class Button: public InputWidget<Button>
  ===========================================================================*/
 {
 public:
-	explicit Button(const std::string& text);
-	Button(const std::string& text, std::function<void()> callback);
-	Button(const std::string& text, std::function<void(Button*)> callback);
+	explicit Button(std::string_view text);
+	Button(std::string_view text, std::function<void()> callback);
+	Button(std::string_view text, std::function<void(Button*)> callback);
 
-	Button* setText(const std::string& text);
+	Button* setText(std::string_view text);
 	std::string getText() const;
 
 	Button* setColor(sf::Color); // Overall tint, except the label
@@ -48,8 +50,10 @@ private:
 	void onThemeChanged() override;
 
 	ItemBox<Text> m_box;
-};
 
-} // namespace
+}; // class Button
 
-#endif // _SFW_BUTTON_HPP_
+} // namespace sfw
+
+
+#endif // _MDEIURFYHHTNUIWHWIDMUTFHYIUEG9849836798435GY7G_

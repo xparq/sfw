@@ -6,14 +6,14 @@
 namespace sfw
 {
 
-template <class T>
+template <Shape T>
 ItemBox<T>::ItemBox(Box::Type type):
 	Box(type)
 {
 	applyState(ActivationState::Default);
 }
 
-template <class T>
+template <Shape T>
 ItemBox<T>::ItemBox(const T& item, Box::Type type):
 	Box(type),
 	m_item(item)
@@ -22,27 +22,27 @@ ItemBox<T>::ItemBox(const T& item, Box::Type type):
 }
 
 
-template <class T>
+template <Shape T>
 void ItemBox<T>::setItemColor(sf::Color color)
 {
 	m_itemColor = color;
 	m_item.setFillColor(m_itemColor.value());
 }
 
-template <class T>
+template <Shape T>
 void ItemBox<T>::setFillColor(sf::Color color)
 {
 	Box::setFillColor(color);
 }
 
-template <class T>
+template <Shape T>
 void ItemBox<T>::setTintColor(sf::Color color)
 {
 	m_tintColor = color;
 }
 
 
-template <class T>
+template <Shape T>
 void ItemBox<T>::applyState(ActivationState state)
 {
 	Box::applyState(state);
@@ -68,7 +68,7 @@ void ItemBox<T>::applyState(ActivationState state)
 	}
 }
 
-template <class T>
+template <Shape T>
 void ItemBox<T>::draw(const gfx::RenderContext& ctx) const //override
 {
 	Box::draw(ctx);
@@ -81,22 +81,25 @@ void ItemBox<T>::draw(const gfx::RenderContext& ctx) const //override
 		                                  getSize().y - 2 * (float)Theme::borderSize));
 		r.setPosition(getPosition()); r.move({(float)Theme::borderSize, (float)Theme::borderSize});
 */
-		sf::RectangleShape r(sf::Vector2f(getSize().x, getSize().y));
-		r.setPosition(getPosition());
-
+		auto r = sf::RectangleShape(getSize()); r.setPosition(getPosition());
+		//!! Should be:
+		//!!auto r = sf::RectangleShape( {getPosition(), getSize()} ); // auto fRect -> sf::Rect<float>
+		//!! or:
+		//!!auto r = sf::RectangleShape{ getPosition(), getSize() };
+		//!! but SFML's RectangleShape still doesn't seem to have "rectangular" ctors!... :-o
 		r.setFillColor(m_tintColor.value());
 		r.setOutlineThickness(0);
 		ctx.target.draw(r, ctx.props);
 	}
 }
 
-template <class T>
+template <Shape T>
 void ItemBox<T>::onPress()
 {
 	m_item.move({0.f, 1.f});
 }
 
-template <class T>
+template <Shape T>
 void ItemBox<T>::onRelease()
 {
 	m_item.move({0.f, -1.f});

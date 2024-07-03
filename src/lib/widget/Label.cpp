@@ -1,13 +1,16 @@
 #include "sfw/widget/Label.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/util/adapter/sfml.hpp"
+#include "sfw/adapter/sfml.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
+
+#include <string>
+
 
 namespace sfw
 {
 
-Label::Label(const std::string& text)
+Label::Label(std::string_view text)
 {
 	onThemeChanged(); //!!Calling it this way is a temp. kludge (for DRY). Also: it has to happen before the rest of the init.
 	setFocusable(false);
@@ -15,9 +18,9 @@ Label::Label(const std::string& text)
 }
 
 
-Label* Label::setText(const std::string& text)
+Label* Label::setText(std::string_view text)
 {
-	m_text.setString(/*sfw::*/stdstring_to_SFMLString(text));
+	m_text.setString(/*sfw::*/stdstringview_to_SFMLString(text));
 	recomputeGeometry();
 	return this;
 }
@@ -71,10 +74,10 @@ void Label::draw(const gfx::RenderContext& ctx) const
 void Label::onThemeChanged()
 {
 	m_text.setFont(Theme::getFont());
-	m_text.setPosition({Theme::PADDING, Theme::PADDING}); //!!  ... + m_text.getLocalBounds().top});
-														  //!! The "canonical" SFML offest correction would
-														  //!! make the positioning inconsistent: some text
-														  //!! would then sit on the baseline, some won't etc.!
+	m_text.reposition({Theme::PADDING, Theme::PADDING}); //!!??  ... + m_text.getLocalBounds().top});
+	                                                 //!! The "canonical" SFML offest correction would
+	                                                 //!! make the positioning inconsistent: some text
+	                                                 //!! would then sit on the baseline, some won't etc.!
 	m_text.setFillColor(Theme::click.textColor);
 	m_text.setCharacterSize((unsigned)Theme::textSize);
 	recomputeGeometry();
@@ -83,11 +86,7 @@ void Label::onThemeChanged()
 
 void Label::recomputeGeometry()
 {
-	auto bounds = m_text.getLocalBounds();
-	Widget::setSize(
-		bounds.width + Theme::PADDING * 2 + bounds.left,
-		bounds.height + Theme::PADDING * 2 + bounds.top
-	);
+	setSize(m_text.size() + Theme::PADDING * 2);
 }
 
 } // namespace

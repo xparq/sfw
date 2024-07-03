@@ -44,8 +44,17 @@ namespace sfw::geometry
 	public:
 		constexpr Rectangle_Interface() = default;
 
+		//!!?? Accept native vector types (our Vector auto-converts to those, so they work, too),
+		//!!?? but that might not actually be a good thing -- could be confusingly permissive, and
+		//!!?? also untenable with more complex classes, which then would also be expected to support
+		//!!?? all sorts of other native types transparently (with minor combinatoric explosions)!
+		//!!?? (And the confusion part: generic APIs are not expected to work with "random" foreign
+		//!!?? types; however, supporting the types of the current backend could be excused.)
 		constexpr Rectangle_Interface(Impl::vector_type position, Impl::vector_type size)
 			: Impl(position.native(), size.native()) {}
+
+		constexpr Rectangle_Interface(Impl::vector_type size)
+			: Impl({0,0}, size.native()) {}
 
 /*!! OLD:
 		// Convert from lval with different number type:
@@ -69,7 +78,7 @@ namespace sfw::geometry
 		//!! Also: if the converting ctor above indeed transparently covers rvals/lvals & const/non-consts,
 		//!! then do the same for the plain (Other == Self) copy/move ctors below:
 
-//!!?? WHY ARE THESE NEVER ACTUALLY SELECTED?! :-o (Not a failed assert ever! :-o )
+//!!?? WHY ARE THESE NEVER ACTUALLY SELECTED IN GCC, BUT ARE IN MSVC?! :-o (Not a failed assert ever! :-o )
 		template <Rectangle SameRectT,
 			typename = std::enable_if_t< std::is_same_v<typename std::decay_t<SameRectT>::number_type, typename Impl::number_type> >
 				//!! decay_t (or at least std::remove_cvref_t) is CRITICAL for accepting both const/non-const OtherRect ctor args.! :-o
@@ -135,8 +144,11 @@ namespace sfw::geometry
 		constexpr sfw::/*!!math::!!*/Vec2<typename Impl::number_type> position() const { return {x(), y()}; }
 		constexpr sfw::/*!!math::!!*/Vec2<typename Impl::number_type> size()     const { return {dx(), dy()}; }
 
-		constexpr operator       Impl::native_type& ()       { return Impl::native(); }
-		constexpr operator const Impl::native_type& () const { return Impl::native(); }
+		constexpr operator       typename Impl::native_type& ()       { return Impl::native(); }
+		constexpr operator const typename Impl::native_type& () const { return Impl::native(); }
+
+		constexpr operator bool () { return (bool)dx() && (bool)dy(); } // Area != 0?
+			// So, the position doesn't matter. Also, negative size is OK. Also, not ||, unlike Vector's.
 
 	}; // class Rectangle_Interface
 

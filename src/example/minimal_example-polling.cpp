@@ -34,9 +34,14 @@ int main()
 
         // Process events in the queue (each one, to avoid possible congestion),
         // and pass them to the GUI, until closing or an error has occured
-        for (sf::Event event; window.pollEvent(event) && gui.process(event); )
+        while (const auto event = window.pollEvent())
         {
-            // Your own custom event processing here...
+             if (event)
+	     {
+		gui.process(*event); // Pass it to the GUI!
+
+	     	// Your own custom event processing here...
+	     }
         }
     }
 

@@ -1,9 +1,11 @@
-#ifndef GUI_FORMLAYOUT_HPP
-#define GUI_FORMLAYOUT_HPP
+#ifndef _DIOFCUHIWOUETY8XYN867D49T86WDR7G4FH_
+#define _DIOFCUHIWOUETY8XYN867D49T86WDR7G4FH_
+
 
 #include "sfw/Layout.hpp"
 
-#include <string>
+#include <string_view>
+
 
 namespace sfw
 {
@@ -24,8 +26,8 @@ public:
 	 * - widgetname_override: Use this as the widget name (instead of `label`)
 	 * Returns a pointer to the added widget (or nullptr for label-only rows).
 	 */
-	Widget* add(const std::string& label, Widget* widget = nullptr,
-		const std::string& widgetname_override = "");
+	Widget* add(std::string_view label, Widget* widget = nullptr,
+		std::string_view widgetname_override = "");
 
 	/*
 	 * As above, but allow using any widget as "label" (prefix)
@@ -34,7 +36,7 @@ public:
 	 * - labelwidgetname_override: name for the "label" widget
 	 */
 	Widget* add(Widget* labelwidget, Widget* widget = nullptr,
-		const std::string& widgetname_override = "", const std::string& labelwidgetname_override = "");
+		std::string_view widgetname_override = "", std::string_view labelwidgetname_override = "");
 
 	/*************************************************************************
 	* Various convenience helper templates are also defined to spare all the
@@ -53,8 +55,10 @@ private:
 	void recomputeGeometry() override;
 
 	float m_labelColumnWidth;
-};
 
-} // namespace
+}; // class Form
 
-#endif // GUI_FORMLAYOUT_HPP
+} // namespace sfw
+
+
+#endif // _DIOFCUHIWOUETY8XYN867D49T86WDR7G4FH_

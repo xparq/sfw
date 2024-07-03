@@ -48,6 +48,9 @@ namespace adapter::SFML
 		constexpr auto& _y()       { return _d.y; }
 		constexpr auto  _x() const { return _d.x; }
 		constexpr auto  _y() const { return _d.y; }
+
+		// Since op<=> will be deleted by the Ifc class, it can't be relied on...
+		bool operator == (const Vector2_Impl&) const = default;
 	};
 
 	template <Scalar NumT>

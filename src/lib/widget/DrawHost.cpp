@@ -6,15 +6,15 @@
 namespace sfw
 {
 
-DrawHost::DrawHost(const DrawHook& hook)
+DrawHost::DrawHost(const DrawHook& draw_hook)
 {
-    setDrawHook(hook);
+    setDrawHook(draw_hook);
 }
 
 
-Widget* DrawHost::setDrawHook(const DrawHook& hook)
+Widget* DrawHost::setDrawHook(const DrawHook& draw_hook)
 {
-    m_drawHook = hook;
+    m_drawHook = draw_hook;
     return this;
 }
 

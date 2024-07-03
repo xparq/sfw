@@ -1,5 +1,5 @@
 #include "sfw/Theme.hpp"
-#include "sfw/util/shim/sfml.hpp" // std::string <-> sf::String conv.
+#include "sfw/adapter/sfml.hpp" // std::string[_view] <-> sf::String conv.
 #include "sfw/util/diagnostics.hpp"
 
 #include <algorithm>
@@ -24,14 +24,14 @@ template <class T> OptionsBox<T>::OptionsBox(std::function<void(OptionsBox<T>*)>
 }
 
 
-template <class T> auto OptionsBox<T>::add(const std::string& label, const T& value)
+template <class T> auto OptionsBox<T>::add(std::string_view label, const T& value)
 {
 	m_items.push_back(Item(label, value));
 
-	m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(label));
+	m_box.item().set(label);
 	// Check if the box needs to be resized
-	float width = m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2;
-	if (width > this->getSize().x) //! See comment at the class def., why this->...
+	float width = m_box.item().size().x() + Theme::getBoxHeight() * 2 + Theme::PADDING * 2; //!! Height used directly in a width calc...
+	if (width > this->getSize().x()) //! See comment at the class def., why this->...
 	{
 		m_box.setSize(width, (float)Theme::getBoxHeight());
 		m_arrowRight.setPosition(width - (float)Theme::getBoxHeight(), 0.f);
@@ -47,7 +47,7 @@ template <class T> auto OptionsBox<T>::add(const std::string& label, const T& va
 }
 
 
-template <class T> auto OptionsBox<T>::assign(const std::string& label, const T& value)
+template <class T> auto OptionsBox<T>::assign(std::string_view label, const T& value)
 {
 	for (size_t i = 0; i < m_items.size(); ++i)
 	{
@@ -71,7 +71,7 @@ template <class T> auto OptionsBox<T>::set(size_t index)
 	return this;
 }
 
-template <class T> auto OptionsBox<T>::set(const std::string& label)
+template <class T> auto OptionsBox<T>::set(std::string_view label)
 {
 	for (size_t i = 0; i < m_items.size(); ++i)
 	{
@@ -100,7 +100,7 @@ template <class T> auto OptionsBox<T>::select(size_t index)
 	return this->update(index);
 }
 
-template <class T> auto OptionsBox<T>::select(const std::string& label)
+template <class T> auto OptionsBox<T>::select(std::string_view label)
 {
 	return this->update(label);
 }
@@ -172,7 +172,7 @@ template <class T> auto OptionsBox<T>::update_selection(size_t index)
 	if (index < m_items.size())
 	{
 		m_currentIndex = index;
-		m_box.item().setString(/*sfw::*/stdstring_to_SFMLString(m_items[index].label));
+		m_box.item().set(m_items[index].label);
 		m_box.centerTextHorizontally(m_box.item());
 	}
 	return this;
@@ -216,8 +216,8 @@ template <class T> void OptionsBox<T>::onThemeChanged()
 	auto width = (float)Theme::minWidgetWidth;
 	for (size_t i = 0; i < m_items.size(); ++i)
 	{
-		m_box.item().setString(stdstring_to_SFMLString(m_items[i].label));
-		width = max(width, m_box.item().getLocalBounds().width + Theme::getBoxHeight() * 2 + Theme::PADDING * 2);
+		m_box.item().set(m_items[i].label);
+		width = max(width, m_box.item().size().x() + Theme::getBoxHeight() * 2 + Theme::PADDING * 2);
 	}
 	m_box.setSize(width, (float)Theme::getBoxHeight());
 	this->setSize(m_box.getSize()); // See comment at the class def., why this->...
@@ -232,7 +232,7 @@ template <class T> void OptionsBox<T>::onThemeChanged()
 
 	// Right arrow
 	m_arrowRight.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
-	m_arrowRight.setPosition(m_box.getSize().x - Theme::getBoxHeight(), 0);
+	m_arrowRight.setPosition(m_box.getSize().x() - Theme::getBoxHeight(), 0);
 	//!!WOW! Doing the same in reverse would make it fall apart spectacularly!! :-ooo
 	//!!m_arrowRight.setPosition(m_box.getSize().x - Theme::getBoxHeight(), 0);
 	//!!m_arrowRight.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
@@ -291,7 +291,7 @@ template <class T> void OptionsBox<T>::onMouseWheelMoved(int delta)
 }
 
 
-template <class T> void OptionsBox<T>::onKeyPressed(const sf::Event::KeyEvent& key)
+template <class T> void OptionsBox<T>::onKeyPressed(const sf::Event::KeyChanged& key)
 {
 	switch (key.code)
 	{
@@ -317,7 +317,7 @@ template <class T> void OptionsBox<T>::onKeyPressed(const sf::Event::KeyEvent& k
 	}
 }
 
-template <class T> void OptionsBox<T>::onKeyReleased(const sf::Event::KeyEvent& key)
+template <class T> void OptionsBox<T>::onKeyReleased(const sf::Event::KeyChanged& key)
 {
 	switch (key.code)
 	{
@@ -338,7 +338,7 @@ template <class T> void OptionsBox<T>::onKeyReleased(const sf::Event::KeyEvent& 
 }
 
 
-template <class T> OptionsBox<T>::Item::Item(const std::string& text, const T& val):
+template <class T> OptionsBox<T>::Item::Item(std::string_view text, const T& val):
 	label(text),
 	value(val)
 {

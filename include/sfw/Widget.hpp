@@ -1,6 +1,7 @@
 #ifndef _SODRTYUN3045679MY450786NY3079Y78RYCHKLVJ_
 #define _SODRTYUN3045679MY450786NY3079Y78RYCHKLVJ_
 
+#include "sfw/math/Vector.hpp"
 #include "sfw/Event.hpp"
 #include "sfw/ActivationState.hpp"
 
@@ -11,7 +12,6 @@
 
 #include "sfw/gfx/Render.hpp"
 
-#include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Window/Event.hpp>
 
@@ -51,21 +51,22 @@ class Widget : public gfx::Drawable, public Event::Handler
 {
 public:
 	// Widget geometry
-	Widget* setPosition(const sf::Vector2f& pos);
+	Widget* setPosition(fVec2 pos);
 	Widget* setPosition(float x, float y);
-	const sf::Vector2f& getPosition() const; //!!?? Should just return Vector2f by val.?
+	fVec2   getPosition() const; //!!?? Should just return Vector2f by val.?
 
 	// Don't use these, unless absolutely necessary & signed the waiver!...
 	// (They trigger reflow, so might cause infinite loops if called nonchalantly.)
 	// Widget sizing is fully automatic anyway.
-	Widget* setSize(const sf::Vector2f& size);
+	Widget* setSize(fVec2 size);
 	Widget* setSize(float width, float height);
-	const sf::Vector2f& getSize() const; //!!?? Should just return Vector2f by val.?
+	fVec2   getSize() const; //!!?? Should just return Vector2f by val.?
 
 	// Queries:
 
 	// Check if a point belongs to the widget
-	bool contains(const sf::Vector2f& point) const;
+	bool contains(fVec2 point) const;
+	bool contains(float x, float y) const;
 
 	// Enable/disable processing (user) events
 	// (Not just inputs, but also outputs like triggering user callbacks.)
@@ -116,7 +117,7 @@ protected:
 		Widget(Widget&&);
 		Widget(const Widget&);
 
-	sf::Vector2f getAbsolutePosition() const;
+	fVec2 getAbsolutePosition() const;
 		// Window coordinates, not relative to the GUI Main rect.!
 		// (So, even when the GUI itself is offset, it won't affect this.)
 
@@ -184,8 +185,8 @@ private:
 	bool m_focusable;
 	ActivationState m_activationState;
 
-	sf::Vector2f m_position;
-	sf::Vector2f m_size;
+	fVec2 m_position;
+	fVec2 m_size;
 	sf::Transform m_transform;
 
 	Tooltip* m_tooltip = nullptr;
@@ -193,7 +194,7 @@ private:
 #ifdef DEBUG
 public:
 	void draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor = sf::Color::Red,
-		sf::Color fillcolor = sf::Color::Transparent) const; // Well, with fillColor, now it can also do interior, not just "outline"
+	                  sf::Color fillcolor = sf::Color::Transparent) const; // Well, with fillColor, now it can also do interior, not just "outline"
 #endif
 
 // ---- Misc. hackery... -----------------------------------------------------

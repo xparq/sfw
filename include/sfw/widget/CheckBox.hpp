@@ -1,9 +1,11 @@
-#ifndef _SFW_CHECKBOX_HPP_
-#define _SFW_CHECKBOX_HPP_
+#ifndef _PDOTUTMFY245O8UNITHG8Y4Y078FYGBN78EYFH7IV45_
+#define _PDOTUTMFY245O8UNITHG8Y4Y078FYGBN78EYFH7IV45_
+
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/element/CheckMark.hpp"
+
 
 namespace sfw
 {
@@ -50,9 +52,10 @@ private:
 	Box m_box;
 	CheckMark m_checkmark;
 	bool m_checked;
-};
+
+}; // class CheckBox
+
+} // namespace sfw
 
 
-} // namespace
-
-#endif // _SFW_CHECKBOX_HPP_
+#endif // _PDOTUTMFY245O8UNITHG8Y4Y078FYGBN78EYFH7IV45_

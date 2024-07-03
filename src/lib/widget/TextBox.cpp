@@ -3,7 +3,7 @@
 #include "sfw/Theme.hpp"
 #include "sfw/GUI-main.hpp"
 #include "sfw/util/utf8.hpp"
-#include "sfw/util/adapter/sfml.hpp"
+#include "sfw/adapter/sfml.hpp"
 #include "sfw/util/diagnostics.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -342,7 +342,7 @@ void TextBox::update_view()
 {
 	float framing_offset = Theme::borderSize + Theme::PADDING;
 	float inrect_xmin = framing_offset;
-	float inrect_xmax = getSize().x - framing_offset;
+	float inrect_xmax = getSize().x() - framing_offset;
 	float inrect_y = framing_offset;
 
 	m_cursorRect.setPosition({m_text.findCharacterPos(m_cursorPos).x, inrect_y});
@@ -358,7 +358,7 @@ void TextBox::update_view()
 	m_text.move({diff, 0});
 	m_cursorRect.move({diff, 0});
 
-	auto text_x = m_text.getPosition().x;
+	auto text_x = m_text.position().x();
 	//auto bounds = m_text.getLocalBounds(); float sfml_text_offset = bounds.left;
 	// Sigh. These are all sometimes the same, sometimes slightly different... :-/
 	//float textWidth_raw = bounds.width;
@@ -386,7 +386,7 @@ cerr << endl;
 */
 		// ...but if the text is shorter than the box, align left!
 		if (textWidth < inrect_xmax - inrect_xmin) {
-			diff = inrect_xmin - m_text.getPosition().x;
+			diff = inrect_xmin - m_text.position().x();
 		} else {
 			diff = inrect_xmax - m_cursorWidth - (text_x + textWidth);
 		}
@@ -399,8 +399,8 @@ cerr << endl;
 	//!!how exactly this fixes it... :-o
 	//!!
 	//!!This should also adjust the x offset (later...)! (See notes at onThemeChanged!)
-	m_text.setPosition({m_text.getPosition().x, framing_offset});
-	m_cursorRect.setPosition({m_cursorRect.getPosition().x, framing_offset});
+	m_text.reposition({m_text.position().x(), framing_offset});
+	m_cursorRect.setPosition({m_cursorRect.getPosition().x, framing_offset}); //!! Sigh, mixing the two APIs...
 
 	// Also update the selection highlight...
 	if (m_selection)
@@ -682,14 +682,14 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 	// Crop the text with GL Scissor
 	glEnable(GL_SCISSOR_TEST);
 
-	sf::Vector2f pos = getAbsolutePosition();
-	auto width = max(0.f, getSize().x - 2 * Theme::borderSize - 2 * Theme::PADDING); // glScissor will fail if < 0!
+	fVec2 pos = getAbsolutePosition();
+	auto width = max(0.f, getSize().x() - 2 * Theme::borderSize - 2 * Theme::PADDING); // glScissor will fail if < 0!
 
 	glScissor(
-		(GLint)(pos.x + Theme::borderSize + Theme::PADDING),
-		(GLint)(ctx.target.getSize().y - (pos.y + getSize().y)),
+		(GLint)(pos.x() + Theme::borderSize + Theme::PADDING),
+		(GLint)(ctx.target.getSize().y - (pos.y() + getSize().y())), //!! Sigh... Horrid mix of two APIs, again!... :-/
 		(GLsizei)width,
-		(GLsizei)getSize().y
+		(GLsizei)getSize().y()
 	);
 	//!!Original: (tends to overflow the input rect -- how come it worked upstream?! :-o )
 	//!!glScissor(pos.x + Theme::borderSize, ctx.target.getSize().y - (pos.y + getSize().y), getSize().x, getSize().y);

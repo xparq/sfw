@@ -3,7 +3,8 @@
 
 
 #include <utility> // declval
-#include <type_traits> // invoke_result_t, type_identity
+#include <type_traits> // invoke_result_t, type_identity, remove_reference
+
 
 namespace sfw::internal {
 

@@ -7,10 +7,13 @@
 #include <iostream> // cerr, for errors, cout for some "demo" info
 #include <cassert>
 using namespace std;
+using namespace sfw::geometry;
 
 // Try/check without most of the sfw:: prefixes:
 using namespace sfw;
 
+
+//============================================================================
 int main()
 try {
 	//------------------------------------------------------------------------
@@ -71,9 +74,9 @@ try {
 	// (See the rest of #167 later below, at the other DrawHost widget!)
 	auto circlevista = new DrawHost([&](auto* w, auto ctx) {
 		sf::CircleShape circ(50);
-		sf::Texture backdrop;
-                if (!backdrop.loadFromFile("test/example.jpg")) return;
-		circ.setTexture(&backdrop);
+		sfw::Texture backdrop;
+                if (!backdrop.load("test/example.jpg")) return;
+		circ.setTexture(&backdrop); //!! No need for circ.setTexture(&backdrop.native()), as sf::Texture as a mixin of sfw::Texture!
 		circ.setTextureRect({{10, 10}, {100, 100}});
 
 		auto sfml_renderstates = ctx.props;
@@ -193,20 +196,17 @@ try {
 	//!!
 	//!! Plus, a light (template-based?) interface would also be needed
 	//!! for accessging them from the outside in a somewhat civilized way!
-		sf::Text text(Theme::getFont(), "Hello world!");
+		sfw::Text text("Hello world!");
 		sf::RectangleShape textrect;
 
 	auto sfText = new DrawHost([&](auto* raw_w, auto ctx) {
 		// Get current (raw, untransformed) text size
 		//! Note: the text string & style attributes may have been
 		//! changed by other widgets!
-		auto tbounds = text.getLocalBounds();
-		//! sf::Text's bound-rect is not 0-based! :-o (-> SFML #216)
-		sf::Vector2f mysterious_sfml_offset = {tbounds.left, tbounds.top};
-		sf::Vector2f tsize = {tbounds.width + tbounds.left, tbounds.height + tbounds.top};
+		auto tsize = text.size();
 		// Get boundrect of the transformed (rotated, scaled etc.) text
 		// for sizing the wrapper widget
-		sf::FloatRect bgRect{{0,0}, {tsize.x * 1.2f, tsize.y * 3.5f}};
+		fRect bgRect{{}, {tsize.x() * 1.2f, tsize.y() * 3.5f}};
 		auto actualBoundRect = text.getTransform().transformRect(bgRect);
 //!!??		auto actualBoundRect = xform.transformRect(textrect.getGlobalBounds());
 //!!?? Why's getGlobalBounds different here?!
@@ -217,8 +217,7 @@ try {
 		auto* w = (DrawHost*)raw_w;
 
 		//!! Umm... This is *GROSS*! Basically triggers a full GUI resize, right from draw()! :-oo
-		w->setSize((actualBoundRect.width  + 2 * Theme::PADDING),
-		           (actualBoundRect.height + 2 * Theme::PADDING));
+		w->setSize(fVec2(actualBoundRect.size) + 2.f * Theme::PADDING);
 
 		//!! Must position the shapes after setSize, as setSize may move the widget
 		//!! out from the content we manually hack here, leaving the appearance off
@@ -229,13 +228,12 @@ try {
 		// Sync the bg. rect to various "externalia":
 		textrect.setScale(text.getScale());
 		textrect.setRotation(text.getRotation());
-		textrect.setSize(bgRect.getSize());
+		textrect.setSize(bgRect.size());
 		textrect.setOrigin({textrect.getSize().x / 2, textrect.getSize().y / 2});
-		textrect.setPosition({w->getSize().x / 2, w->getSize().y / 2});
+		textrect.setPosition({w->getSize().x() / 2, w->getSize().y() / 2});
 
-		text.setOrigin({tsize.x / 2 + mysterious_sfml_offset.x,
-                                tsize.y / 2 + mysterious_sfml_offset.y}); //! sf::Text's bound-rect is not 0-based! :-o
-		text.setPosition({w->getSize().x / 2, w->getSize().y / 2});
+		text.setOrigin(tsize / 2);
+		text.setPosition(w->getSize() / 2);
 
 		auto sfml_renderstates = ctx.props;
 		sfml_renderstates.transform *= w->getTransform();
@@ -752,20 +750,18 @@ cerr << "font size (method 4): "<< themecfg.textSize << endl; //!!#196
 		demo.render();
 		window.display();
 
-		sf::Event event;
 		// Pass events to the GUI & check for closing or failure
 		//!! Can't shortcut it when the GUI doesn't own the window, so when
 		//!! it gets deactivated it wouldn't block the rest of the world, too:
 		//!!while (window.pollEvent(event) && demo.process(event) || )
-		while (window.pollEvent(event))
+		while (const auto event = window.pollEvent())
 		{
-			demo.process(event);
+			demo.process(event.value());
 
-			// Handle the window closing separately, as we
-			// don't want to close with the gui in this setup:
-			if (event.type == sf::Event::Closed ||
-			    // Just for convenience, also close on Esc:
-			    (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Key::Escape))
+			// Handle the window-closing explicitly, as we've configured
+			// the GUI manager to not do that in this setup:
+			if (event->is<sf::Event::Closed>() || // And also close on Esc:
+			   (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape))
 			{
 				window.close(); // Not demo.close() if the GUI doesn't own the window!
 				                // Also: window.close() will indirectly disable the GUI.

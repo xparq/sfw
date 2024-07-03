@@ -1,6 +1,9 @@
 #ifndef _SUIOHTCY78Y678E4785T36T6B67X34574NY7T_
 #define _SUIOHTCY78Y678E4785T36T6B67X34574NY7T_
 
+
+#include "sfw/gfx/element/Texture.hpp"
+#include "sfw/gfx/element/Font.hpp"
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/element/Wallpaper.hpp"
 //#include "sfw/geometry/Rectangle.hpp" // Definitely done already by those rectangular things above. ;)
@@ -9,11 +12,12 @@
 
 #include <SFML/Window.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Color.hpp>
 
 #include <map>
 #include <string>
+#include <string_view>
+
 
 namespace sfw {
 
@@ -33,14 +37,14 @@ public:
 		//
 		// Note: these are not "defaults" here, but "unset" markers (and/or diagnostic sentinels)
 		// (except when the type doesn't allow such "off-band" values; then it's indeed a default).
-		const char* name = nullptr;
-		const char* basePath = nullptr;
-		const char* textureFile = nullptr;
-		sf::Color bgColor = sf::Color::White; // no "unset" color, so must use a sensible default here
+		const char*    name = nullptr;
+		const char*    basePath = nullptr;
+		const char*    textureFile = nullptr;
+		sf::Color      bgColor = sf::Color::White; // no "unset" color, so must use a sensible default here
 		Wallpaper::Cfg wallpaper = {};
-		size_t textSize = 0; //!!?? uint16_t: a) fixed (-> ABI compat.!), b) smaller, c) but may need annoying extra casts, d) uint_least16_t is the guaranteed type actually...
-		const char* fontFile = nullptr;
-		bool multiTooltips = false;
+		size_t         textSize = 0; //!!?? uint16_t: a) fixed (-> ABI compat.!), b) smaller, c) but may need annoying extra casts, d) uint_least16_t is the guaranteed type actually...
+		const char*    fontFile = nullptr;
+		bool           multiTooltips = false;
 
 	protected:
 		friend class GUI;
@@ -54,12 +58,12 @@ public:
 	static Cfg cfg;
 
 	// Load the GUI global font
-	static bool loadFont(const std::string& path);
-	static const sf::Font& getFont();
+	static bool loadFont(std::string_view path);
+	static const /*!!gfx::!!*/Font& getFont();
 
 	// Load & access (parts of) the GUI spritesheet
-	static bool loadTexture(const std::string& path);
-	static const sf::Texture& getTexture();
+	static bool loadTexture(std::string_view path);
+	static const /*!!gfx::!!*/Texture& getTexture();
 	static const geometry::iRect& getTextureRect(Box::Type type, ActivationState state);
 
 		// Convenience helpers:
@@ -70,10 +74,10 @@ public:
 	// Default widget height based on text size
 	static float getBoxHeight();
 
-	// Height of (a line of) text
-	static int getLineSpacing();
+	// Height of a line of text with the current base text size
+	static float getLineSpacing();
 
-	static sf::Cursor& getDefaultCursor();
+	static const sf::Cursor& getDefaultMousePointer();
 
 	// Two different (input) widget styles: textual ('Input') and generic ('Click')
 	//!!CLEANUP! -> #308, #11... Should be more refined & flexible!
@@ -104,8 +108,7 @@ public:
 	static sf::Event::KeyChanged previousWidgetKey;
 	static sf::Event::KeyChanged nextWidgetKey;
 
-	// Auto-initialized to default cursor
-	static sf::Cursor& cursor;
+	static const sf::Cursor& mousePointer;
 
 private:
 	enum TextureID
@@ -122,11 +125,12 @@ private:
 		_TEXTURE_ID_COUNT
 	};
 
-	static sf::Font m_font;
-	static sfw::/*!!gfx::!!*/Texture m_texture;
+	static /*!!gfx::!!*/Font m_font;
+	static /*!!gfx::!!*/Texture m_texture;
 	static geometry::iRect m_subrects[_TEXTURE_ID_COUNT];
 }; // class
 
 } // namsepace sfw
+
 
 #endif // _SUIOHTCY78Y678E4785T36T6B67X34574NY7T_
