@@ -11,7 +11,7 @@
 namespace sfw
 {
 
-ImageButton::ImageButton(const /*!!gfx::!!*/Texture& texture, std::string_view label):
+ImageButton::ImageButton(const gfx::Texture& texture, std::string_view label):
 	m_background(texture), // No default sf::Sprite ctor! :-/
 	m_pressed(false)
 {
@@ -23,7 +23,7 @@ ImageButton::ImageButton(const /*!!gfx::!!*/Texture& texture, std::string_view l
 }
 
 
-ImageButton* ImageButton::setTexture(const /*!!gfx::!!*/Texture& texture)
+ImageButton* ImageButton::setTexture(const gfx::Texture& texture)
 {
 	int width  = texture.size().x();
 	int height = texture.size().y() / 3; // default, hover, focus
@@ -70,7 +70,7 @@ ImageButton* ImageButton::setSize(fVec2 size)
 	return this;
 }
 
-ImageButton* ImageButton::setFont(const /*!!gfx::!!*/Font& font)
+ImageButton* ImageButton::setFont(const gfx::Font& font)
 {
 	m_text.setFont(font);
 	centerText();
@@ -78,7 +78,7 @@ ImageButton* ImageButton::setFont(const /*!!gfx::!!*/Font& font)
 }
 
 
-const /*!!gfx::!!*/Font& ImageButton::getFont() const
+const gfx::Font& ImageButton::getFont() const
 {
 	return m_text.getFont();
 }

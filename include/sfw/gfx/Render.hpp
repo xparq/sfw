@@ -1,54 +1,18 @@
-#ifndef _DMNE98475Y687D348057NHY6378945HY6B0V45978Y9TG898_
-#define _DMNE98475Y687D348057NHY6378945HY6B0V45978Y9TG898_
+#ifndef _LKUDFTY4875OTYB8E76TYR8YRTNBN89R7DBNYTVHGC5T_
+#define _LKUDFTY4875OTYB8E76TYR8YRTNBN89R7DBNYTVHGC5T_
 
-namespace sfw::gfx //!! Inconsistent with the ns (just sfw) of other related classes! :-o :-/
-{
 
-//----------------------------------------------------------------------------
-// "Mixin base" of the real RenderContext
-//!! Currently just a placeholder!
-template <typename Backend>
-struct RenderContext_base
-{
-};
+#include "SAL/gfx/Render.hpp"
 
 //----------------------------------------------------------------------------
-// Abstract "mixin base" of the real Drawable base
-template <typename Backend>
-class Drawable_base
-{
-protected:
-	virtual void draw(const RenderContext_base<Backend>& ctx) const = 0;
-
-	//  Then the actual drawing could be like:
-	//  public void draw(const RenderContext& ctx) const override //! Declare it public!
-	//  {
-	//  	my_sfw_drawable.draw(ctx); // This is why it needs to be public!
-	//  	// Or, for native SFML objects:
-	//  	ctx.target.draw(my_SFML_drawable, ctx.props);
-	//  }
-	//
-	//  This way e.g. widget interfaces can be designed backend-independently,
-	//  while implementation code can keep using SFML directly.
-};
-
-
+//!! Temporary kludge for the current unfinished C++ namespacing...
 //----------------------------------------------------------------------------
-// "Mixin base" of the real Renderer
-//!! Currently just a placeholder!
-template <typename Backend>
-class Renderer_base
+namespace sfw::gfx
 {
-public:
-//!!??	render(...);
-};
+	using SAL::gfx::Drawable;
+	using SAL::gfx::Renderer;
+	using SAL::gfx::RenderContext;
+}
 
 
-} // namespace sfw::gfx
-
-
-#include "sfw/adapter/dispatch.hpp"
-#include SFW_ADAPTER_IMPL(gfx/Render)
-
-
-#endif // _DMNE98475Y687D348057NHY6378945HY6B0V45978Y9TG898_
+#endif // _LKUDFTY4875OTYB8E76TYR8YRTNBN89R7DBNYTVHGC5T_

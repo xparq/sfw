@@ -2,7 +2,8 @@
 #define _DM948576NDM948576NB398R7Y8UHJ4968VB_
 
 #include "sfw/Widget.hpp"
-#include "sfw/util/cpp/generic.hpp"
+
+#include "SAL/util/cpp/templ.hpp"
 
 #include <string_view>
 #include <concepts>

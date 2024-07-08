@@ -1,5 +1,6 @@
 #include "sfw/layout/HBox.hpp"
 #include "sfw/Theme.hpp"
+
 #include "sfw/math/Vector.hpp"
 
 #include <algorithm>
@@ -8,6 +9,7 @@
 
 namespace sfw
 {
+
 
 void HBox::recomputeGeometry()
 {
@@ -23,5 +25,6 @@ void HBox::recomputeGeometry()
     size.x() = max(0.f, pos.x() - Theme::MARGIN); // 0 for an empty container
     Widget::setSize(size);
 }
+
 
 } // namespace sfw

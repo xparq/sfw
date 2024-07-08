@@ -2,9 +2,11 @@
 
 #include "sfw/Theme.hpp"
 #include "sfw/GUI-main.hpp"
-#include "sfw/util/utf8.hpp"
-#include "sfw/adapter/sfml.hpp"
-#include "sfw/util/diagnostics.hpp"
+
+#include "SAL/util/utf8.hpp"
+#include "SAL/sfml.hpp" //!! Should be "interfaced" away!...
+
+#include "SAL/util/diagnostics.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -71,7 +73,7 @@ std::string TextBox::get() const
 
 std::string TextBox::getSelected() const
 {
-	return SFMLString_to_stdstring(
+	return SAL::SFMLString_to_stdstring(
 		m_selection.empty() ? "" : m_text.getString().substring(m_selection.lower(), m_selection.length())
 	);
 	//!!Decoupled from SFML, but slower (O(N)):
@@ -237,7 +239,7 @@ void TextBox::Copy()
 {
 	if (m_selection)
 	{
-//		sf::Clipboard::setString(stdstring_to_SFMLString(getSelected()));
+//		sf::Clipboard::setString(SAL::stdstring_to_SFMLString(getSelected()));
 		sf::Clipboard::setString(getSelectedString());
 	}
 }
@@ -246,7 +248,7 @@ void TextBox::Cut()
 {
 	if (m_selection)
 	{
-//		sf::Clipboard::setString(stdstring_to_SFMLString(getSelected()));
+//		sf::Clipboard::setString(SAL::stdstring_to_SFMLString(getSelected()));
 		sf::Clipboard::setString(getSelectedString());
 		delete_selected();
 	}
@@ -254,7 +256,7 @@ void TextBox::Cut()
 
 void TextBox::Paste()
 {
-	std::string clip = SFMLString_to_stdstring(sf::Clipboard::getString());
+	std::string clip = SAL::SFMLString_to_stdstring(sf::Clipboard::getString());
 	auto cliplen = utf8_cpsize(clip);
 	// Refuse to change if it would overflow
 	if (length() + cliplen - m_selection.length() > m_maxLength)
@@ -742,7 +744,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 //!!Will be done in an automatically backand-matched derived variant class later!
 TextBox* TextBox::setString(const sf::String& content)
 {
-	return set(SFMLString_to_stdstring(content));
+	return set(SAL::SFMLString_to_stdstring(content));
 }
 
 sf::String TextBox::getString() const
@@ -766,4 +768,5 @@ sf::String TextBox::getPlaceholderString() const
 	return m_placeholder.getString();
 }
 
-} // namespace
+
+} // namespace sfw

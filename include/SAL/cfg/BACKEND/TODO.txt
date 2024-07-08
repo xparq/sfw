@@ -1,0 +1,12 @@
+﻿Split this into multiple modules, each with a separately configurable backend!
+E.g. math, geometry, graphics, inputs/events, audio, time etc.
+
+Note that one (compound) backend (like SFML) can provide services for more than
+one of these interface modules (i.e. math, graphics, inputs, audio etc.).
+
+An overall single BACKEND/.../DEFAULT.h header should then set multiple cfg.
+macros, one for each interface module that a) the selected (compound) backend
+has the functionality for, and b) has the necessary adapters (vaguely analogous
+e.g. to NT's HAL drivers) implemented.
+
+(See also: #392.)

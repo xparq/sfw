@@ -1,5 +1,0 @@
-﻿Split this to multiple modules, each with their own switchable backends!
-
-An overall single BACKEND/.../DEFAULT.h header should then set multiple cfg.
-macros, one for each backend module that the selected (compound) backend lib
-has support for (and of course also has my adapters).

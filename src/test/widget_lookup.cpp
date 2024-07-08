@@ -74,9 +74,9 @@ try {
 	// (See the rest of #167 later below, at the other DrawHost widget!)
 	auto circlevista = new DrawHost([&](auto* w, auto ctx) {
 		sf::CircleShape circ(50);
-		sfw::Texture backdrop;
+		sfw::gfx::Texture backdrop;
                 if (!backdrop.load("test/example.jpg")) return;
-		circ.setTexture(&backdrop); //!! No need for circ.setTexture(&backdrop.native()), as sf::Texture as a mixin of sfw::Texture!
+		circ.setTexture(&backdrop); //!! No need for circ.setTexture(&backdrop.native()), as sf::Texture is a mixin of sfw::gfx::Texture!
 		circ.setTextureRect({{10, 10}, {100, 100}});
 
 		auto sfml_renderstates = ctx.props;
@@ -196,7 +196,7 @@ try {
 	//!!
 	//!! Plus, a light (template-based?) interface would also be needed
 	//!! for accessging them from the outside in a somewhat civilized way!
-		sfw::Text text("Hello world!");
+		sfw::gfx::Text text("Hello world!");
 		sf::RectangleShape textrect;
 
 	auto sfText = new DrawHost([&](auto* raw_w, auto ctx) {

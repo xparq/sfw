@@ -1,3 +1,9 @@
+/*****************************************************************************
+   Basic horizontal/vertical progress bar
+
+   Static output-only widget: can't be interacted with, or trigger events.
+ *****************************************************************************/
+
 #ifndef _KJWHMIUWERHIUCHIUJHCKFLJHBFDKLUHDVCTIXOHFG_
 #define _KJWHMIUWERHIUCHIUJHCKFLJHBFDKLUHDVCTIXOHFG_
 
@@ -17,13 +23,6 @@ enum LabelPlacement
 	LabelOver,   // Label over (inside) the progress bar
 	LabelOutside // Label next to or below the bar
 };
-
-/*
-   Basic horizontal/vertical progress bar
-
-   Static output-only widget: can't be interacted with, or trigger events.
-*/
-
 
 	namespace _ProgressBar_GCC_CLANG_bug_workaround // https://stackoverflow.com/questions/53408962/try-to-understand-compiler-error-message-default-member-initializer-required-be
 	{
@@ -88,7 +87,7 @@ private:
 
 	Box m_box;
 	sf::Vertex m_bar[_VERTEX_COUNT_];
-	Text m_label;
+	gfx::Text m_label;
 }; // ProgressBar
 
 

@@ -1,7 +1,7 @@
 #ifndef _UOTYNDUFTN78FN747852B678C46B78V5Y_
 #define _UOTYNDUFTN78FN747852B678C46B78V5Y_
 
-#include "sfw/util/generic.hpp" // using sfw::Unknown, sfw::UseDefault
+#include "sfw/util/default_param.hpp" // using sfw::Unknown, sfw::UseDefault
 
 namespace sfw
 {

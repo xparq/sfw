@@ -1,13 +1,15 @@
 #include "sfw/gfx/element/CheckMark.hpp"
 
 #include "sfw/Theme.hpp"
-#include "sfw/geometry/Rectangle.hpp"
+
+#include "SAL/geometry/Rectangle.hpp"
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 
 #include <cmath>
+
 
 namespace sfw
 {
@@ -78,5 +80,6 @@ void CheckMark::updateGeometry(float x, float y)
 	m_vertices[2].position = sf::Vector2f(x + rect.width(), y);
 	m_vertices[3].position = sf::Vector2f(x + rect.width(), y + rect.height());
 }
+
 
 } // namespace sfw

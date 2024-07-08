@@ -5,6 +5,8 @@
 #include "sfw/Widget.hpp"
 #include "sfw/gfx/element/Text.hpp"
 
+#include <SFML/Graphics/Text.hpp>
+
 #include <string_view>
 
 
@@ -29,7 +31,7 @@ public:
     Label* setTextSize(size_t size);
     size_t getTextSize() const;
 
-    Label* setStyle(sf::Text::Style style);
+    Label* setStyle(sf::Text::Style style); //!! Direct SFML usage!
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;
@@ -38,7 +40,7 @@ private:
 
     void onThemeChanged() override;
 
-    Text m_text;
+    gfx::Text m_text;
 
 }; // class Label
 

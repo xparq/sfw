@@ -3,10 +3,11 @@
 
 #include <SFML/Window/Mouse.hpp>
 
-#include "sfw/util/diagnostics.hpp"
+#include "SAL/util/diagnostics.hpp"
 
 
 namespace sfw {
+
 
 //----------------------------------------------------------------------------
 Tooltip::Tooltip(Widget* owner, std::string text):

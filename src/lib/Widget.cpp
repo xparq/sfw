@@ -2,7 +2,8 @@
 #include "sfw/WidgetContainer.hpp"
 #include "sfw/GUI-main.hpp"
 #include "sfw/widget/Tooltip.hpp"
-#include "sfw/util/diagnostics.hpp"
+
+#include "SAL/util/diagnostics.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -15,9 +16,9 @@
 #
 #endif
 
+
 namespace sfw
 {
-
 using enum ActivationState;
 
 

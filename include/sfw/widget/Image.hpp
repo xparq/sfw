@@ -3,13 +3,15 @@
 
 
 #include "sfw/Widget.hpp"
+#include "SAL/gfx/element/Texture.hpp"
+#include "SAL/gfx/element/TexturedVertex2.hpp"
+
+//!!#include "SAL/geometry/Rectangle.hpp"
 #include "sfw/geometry/Rectangle.hpp"
-#include "sfw/gfx/element/Texture.hpp"
 
 #include <string_view>
 
 #include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Vertex.hpp>
 
 
 namespace sfw
@@ -27,13 +29,13 @@ public:
     Image();
     Image(std::string_view filename,  const geometry::iRect& r = NullRect);
     Image(const sf::Image& image,     const geometry::iRect& r = NullRect);
-    Image(const /*!!gfx::!!*/Texture& texture, const geometry::iRect& r = NullRect);
+    Image(const SAL::gfx::Texture& texture, const geometry::iRect& r = NullRect);
 
     Image* setTexture(std::string_view filename,  const geometry::iRect& r = NullRect);
     Image* setTexture(const sf::Image& image,     const geometry::iRect& r = NullRect);
-    Image* setTexture(const /*!!gfx::!!*/Texture& texture, const geometry::iRect& r = NullRect);
+    Image* setTexture(const SAL::gfx::Texture& texture, const geometry::iRect& r = NullRect);
 
-    const /*!!gfx::!!*/Texture& texture() const { return m_texture; }
+    const SAL::gfx::Texture& texture() const { return m_texture; }
 
     Image* setCropRect(const geometry::iRect& r);
     geometry::iRect cropRect() const;
@@ -49,10 +51,10 @@ private:
     void draw(const gfx::RenderContext& ctx) const override;
     void onResized() override;
 
-    /*!!gfx::!!*/Texture m_texture;
+    SAL::gfx::Texture m_texture;
     fVec2 m_baseSize;
     float m_scalingFactor = 1.f;
-    sf::Vertex m_vertices[4];
+    SAL::gfx::TexturedVertex2 m_vertices[4];
 };
 
 } // namespace sfw

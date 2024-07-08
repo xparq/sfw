@@ -1,7 +1,7 @@
 #ifndef _SODRTYUN3045679MY450786NY3079Y78RYCHKLVJ_
 #define _SODRTYUN3045679MY450786NY3079Y78RYCHKLVJ_
 
-#include "sfw/math/Vector.hpp"
+
 #include "sfw/Event.hpp"
 #include "sfw/ActivationState.hpp"
 
@@ -11,6 +11,8 @@
 //!!#include "sfw/GUI-main.hpp"        // See forw. decl. below instead...
 
 #include "sfw/gfx/Render.hpp"
+
+#include "sfw/math/Vector.hpp"
 
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Window/Event.hpp>
@@ -381,6 +383,8 @@ public:
 
 }; // class Widget
 
+
 } // namespace sfw
+
 
 #endif // _SODRTYUN3045679MY450786NY3079Y78RYCHKLVJ_

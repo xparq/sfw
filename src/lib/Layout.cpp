@@ -2,7 +2,8 @@
 #include "sfw/Theme.hpp"
 #include "sfw/widget/Tooltip.hpp"
 #include "sfw/gfx/Render.hpp"
-#include "sfw/adapter/sfml.hpp" // for sf::Event::KeyChanged::==
+
+#include "SAL/sfml.hpp" // for sf::Event::KeyChanged::== (Should be "interfaced" away!...)
 
 #ifdef DEBUG
 #   include "sfw/GUI-main.hpp"

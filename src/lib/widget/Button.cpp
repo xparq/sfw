@@ -1,9 +1,11 @@
 #include "sfw/widget/Button.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/adapter/sfml.hpp"
+
+#include "SAL/sfml.hpp" //!! Should be "interfaced" away!...
 
 #include <algorithm>
 	using std::max;
+
 
 namespace sfw
 {
@@ -29,14 +31,14 @@ Button::Button(const std::string_view text, std::function<void(Button*)> callbac
 
 Button* Button::setText(std::string_view text)
 {
-	m_box.item().setString(/*sfw::*/stdstringview_to_SFMLString(text));
+	m_box.item().setString(SAL::stdstringview_to_SFMLString(text));
 	recomputeGeometry();
 	return this;
 }
 
 std::string Button::getText() const
 {
-	return /*sfw::*/SFMLString_to_stdstring(m_box.item().getString());
+	return SAL::SFMLString_to_stdstring(m_box.item().getString());
 }
 
 

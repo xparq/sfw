@@ -1,14 +1,17 @@
 #include "sfw/widget/CheckBox.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/util/diagnostics.hpp"
+
+#include "SAL/util/diagnostics.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
 #include <algorithm>
 	using std::max;
 
+
 namespace sfw
 {
+
 
 CheckBox::CheckBox(bool checked_state):
 	m_box(Box::Input)
@@ -94,5 +97,6 @@ void CheckBox::onKeyPressed(const sf::Event::KeyChanged& key)
 		toggle();
 	}
 }
+
 
 } // namespace sfw

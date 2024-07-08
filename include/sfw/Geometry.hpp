@@ -10,7 +10,7 @@
 #include "extern/math/adapter/SFML/Vector2.hpp"
 //}
 
-#include "sfw/geometry/Rectangle.hpp"
+#include "SAL/geometry/Rectangle.hpp"
 !!*/
 
 #endif // _GFU3589077GVHM0DFYH8946UM89UE5898BFI_

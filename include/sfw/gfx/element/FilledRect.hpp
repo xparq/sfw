@@ -1,15 +1,19 @@
+//----------------------------------------------------------------------------
+// Making a native "vocabulary tyoe" from an external component...
+//----------------------------------------------------------------------------
+
 #ifndef _FCVU567BDXC2M48UI5Y678943YNH87RE5Y65368_
 #define _FCVU567BDXC2M48UI5Y678943YNH87RE5Y65368_
 
+
 #include "sfw/gfx/Render.hpp"
 
-#include "sfw/adapter/dispatch.hpp"
-#include SFW_ADAPTER_IMPL(gfx/element, FilledRect.hpp)
+#include "SAL/gfx/element/FilledRect.hpp"
 
-namespace sfw {
 
-using FilledRect = FilledRect_Impl; //!! FilledRect_Impl<FilledRect>;
-
+namespace sfw::gfx
+{
+	using FilledRect = SAL::gfx::FilledRect;
 };
 
 #endif // _FCVU567BDXC2M48UI5Y678943YNH87RE5Y65368_

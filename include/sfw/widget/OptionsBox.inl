@@ -1,9 +1,11 @@
 #include "sfw/Theme.hpp"
-#include "sfw/adapter/sfml.hpp" // std::string[_view] <-> sf::String conv.
-#include "sfw/util/diagnostics.hpp"
+
+#include "SAL/sfml.hpp" // std::string[_view] <-> sf::String conv. (Should be "interfaced" away!...)
+#include "SAL/util/diagnostics.hpp"
 
 #include <algorithm>
 	using std::max;
+
 
 namespace sfw
 {
@@ -11,8 +13,8 @@ namespace sfw
 template <class T> OptionsBox<T>::OptionsBox():
 	m_currentIndex(0), // Used to start with the last: (size_t)-1, but #359...
 	m_box(Box::Input),
-	m_arrowLeft(Arrow(Arrow::Left)),
-	m_arrowRight(Arrow(Arrow::Right))
+	m_arrowLeft(Arrow(Arrow::Direction::Left)),
+	m_arrowRight(Arrow(Arrow::Direction::Right))
 {
 	onThemeChanged();
 }
@@ -345,4 +347,4 @@ template <class T> OptionsBox<T>::Item::Item(std::string_view text, const T& val
 }
 
 
-} // namespace
+} // namespace sfw

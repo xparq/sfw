@@ -49,7 +49,7 @@ private:
 	void onKeyReleased(const sf::Event::KeyChanged& key) override;
 	void onThemeChanged() override;
 
-	ItemBox<Text> m_box;
+	ItemBox<gfx::Text> m_box;
 
 }; // class Button
 

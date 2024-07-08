@@ -1,6 +1,8 @@
 #include "sfw/widget/ProgressBar.hpp"
+
 #include "sfw/Theme.hpp"
-#include "sfw/geometry/Rectangle.hpp"
+
+#include "SAL/geometry/Rectangle.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
@@ -125,7 +127,7 @@ void ProgressBar::updateGeometry()
 
 	// Extend the widget box if the label will be outside the bar...
 
-	m_label.setString(stdstring_to_SFMLString("100" + m_cfg.unit));
+	m_label.setString(SAL::stdstring_to_SFMLString("100" + m_cfg.unit));
 		// Shaky heuristics to find the maximum width the label might need.
 		//!! Will certainly become incorrect with patterns later, but
 		//!! it's already hopeless with arbitrary ranges (#287) now!
@@ -170,7 +172,7 @@ void ProgressBar::updateGeometry()
 		clamped_value = std::max(min(), std::min(max(), m_value));
 	}
 
-	m_label.setString(stdstring_to_SFMLString(std::to_string(int(round(m_value))) + m_cfg.unit)); //! The label should still show the original value,
+	m_label.setString(SAL::stdstring_to_SFMLString(std::to_string(int(round(m_value))) + m_cfg.unit)); //! The label should still show the original value,
 	                                                                     //! that's the whole point of clamp = false!
 	auto bar_length = val_to_barlength(clamped_value);
 	if (m_cfg.orientation == Horizontal)

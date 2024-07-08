@@ -1,0 +1,6 @@
+﻿- Rename the legacy sfw:: namespaces!
+  Can't just omi them, and leave it to the app to include these from inside
+  some app-specific wrapper ns., because these headers also include lots of
+  other (std, 3rd-party) stuff that would then break!
+
+- Migrate the soruces, too, from src/lib to src/SAL (for the time being)!

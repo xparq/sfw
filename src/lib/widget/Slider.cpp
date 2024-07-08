@@ -1,6 +1,7 @@
 #include "sfw/widget/Slider.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/util/diagnostics.hpp"
+
+#include "SAL/util/diagnostics.hpp"
 
 #include <cmath>
 #include <algorithm> // min, max
@@ -60,9 +61,9 @@ UI:
 
 */
 
+
 namespace sfw
 {
-
 using enum ActivationState;
 
 
@@ -483,4 +484,4 @@ void Slider::onThemeChanged()
 }
 
 
-} // namespace
+} // namespace sfw

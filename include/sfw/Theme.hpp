@@ -6,9 +6,10 @@
 #include "sfw/gfx/element/Font.hpp"
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/element/Wallpaper.hpp"
-//#include "sfw/geometry/Rectangle.hpp" // Definitely done already by those rectangular things above. ;)
-
+//!! Make it modular, so each component can have its own theming definitions:
 //!!#include "sfw/widget/Tooltip/Style.hpp"
+
+//#include "SAL/geometry/Rectangle.hpp" // Definitely done already by the rectangular things above. ;)
 
 #include <SFML/Window.hpp>
 #include <SFML/Window/Event.hpp>
@@ -59,11 +60,11 @@ public:
 
 	// Load the GUI global font
 	static bool loadFont(std::string_view path);
-	static const /*!!gfx::!!*/Font& getFont();
+	static const gfx::Font& getFont();
 
 	// Load & access (parts of) the GUI spritesheet
 	static bool loadTexture(std::string_view path);
-	static const /*!!gfx::!!*/Texture& getTexture();
+	static const gfx::Texture& getTexture();
 	static const geometry::iRect& getTextureRect(Box::Type type, ActivationState state);
 
 		// Convenience helpers:
@@ -125,8 +126,8 @@ private:
 		_TEXTURE_ID_COUNT
 	};
 
-	static /*!!gfx::!!*/Font m_font;
-	static /*!!gfx::!!*/Texture m_texture;
+	static gfx::Font m_font;
+	static gfx::Texture m_texture;
 	static geometry::iRect m_subrects[_TEXTURE_ID_COUNT];
 }; // class
 

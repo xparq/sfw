@@ -72,8 +72,8 @@ private:
 	Widget* m_owner; GUI* getMain() const { return m_owner ? m_owner->getMain() : nullptr; }
 
 	State m_state{Off};
-	FilledRect m_box;
-	Text m_text;
+	gfx::FilledRect m_box;
+	gfx::Text m_text;
 	size_t m_length; // of the text (cached to spare the length queries)
 	float m_timeStateChange;
 };

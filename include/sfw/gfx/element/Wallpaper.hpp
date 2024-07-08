@@ -1,56 +1,89 @@
-#ifndef _HY389N475YTNC38945768723Q4YT78W45_
-#define _HY389N475YTNC38945768723Q4YT78W45_
+#ifndef _DOCIU4Y578TB87SX45T687045N78H3565456UHY_
+#define _DOCIU4Y578TB87SX45T687045N78H3565456UHY_
 
-#include "sfw/gfx/Render.hpp"
-#include "sfw/ActivationState.hpp"
+#include "sfw/gfx/element/GenericWallpaper.hpp" //!! Pretty stupid experimental design...
 
-#include <string>
+#include "SAL/gfx/element/Texture.hpp"
+#include "SAL/gfx/element/TexturedVertex2.hpp"
+#include "SAL/math/Vector.hpp"
+//!!#include "SAL/math/Vector.hpp"
+#include "sfw/math/Vector.hpp" //!!
+//!!#include "SAL/geometry/Rectangle.hpp"
+#include "sfw/geometry/Rectangle.hpp" //!!
+#include "SAL/gfx/Render.hpp"
+
+#include <SFML/Graphics/Transformable.hpp>
+#include <SFML/Graphics/Color.hpp>
+
+#include <string_view>
+
 
 namespace sfw
 {
 
-class GenericWallpaper
+/**
+ * Draw an image, possibly stretched, onto a rectangle
+ */
+class Wallpaper: public GenericWallpaper, public SAL::gfx::Drawable, public sf::Transformable
 {
+	static constexpr geometry::iRect NullRect{};
+
 public:
-
-	enum Placement : unsigned //!!Generalize this to gfx::Image::Placement!!
+	struct Cfg
 	{
-		Default, // no alignment/scaling, just toss the image at (0,0) and run...
+		std::string filename;
+		Placement placement;
+		sf::Color tint;
 
-		HStretch = 1,
-		VStretch = HStretch <1,
-		KeepAspectRatio = VStretch <1,
-		// public: // i.e. use these 3 instead:
-		FitWidth = HStretch | KeepAspectRatio,
-		FitHeight = VStretch | KeepAspectRatio,
-		Stretch = HStretch | VStretch,
-
-		AlignLeft = 8,
-		AlignRight = AlignLeft <1,
-		AlignTop = AlignRight <1,
-		AlignBottom = AlignTop <1,
-
-		HCenter = AlignLeft | AlignRight,
-		VCenter = AlignTop | AlignBottom,
-		Center = HCenter | VCenter,
-
-		HTile = 128,
-		VTile = HTile <1,
-		Tile = HTile | VTile,
+		Cfg(const std::string& f = "", Wallpaper::Placement p = Center, sf::Color c = sf::Color::White)
+		:
+			filename(f),
+			placement(p),
+			tint(c)
+		{}
 	};
-//	using GenericWallpaper::Placement;
 
-	void disable() { state = ActivationState::Disabled; }
-	void enable()  { state = ActivationState::Default; }
-	operator bool() const { return state == ActivationState::Default; }
+
+	Wallpaper();
+	Wallpaper(std::string_view filename,   const geometry::iRect& r = NullRect);
+	Wallpaper(const sf::Image& image,      const geometry::iRect& r = NullRect);
+	Wallpaper(const SAL::gfx::Texture& texture, const geometry::iRect& r = NullRect);
+
+	Wallpaper* setImage(std::string_view filename,   const geometry::iRect& r = NullRect);
+	Wallpaper* setImage(const sf::Image& image,      const geometry::iRect& r = NullRect);
+	Wallpaper* setImage(const SAL::gfx::Texture& texture, const geometry::iRect& r = NullRect);
+
+	const SAL::gfx::Texture& texture() const { return m_texture; }
+
+	Wallpaper* setSize(iVec2 size);
+	iVec2      getSize() const;
+
+	Wallpaper*      setCropRect(const geometry::iRect& r);
+	geometry::iRect getCropRect() const;
+
+	// Scaling based on the original image size
+
+	Wallpaper* scale(float factor);
+	float      scale() const { return m_scalingFactor; }
+	// Relative scaling based on the current size
+	Wallpaper* rescale(float factor);
+
+	Wallpaper* setColor(const sf::Color& color);
+	sf::Color  getColor() const;
+
+public: //! <- NOT private, because draw() may be accessed directly (statically),
+        //!    rather than just polymorphically (dynamically) via a pointer!
+	void draw(const SAL::gfx::RenderContext& ctx) const override;
 
 private:
-	ActivationState state = ActivationState::Default;
+	SAL::gfx::Texture m_texture;
+	iVec2 m_baseSize;
+	float m_scalingFactor = 1.f;
+	SAL::gfx::TexturedVertex2 m_vertices[4];
 };
 
-} // namespace
 
-#include "sfw/adapter/dispatch.hpp"
-#include SFW_ADAPTER_IMPL(gfx/element, Wallpaper.hpp)
+} // namespace sfw
 
-#endif // _HY389N475YTNC38945768723Q4YT78W45_
+
+#endif // _DOCIU4Y578TB87SX45T687045N78H3565456UHY_

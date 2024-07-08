@@ -1,7 +1,8 @@
 #include "sfw/WidgetContainer.hpp"
 
 #include "sfw/GUI-main.hpp"
-#include "sfw/adapter/sfml.hpp"
+
+#include "SAL/sfml.hpp" //!! Should be "interfaced" away!...
 
 #include <cassert>
 #include <string>
@@ -221,5 +222,6 @@ Widget* WidgetContainer::addBefore(std::string_view anchor_name, Widget* widget,
 //!!??	Widget* a = this->widget(anchor_name);
 	return a ? addBefore(a, widget, name) : add(widget, name);
 }
+
 
 } // namespace sfw

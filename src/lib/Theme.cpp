@@ -1,5 +1,6 @@
 #include "sfw/Theme.hpp"
-#include "sfw/util/diagnostics.hpp"
+
+#include "SAL/util/diagnostics.hpp"
 
 #include <string>
 	using std::string;
@@ -10,6 +11,7 @@
 namespace sfw
 {
 using namespace geometry;
+
 
 Theme::Cfg Theme::DEFAULT =
 {
@@ -86,8 +88,8 @@ sf::Event::KeyChanged Theme::previousWidgetKey = { .code = sf::Keyboard::Key::Ta
 #pragma GCC diagnostic pop
 #endif
 
-/*!!gfx::!!*/Font     Theme::m_font;
-/*!!gfx::!!*/Texture  Theme::m_texture;
+gfx::Font     Theme::m_font;
+gfx::Texture  Theme::m_texture;
 iRect                 Theme::m_subrects[_TEXTURE_ID_COUNT];
 
 const sf::Cursor&     Theme::mousePointer = getDefaultMousePointer();
@@ -114,15 +116,15 @@ const sf::Cursor& Theme::getDefaultMousePointer()
 }
 
 
-bool Theme::loadFont(string_view filename)
+bool Theme::loadFont(string_view path)
 {
-	return m_font.load(filename);
+	return m_font.load(path);
 }
 
 
-bool Theme::loadTexture(string_view filename)
+bool Theme::loadTexture(string_view path)
 {
-	if (m_texture.load(filename))
+	if (m_texture.load(path))
 	{
 		iRect subrect;
 		//!! Alas, rect.width()/height() are NOT lvalues; need to use the alt. setter API:
@@ -142,13 +144,13 @@ bool Theme::loadTexture(string_view filename)
 }
 
 
-const /*!!gfx::!!*/Font& Theme::getFont()
+const gfx::Font& Theme::getFont()
 {
 	return m_font;
 }
 
 
-const /*!!gfx::!!*/Texture& Theme::getTexture()
+const gfx::Texture& Theme::getTexture()
 {
 	return m_texture;
 }
@@ -207,5 +209,6 @@ float Theme::getLineSpacing()
 {
 	return m_font.lineSpacing((unsigned)textSize);
 }
+
 
 } // namespace sfw

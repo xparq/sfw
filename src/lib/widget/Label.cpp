@@ -1,6 +1,7 @@
 #include "sfw/widget/Label.hpp"
 #include "sfw/Theme.hpp"
-#include "sfw/adapter/sfml.hpp"
+
+#include "SAL/sfml.hpp" //!! Should be "interfaced" away!...
 
 #include <SFML/Graphics/RenderTarget.hpp>
 
@@ -20,14 +21,14 @@ Label::Label(std::string_view text)
 
 Label* Label::setText(std::string_view text)
 {
-	m_text.setString(/*sfw::*/stdstringview_to_SFMLString(text));
+	m_text.setString(SAL::stdstringview_to_SFMLString(text));
 	recomputeGeometry();
 	return this;
 }
 
 std::string Label::getText() const
 {
-	return /*sfw::*/SFMLString_to_stdstring(m_text.getString());
+	return SAL::SFMLString_to_stdstring(m_text.getString());
 }
 
 
@@ -89,4 +90,5 @@ void Label::recomputeGeometry()
 	setSize(m_text.size() + Theme::PADDING * 2);
 }
 
-} // namespace
+
+} // namespace sfw

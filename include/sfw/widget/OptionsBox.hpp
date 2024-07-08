@@ -110,9 +110,9 @@ private:
 	size_t m_currentIndex;
 
 	// Visual components
-	ItemBox<Text> m_box;         // The entire widget (incl. the arrows)
-	ItemBox<Arrow> m_arrowLeft;  // Control for "Select Prev."
-	ItemBox<Arrow> m_arrowRight; // Control for "Select Next"
+	ItemBox<gfx::Text> m_box;    // The entire widget "assembly" (incl. the arrows)
+	ItemBox<Arrow> m_arrowLeft;  // Control element for "Select Prev."
+	ItemBox<Arrow> m_arrowRight; // Control element for "Select Next"
 };
 
 } // namespace sfw

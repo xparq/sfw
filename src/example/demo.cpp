@@ -98,7 +98,7 @@ try {
 	// to be manipulated by other widgets...
 	// + a wrapper widget for boxing them nicely
 
-		sfw::Text text("Hello world!");
+		sfw::gfx::Text text("Hello world!");
 		sf::RectangleShape textrect;
 
 	auto sfText = new sfw::DrawHost([&](auto* widget, auto ctx) { // This entire function is a draw() hook!
@@ -110,7 +110,7 @@ try {
 		// That will also be the (variable!) size of the widget.
 		//! (Note: sf::Text's bound-rect would not be 0-based, throwing off
 		//! any unsuspecting geometry operations! (-> SFML #216)
-		//! But with sfw::Text we don't need to deal with that here.)
+		//! But with sfw::gfx::Text we don't need to deal with that here.)
 		fRect bgrect({}, {text.size().x() * 1.2f, text.size().y() * 3.5f});
 		fVec2 containerSize = text.getTransform().transformRect(bgrect).size; //!! Confusing mix of SFW and SFML APIs! :-/
 //!!??		auto actualBoundRect = xform.transformRect(textrect.getGlobalBounds());
@@ -279,7 +279,7 @@ try {
 
 	// Bitmap buttons
 	auto imgbuttons_form = left_panel->add(sfw::Form());
-	sfw::Texture buttonimg; //! DON'T put this texture inside the if() as a local temporary!... ;)
+	sfw::gfx::Texture buttonimg; //! DON'T put this texture inside the if() as a local temporary!... ;)
 	if (buttonimg.load("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
 		auto combined_labels = new VBox();
@@ -466,18 +466,29 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	optTxtColor->select("Red"); // Now all ready, safe to trigger the update callback (so, not just set()...)
 	optTxtBg->select("Black");
 
-
 	//--------------------------------------------------------------------
 	// Start another thread that also manipulates some widgets:
 	jthread bg_thread(background_thread, std::ref(demo));
+
+cerr<<"Starting the evenmt loop..."<< endl;
 
 	//--------------------------------------------------------------------
 	// Event Loop
 	//--------------------------------------------------------------------
 	while (demo)
 	{
-		// Render the GUI
 		demo.render();
+
+/*!!!!????
+  !!!!???? The app SOMETIMES crashes, e.g. even depending on whether this dummy write is here! :-ooo
+           (-> #392/3, #226, #387)
+cerr<<"";
+  !!!!???? (Not in DEBUG mode, unfortunately...)
+  After a few restarts, finally I got an exception:
+	Failed to add a new character to the font: the maximum texture size has been reached
+	terminate called after throwing an instance of 'std::bad_alloc'
+  	what():  std::bad_alloc
+????!!!!*/
 
 		// Show the updated window
 		window.display();

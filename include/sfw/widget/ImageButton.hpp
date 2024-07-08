@@ -22,7 +22,7 @@ namespace sfw
 class ImageButton: public InputWidget<ImageButton>
 {
 public:
-	ImageButton(const /*!!gfx::!!*/Texture& texture, std::string_view label = "");
+	ImageButton(const gfx::Texture& texture, std::string_view label = "");
 
 	ImageButton* setText(std::string_view label);
 	std::string  getText() const;
@@ -32,14 +32,14 @@ public:
 		// an explicit setSize call will rescale the image to the new size.
 	//!!?? Shouldn't this be virtual then?! Not even the base Widget setSize is!
 
-	ImageButton* setFont(const /*!!gfx::!!*/Font& font);
-	const /*!!gfx::!!*/Font& getFont() const;
+	ImageButton* setFont(const gfx::Font& font);
+	const gfx::Font& getFont() const;
 
 	ImageButton* setTextSize(size_t size);
 	ImageButton* setTextStyle(sf::Text::Style style);
 	ImageButton* setTextColor(sf::Color color);
 
-	ImageButton* setTexture(const /*!!gfx::!!*/Texture& texture);
+	ImageButton* setTexture(const gfx::Texture& texture);
 		// Also resets the scaling; see setSize!
 
 private:
@@ -56,7 +56,7 @@ private:
 	void press();
 	void release();
 
-	/*!!gfx::!!*/Text m_text;
+	gfx::Text m_text;
 	sf::Sprite m_background;
 	bool m_pressed;
 

@@ -1,7 +1,8 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
 #include "sfw/widget/Tooltip.hpp"
-#include "sfw/util/diagnostics.hpp"
+
+#include "SAL/util/diagnostics.hpp"
 
 //!! Stuff for clearing the bg. when not owning the entire window
 //!! (Should be moved to the Renderer!)
@@ -12,6 +13,7 @@
 #include <system_error>
 #include <iostream> // for printing errors/warnings
 using namespace std;
+
 
 namespace sfw
 {
@@ -521,4 +523,5 @@ void GUI::onTick()
 	});
 }
 
-} // namespace
+
+} // namespace sfw

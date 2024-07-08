@@ -1,17 +1,20 @@
 #include "sfw/gfx/element/Box.hpp"
 
 #include "sfw/Theme.hpp"
-#include "sfw/geometry/Rectangle.hpp"
-#include "sfw/util/diagnostics.hpp"
+
+#include "SAL/geometry/Rectangle.hpp"
+#include "SAL/util/diagnostics.hpp"
 
 #include <SFML/Graphics/RenderTarget.hpp> // See draw()...
 #include <SFML/Graphics/RectangleShape.hpp>
 
 #include <cmath>
 
+
 namespace sfw
 {
 using namespace geometry;
+
 
 Box::Box(Type type):
 	m_type(type),
@@ -24,20 +27,17 @@ Box::Box(Type type):
 
 fVec2 Box::getPosition() const
 {
-	return fVec2(m_vertices[TOP_LEFT].position); //!! Making the conversion from SFML more explicit; also a reminder to wrap vertices, too...
+	return m_vertices[TOP_LEFT].position();
 }
 
 
 void Box::setPosition(float x, float y)
 {
-	// OpenGL will render things kinda funny otherwise:
-	x = roundf(x);
-	y = roundf(y);
-
-	fVec2 diff = fVec2(x, y) - getPosition();
+	fVec2 diff = fVec2(x, y).round() - getPosition(); // OpenGL could render fine details blurred without rounding!
 	for (size_t i = 0; i < VERTEX_COUNT; ++i)
-		m_vertices[i].position += sf::Vector2f(diff); //!! Direct, hardcoded conversion to SFML! :-/
-		//!! (Using diff.native() would be deceptive: pretending to not be directly SFML-dependent here...)
+		m_vertices[i].position(m_vertices[i].position() + diff);
+//!! Not yet:
+//!!		m_vertices[i].position() += diff;
 }
 
 
@@ -72,7 +72,7 @@ void Box::setSize(float width, float height)
 fVec2 Box::getSize() const
 {
 	// Bottom right corner - top left corner
-	return fVec2(m_vertices[BOTTOM_RIGHT].position) - getPosition(); //!! Making the conversion from SFML more explicit; also a reminder to wrap vertices, too...
+	return m_vertices[BOTTOM_RIGHT].position() - getPosition();
 }
 
 
@@ -95,38 +95,38 @@ void Box::release()
 
 bool Box::contains(float x, float y) const
 {
-	return x > m_vertices[TOP_LEFT].position.x && x < m_vertices[BOTTOM_RIGHT].position.x
-	    && y > m_vertices[TOP_LEFT].position.y && y < m_vertices[BOTTOM_RIGHT].position.y;
+	return x > m_vertices[TOP_LEFT].position().x() && x < m_vertices[BOTTOM_RIGHT].position().x()
+	    && y > m_vertices[TOP_LEFT].position().y() && y < m_vertices[BOTTOM_RIGHT].position().y();
 }
 
 
 void Box::setSegmentGeometry(StripSegment n, float x0, float x2, float x4, float x6, float top, float bottom)
 {
 	size_t index = n * VERTICES_PER_SEGMENT;
-	m_vertices[index++].position = fVec2(x0, top);
-	m_vertices[index++].position = fVec2(x0, bottom);
-	m_vertices[index++].position = fVec2(x2, top);
-	m_vertices[index++].position = fVec2(x2, bottom);
-	m_vertices[index++].position = fVec2(x4, top);
-	m_vertices[index++].position = fVec2(x4, bottom);
-	m_vertices[index++].position = fVec2(x6, top);
-	m_vertices[index++].position = fVec2(x6, bottom);
+	m_vertices[index++].position({x0, top});
+	m_vertices[index++].position({x0, bottom});
+	m_vertices[index++].position({x2, top});
+	m_vertices[index++].position({x2, bottom});
+	m_vertices[index++].position({x4, top});
+	m_vertices[index++].position({x4, bottom});
+	m_vertices[index++].position({x6, top});
+	m_vertices[index++].position({x6, bottom});
 	// Extra dummy vertex for "carriage-return"
-	m_vertices[index].position = m_vertices[index - 1].position;
+	m_vertices[index].position(m_vertices[index - 1].position());
 	assert(index == n * VERTICES_PER_SEGMENT + VERTICES_PER_SEGMENT - 1);
 }
 
-void Box::setSegmentTextureCoords(StripSegment n, float txleft, float txtop, float txwidth, float txheight)
+void Box::setSegmentTextureCoords(StripSegment n, int txleft, int txtop, int txwidth, int txheight)
 {
-	size_t index = n * VERTICES_PER_SEGMENT;
-	for (size_t x = 0; x <= 3; ++x)
+	int index = n * VERTICES_PER_SEGMENT; //! Not auto for tighter control at the op== in the assert below.
+	for (int x = 0; x <= 3; ++x)
 	{
-		m_vertices[index++].texCoords = fVec2(txleft + txwidth * x, txtop);
-		m_vertices[index++].texCoords = fVec2(txleft + txwidth * x, txtop + txheight);
+		m_vertices[index++].texture_position({txleft + txwidth * x, txtop});
+		m_vertices[index++].texture_position({txleft + txwidth * x, txtop + txheight});
 	}
 	// Extra dummy vertex for "carriage-return":
-	m_vertices[index].texCoords = m_vertices[index - 1].texCoords;
-	assert(index == n * VERTICES_PER_SEGMENT + VERTICES_PER_SEGMENT - 1);
+	m_vertices[index].texture_position(m_vertices[index - 1].texture_position());
+	assert(unsigned(index) == n * VERTICES_PER_SEGMENT + VERTICES_PER_SEGMENT - 1);
 }
 
 
@@ -143,12 +143,12 @@ void Box::applyState(ActivationState state)
 //!! Adapt Theme to avoid that:
 //!!	const iRect& subrect = Theme::getTextureRect(m_type, state);
 
-	auto x = (float)subrect.x();
-	auto y = (float)subrect.y();
-	auto width = (float)Theme::borderSize;
-	auto height = (float)Theme::borderSize;
-	setSegmentTextureCoords(TOP_SEGMENT,    x, y, width, height);
-	setSegmentTextureCoords(MIDDLE_SEGMENT, x, y + height, width, height);
+	int x = subrect.x();
+	int y = subrect.y();
+	int width  = Theme::borderSize;
+	int height = Theme::borderSize;
+	setSegmentTextureCoords(TOP_SEGMENT,    x, y             , width, height);
+	setSegmentTextureCoords(MIDDLE_SEGMENT, x, y + height    , width, height);
 	setSegmentTextureCoords(BOTTOM_SEGMENT, x, y + height * 2, width, height);
 
 	if (m_activationState == ActivationState::Pressed) // Any state change happens to cancel the "Pressed" state!
@@ -162,20 +162,25 @@ void Box::applyState(ActivationState state)
 	m_activationState = state;
 }
 
-void Box::draw(const gfx::RenderContext& ctx) const //override
+void Box::draw(const SAL::gfx::RenderContext& ctx) const //override
 {
+//!! OLD:
+//!!	ctx.target.draw(m_vertices, VERTEX_COUNT, sf::PrimitiveType::TriangleStrip, lstates);
+	SAL::gfx::TexturedVertex2::draw_strip(ctx, Theme::getTexture(), m_vertices, VERTEX_COUNT);
+
 	auto lstates = ctx.props;
 	lstates.texture = &Theme::getTexture();
-	ctx.target.draw(m_vertices, VERTEX_COUNT, sf::PrimitiveType::TriangleStrip, lstates);
+
 	// Overdraw with a filled rect (presumably with some alpha!) if fillColor was set:
 	if (m_fillColor)
 	{
 /*
 		sf::RectangleShape r(fVec2(getSize().x - 2 * (float)Theme::borderSize,
-		                                  getSize().y - 2 * (float)Theme::borderSize));
+		                           getSize().y - 2 * (float)Theme::borderSize));
 		r.setPosition(getPosition()); r.move({(float)Theme::borderSize, (float)Theme::borderSize});
 */
-		sf::RectangleShape r({getSize().x(), getSize().y()});
+		//!! All direct SFML below!...
+ 		sf::RectangleShape r({getSize().x(), getSize().y()});
 		r.setPosition(getPosition());
 		r.setFillColor(m_fillColor.value());
 		r.setOutlineThickness(0);
@@ -200,5 +205,6 @@ void Box::centerVerticalTextVertically(sf::Text& text)
 	float y = roundf(getPosition().y() + (size.y() - textSize.width()) / 2);
 	text.setPosition({Theme::getBoxHeight() - Theme::PADDING, y});
 }
+
 
 } // namespace sfw

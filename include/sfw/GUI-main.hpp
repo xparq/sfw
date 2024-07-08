@@ -7,6 +7,7 @@
 #include "sfw/WidgetPtr.hpp"
 #include "sfw/layout/VBox.hpp"
 #include "sfw/gfx/element/Wallpaper.hpp"
+
 #include "sfw/math/Vector.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>

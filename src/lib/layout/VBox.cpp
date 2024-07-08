@@ -1,5 +1,6 @@
 #include "sfw/layout/VBox.hpp"
 #include "sfw/Theme.hpp"
+
 #include "sfw/math/Vector.hpp"
 
 #include <algorithm>
@@ -8,6 +9,7 @@
 
 namespace sfw
 {
+
 
 void VBox::recomputeGeometry()
 {
@@ -23,5 +25,6 @@ void VBox::recomputeGeometry()
     size.y() = max(0.f, pos.y() - Theme::MARGIN); // 0 for an empty container
     Widget::setSize(size);
 }
+
 
 } // namespace sfw

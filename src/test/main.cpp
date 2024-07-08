@@ -84,7 +84,7 @@ try {
 	// (See the rest of #167 later below, at the other DrawHost widget!)
 	auto circlevista = new DrawHost([&](auto* w, auto ctx) {
 		sf::CircleShape circ(50);
-		sfw::Texture backdrop;
+		sfw::gfx::Texture backdrop;
                 if (!backdrop.load("test/example.jpg")) { cerr << "Failed to load test/example.jpg!\n";
 			return;
 		}
@@ -158,7 +158,7 @@ try {
 	//!!
 	//!! Plus, a light (template-based?) interface would also be needed
 	//!! for accessging them from the outside in a somewhat civilized way!
-		sfw::Text text("Hello world!");
+		sfw::gfx::Text text("Hello world!");
 		sf::RectangleShape textrect;
 
 	auto sfText = new DrawHost([&](auto* widget, auto ctx) { // This entire function is a draw() hook!
@@ -169,7 +169,7 @@ try {
 		// That will also be the (variable!) size of the widget.
 		//! (Note: sf::Text's bound-rect would not be 0-based, throwing off
 		//! any unsuspecting geometry operations! (-> SFML #216)
-		//! But with sfw::Text we don't need to deal with that here.)
+		//! But with sfw::gfx::Text we don't need to deal with that here.)
 		fRect bgrect({}, {text.size().x() * 1.2f, text.size().y() * 3.5f});
 		fVec2 containerSize = text.getTransform().transformRect(bgrect).size; //!! Confusing mix of SFW and SFML APIs! :-/
 //!!??		auto actualBoundRect = xform.transformRect(textrect.getGlobalBounds());
@@ -363,7 +363,7 @@ try {
 	cout << "UTF-8 button text got back as: \"" << demo.find_widget<Button>(utf8button_tag)->getText() << "\"\n";
 
 	// Bitmap button
-	sfw::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
+	sfw::gfx::Texture buttonimg; //! DON'T put this inside the if () as local temporary (as I once have... ;) )
 	if (buttonimg.load("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
 		buttons_form->add("Native size", new ImageButton(buttonimg, "All defaults"))

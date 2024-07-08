@@ -116,9 +116,9 @@ private:
 	CursorStyle   m_cursorStyle;
 	float         m_cursorWidth = 1; // pixel
 	float         m_cursorBlinkPeriod = 1; // s
-	Text          m_placeholder;
+	gfx::Text     m_placeholder;
 	// Internal editor state:
-	Text          m_text; //!! <- well, this also contains the visual state of the text!
+	gfx::Text     m_text; //!! <- well, this also contains the visual state of the text!
 	size_t        m_cursorPos; // (Not a property of the visual cursor representation!)
 	TextSelection m_selection;
 	// Widget visual state:
