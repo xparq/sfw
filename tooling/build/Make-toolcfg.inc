@@ -58,11 +58,12 @@ CFLAGS_COMMON.msvc.shared =
 CFLAGS_COMMON.msvc += ${CFLAGS_COMMON.msvc.$(LIB_MODE)}
 
 CFLAGS_COMMON.linux.debug_0 = -DNDEBUG
-CFLAGS_COMMON.linux.debug_1 = -DDEBUG -g
+CFLAGS_COMMON.linux.debug_1 = -DDEBUG -g -fsanitize=address
 CFLAGS_COMMON.mingw.debug_0 = -DNDEBUG
-CFLAGS_COMMON.mingw.debug_1 = -DDEBUG -g
+#!!CFLAGS_COMMON.mingw.debug_1 = -DDEBUG -g #! Not with w64devkit: -fsanitize=address (See also at LDFLAGS!)
+CFLAGS_COMMON.mingw.debug_1    = -DDEBUG -g -fsanitize=undefined -fsanitize-trap # w64devkit/issues/148
 CFLAGS_COMMON.msvc.debug_0 = -DNDEBUG
-CFLAGS_COMMON.msvc.debug_1 = -DDEBUG -Zi
+CFLAGS_COMMON.msvc.debug_1 = -DDEBUG -Zi -fsanitize=address
 
 CFLAGS_COMMON += ${CFLAGS_COMMON.$(TOOLCHAIN)} 
 CFLAGS_COMMON += ${CFLAGS_COMMON.$(TOOLCHAIN).debug_$(DEBUG)} 
@@ -122,10 +123,13 @@ LINKER.mingw  = $(CXX)
 LINKER.msvc   = link
 LINKER = ${LINKER.$(TOOLCHAIN)}
 # - flags
-LDFLAGS.linux   = -pthread -o "$@"
-LDFLAGS.mingw   = -pthread -o "$@"
-LDFLAGS.msvc    = -nologo -out:"$@"
-LDFLAGS = ${LDFLAGS.$(TOOLCHAIN)}
+LDFLAGS.linux.debug_0  = -o "$@"
+LDFLAGS.linux.debug_1  = -o "$@" -fsanitize=address
+LDFLAGS.mingw.debug_0  = -o "$@"
+LDFLAGS.mingw.debug_1  = -o "$@" #! Not with w64devkit: -fsanitize=address (See also at CFLAGS!)
+LDFLAGS.msvc.debug_0   = -nologo -out:"$@"
+LDFLAGS.msvc.debug_1   = -nologo -out:"$@"
+LDFLAGS = ${LDFLAGS.$(TOOLCHAIN).debug_$(DEBUG)}
 
 
 #-----------------------------------------------------------------------------
