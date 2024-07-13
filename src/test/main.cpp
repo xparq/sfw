@@ -1,5 +1,7 @@
 #include "sfw/GUI.hpp"
 
+#include "SAL/util/diagnostics.hpp"
+
 #include <SFML/Graphics.hpp>
 
 #include <string> // to_string
@@ -560,21 +562,20 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		s.setFillColor(sf::Color::Cyan);
 		window.draw(s);
 
-		demo.render();
-		window.display();
-
-		// Pass events to the GUI & check for closing or failure
-		//!! Can't shortcut it when the GUI doesn't own the window, so when
-		//!! it gets deactivated it wouldn't block the rest of the world, too:
-		//!!while (window.pollEvent(event) && demo.process(event) || )
-		while (const auto event = window.pollEvent())
+		// This "inside-out" loop structure is to allow screen updates both
+		// after events and also after idle timeouts regularly (to support showing
+		// changes by other threads), without duplicating those updates, and
+		// also without requiring an initial extra draw outside the loop.
+		// (-> FizzBuzz?... ;) )
+		auto event = window.pollEvent();
+		while (event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore spammy raw mouse move events!
+		if (event)
 		{
-			if (!event) this_thread::sleep_for(10ms); //!!?? But... but... if the while's rolling, it's always true, right?!
-			                                          //!!?? But then what does pollEvent() do/return when the event queue is empty?!
+			// Pass the event to the GUI:
 			demo.process(event.value());
 
-			// Handle the window-closing explicitly, as we've configured
-			// the GUI manager to not do that in this setup:
+			// Handle window-closing explicitly, as we've configured the
+			// GUI manager to not do that automatically in this setup:
 			if (event->is<sf::Event::Closed>() || // And also close on Esc:
 			   (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape))
 			{
@@ -582,6 +583,11 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 				                // Also: window.close() will indirectly disable the GUI.
 			}
 		}
+
+		demo.render();
+		window.display();
+
+		if (!event) this_thread::sleep_for(20ms);
 	}
 
 	return EXIT_SUCCESS;

@@ -1,5 +1,7 @@
 #include "sfw/GUI.hpp"
 
+#include "SAL/util/diagnostics.hpp"
+
 #include <SFML/Graphics.hpp>
 
 #include <string> // to_string
@@ -9,9 +11,10 @@
 #include <cassert>
 using namespace std;
 
-void background_thread(sfw::GUI& gui);
 
+void background_thread(sfw::GUI& gui);
 static auto toy_anim_on = false;
+
 
 int main()
 try {
@@ -383,7 +386,7 @@ try {
 	// (Also directly changes the font size of the theme cfg. data stored in the
 	// "theme-selector" widget, so that it remembers the updated size (for each theme)!)
 	right_bar->add(sfw::Label("Theme font size (use the m. wheel):")); // Move that remark to a tooltip!
-	right_bar->add(sfw::Slider({.length = 100, .range = {8, 18}}), "font size slider")
+	right_bar->add(sfw::Slider({.length = 100, .range = {8, 20}}), "font size slider")
 		//!! Would be tempting to sync the initial font size directly with
 		//!! the theme selector widget -- but can't: the GUI is not up yet, so...
 		//!! ->set(w->getWidget<OBTheme>("theme-selector")->current().textSize) //! getWidget would fail here!
@@ -470,40 +473,38 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	// Start another thread that also manipulates some widgets:
 	jthread bg_thread(background_thread, std::ref(demo));
 
-cerr<<"Starting the evenmt loop..."<< endl;
 
 	//--------------------------------------------------------------------
 	// Event Loop
 	//--------------------------------------------------------------------
+//cerr<<"Starting the event loop..."<< endl;
 	while (demo)
 	{
-		demo.render();
-
-/*!!!!????
-  !!!!???? The app SOMETIMES crashes, e.g. even depending on whether this dummy write is here! :-ooo
-           (-> #392/3, #226, #387)
-cerr<<"";
-  !!!!???? (Not in DEBUG mode, unfortunately...)
-  After a few restarts, finally I got an exception:
-	Failed to add a new character to the font: the maximum texture size has been reached
-	terminate called after throwing an instance of 'std::bad_alloc'
-  	what():  std::bad_alloc
-????!!!!*/
-
-		// Show the updated window
-		window.display();
-
-		// Pass events to the GUI & check for closing or failure
-		while (const auto event = window.pollEvent())
+		// While somewhat less elegant than the textbook double-loop solution,
+		// this unrolled single-loop structure (not counting the trivial raw-mouse-move
+		// filter loop) is chosen for allowing screen updates both after input events
+		// and also after some idle timeout (to support showing (polling) changes
+		// made by other threads), without either awkwardly duplicating the updates
+		// in a nested event-puming loop or having an initial extra draw outside
+		// the main loop. (-> FizzBuzz?... ;) )
+		auto event = window.pollEvent();
+		while (event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore spammy raw mouse move events!
+		if (event)
 		{
-			if (!event) this_thread::sleep_for(10ms); //!!?? But... but... if the while's rolling, it's always true, right?!
-			                                          //!!?? But then what does pollEvent() do/return when the event queue is empty?!
+			// Pass the event to the GUI:
 			demo.process(event.value());
 
 			// Close on Esc:
 			if (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape)
 				demo.close();
 		}
+
+		// Redraw the UI into the rendering (frame) buffer of the connected (or some other) window:
+		demo.render(/*!!maybe_to_some_other_window!!*/);
+		// Show the updated window:
+		window.display();
+
+		if (!event) this_thread::sleep_for(20ms);
 	}
 
 	return EXIT_SUCCESS;
@@ -522,18 +523,18 @@ void background_thread(sfw::GUI& gui)
 
 	while (gui)
 	{
-		// Cycle the rot. slider
-	        auto sampletext_angle = sf::degrees(rot_slider->get());
-		rot_slider->update(int(sampletext_angle.asDegrees()) % 360 + 2);
+		if (toy_anim_on)
+		{
+			// Cycle the rot. slider
+			auto sampletext_angle = sf::degrees(rot_slider->get());
+			rot_slider->update(int(sampletext_angle.asDegrees()) % 360 + 2);
+		}
 
-		do this_thread::sleep_for(chrono::milliseconds(50));
-		// Keep on sleeping while the anim. is disabled, and poll for termination:
-		while (!toy_anim_on && gui);
-		// (NOTE: doing this AFTER manipulating the widget, because the GUI
-		// may have been shut down in the meantime, and it's unhealthy (UB)
-		// to still keep using it then...
-		// This is far from bullet-proof, of course, as the threads aren't
-		// synced in any way, but for a demo like this, it's OK.)
+		this_thread::sleep_for(chrono::milliseconds(20));
+		// (NOTE: the GUI may have been shut down in the meantime, and it's
+		// pretty unhealthy to still keep using it then... So, this is far
+		// from bullet-proof, of course, because the threads aren't synced
+		// in any way! But for a demo like this, let's pretend it was OK...)
 
 		cerr << gui.sessionTime() << "           \b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
 	}
