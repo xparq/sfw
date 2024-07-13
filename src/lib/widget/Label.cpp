@@ -75,7 +75,7 @@ void Label::draw(const gfx::RenderContext& ctx) const
 void Label::onThemeChanged()
 {
 	m_text.setFont(Theme::getFont());
-	m_text.reposition({Theme::PADDING, Theme::PADDING}); //!!??  ... + m_text.getLocalBounds().top});
+	m_text.position({Theme::PADDING, Theme::PADDING}); //!!??  ... + m_text.getLocalBounds().top});
 	                                                 //!! The "canonical" SFML offest correction would
 	                                                 //!! make the positioning inconsistent: some text
 	                                                 //!! would then sit on the baseline, some won't etc.!

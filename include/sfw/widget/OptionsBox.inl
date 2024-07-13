@@ -174,8 +174,9 @@ template <class T> auto OptionsBox<T>::update_selection(size_t index)
 	if (index < m_items.size())
 	{
 		m_currentIndex = index;
+		static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>, "The label can only be gfx::Text currently!");
 		m_box.item().set(m_items[index].label);
-		m_box.centerTextHorizontally(m_box.item());
+		m_box.item().center_in(m_box.getRect());
 	}
 	return this;
 }

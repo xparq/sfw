@@ -39,11 +39,11 @@ public:
 	fVec2 size() const;
 	fVec2 position() const;
 
-	void  reposition(fVec2 pos);
+	void  position(fVec2 pos);
 
 	// Centering should do nothing with a null rect, but in fact we might use that internally
 	// to recenter inside its "fake" bounding box, compensating for the default SFML misalignment.
-	void  center(const geometry::fRect& box);
+	void  center_in(const geometry::fRect& box);
 
 	//!! These would be nice for sparing the torture of dealing with the SFML text positioning quirk,
 	//!! but, alas, getOrigin() can't lie, as long as our Text here is ALSO sf::Text... :-/
@@ -67,7 +67,7 @@ private:
 	void _recalc();
 
 	//!! Should be automatic, controlled by a mode flag:
-	void _realign(/*!!align_mode: pixel!!*/) { reposition(position().round()); }
+	void _realign(/*!!align_mode: pixel!!*/) { position(position().round()); }
 
 	//--------------------------------------------------------------------
 	// Data...

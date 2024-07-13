@@ -1,9 +1,11 @@
 #ifndef _DM948576NDM948576NB398R7Y8UHJ4968VB_
 #define _DM948576NDM948576NB398R7Y8UHJ4968VB_
 
+
 #include "sfw/Widget.hpp"
 
 #include "SAL/util/cpp/templ.hpp"
+#include "SAL/util/diagnostics.hpp"
 
 #include <string_view>
 #include <concepts>
@@ -11,7 +13,6 @@
 #include <type_traits> // invoke_result_t, is_void_v, is_reference_v
 
 #include <iostream>
-#include <cassert>
 
 #ifdef DEBUG
 # include <string>
@@ -472,6 +473,7 @@ template <std::derived_from<Widget> W>
 	SFW_CALL(W, name, set, __VA_ARGS__)
 
 
-} // namespace
+} // namespace sfw
+
 
 #endif // _DM948576NDM948576NB398R7Y8UHJ4968VB_

@@ -99,26 +99,41 @@ cerr << "SFML px offset of ["<<get()<<"]: " << fVec2(getLocalBounds().position)
 
 // Centering should do nothing with a null rect, but in fact we might use that internally
 // to recenter inside its "fake" bounding box, compensating for the default SFML misalignment.
-void  Text::center(const geometry::fRect& box)
+void  Text::center_in(const geometry::fRect& box) //!! Can't get myself making this also a template on Rect's NumT...
 {
 //!! No, can't just temporarily set it: setScale and setRotation etc. don't render
 //!! anything, they just set parameters with effects deferred to draw()ing! :)
 //!!	auto save = getOrigin();
-	setOrigin(size() / 2 + _sf_padding);
-	reposition(box.position() + box.size() / 2); 
+
+	// Rounding is critical here, after both divisions, to avoid blurred rendering:
+	setOrigin( ((size() / 2) + _sf_padding).round() );
+	position( (box.position() + (box.size() / 2)).round());
+/*!!
+#ifdef DEBUG
+cerr	<< "BOX pos: " << box.position()
+	<< "	Text pos: " << position()
+	<< "	Text O: " << fVec2(getOrigin())
+	<< '\n';
+#endif
+!!*/
+	//!!?? There's still an unexpected (1-pixel? or more?) offset at certain font sizes,
+	//!!?? also manifesting as a displacement from the supposed text rect (shown in DEBUG
+	//!!?? with LAlt), but it has nothing to do with the rounding here.
+
 //!!	setOrigin(save);
 }
 
-void Text::reposition(fVec2 pos) { setPosition(pos); }
+void Text::position(fVec2 pos) { setPosition(pos); }
 
-fVec2 Text::position() const    { return fVec2(getPosition()); }
+fVec2 Text::position() const    { return getPosition(); }
 
 
 //----------------------------------------------------------------------------
 void Text::_recalc() 
 {
 	_sf_padding = getLocalBounds().position;
-	_pos_offset = _sf_padding / 2; //!!?? This is probably not the correct idea! (-> SFML#216)
+	//!!??_pos_offset = _sf_padding / 2; //!!?? This is probably not the correct idea! (-> SFML#216)
+	//!!?? Also, should it probably be rounded already here?
 }
 
 

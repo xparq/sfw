@@ -2,16 +2,15 @@
 
 #include "sfw/Theme.hpp"
 
-#include "SAL/geometry/Rectangle.hpp"
 #include "SAL/util/diagnostics.hpp"
 
-#include <SFML/Graphics/RenderTarget.hpp> // See draw()...
-#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RenderTarget.hpp> //!! Still some direct sf::RenderTarget manipulation in draw()!...
+#include <SFML/Graphics/RectangleShape.hpp> //!! Direct SFML use!...
 
-#include <cmath>
+#include <cmath> // round
 
 
-namespace sfw
+namespace sfw//!!::parts
 {
 using namespace geometry;
 
@@ -47,8 +46,8 @@ void Box::setSize(float width, float height)
 		return;
 
 	// OpenGL will render things kinda funny otherwise:
-	width = roundf(width);
-	height = roundf(height);
+	width = std::round(width);
+	height = std::round(height);
 
 	// Move/resize each of the 9 slices
 	// 0--x1--x2--x3
@@ -73,6 +72,11 @@ fVec2 Box::getSize() const
 {
 	// Bottom right corner - top left corner
 	return m_vertices[BOTTOM_RIGHT].position() - getPosition();
+}
+
+geometry::fRect Box::getRect() const
+{
+	return {{}, getSize()};
 }
 
 
@@ -164,12 +168,7 @@ void Box::applyState(ActivationState state)
 
 void Box::draw(const SAL::gfx::RenderContext& ctx) const //override
 {
-//!! OLD:
-//!!	ctx.target.draw(m_vertices, VERTEX_COUNT, sf::PrimitiveType::TriangleStrip, lstates);
-	SAL::gfx::TexturedVertex2::draw_strip(ctx, Theme::getTexture(), m_vertices, VERTEX_COUNT);
-
-	auto lstates = ctx.props;
-	lstates.texture = &Theme::getTexture();
+	SAL::gfx::TexturedVertex2::draw_trianglestrip(ctx, Theme::getTexture(), m_vertices, VERTEX_COUNT);
 
 	// Overdraw with a filled rect (presumably with some alpha!) if fillColor was set:
 	if (m_fillColor)
@@ -184,27 +183,12 @@ void Box::draw(const SAL::gfx::RenderContext& ctx) const //override
 		r.setPosition(getPosition());
 		r.setFillColor(m_fillColor.value());
 		r.setOutlineThickness(0);
-		ctx.target.draw(r, lstates);
+
+		auto sfml_renderstates = ctx.props;
+		sfml_renderstates.texture = &Theme::getTexture();
+		ctx.target.draw(r, sfml_renderstates);
 	}
 }
 
 
-void Box::centerTextHorizontally(sf::Text& text)
-{
-	fVec2 size = getSize();
-	fRect textSize = text.getLocalBounds();
-	float x = roundf(getPosition().x() + (size.x() - textSize.width()) / 2);
-	text.setPosition({x, Theme::borderSize + Theme::PADDING});
-}
-
-
-void Box::centerVerticalTextVertically(sf::Text& text)
-{
-	fVec2 size = getSize();
-	fRect textSize = text.getLocalBounds();
-	float y = roundf(getPosition().y() + (size.y() - textSize.width()) / 2);
-	text.setPosition({Theme::getBoxHeight() - Theme::PADDING, y});
-}
-
-
-} // namespace sfw
+} // namespace sfw//!!::parts

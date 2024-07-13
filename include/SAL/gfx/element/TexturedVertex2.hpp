@@ -20,11 +20,11 @@ namespace SAL::gfx
 		using Impl::Impl;
 
 	//!! Will need to be more sophisticated than this! :)
-	static void draw_strip(const gfx::RenderContext& ctx,
-	                       const gfx::Texture& texture,
+	static void draw_trianglestrip(const gfx::RenderContext& ctx,
+	                       const gfx::Texture& texture, //!! Pass via ctx, but in an SFML-independent way!
 	                       const TexturedVertex2* v_array,
 	                       unsigned v_count)
-		{ _draw_strip(ctx, texture, v_array, v_count); }
+		{ _draw_trianglestrip(ctx, texture, v_array, v_count); }
 
 	};
 }

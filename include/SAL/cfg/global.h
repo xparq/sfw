@@ -1,5 +1,5 @@
-﻿//!! This file is never included from anywhere yet...
-//!! But, in fact, it should be included from everywhere!
-//!! Make it forced by the build! Plus a check + #error to GUI.hpp!
+﻿//!! This file is only included by SAL.hpp, but that's not enough!
+//!! It should be included from everything in the SAL!
+//!! Make it forced by the build! Plus a check + #error to e.g. GUI.hpp!
 
 #define SAL_VECTOR_STREAMABLE

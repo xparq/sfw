@@ -52,7 +52,7 @@ namespace SAL::gfx
 		void texture_position(iVec2 txpos) { native().texCoords = {(float)txpos.x(), (float)txpos.y()}; } //! See the int<->float comment at the ctors!
 
 
-	static void _draw_strip(const gfx::RenderContext& ctx,
+	static void _draw_trianglestrip(const gfx::RenderContext& ctx,
 	                        const gfx::Texture& texture,
 	                        const TexturedVertex2_Impl* v_array,
 	                        unsigned v_count)

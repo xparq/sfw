@@ -81,13 +81,12 @@ private:
 
 	enum VertexIndex : unsigned { TopLeft, BottomLeft, TopRight, BottomRight, _VERTEX_COUNT_ };
 
-	Cfg m_cfg;
-
-	float m_value;
-
-	Box m_box;
+	// Data
+	Cfg        m_cfg;
+	float      m_value;
+	Box        m_box;
 	sf::Vertex m_bar[_VERTEX_COUNT_];
-	gfx::Text m_label;
+	gfx::Text  m_label;
 }; // ProgressBar
 
 

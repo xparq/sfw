@@ -12,7 +12,6 @@
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/OpenGL.hpp>
 
-#include <cassert>
 #include <algorithm>
 	using std::min, std::max;
 
@@ -401,7 +400,7 @@ cerr << endl;
 	//!!how exactly this fixes it... :-o
 	//!!
 	//!!This should also adjust the x offset (later...)! (See notes at onThemeChanged!)
-	m_text.reposition({m_text.position().x(), framing_offset});
+	m_text.position({m_text.position().x(), framing_offset});
 	m_cursorRect.setPosition({m_cursorRect.getPosition().x, framing_offset}); //!! Sigh, mixing the two APIs...
 
 	// Also update the selection highlight...

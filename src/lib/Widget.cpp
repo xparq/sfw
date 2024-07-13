@@ -5,10 +5,9 @@
 
 #include "SAL/util/diagnostics.hpp"
 
-#include <cmath>
+#include <cmath> // round
 #include <iostream>
 	using std::cerr, std::endl;
-#include <cassert>
 
 #ifdef DEBUG
 #
@@ -139,7 +138,7 @@ Widget* Widget::setPosition(float x, float y)
 	//!! Reflowing could guarantee to keep this newly set (local-to-parent) position though,
 	//!! and it would make sense to still trigger it in some (yet to be implemented) cases.
 
-	m_position = {roundf(x), roundf(y)};
+	m_position = {std::round(x), std::round(y)};
 	m_transform = sf::Transform(
 		1, 0, m_position.x(), // translate x
 		0, 1, m_position.y(), // translate y
@@ -177,7 +176,7 @@ Widget* Widget::setSize(fVec2 size)
 
 Widget* Widget::setSize(float width, float height)
 {
-	auto new_size = fVec2(roundf(width), roundf(height));
+	auto new_size = fVec2(std::round(width), std::round(height));
 //!! OLD:if (m_size.x() != new_size.x() || m_size.y() != new_size.y())
 	if (m_size != new_size)
 	{
@@ -192,6 +191,12 @@ fVec2 Widget::getSize() const
 {
 	return m_size;
 }
+
+geometry::fRect Widget::getRect() const
+{
+	return {{}, getSize()};
+}
+
 
 
 //----------------------------------------------------------------------------

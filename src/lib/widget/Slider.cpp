@@ -9,8 +9,6 @@
 #include <string>
 	using std::to_string;
 
-#include <cassert>
-
 //!!Reconcile this with the diag. stuff; see #284!
 #include <iostream>
 	using std::cerr, std::endl;

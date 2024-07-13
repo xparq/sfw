@@ -71,9 +71,9 @@ void ItemBox<T>::applyState(ActivationState state)
 template <Shape T>
 void ItemBox<T>::draw(const gfx::RenderContext& ctx) const //override
 {
-	Box::draw(ctx);
+	Box::draw(ctx); //! Qualified (with the base) to avoid infinite recursion...
 	m_item.draw(ctx);
-	// "Tint" the box *after* the item has been drawn! (So, alpha is expected to have been set accordingly!)
+	// Tint the box *after* the item has been drawn! (So, alpha is expected to have been set accordingly!)
 	if (m_tintColor)
 	{
 /*

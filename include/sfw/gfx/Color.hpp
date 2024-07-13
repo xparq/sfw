@@ -3,7 +3,8 @@
 
 #include <cstdint>
 #include <string>
-#include <cassert>
+
+#include "SAL/util/diagnostics.hpp"
 
 //!! Auto-dispatch for the current backend instead (-> gfx/backend.hpp):
 //!! Also, don't just move this to gfx/Color -- at lesat definitely not

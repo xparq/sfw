@@ -2,6 +2,7 @@
 #define _IQEUSH8CYEVHG8974MHGCUV8YRVGHE48M7VRH98UHC598RV_
 
 
+#include "SAL/cfg/global.h"
 #include "SAL/dispatch.hpp"
 
 

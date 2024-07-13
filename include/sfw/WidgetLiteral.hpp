@@ -13,7 +13,9 @@
 //#include <type_traits> // invoke_result_t, is_void_v
 
 #include <iostream>
-#include <cassert>
+
+#include "SAL/util/diagnostics.hpp"
+
 
 namespace sfw
 {

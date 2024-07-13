@@ -8,7 +8,7 @@
 #include <iostream> // cerr, for errors, cout for some "demo" info
 #include <thread>
 #include <chrono>
-#include <cassert>
+
 using namespace std;
 
 
@@ -140,7 +140,7 @@ try {
 		textrect.setOrigin({textrect.getSize().x / 2, textrect.getSize().y / 2});
 		textrect.setPosition(widget->getSize() / 2);
 
-		text.center({{}, widget->getSize()}); //! Also changes its origin (to the center of the bounding box)!
+		text.center_in({{}, widget->getSize()}); //! Also changes its origin (to the center of the bounding box)!
 
 		// Draw, finally:
 		auto sfml_renderstates = ctx.props;

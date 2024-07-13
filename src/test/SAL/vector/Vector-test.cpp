@@ -122,11 +122,17 @@ int main()
 	// Manipulating the native type:
 	auto v_23 = Vec2{2,3};
 	v_23.native().y = 4;
-	cout << "Native access: " << v_23 << '\n';
+	cout << "(2, 3) changed (y := 4) via native() access: " << v_23 << '\n';
 
 
 	//--------------------------------------------------------------------
 	// Math operators...
+	//!! ...
+
+	//--------------------------------------------------------------------
+	// Misc. operators...
+	auto flipped = fVec2(6,7).flip();
+	cout << "(6, 7) flipped:" << flipped << '\n';
 
 
 	// No .0 formatting, despite not being int! :-o

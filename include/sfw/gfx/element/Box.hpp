@@ -4,26 +4,26 @@
 
 #include "sfw/ActivationState.hpp"
 
-//!! This doesn't compile currently without resorting to a blatant `using namespace SAL`!... :)
-//!!
 #include "sfw/math/Vector.hpp"
-//!!#include "SAL/math/Vector.hpp"
-
+//!!??#include "SAL/math/Vector.hpp"
+#include "sfw/geometry/Rectangle.hpp"
+//!!??#include "SAL/geometry/Rectangle.hpp"
 #include "SAL/gfx/element/TexturedVertex2.hpp"
+#include "SAL/gfx/element/Text.hpp"
 #include "SAL/gfx/Render.hpp"
 
-#include <SFML/Graphics/Text.hpp> //!! Use our own adapter class!
 #include <SFML/Graphics/Color.hpp> //!! Use our own adapter class!
 
 #include <cmath>
 #include <optional>
 
-namespace sfw//!!::gfx
+namespace sfw//!!::parts
 {
 
-/**
- * Event-sensitive textured/colored rectangle for building widgets
- */
+/*****************************************************************************
+   Multi-state framed/textured (and optionally tinted) rectangle for
+   building widgets
+ *****************************************************************************/
 class Box: public SAL::gfx::Drawable
 {
 public:
@@ -35,15 +35,16 @@ public:
 
 	Box(Type type = Click);
 
-	/*!!SAL::!!*/fVec2 getPosition() const;
+	fVec2 getPosition() const;
 
 	void setPosition(float x, float y);
-	void setPosition(const /*!!SAL::!!*/fVec2& pos)  { return setPosition(pos.x(), pos.y()); }
+	void setPosition(const fVec2& pos)  { return setPosition(pos.x(), pos.y()); }
 
 	void setSize(float width, float height);
-	void setSize(const /*!!SAL::!!*/fVec2& size)     { return setSize(size.x(), size.y()); }
+	void setSize(const fVec2& size)     { return setSize(size.x(), size.y()); }
 
-	/*!!SAL::!!*/fVec2 getSize() const;
+	fVec2 getSize() const;
+	geometry::fRect getRect() const;
 
 	// Fill the interior of the box with a color, overriding its texture
 	// The edges will NOT be affected!
@@ -60,17 +61,15 @@ public:
 	template <class T>
 	void centerItem(T& item)
 	{
-		/*!!SAL::!!*/fVec2 size = getSize();
-		/*!!SAL::!!*/fVec2 itemSize = item.getSize();
+		fVec2 size = getSize();
+		fVec2 itemSize = item.getSize();
 		// Center item
 		item.setPosition(
-			{roundf(getPosition().x() + (size.x() - itemSize.x()) / 2),
-			 roundf(getPosition().y() + (size.y() - itemSize.y()) / 2)}
+			{std::round(getPosition().x() + (size.x() - itemSize.x()) / 2),
+			 std::round(getPosition().y() + (size.y() - itemSize.y()) / 2)}
+			//!!(getPosition() + (size - itemSize) / 2).round()
 		);
 	}
-
-	void centerTextHorizontally(sf::Text& text);
-	void centerVerticalTextVertically(sf::Text& text);
 
 public: //! <- NOT private, because draw() may be accessed directly (statically),
         //!    rather than just polymorphically (dynamically) via a pointer!
@@ -129,7 +128,7 @@ private:
 };
 
 
-} // namespace sfw//!!::gfx
+} // namespace sfw//!!::parts
 
 
 #endif // _OEFGUNDRYBFUNTXM7834C5T687BT8F793CN3M57_

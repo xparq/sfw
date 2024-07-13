@@ -2,9 +2,8 @@
 
 #include "sfw/GUI-main.hpp"
 
-#include "SAL/sfml.hpp" //!! Should be "interfaced" away!...
+#include "SAL/util/diagnostics.hpp"
 
-#include <cassert>
 #include <string>
     using std::string, std::begin, std::end;
 #include <charconv>

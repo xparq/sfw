@@ -208,7 +208,7 @@ void ImageButton::release()
 
 void ImageButton::centerText()
 {
-	m_text.center({{}, getSize()});
+	m_text.center_in({{}, getSize()});
 }
 
 

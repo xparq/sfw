@@ -7,15 +7,13 @@
 
 
 #include "SAL/gfx/element/TextureFrame.hpp"
-//!!#include "SAL/geometry/Rectangle.hpp" //!! sfw/Rect.hpp, with a simple alias sfw::Rect -> SAL::geometry::...
-
-#include "sfw/gfx/Render.hpp" //!! SALIFY!...
+#include "SAL/gfx/Render.hpp"
 #include "sfw/math/Vector.hpp"
 
 
-namespace sfw//!!::gfx
+namespace sfw//!!::parts
 {
-	class Arrow : public /*!!??SAL::!!*/gfx::Drawable 
+	class Arrow : public SAL::gfx::Drawable
 	{
 	public:
 		using Direction = SAL::gfx::TextureFrame::Direction;
@@ -32,7 +30,7 @@ namespace sfw//!!::gfx
 
 	public: //! <- NOT private, because draw() may be called via the direct subclass
 		//!    statically, rather than always polymorphically (dynamically)!
-		void draw(const /*!!??SAL::!!*/gfx::RenderContext& ctx) const override;
+		void draw(const SAL::gfx::RenderContext& ctx) const override;
 
 	protected:
 		void updateGeometry(fVec2 pos, Direction direction);
@@ -41,7 +39,7 @@ namespace sfw//!!::gfx
 		SAL::gfx::TextureFrame m_frame;
 	};
 
-} // namespace sfw//!!::gfx
+} // namespace sfw//!!::parts
 
 
 #endif // _ODIU4WE5OYHNUDHSRGUIFYHB87ERHO78GD4N87RGT_

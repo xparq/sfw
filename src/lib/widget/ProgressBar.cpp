@@ -76,8 +76,9 @@ void ProgressBar::draw(const gfx::RenderContext& ctx) const
 {
 	auto sfml_renderstates = ctx.props;
 	sfml_renderstates.transform *= getTransform();
-	m_box.draw({ctx.target, sfml_renderstates});
 	sfml_renderstates.texture = &Theme::getTexture();
+
+	m_box.draw({ctx.target, sfml_renderstates});
 	ctx.target.draw(m_bar, _VERTEX_COUNT_, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
 	if (m_cfg.label_placement != LabelNone)
 		m_label.draw({ctx.target, sfml_renderstates});
@@ -120,14 +121,14 @@ void ProgressBar::updateGeometry()
 	m_bar[BottomRight].position = {x2, y2};
 
 	auto brect = fRect(Theme::getProgressBarTextureRect());
-	m_bar[TopLeft]    .texCoords = {brect.left(),                brect.top()};
-	m_bar[BottomLeft] .texCoords = {brect.left(),                brect.top() + brect.height()};
+	m_bar[TopLeft]    .texCoords = {brect.left()                , brect.top()};
+	m_bar[BottomLeft] .texCoords = {brect.left()                , brect.top() + brect.height()};
 	m_bar[TopRight]   .texCoords = {brect.left() + brect.width(), brect.top()};
 	m_bar[BottomRight].texCoords = {brect.left() + brect.width(), brect.top() + brect.height()};
 
 	// Extend the widget box if the label will be outside the bar...
 
-	m_label.setString(SAL::stdstring_to_SFMLString("100" + m_cfg.unit));
+	m_label.set("100" + m_cfg.unit);
 		// Shaky heuristics to find the maximum width the label might need.
 		//!! Will certainly become incorrect with patterns later, but
 		//!! it's already hopeless with arbitrary ranges (#287) now!
@@ -145,7 +146,7 @@ void ProgressBar::updateGeometry()
 		if (m_cfg.orientation == Horizontal)
 		{
 			// Place the label at the right side of the bar
-			m_label.reposition({m_cfg.length + Theme::PADDING, Theme::PADDING});
+			m_label.position({m_cfg.length + Theme::PADDING, Theme::PADDING});
 			setSize({m_cfg.length + Theme::PADDING + labelWidth, m_box.getSize().y()});
 		}
 		else
@@ -172,8 +173,8 @@ void ProgressBar::updateGeometry()
 		clamped_value = std::max(min(), std::min(max(), m_value));
 	}
 
-	m_label.setString(SAL::stdstring_to_SFMLString(std::to_string(int(round(m_value))) + m_cfg.unit)); //! The label should still show the original value,
-	                                                                     //! that's the whole point of clamp = false!
+	m_label.set(std::to_string(int(std::round(m_value))) + m_cfg.unit); //! The label should still show the original value,
+	                                                                    //! that's the whole point of clamp = false!
 	auto bar_length = val_to_barlength(clamped_value);
 	if (m_cfg.orientation == Horizontal)
 	{
@@ -183,7 +184,7 @@ void ProgressBar::updateGeometry()
 	
 		if (m_cfg.label_placement == LabelOver)
 		{
-			m_box.centerTextHorizontally(m_label);
+			m_label.center_in(m_box.getRect());
 		}
 		// No need to reposition if LabelOutside.
 	}
@@ -195,13 +196,14 @@ void ProgressBar::updateGeometry()
 
 		if (m_cfg.label_placement == LabelOver)
 		{
-			m_box.centerVerticalTextVertically(m_label);
+			m_label.center_in(m_box.getRect());
+
 		}
 		else if (m_cfg.label_placement == LabelOutside)
 		{
 			// Refresh horizontal label pos. in case its width has changed
-			m_label.reposition({(m_box.getSize().x() - m_label.size().x()) / 2,
-			                     m_box.getSize().y() + Theme::PADDING});
+			m_label.position({(m_box.getSize().x() - m_label.size().x()) / 2,
+			                   m_box.getSize().y() + Theme::PADDING});
 		}
 	}
 }

@@ -1,18 +1,14 @@
 #include "sfw/gfx/element/Arrow.hpp"
 
 #include "sfw/Theme.hpp"
-#include "sfw/gfx/Render.hpp"
-
-#include "SAL/geometry/Rectangle.hpp" //!! OR from SAL?!
-
-#include <SFML/Graphics/RenderTarget.hpp> // See draw()...
+#include "SAL/geometry/Rectangle.hpp"
 
 #include <cmath>
 
 
-namespace sfw
+namespace sfw//!!::parts
 {
-using namespace geometry;
+using namespace SAL::geometry;
 
 Arrow::Arrow(Direction direction) :
 	m_direction(direction),
@@ -48,8 +44,8 @@ void Arrow::setFillColor([[maybe_unused]] const sf::Color& color)
 
 void Arrow::setPosition(fVec2 pos)
 {
-	//! We have updateGeometry() here, but not at move, because the positions need to be set
-	//! differently based on to the current orientation (unlike with move):
+	//! We call updateGeometry() here, but not at move(), because abs. positions
+	//! need to be set differently based on the orientation, unlike with move()!
 	updateGeometry(pos.round(), m_direction); // OpenGL could render things blurry without rounding!
 }
 
@@ -63,18 +59,10 @@ void Arrow::move(fVec2 delta)
 fVec2 Arrow::getSize() const
 {
 	return m_frame.texture_size();
-/*!!OLD:	
-//!! This one copies:
-	const iRect rect = Theme::getArrowTextureRect();
-//!! Adapt Theme to avoid that:
-//!!	const iRect& rect = Theme::getArrowTextureRect();
-
-	return fVec2((float)rect.width(), (float)rect.height());
-!!*/	
 }
 
 
-void Arrow::draw(const gfx::RenderContext& ctx) const
+void Arrow::draw(const SAL::gfx::RenderContext& ctx) const
 {
 	m_frame.draw(ctx, Theme::getTexture());
 }
@@ -86,4 +74,4 @@ void Arrow::updateGeometry(fVec2 pos, Direction direction)
 }
 
 
-} // namespace sfw
+} // namespace sfw//!!::parts

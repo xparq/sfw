@@ -147,13 +147,7 @@ void Wallpaper::draw(const SAL::gfx::RenderContext& ctx) const
 {
 	auto ctx_mod = ctx;
 	ctx_mod.props.transform *= getTransform(); //!! Direct SFML use!
-	SAL::gfx::TexturedVertex2::draw_strip(ctx_mod, m_texture, m_vertices, 4);
-/*!! OLD:
-	auto sfml_renderstates = ctx.props;
-	sfml_renderstates.transform *= getTransform();
-	sfml_renderstates.texture = &m_texture.native();
-	ctx.target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
-!!*/
+	SAL::gfx::TexturedVertex2::draw_trianglestrip(ctx_mod, m_texture, m_vertices, 4);
 }
 
 

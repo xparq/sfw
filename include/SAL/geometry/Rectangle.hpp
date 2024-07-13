@@ -96,10 +96,13 @@ namespace SAL::geometry
 		// All other signatures are passed to the native impl.:
 		using Impl::Impl; // Elevate the backend-specific ctors for implicit backend -> abstract conversions!
 
-		// The default op= is fine!
 
-		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
-		constexpr auto adapter() const { return static_cast<const Impl*>(this); }
+		// Convert to the native type:
+		constexpr operator       typename Impl::native_type& ()       { return Impl::native(); }
+		constexpr operator const typename Impl::native_type& () const { return Impl::native(); }
+
+
+		// The default op= is fine!
 
 		//!!
 		//!! Some ops. would be suboptimal for native rects of {x1,y1, x2,y2} with this simplistic API!
@@ -144,11 +147,12 @@ namespace SAL::geometry
 		constexpr Vec2<typename Impl::number_type> position() const { return {x(), y()}; }
 		constexpr Vec2<typename Impl::number_type> size()     const { return {dx(), dy()}; }
 
-		constexpr operator       typename Impl::native_type& ()       { return Impl::native(); }
-		constexpr operator const typename Impl::native_type& () const { return Impl::native(); }
-
 		constexpr operator bool () { return (bool)dx() && (bool)dy(); } // Area != 0?
 			// So, the position doesn't matter. Also, negative size is OK. Also, not ||, unlike Vector's.
+
+	protected:
+		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
+		constexpr auto adapter() const { return static_cast<const Impl*>(this); }
 
 	}; // class Rectangle_Interface
 

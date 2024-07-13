@@ -1,8 +1,6 @@
 #include "sfw/widget/Button.hpp"
 #include "sfw/Theme.hpp"
 
-#include "SAL/sfml.hpp" //!! Should be "interfaced" away!...
-
 #include <algorithm>
 	using std::max;
 
@@ -31,14 +29,16 @@ Button::Button(const std::string_view text, std::function<void(Button*)> callbac
 
 Button* Button::setText(std::string_view text)
 {
-	m_box.item().setString(SAL::stdstringview_to_SFMLString(text));
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>);
+	m_box.item().set(text);
 	recomputeGeometry();
 	return this;
 }
 
 std::string Button::getText() const
 {
-	return SAL::SFMLString_to_stdstring(m_box.item().getString());
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>);
+	return m_box.item().get();
 }
 
 
@@ -76,22 +76,23 @@ void Button::onThemeChanged()
 }
 
 
-void Button::recomputeGeometry()
+void Button::recomputeGeometry() // override
 {
 	int fittingWidth = (int)(m_box.contentSize().x() + Theme::PADDING * 2 + Theme::borderSize * 2);
 	int width = max(fittingWidth, Theme::minWidgetWidth);
 
 	m_box.setSize((float)width, Theme::getBoxHeight());
-	m_box.centerTextHorizontally(m_box.item());
-
 	setSize(m_box.getSize());
+
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>);
+	m_box.item().center_in(getRect());
 }
 
 
 void Button::draw(const gfx::RenderContext& ctx) const
 {
 	auto lctx = ctx;
-	lctx.props.transform *= getTransform();
+	lctx.props.transform *= getTransform(); //!! DIRECT SFML USE
 	m_box.draw(lctx);
 }
 

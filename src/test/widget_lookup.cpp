@@ -5,7 +5,9 @@
 
 #include <string> // to_string
 #include <iostream> // cerr, for errors, cout for some "demo" info
-#include <cassert>
+
+#include "SAL/util/diagnostics.hpp"
+
 using namespace std;
 using namespace sfw::geometry;
 

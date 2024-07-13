@@ -1,4 +1,4 @@
-//!! RENAME TO BoxedShape, or something (telling what that "Item" is)!
+//!! RENAME TO BoxedShape, or something (telling more about that "Item")!
 
 #ifndef _SEUORTY847S6Y87EWY8704MTOGS87TG7N896_
 #define _SEUORTY847S6Y87EWY8704MTOGS87TG7N896_
@@ -6,9 +6,8 @@
 
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/element/Text.hpp"
-
+#include "sfw/math/Vector.hpp"
 #include "SAL/util/cpp/macros.hpp" // MIXIN()
-#include "SAL/math/Vector.hpp"
 
 #include <SFML/Graphics/Color.hpp>
 
@@ -55,9 +54,10 @@ public:
 	const T& item() const { return m_item; }
 
 	fVec2 contentSize() const {
-		if constexpr (std::is_convertible_v<T, gfx::Text>) { return fVec2(m_item.size()); } //!! This should become part of the Shape concept though!
-		//!!if constexpr (...Transfofmable?) { return fVec2(m_item.getSize().size); }
-	} //!! Direct SFML API calls!
+		static_assert(std::is_convertible_v<T, gfx::Text>, "Only Text has .size() yet!");
+		return fVec2(m_item.size()); //!! .size() should be part of the Shape concept!
+		//!!if constexpr (...Transformable?) { return fVec2(m_item.size()); }
+	}
 
 public: //! <- NOT private, because draw() may be accessed directly (statically),
         //!    rather than just polymorphically (dynamically) via a pointer!

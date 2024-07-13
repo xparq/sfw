@@ -19,6 +19,7 @@
 #include "Scalar.hpp"
 
 #include <cmath> // round
+#include <utility> // swap
 
 
 namespace SAL//!!::math
@@ -48,7 +49,12 @@ namespace SAL//!!::math
 	class Vector_Interface : public Impl // mixin
 	{
 	public:
-		using Impl::Impl; // Elevate the backend-specific ctors for implicit backend -> abstract conversions!
+		// Convert from the native type:
+		using Impl::Impl; // Elevate the backend-specific ctors for implicit backend -> adapter conversions!
+
+		// Convert to the native type:
+		constexpr operator const typename Impl::native_type& () const { return Impl::native(); } //!!?? Should just return by-val, as the other const methods?
+		constexpr operator       typename Impl::native_type& ()       { return Impl::native(); }
 
 		// The default op= is fine!
 
@@ -58,22 +64,24 @@ namespace SAL//!!::math
 		auto operator <=> (const Vector_Interface<Impl>&) const = delete;
 		// (Ironically,, op== WOULD be made automatically available from a <=>, but well...)
 
-		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
-		constexpr auto adapter() const { return static_cast<const Impl*>(this); }
-
 		constexpr auto  x() const { return adapter()->_x(); }
 		constexpr auto  y() const { return adapter()->_y(); }
 		constexpr auto& x()       { return adapter()->_x(); }
 		constexpr auto& y()       { return adapter()->_y(); }
 
-		constexpr operator       typename Impl::native_type& ()       { return Impl::native(); }
-		constexpr operator const typename Impl::native_type& () const { return Impl::native(); }
+		constexpr operator bool () const { return (bool)x() || (bool)y(); }
 
-		constexpr operator bool () { return (bool)x() || (bool)y(); }
+		constexpr auto  flip() const     { return Vector_Interface(y(), x()); }
+		constexpr auto& flip()           { std::swap(x(), y()); return *this; }
 
 		// A common chore (e.g. to avoid subpixel AA-blurring with OpenGL):
-		constexpr auto  round() const { return Vector_Interface(std::round(x()), std::round(y())); }
-		constexpr auto& round()       { std::round(x()); std::round(y()); return *this; }
+		constexpr auto   round() const   { return Vector_Interface(std::round(x()), std::round(y())); }
+		constexpr auto&  round()         { x() = std::round(x()); y() = std::round(y()); return *this; }
+
+
+	protected:
+		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
+		constexpr auto adapter() const { return static_cast<const Impl*>(this); }
 
 	}; // class Vector_Interface
 

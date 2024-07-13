@@ -13,6 +13,7 @@
 #include "sfw/gfx/Render.hpp"
 
 #include "sfw/math/Vector.hpp"
+#include "sfw/geometry/Rectangle.hpp"
 
 #include <SFML/Graphics/Transform.hpp>
 #include <SFML/Window/Event.hpp>
@@ -63,6 +64,7 @@ public:
 	Widget* setSize(fVec2 size);
 	Widget* setSize(float width, float height);
 	fVec2   getSize() const; //!!?? Should just return Vector2f by val.?
+	geometry::fRect getRect() const;
 
 	// Queries:
 
