@@ -12,7 +12,9 @@
 #include SAL_ADAPTER(gfx/element/ColorVertex2)
 
 #include "SAL/gfx/element/Texture.hpp"
-#include <SFML/Graphics/Color.hpp> //!! DIRECT SFML!
+#include "SAL/gfx/Color.hpp"
+
+#include <type_traits> // is_same
 
 
 namespace SAL::gfx::adapter
@@ -21,15 +23,19 @@ namespace SFML
 {
 	class TexturedVertex2_Impl : public ColorVertex2_Impl
 	{                      using Base = ColorVertex2_Impl;
+	protected:
+		using native_type = Base::native_type; //! Same here!...
+			static_assert(std::is_same_v<native_type, sf::Vertex>);
+
 	public:
 		// Inherited ctors...
 		// Note: The missing texture coords will be initialized to zero by iVec2 itself!
 		using Base::Base;
 //!!		constexpr TexturedVertex2_Impl()
-//!!			: _d({0,0}, sf::Color::White, {0,0}) {}
+//!!			: _d({0,0}, Color::White, {0,0}) {}
 
-		constexpr TexturedVertex2_Impl(fVec2 pos, sf::Color color, iVec2 txpos)
-//!!??OR:	constexpr TexturedVertex2_Impl(const fVec2& pos, sf::Color color, const iVec2& txpos)
+		constexpr TexturedVertex2_Impl(fVec2 pos, Color color, iVec2 txpos)
+//!!??OR:	constexpr TexturedVertex2_Impl(const fVec2& pos, Color color, const iVec2& txpos)
 			: Base(pos, color) // fVec2 auto-converts to sf::Vector
 			{ _d.texCoords = {(float)txpos.x(), (float)txpos.y()}; } //!! Alas, double init: overriding the default {0,0}!... :-/
 				//! This is actually a float vector in SFML; quoting from Vertex.hpp:
@@ -55,6 +61,9 @@ namespace SFML
 
 		// Accessors for texture pos...
 		constexpr iVec2     _texture_position() const      { return iVec2((int)native().texCoords.x, (int)native().texCoords.y); } //! See the int<->float comment at the ctors!
+//!! Type mismatch (SAL vs. native), but also confusing syntax: .prop() = x...:
+//!!		constexpr iVec2&    _texture_position()            { return iVec2((int)native().texCoords.x, (int)native().texCoords.y); } //! See the int<->float comment at the ctors!
+
 		constexpr void      _texture_position(iVec2 txpos) { native().texCoords = {(float)txpos.x(), (float)txpos.y()}; } //! See the int<->float comment at the ctors!
 
 
@@ -70,8 +79,8 @@ namespace SFML
 		}
 
 	private:
-		const native_type& native() const { return _d; }
-		      native_type& native()       { return _d; }
+		constexpr const native_type& native() const { return _d; }
+		constexpr       native_type& native()       { return _d; }
 	};
 
 } // namespace SFML

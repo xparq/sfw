@@ -2,7 +2,7 @@
 
 #include "SAL/util/diagnostics.hpp"
 
-#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderStates.hpp> //!! .transform *= getTransform()
 
 
 namespace sfw
@@ -109,16 +109,16 @@ Wallpaper* Wallpaper::rescale(float factor)
 }
 
 
-Wallpaper* Wallpaper::setColor(const sf::Color& color)
+Wallpaper* Wallpaper::setColor(const Color& color)
 {
 	for (int i = 0; i < 4; ++i)
 		m_vertices[i].color(color);
 	return this;
 }
 
-sf::Color Wallpaper::getColor() const
+Color Wallpaper::getColor() const
 {
-	return m_vertices[0].color(); //! Well, not an overwhelmingly future-proof approach, but OK...
+	return m_vertices[0].color(); //!! Not the overwhelmingly solid/future-proof approach I used to dream of as a child...
 }
 
 

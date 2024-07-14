@@ -9,12 +9,13 @@
 // (See using it in Text::draw()!)
 #ifdef DEBUG	
 #  include <SFML/Graphics/RectangleShape.hpp>
+#  include "sfw/gfx/Color.hpp"
 #  include <string>
 namespace
 {
 	using namespace std;
 	using namespace SAL/*!!::math!!*/; using namespace SAL::gfx; using namespace SAL::geometry;
-	void draw_border(const gfx::RenderContext& ctx, const Text* parent, sf::Color bordercolor, fVec2 sfml_offset = fVec2(0,0))
+	void draw_border(const gfx::RenderContext& ctx, const Text* parent, Color bordercolor, fVec2 sfml_offset = fVec2(0,0))
 	{
 		[[maybe_unused]] auto ODUMP = [](const Text* t, string s, sf::RectangleShape* r) { if (t->get() == s) {
 			cerr << "===>>  Origin & pos. of '"<<s<<"': " << fVec2(t->getOrigin()) << "; " << fVec2(t->getPosition())
@@ -40,14 +41,14 @@ namespace
 				//!!   -> Because the scaling is relative to the origin, so if it's not 0, then the
 				//!!      origin offset will translate to a scaled displacement!
 				//!!??
-			r.setFillColor(sf::Color::Transparent);
+			r.setFillColor(Color::None);
 			r.setOutlineColor(bordercolor);
 			r.setOutlineThickness(1);
 		ctx.target.draw(r, ctx.props);
 //ODUMP(parent, "All defaults", &r);
 //ODUMP(parent, "Hello world!", &r);
 // Recolored redraw, to dbl-check (just while pressing Alt, or whatever triggers this function):
-//sf::Text t(*parent); t.setFillColor(sf::Color::Cyan); ctx.target.draw(t, ctx.props);
+//sf::Text t(*parent); t.setFillColor(Color::Cyan); ctx.target.draw(t, ctx.props);
 	}
 }
 #endif // DEBUG
@@ -143,7 +144,7 @@ void Text::draw(const RenderContext& ctx) const //override
 	ctx.target.draw((native_type&)*this, ctx.props);
 #ifdef DEBUG	
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LAlt))
-		draw_border(ctx, this, sf::Color::Green, _sf_padding);
+		draw_border(ctx, this, Color::Green, _sf_padding);
 #endif
 }
 

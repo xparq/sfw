@@ -1,5 +1,6 @@
 ﻿#include "sfw/widget/Tooltip.hpp"
 #include "sfw/GUI-main.hpp" // sessionTime() etc.
+#include "sfw/gfx/Color.hpp"
 
 #include <SFML/Window/Mouse.hpp>
 
@@ -64,9 +65,9 @@ void Tooltip::show()
 	if (auto gui = getMain(); gui)
 	{
 		// Reset the colors changed by Fadeout
-		m_box.colorFill = sf::Color(255, 255, 220, 224);
-		m_box.colorBorder = m_box.colorFill; m_box.colorBorder *= sf::Color(160, 160, 160, 255);
-		m_text.setFillColor(sf::Color(0, 0, 0, 255));
+		m_box.colorFill   = {255, 255, 220, 224};
+		m_box.colorBorder = m_box.colorFill * Color{160, 160, 160, 255};
+		m_text.setFillColor({0, 0, 0, 255});
 /*!!
 		m_mouseLastPos = gui->getMousePosition();
 //DEBUG:		setPosition(m_mouseLastPos);
@@ -205,10 +206,12 @@ void Tooltip::onTick()
 		break;
 	case Fadeout:
 		{uint8_t DELTA = 8;
-			if (m_box.colorFill.a > DELTA) {
-				m_box.colorFill.a -= DELTA;
-				if (m_box.colorBorder.a) m_box.colorBorder.a -= DELTA;
-				m_text.setFillColor(sf::Color(0, 0, 0, m_text.getFillColor().a - DELTA));
+			if (m_box.colorFill.a() > DELTA) {
+//!! Can't:			m_box.colorFill.a -= DELTA;
+				m_box.colorFill.a(m_box.colorFill.a() - DELTA);
+//!! Can't:			if (m_box.colorBorder.a) m_box.colorBorder.a -= DELTA;
+				if (m_box.colorBorder.a()) m_box.colorBorder.a(m_box.colorBorder.a() - DELTA);
+				m_text.setFillColor(Color(0, 0, 0, m_text.getFillColor().a() - DELTA));
 			}
 			else setState(Off);
 			/*if (elapsed(FADEOUT_TIME))

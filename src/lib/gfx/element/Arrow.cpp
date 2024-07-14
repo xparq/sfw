@@ -33,7 +33,7 @@ Arrow::Arrow(Direction direction) :
 }
 
 
-void Arrow::setFillColor([[maybe_unused]] const sf::Color& color)
+void Arrow::setFillColor([[maybe_unused]] Color color)
 {
 //!! -> #97: "...mysterious overpaint with setFillColor"
 //!!

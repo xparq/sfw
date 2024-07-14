@@ -10,10 +10,10 @@
 //!!#include "sfw/widget/Tooltip/Style.hpp"
 
 //#include "SAL/geometry/Rectangle.hpp" // Definitely done already by the rectangular things above. ;)
+//#include "sfw/gfx/Color.hpp"          // Also this, by those colorful things above. :)
 
 #include <SFML/Window.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Graphics/Color.hpp>
 
 #include <map>
 #include <string>
@@ -41,7 +41,8 @@ public:
 		const char*    name = nullptr;
 		const char*    basePath = nullptr;
 		const char*    textureFile = nullptr;
-		sf::Color      bgColor = sf::Color::White; // no "unset" color, so must use a sensible default here
+		Color          bgColor = Color::None; // "transparent black"
+//!!??		Color          bgColor = Color::White; // Color::None could be the "unset" color, but white may still be more practical for debugging here
 		Wallpaper::Cfg wallpaper = {};
 		size_t         textSize = 0; //!!?? uint16_t: a) fixed (-> ABI compat.!), b) smaller, c) but may need annoying extra casts, d) uint_least16_t is the guaranteed type actually...
 		const char*    fontFile = nullptr;
@@ -84,19 +85,19 @@ public:
 	//!!CLEANUP! -> #308, #11... Should be more refined & flexible!
 	struct Style
 	{
-		sf::Color textColor;
-		sf::Color textColorHover;
-		sf::Color textColorFocus;
-		sf::Color textColorDisabled;
-		sf::Color textSelectionColor;
-		sf::Color textPlaceholderColor;
+		Color textColor;
+		Color textColorHover;
+		Color textColorFocus;
+		Color textColorDisabled;
+		Color textSelectionColor;
+		Color textPlaceholderColor;
 	};
 	static Style click;
 	static Style input;
 
 	static size_t textSize;
 
-	static sf::Color bgColor;
+	static Color bgColor;
 	static Wallpaper::Cfg wallpaper;
 	static bool clearBackground;
 

@@ -8,6 +8,7 @@
 #include <iostream> // cerr, for errors, cout for some "demo" info
 #include <thread>
 #include <chrono>
+#include <utility> // ref
 
 using namespace std;
 
@@ -38,7 +39,7 @@ try {
 	//------------------------------------------------------------------------
 	// Setup the Test GUI...
 
-	using OBColor = OptionsBox<sf::Color>;
+	using OBColor = OptionsBox< Color>;
 
 //	Theme::DEFAULT.basePath = "demo/";
 //	Theme::DEFAULT.fontFile = "font/Vera.ttf"; // relative to basePath!
@@ -47,7 +48,7 @@ try {
 	Theme::click.textColor      = Color("#191B18");
 	Theme::click.textColorHover = Color("#191B18");
 	Theme::click.textColorFocus = Color("#000");
-	Theme::input.textColor = Color("#000");
+	Theme::input.textColor      = Color("#000");
 	Theme::input.textColorHover = Color("#000");
 	Theme::input.textColorFocus = Color("#000");
 	Theme::input.textColorDisabled = Color("#888");
@@ -57,7 +58,7 @@ try {
 	// Some dynamically switchable theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
 		{ "Baseline", "demo/", "texture-sfw-baseline.png", Color("#e6e8e0"),
-		  Wallpaper::Cfg("demo/wallpaper.jpg", Wallpaper::Center, sf::Color(255,25,25,20)),
+		  Wallpaper::Cfg("demo/wallpaper.jpg", Wallpaper::Center, Color(255,25,25,20)),
 		  11, "font/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  Color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", Color("#dddbde"), {}, 12, "font/Vera.ttf" },
@@ -271,13 +272,13 @@ try {
 	// -- Creating one as a template to clone it later, because
 	//    WIDGETS MUSTN'T BE COPIED AFTER HAVING BEEN ADDED TO THE GUI!
 	OBColor ColorSelect_TEMPLATE; (&ColorSelect_TEMPLATE)
-		->add("Black", sf::Color::Black)
-		->add("Red", sf::Color::Red)
-		->add("Green", sf::Color::Green)
-		->add("Blue", sf::Color::Blue)
-		->add("Cyan", sf::Color::Cyan)
-		->add("Yellow", sf::Color::Yellow)
-		->add("White", sf::Color::White)
+		->add("Black",  Color::Black)
+		->add("Red",    Color::Red)
+		->add("Green",  Color::Green)
+		->add("Blue",   Color::Blue)
+		->add("Cyan",   Color::Cyan)
+		->add("Yellow", Color::Yellow)
+		->add("White",  Color::White)
 	;
 
 	// Select sample text color
@@ -430,6 +431,8 @@ try {
 		demo.setTheme(themecfg); // Swallowing the error for YOLO reasons ;)
 		// Update the wallpaper on/off checkbox:
 		if (w->find_widget("Wallpaper")) w->template find_widget<CheckBox>("Wallpaper")->set(demo.hasWallpaper());
+		// Update the wallpaper alpha slider:
+		if (w->find_widget("Wallpaper α")) w->template find_widget<CheckBox>("Wallpaper α")->set(demo.hasWallpaper());
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
 	themeselect->set(DEFAULT_THEME);
@@ -473,21 +476,24 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	                                       demo.hasWallpaper()));
 	// Wallpaper transparency slider
 	bgform->add("Wallpaper α", Slider({.length = 75, .range = {0, 255}}))
-		->set(demo.getWallpaper().getColor().a)
+		->set(demo.getWallpaper().getColor().a())
 		->setCallback([&](auto* w) {
-			assert(demo.find_widget("theme-selector"));
+			assert(demo.find_widget("theme-selector")); //!! Just an assert, as this is mostly run in DEBUG...
+			//!! Alas, this won't work, as the fallback default is expected to be passed by-value,
+			//!! and "forcibly" passing a ref will break a ?: op in Widget::get_or())...:
+			//!!auto& themecfg = demo.get<OBTheme>("theme-selector", std::ref(themes[DEFAULT_THEME]));
 			auto& themecfg = demo.find_widget<OBTheme>("theme-selector")->current();
-			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
-			                           themecfg.wallpaper.tint.g,
-			                           themecfg.wallpaper.tint.b,
-			                           (uint8_t)w->get()};
-			demo.setWallpaperColor(themecfg.wallpaper.tint);
+			themecfg.wallpaper.tint.a((uint8_t)w->get());    // Update the current config, to make the change "persistent".
+			Theme::wallpaper.tint = themecfg.wallpaper.tint; // Update the current theme, to make it "robust". (-> #419)
+			demo.setWallpaperColor(Theme::wallpaper.tint);   // Update the wallpaper itself, to make it instant...
 		});
 //cerr << "wallpap alpha: " << demo.find_widget<Slider>("Wallpaper α")->get() << endl;
 	// Window background color selector
 	bgform->add("Window bg.", (new OBColor(ColorSelect_TEMPLATE))
 		->add("Default", themes[DEFAULT_THEME].bgColor)
-		->setCallback([](auto* w){ Theme::bgColor = w->current(); })
+		->setCallback([&](auto* w){
+			Theme::bgColor = w->current();
+		})
 	);
 
 	// A pretty useless, but interesting clear-background checkbox
@@ -559,7 +565,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		// Draw this first to confirm a translucent GUI bg works:
 		sf::CircleShape s{100};
 		s.setPosition({400, 300});
-		s.setFillColor(sf::Color::Cyan);
+		s.setFillColor(Color::Cyan);
 		window.draw(s);
 
 		// This "inside-out" loop structure is to allow screen updates both
@@ -568,7 +574,7 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		// also without requiring an initial extra draw outside the loop.
 		// (-> FizzBuzz?... ;) )
 		auto event = window.pollEvent();
-		while (event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore spammy raw mouse move events!
+		while (event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore the raw mouse-move event spam of SFML3! :-/
 		if (event)
 		{
 			// Pass the event to the GUI:

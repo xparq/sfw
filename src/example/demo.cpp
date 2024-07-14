@@ -35,7 +35,7 @@ try {
 
 	// Just to spare some noise & typing...
 	using sfw::Theme, sfw::Color, sfw::VBox, sfw::HBox, sfw::Form;
-	using OBColor = sfw::OptionsBox<sf::Color>;
+	using OBColor = sfw::OptionsBox<Color>;
 
 	// Customizing some theme props. (optional)
 
@@ -46,7 +46,7 @@ try {
 	Theme::click.textColor      = Color("#191B18");
 	Theme::click.textColorHover = Color("#191B18");
 	Theme::click.textColorFocus = Color("#000");
-	Theme::input.textColor = Color("#000");
+	Theme::input.textColor      = Color("#000");
 	Theme::input.textColorHover = Color("#000");
 	Theme::input.textColorFocus = Color("#000");
 	Theme::input.textColorDisabled = Color("#888");
@@ -58,7 +58,7 @@ try {
 	// Raw C++ init lists (with rigid positions):
 	Theme::Cfg themes[] = {
 		{ "Baseline", "demo/", "texture-sfw-baseline.png", Color("#e6e8e0"),
-		  sfw::Wallpaper::Cfg{"demo/wallpaper.jpg", sfw::Wallpaper::Center, sf::Color(255,255,255,63)},
+		  sfw::Wallpaper::Cfg{"demo/wallpaper.jpg", sfw::Wallpaper::Center, Color(255,255,255,63)},
 		  17, "font/LiberationSans-Regular.ttf" },
 		{ "Classic ☺",              "demo/", "texture-sfw-classic.png",  Color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
 		{ "sfml-widgets's default", "demo/", "texture-sfmlwidgets-default.png", Color("#dddbde"), {}, 12, "font/Vera.ttf" },
@@ -228,13 +228,13 @@ try {
 	// -- Creating one as a template to clone it later, because
 	//    WIDGETS MUSTN'T BE COPIED AFTER HAVING BEEN ADDED TO THE GUI!
 	OBColor ColorSelect_TEMPLATE; (&ColorSelect_TEMPLATE)
-		->add("Black", sf::Color::Black)
-		->add("Red", sf::Color::Red)
-		->add("Green", sf::Color::Green)
-		->add("Blue", sf::Color::Blue)
-		->add("Cyan", sf::Color::Cyan)
-		->add("Yellow", sf::Color::Yellow)
-		->add("White", sf::Color::White)
+		->add("Black" , Color::Black)
+		->add("Red"   , Color::Red)
+		->add("Green" , Color::Green)
+		->add("Blue"  , Color::Blue)
+		->add("Cyan"  , Color::Cyan)
+		->add("Yellow", Color::Yellow)
+		->add("White" , Color::White)
 	;
 
 	// Select sample text color
@@ -249,7 +249,7 @@ try {
 		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
 			textrect.setFillColor(w->current());
-			w->setFillColor(w->current() * sf::Color(255, 255, 255, 64));
+			w->setFillColor(w->current() * Color(255, 255, 255, 64));
 		});
 
 	// (See also another one for window bg. color selection!)
@@ -363,10 +363,11 @@ try {
 		{
 			// Update the wallpaper controls:
 			demo.call<sfw::CheckBox>("Wallpaper", [&](auto* wptoggle) {
-				wptoggle->set(demo.hasWallpaper())         // set() first, as it returns CheckBox*
-				        ->enable(demo.hasWallpaper()); }); // whereas enable() would degrade to Widget*!
-			demo.call<sfw::CheckBox>("Wallpaper α", [&](auto* wpalpha) {
-				wpalpha->enable(demo.hasWallpaper()); });
+				wptoggle->enable(demo.hasWallpaper());
+				wptoggle->set(demo.hasWallpaper()); });
+			demo.call<sfw::Slider>("Wallpaper α", [&](auto* wpalpha) {
+				wpalpha->enable(demo.hasWallpaper());
+				if (demo.hasWallpaper()) wpalpha->update(themecfg.wallpaper.tint.a()); });
 			// Update the bg. color selector's "Default" value:
 			demo.call<OBColor>("Bg. color", [&](auto* bgsel) {
 				bgsel->assign("Default", themecfg.bgColor); });
@@ -379,7 +380,7 @@ try {
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
 	themeselect->set(DEFAULT_THEME);
-	right_bar->add(sfw::Label("Change theme:"));
+	right_bar->add(sfw::Label("Select theme:"));
 	right_bar->add(themeselect, "theme-selector");
 
 	// Theme font size slider
@@ -427,12 +428,23 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 
 	// Wallpaper transparency slider
 	bgform->add("Wallpaper α", sfw::Slider({.length = 65, .range={0, 255}}))
-		->set(demo.getWallpaper().getColor().a)
+		->set(demo.getWallpaper().getColor().a())
 		->setCallback([&](auto* w) {
 			demo.call<OBTheme>("theme-selector", [&](auto* ts) {
 				auto tint = ts->get().wallpaper.tint;
-				tint = {tint.r, tint.g, tint.b, (uint8_t)w->get()};
-				demo.setWallpaperColor(tint);
+				tint.a((uint8_t)w->get());
+				demo.setWallpaperColor(tint);  // Update the wallpaper itself, to make it instant...
+				Theme::wallpaper.tint = tint;  // Update the current theme, to make it "robust"! (-> #419)
+/*
+				// And also update the current config, to make the change "persistent":
+				//!! Alas, this won't work, as the fallback default is expected to be passed by-value,
+				//!! and "forcibly" passing a ref will break a ?: op in Widget::get_or())...:
+				//!!auto& themecfg = demo.get<OBTheme>("theme-selector", std::ref(themes[DEFAULT_THEME]));
+				if (auto* ts = demo.find_widget<OBTheme>("theme-selector")) {
+					auto& themecfg = ts->current();
+					themecfg.wallpaper.tint.a(tint);
+				}
+*/
 			});
 		});
 	// Window background color selector
@@ -440,7 +452,6 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 		->add("Default", themes[DEFAULT_THEME].bgColor)
 		->setCallback([&](auto* w) {
 			Theme::bgColor = w->current();
-			demo.themeChanged();
 		})
 	);
 	// A pretty useless, but interesting clear-background checkbox
@@ -481,14 +492,14 @@ cerr << "font size: "<< themecfg.textSize << endl; //!!#196
 	while (demo)
 	{
 		// While somewhat less elegant than the textbook double-loop solution,
-		// this unrolled single-loop structure (not counting the trivial raw-mouse-move
+		// this unrolled single-loop structure (not counting the raw-mouse-move
 		// filter loop) is chosen for allowing screen updates both after input events
 		// and also after some idle timeout (to support showing (polling) changes
 		// made by other threads), without either awkwardly duplicating the updates
 		// in a nested event-puming loop or having an initial extra draw outside
 		// the main loop. (-> FizzBuzz?... ;) )
 		auto event = window.pollEvent();
-		while (event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore spammy raw mouse move events!
+		while (event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore the raw mouse-move event spam of SFML3! :-/
 		if (event)
 		{
 			// Pass the event to the GUI:

@@ -8,7 +8,6 @@
 #include "sfw/gfx/element/Text.hpp"
 
 #include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
 
 #include <string>
 

@@ -1,12 +1,7 @@
 #include "sfw/gfx/element/CheckMark.hpp"
 
 #include "sfw/Theme.hpp"
-
-#include "SAL/geometry/Rectangle.hpp"
-
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Vertex.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
+#include "sfw/geometry/Rectangle.hpp"
 
 #include <cmath>
 
@@ -17,12 +12,12 @@ using namespace geometry;
 
 CheckMark::CheckMark()
 {
- 	const auto rect = fRect(Theme::getCheckMarkTextureRect()); // iRect -> fRect
+ 	const iRect rect = Theme::getCheckMarkTextureRect();
 
-	m_vertices[0].texCoords = sf::Vector2f(rect.left(), rect.top());
-	m_vertices[1].texCoords = sf::Vector2f(rect.left(), rect.top() + rect.height());
-	m_vertices[2].texCoords = sf::Vector2f(rect.left() + rect.width(), rect.top());
-	m_vertices[3].texCoords = sf::Vector2f(rect.left() + rect.width(), rect.top() + rect.height());
+	m_vertices[0].texture_position({rect.left()               , rect.top()});
+	m_vertices[1].texture_position({rect.left()               , rect.top() + rect.height()});
+	m_vertices[2].texture_position({rect.left() + rect.width(), rect.top()});
+	m_vertices[3].texture_position({rect.left() + rect.width(), rect.top() + rect.height()});
 
 	updateGeometry(0, 0);
 }
@@ -38,8 +33,9 @@ void CheckMark::move(fVec2 delta)
 {
 	for (int i = 0; i < 4; ++i)
 	{
-		m_vertices[i].position.x += delta.x();
-		m_vertices[i].position.y += delta.y();
+//!! Can't:	m_vertices[i].position += delta;
+//!! or even:	m_vertices[i].position() += delta;
+		m_vertices[i].position(m_vertices[i].position() + delta);
 	}
 }
 
@@ -57,28 +53,26 @@ fVec2 CheckMark::getSize() const
 }
 
 
-void CheckMark::setColor(const sf::Color& color)
+void CheckMark::setColor(Color c)
 {
 	for (int i = 0; i < 4; ++i)
-		m_vertices[i].color = color;
+		m_vertices[i].color(c);
 }
 
 
 void CheckMark::draw(const gfx::RenderContext& ctx) const // override
 {
-	auto lstates = ctx.props;
-	lstates.texture = &Theme::getTexture();
-	ctx.target.draw(m_vertices, 4, sf::PrimitiveType::TriangleStrip, lstates);
+	gfx::TexturedVertex2::draw_trianglestrip(ctx, Theme::getTexture(), m_vertices, 4);
 }
 
 
 void CheckMark::updateGeometry(float x, float y)
 {
 	const auto rect = fRect(Theme::getCheckMarkTextureRect()); // iRect -> fRect
-	m_vertices[0].position = sf::Vector2f(x, y);
-	m_vertices[1].position = sf::Vector2f(x, y + rect.height());
-	m_vertices[2].position = sf::Vector2f(x + rect.width(), y);
-	m_vertices[3].position = sf::Vector2f(x + rect.width(), y + rect.height());
+	m_vertices[0].position( {x               , y} );
+	m_vertices[1].position( {x               , y + rect.height()} );
+	m_vertices[2].position( {x + rect.width(), y} );
+	m_vertices[3].position( {x + rect.width(), y + rect.height()} );
 }
 
 

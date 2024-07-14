@@ -151,13 +151,13 @@ template <class T> const std::string& OptionsBox<T>::currentLabel() const
 }
 
 
-template <class T> OptionsBox<T>* OptionsBox<T>::setTextColor(const sf::Color& color)
+template <class T> OptionsBox<T>* OptionsBox<T>::setTextColor(Color color)
 {
 	m_box.setItemColor(color);
 	return this;
 }
 
-template <class T> OptionsBox<T>* OptionsBox<T>::setFillColor(const sf::Color& color)
+template <class T> OptionsBox<T>* OptionsBox<T>::setFillColor(Color color)
 {
 	m_box.setFillColor(color);
 	m_arrowLeft.setTintColor(color);

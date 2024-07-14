@@ -5,15 +5,16 @@
 #define _CNJERHKDNGF6C98O423576TGB87RT9NM23745T6Y807RE5T_
 
 
-#include "sfw/gfx/Render.hpp" //!! SALIFY!...
+#include "SAL.hpp"
+
+#include "SAL/gfx/element/TexturedVertex2.hpp" //!! Adapt the code itself; it's still using sf::Vertex!
+//!!??#include SAL_ADAPTER(gfx/element/TexturedVertex2) // Only the backend-facing part!
+#include SAL_ADAPTER(gfx/element/Texture) // Only the backend-facing part!
 #include "SAL/math/Vector.hpp"
 //!!#include "SAL/geometry/Rectangle.hpp"
+#include "SAL/gfx/Color.hpp"
+#include "SAL/gfx/Render.hpp"
 
-#include "SAL.hpp"
-// Use the SFLM-level part of the texture only!
-#include SAL_ADAPTER(gfx/element/Texture)
-
-#include <SFML/Graphics/Color.hpp> //!! SALIFY!
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 
@@ -28,9 +29,6 @@ namespace SAL::gfx::adapter
 {
 namespace SFML
 {
-//!! TEMP. HACKS UNTIL THE NAMESPACES GET RECONCILED:
-using sfw::gfx::RenderContext;
-
 
 class TextureFrame_Impl
 {

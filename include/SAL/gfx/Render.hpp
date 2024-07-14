@@ -1,5 +1,15 @@
+/*****************************************************************************
+!!REQUIREMENTS:
+
+- Like the other SAL adapters, it should interoperate seamlessly with the real
+  backend "renderer" (if there even is one...), "as much as possible" (TBD!).
+  -> Entirely different rendering pipelines may make this infeasible though!
+
+ *****************************************************************************/
+
 #ifndef _DMNE98475Y687D348057NHY6378945HY6B0V45978Y9TG898_
 #define _DMNE98475Y687D348057NHY6378945HY6B0V45978Y9TG898_
+
 
 namespace SAL::gfx
 {

@@ -7,7 +7,7 @@
 
 
 #include "SAL/math/Vector.hpp"
-#include <SFML/Graphics/Color.hpp> //!! DIRECT SFML!
+#include "SAL/gfx/Color.hpp"
 #include "SAL/gfx/Render.hpp"
 
 #include "SAL.hpp"
@@ -36,11 +36,14 @@ namespace SAL::gfx
 		using Impl::Impl;
 
 		// Accessors...
-		constexpr fVec2     position() const              { return adapter()->_position(); }
-		constexpr sf::Color color() const                 { return adapter()->_color(); }
+		constexpr fVec2     position() const        { return adapter()->_position(); }
+		constexpr Color     color()    const        { return adapter()->_color(); }
+//!! Doesn't work, but also confusing syntax: .prop() = x...:
+//!!		constexpr fVec2&    position()              { return adapter()->_position(); }
+//!!		constexpr Color&    color()                 { return adapter()->_color(); }
 
-		constexpr void      position(fVec2 pos)           { adapter()->_position(pos); }
-		constexpr void      color(sf::Color c)            { adapter()->_color(c); }
+		constexpr void      position(fVec2 pos)     { adapter()->_position(pos); }
+		constexpr void      color(Color c)          { adapter()->_color(c); }
 
 
 		//!! Be a bit more sophisticated than this embarrassment! :)

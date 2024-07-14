@@ -1,7 +1,6 @@
 #include "sfw/Theme.hpp"
 
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp> //!! DIRECT SFML!
 
 namespace sfw
 {
@@ -23,20 +22,20 @@ ItemBox<T>::ItemBox(const T& item, Box::Type type):
 
 
 template <Shape T>
-void ItemBox<T>::setItemColor(sf::Color color)
+void ItemBox<T>::setItemColor(Color color)
 {
 	m_itemColor = color;
 	m_item.setFillColor(m_itemColor.value());
 }
 
 template <Shape T>
-void ItemBox<T>::setFillColor(sf::Color color)
+void ItemBox<T>::setFillColor(Color color)
 {
 	Box::setFillColor(color);
 }
 
 template <Shape T>
-void ItemBox<T>::setTintColor(sf::Color color)
+void ItemBox<T>::setTintColor(Color color)
 {
 	m_tintColor = color;
 }

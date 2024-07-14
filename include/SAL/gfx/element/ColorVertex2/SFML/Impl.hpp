@@ -21,9 +21,8 @@
 
 #include "SAL/math/Vector.hpp"
 #include "SAL/gfx/Render.hpp"
-//!!#include "SAL/gfx/Color.hpp" //!!Also include this, for the class interface (signatures)!
+#include "SAL/gfx/Color.hpp"
 
-#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 
 
@@ -37,10 +36,10 @@ namespace SFML
 		using native_type = sf::Vertex;
 	
 	public:
-		ColorVertex2_Impl() : _d({0,0}, sf::Color::White) {} //!!SFML: not just sf::Color, but the init list ("ctor call")!
+		ColorVertex2_Impl() : _d({0,0}, Color::White) {} //!! SFML init list!
 
-		ColorVertex2_Impl(fVec2 pos, sf::Color color) : _d(pos, color) {} // fVec2 auto-converts to sf::Vector
-//!!??OR:	ColorVertex2_Impl(const fVec2& pos, sf::Color color) : _d(pos, color) {} // fVec2 auto-converts to sf::Vector
+		ColorVertex2_Impl(fVec2 pos, Color color) : _d(pos, color) {} // fVec2 auto-converts to sf::Vector
+//!!??OR:	ColorVertex2_Impl(const fVec2& pos, Color color) : _d(pos, color) {} // fVec2 auto-converts to sf::Vector
 			
 		// Copy
 		ColorVertex2_Impl(const ColorVertex2_Impl&) = default;
@@ -56,10 +55,13 @@ namespace SFML
 
 		// Accessors for the position, color, texture pos...
 		constexpr fVec2     _position() const              { return native().position; } // fVec2 auto-converts from sf::Vector2f
-		constexpr sf::Color _color() const                 { return native().color; }
+		constexpr Color     _color()    const              { return native().color; }
+//!! Type mismatch (SAL vs. native), but also confusing syntax: .prop() = x...:
+//!!		constexpr fVec2&    _position()                    { return native().position; } // fVec2 auto-converts from sf::Vector2f
+//!!		constexpr Color&    _color()                       { return native().color; }
 
 		constexpr void      _position(fVec2 pos)           { native().position = pos; }
-		constexpr void      _color(sf::Color c)            { native().color = c; }
+		constexpr void      _color(Color c)                { native().color = c; }
 
 
 		//!! Be a bit more sophisticated than this embarrassment! :)

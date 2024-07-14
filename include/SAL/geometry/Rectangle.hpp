@@ -200,7 +200,7 @@ namespace SAL::geometry
 //----------------------------------------------------------------------------
 
 	template <typename NumT = float>
-	using Rect = Rectangle_Interface<adapter::/*geometry::active_backend::*/Rectangle_Impl<NumT>>;
+	using  Rect = Rectangle_Interface<adapter::/*geometry::active_backend::*/Rectangle_Impl<NumT>>;
 
 	using fRect = Rectangle_Interface<adapter::/*geometry::active_backend::*/Rectangle_Impl<float>>;
 	using iRect = Rectangle_Interface<adapter::/*geometry::active_backend::*/Rectangle_Impl<int>>;

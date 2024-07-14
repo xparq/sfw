@@ -2,12 +2,12 @@
 #define _KUNYWET5GX94358T645N345TF678RWE5TG67F4B57_
 
 #include "sfw/Theme.hpp"
-#include "sfw/gfx/Render.hpp"
 #include "sfw/Widget.hpp"
 #include "sfw/WidgetPtr.hpp"
 #include "sfw/layout/VBox.hpp"
 #include "sfw/gfx/element/Wallpaper.hpp"
-
+#include "sfw/gfx/Color.hpp"
+#include "sfw/gfx/Render.hpp"
 #include "sfw/math/Vector.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -116,19 +116,20 @@ public:
 	/**
 	 * Set/manage wallpaper image
 	 * If `filename` is omitted, the wallpaper configured for the current theme
-	 * (if any) will be reset.
+	 * (if any) will be used.
 	 */
 	void setWallpaper(const Wallpaper::Cfg& cfg);
 	void setWallpaper(std::string filename = "",
 					  Wallpaper::Placement placement = sfw::Wallpaper::Placement::Center,
-					  sf::Color tintColor = sf::Color::White);
+					  Color tintColor = Color::White);
 	const Wallpaper& getWallpaper() const { return m_wallpaper; }
 	void disableWallpaper();
 	bool hasWallpaper();
 	/**
-	 * Tint the wallpaper and/or set its transparency (alpha) level
+	 * Wallpaper color "tint" and/or transparency (alpha) level
 	 */
-	void setWallpaperColor(sf::Color tint);
+	void  setWallpaperColor(Color tint);
+	Color getWallpaperColor() const;
 
 	// Accumulated session time (minus while !active()), in seconds
 	float sessionTime() const;

@@ -714,8 +714,8 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 	clip.setPosition({Theme::borderSize + Theme::PADDING, 0});
 	clip.setSize({width, getSize().y});
 	clip.setOutlineThickness(1);
-	clip.setFillColor(sf::Color(0));
-	clip.setOutlineColor(sf::Color::Green);
+	clip.setFillColor(Color(0));
+	clip.setOutlineColor(Color::Green);
 	ctx.target.draw(clip, sfml_renderstates);
 */
 	// Show cursor if focused
@@ -728,8 +728,8 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 			m_cursorTimer.restart();
 		}
 
-		m_cursorColor.a = (m_cursorStyle == PULSE ? uint8_t(255 - (255 * timer / m_cursorBlinkPeriod))
-		                                          : uint8_t(255 - (255 * timer / m_cursorBlinkPeriod)) & 128 ? 255 : 0);
+		m_cursorColor.a( (m_cursorStyle == PULSE ? uint8_t(255 - (255 * timer / m_cursorBlinkPeriod))
+		                                         : uint8_t(255 - (255 * timer / m_cursorBlinkPeriod)) & 128 ? 255 : 0) );
 		m_cursorRect.setFillColor(m_cursorColor);
 		ctx.target.draw(m_cursorRect, sfml_renderstates);
 	}

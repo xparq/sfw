@@ -1,9 +1,11 @@
-#ifndef _SFW_LAYOUT_HPP_
-#define _SFW_LAYOUT_HPP_
+#ifndef _DOIFUU98DTHUMU985M85Y987NW4579631BRT65Z1286GYMC438Y_
+#define _DOIFUU98DTHUMU985M85Y987NW4579631BRT65Z1286GYMC438Y_
+
 
 #include "sfw/WidgetContainer.hpp"
 
 #include <functional>
+
 
 namespace sfw
 {
@@ -53,8 +55,10 @@ protected:
 private:
 	Widget* m_hoveredWidget;
 	Widget* m_focusedWidget;
-};
 
-} // namespace
+}; // class Layout
 
-#endif // _SFW_LAYOUT_HPP_
+} // namespace sfw
+
+
+#endif // _DOIFUU98DTHUMU985M85Y987NW4579631BRT65Z1286GYMC438Y_

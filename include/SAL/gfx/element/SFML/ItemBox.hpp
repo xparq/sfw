@@ -7,9 +7,9 @@
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/element/Text.hpp"
 #include "sfw/math/Vector.hpp"
-#include "SAL/util/cpp/macros.hpp" // MIXIN()
+#include "sfw/gfx/Color.hpp"
 
-#include <SFML/Graphics/Color.hpp>
+#include "SAL/util/cpp/macros.hpp" // SAL_MIXIN() //!!?? Remove this and just use a comment... Or use it everywhere consistently!
 
 #include <optional> // E.g. for optional coloring
 #include <type_traits> // is_convertible_v
@@ -42,11 +42,11 @@ public:
 	ItemBox(Box::Type type = Box::Click);
 	ItemBox(const T& item, Box::Type type = Box::Click);
 
-	void setFillColor(sf::Color color);
-	void setItemColor(sf::Color color);
+	void setFillColor(Color color);
+	void setItemColor(Color color);
 	// This would draw a filled rect *over* the "item" of ItemBox, so `color`
 	// would usually need an alpha value set accordingly to be practical:
-	void setTintColor(sf::Color color);
+	void setTintColor(Color color);
 
 	void applyState(ActivationState state);
 
@@ -68,8 +68,8 @@ private:
 	void onRelease() override;
 
 	T m_item;
-	std::optional<sf::Color> m_itemColor;
-	std::optional<sf::Color> m_tintColor;
+	std::optional<Color> m_itemColor;
+	std::optional<Color> m_tintColor;
 };
 
 } // namespace sfw

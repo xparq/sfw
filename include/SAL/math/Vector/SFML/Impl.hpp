@@ -10,9 +10,9 @@
 #include <utility> // forward
 
 
-namespace SAL//!!::math
+namespace SAL/*!!::math!!*/::adapter
 {
-namespace adapter::SFML
+namespace SFML
 {
 	template <Scalar NumT, unsigned Dim = 2> //!! Dim is totally unused; just a reminder!
 	class Vector2_Impl
@@ -55,18 +55,22 @@ namespace adapter::SFML
 
 	template <Scalar NumT>
 	Vector2_Impl(NumT x, NumT y) -> Vector2_Impl<NumT>;
-} // namespace adapter::SFML
+
+} // namespace SFML
 
 
-// Save the specific adapter type to a backend-agnostic symbol...
-namespace adapter//::active_backend
-{
+	// Save the specific adapter type to a backend-agnostic symbol...
+	//!!
+	//!! This looks totally useless, as this entire header is dispached by the selected backend,
+	//!! so things defined here could just live directly in adapter::, no need for SFML:: too
+	//!! -- but... The build system can't also dispatch the translation units yet, so it would
+	//!! just compile -- and link -- everything together, causing name clashes across backends!
+	//!!
 	template <Scalar NumT, unsigned Dim = 2>
 	using Vector2_Impl = SFML::Vector2_Impl<NumT, Dim>; //!! Use a "standard" SAL macro for the indirectly name the current backend!
-}
 
 
-} // namespace SAL//!!::math
+} // namespace SAL/*!!::math!!*/::adapter
 
 
 #endif // _RVSRTYNFDGYSVEC336AB64N7W568VW47W57RT7_

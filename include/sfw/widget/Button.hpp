@@ -30,8 +30,8 @@ public:
 	Button* setText(std::string_view text);
 	std::string getText() const;
 
-	Button* setColor(sf::Color); // Overall tint, except the label
-	Button* setTextColor(sf::Color);
+	Button* setColor(Color); // Overall tint, except the label
+	Button* setTextColor(Color);
 
 	Button* click(); // "Macro" for automation
 

@@ -3,16 +3,16 @@
 
 
 #include "sfw/InputWidget.hpp"
+#include "sfw/TextSelection.hpp"
 #include "sfw/gfx/element/Text.hpp"
 #include "sfw/gfx/element/Box.hpp"
-#include "sfw/TextSelection.hpp"
+#include "sfw/gfx/Color.hpp"
 
 #include <string>
 #include <string_view>
 
 #include <SFML/System/String.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Clock.hpp>
 
 
@@ -128,14 +128,14 @@ private:
 	/*!!
 	struct CursorView
 	{
-		mutable sf::Color          color; // for blinking, not the configured cursor color!
+		mutable Color          color; // for blinking, not the configured cursor color!
 		mutable sf::RectangleShape rect;
 		mutable sf::Clock          timer;
 	};
 	mutable CursorView m_cursor;
 	!!*/
 	mutable sf::RectangleShape m_cursorRect;
-	mutable sf::Color m_cursorColor;
+	mutable Color m_cursorColor;
 	mutable sf::Clock m_cursorTimer;
 };
 

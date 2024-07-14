@@ -34,13 +34,13 @@ try {
 	// Setup the test GUI...
 	//------------------------------------------------------------------------
 
-	using OBColor = OptionsBox<sf::Color>;
+	using OBColor = OptionsBox<Color>;
 
 	Theme::PADDING = 2.f;
 	Theme::click.textColor      = Color("#191B18");
 	Theme::click.textColorHover = Color("#191B18");
 	Theme::click.textColorFocus = Color("#000");
-	Theme::input.textColor = Color("#000");
+	Theme::input.textColor      = Color("#000");
 	Theme::input.textColorHover = Color("#000");
 	Theme::input.textColorFocus = Color("#000");
 	Theme::input.textColorDisabled = Color("#888");
@@ -50,7 +50,7 @@ try {
 	// Some dynamically switchable theme "quick config packs" to play with
 	Theme::Cfg themes[] = {
 		{ "Baseline", "demo/", "texture-sfw-baseline.png", Color("#e6e8e0"),
-		  Wallpaper::Cfg("demo/wallpaper.jpg", Wallpaper::Center, sf::Color(255,25,25,20)), 11, "font/LiberationSans-Regular.ttf" },
+		  Wallpaper::Cfg("demo/wallpaper.jpg", Wallpaper::Center, Color(255,25,25,20)), 11, "font/LiberationSans-Regular.ttf" },
 		{ "Classic ☺", "demo/", "texture-sfw-classic.png",  Color("#e6e8e0"), {}, 12, "font/LiberationSans-Regular.ttf" },
 		{ "\"factory default\"", },
 	};
@@ -308,13 +308,13 @@ try {
 	// -- Creating one as a template to clone it later, because
 	//    WIDGETS MUSTN'T BE COPIED AFTER HAVING BEEN ADDED TO THE GUI!
 	OBColor ColorSelect_TEMPLATE; (&ColorSelect_TEMPLATE)
-		->add("Black", sf::Color::Black)
-		->add("Red", sf::Color::Red)
-		->add("Green", sf::Color::Green)
-		->add("Blue", sf::Color::Blue)
-		->add("Cyan", sf::Color::Cyan)
-		->add("Yellow", sf::Color::Yellow)
-		->add("White", sf::Color::White)
+		->add("Black",  Color::Black)
+		->add("Red",    Color::Red)
+		->add("Green",  Color::Green)
+		->add("Blue",   Color::Blue)
+		->add("Cyan",   Color::Cyan)
+		->add("Yellow", Color::Yellow)
+		->add("White",  Color::White)
 	;
 
 	// Select sample text color
@@ -528,19 +528,6 @@ cerr << "font size (method 4): "<< themecfg.textSize << endl; //!!#196
 	// Wallpaper on/off checkbox
 	bgform->add("Wallpaper", CheckBox([&](auto* w) { w->checked() ? demo.setWallpaper() : demo.disableWallpaper(); },
 	                                       demo.hasWallpaper()));
-	// Wallpaper transparency slider
-	bgform->add("Wallpaper α", Slider({.length = 75, .range = {0, 255}}))
-		->set(demo.getWallpaper().getColor().a)
-		->setCallback([&](auto* w) {
-			assert(demo.find_widget("theme-selector"));
-			auto& themecfg = demo.find_widget<OBTheme>("theme-selector")->current();
-			themecfg.wallpaper.tint = {themecfg.wallpaper.tint.r,
-			                           themecfg.wallpaper.tint.g,
-			                           themecfg.wallpaper.tint.b,
-			                           (uint8_t)w->get()};
-			demo.setWallpaperColor(themecfg.wallpaper.tint);
-		});
-//cerr << "wallpap alpha: " << getWidget<Slider>("Wallpaper α")->get() << endl;
 	// Window background color selector
 	bgform->add("Window bg.", (new OBColor(ColorSelect_TEMPLATE))
 		->add("Default", themes[DEFAULT_THEME].bgColor)

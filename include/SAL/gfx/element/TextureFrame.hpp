@@ -17,6 +17,7 @@
 
 #include "SAL/geometry/Rectangle.hpp"
 #include "SAL/gfx/element/Texture.hpp"
+#include "SAL/gfx/Color.hpp"
 #include "SAL/gfx/Render.hpp"
 
 
@@ -36,7 +37,8 @@ namespace SAL::gfx
 
 		void place(fVec2 pos, Direction dir) { _place(pos.x(), pos.y(), dir); }
 
-		void setFillColor(const sf::Color& color); //!!?? NOOP for now
+//		void  setFillColor(Color color);
+//		Color getFillColor() const;
 
 		void move(fVec2 delta) {
 			for (unsigned i = 0; i < _vertex_count; ++i)

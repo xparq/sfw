@@ -26,6 +26,9 @@ namespace SAL::gfx
 
 		// Accessors for texture pos...
 		constexpr iVec2     texture_position() const      { return Impl::_texture_position(); }
+//!! Doesn't work, but also confusing syntax: .prop() = x...:
+//!!		constexpr iVec2&    texture_position()            { return Impl::_texture_position(); }
+
 		constexpr void      texture_position(iVec2 txpos) { Impl::_texture_position(txpos); }
 
 		//!! Be a bit more sophisticated than this embarrassment! :)

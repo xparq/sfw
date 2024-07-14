@@ -99,7 +99,7 @@ ImageButton* ImageButton::setTextStyle(sf::Text::Style style)
 }
 
 
-ImageButton* ImageButton::setTextColor(sf::Color color)
+ImageButton* ImageButton::setTextColor(Color color)
 {
 	m_text.setFillColor(color);
 	return this;

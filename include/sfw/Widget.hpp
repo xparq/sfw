@@ -26,7 +26,7 @@
 
 #ifdef DEBUG
 #
-#  include <SFML/Graphics/Color.hpp> // for draw_outline()
+#  include "sfw/gfx/Color.hpp" // for draw_outline()
 #
 #endif
 
@@ -197,8 +197,8 @@ private:
 
 #ifdef DEBUG
 public:
-	void draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor = sf::Color::Red,
-	                  sf::Color fillcolor = sf::Color::Transparent) const; // Well, with fillColor, now it can also do interior, not just "outline"
+	void draw_outline(const gfx::RenderContext& ctx, Color outlinecolor = Color::Red,
+	                  Color fillcolor = Color::None) const; // Well, with fillColor, now it can also do interior, not just "outline"
 #endif
 
 // ---- Misc. hackery... -----------------------------------------------------

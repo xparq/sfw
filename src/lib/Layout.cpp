@@ -7,6 +7,7 @@
 
 #ifdef DEBUG
 #   include "sfw/GUI-main.hpp"
+#   include "sfw/gfx/Color.hpp"
 #   include <iostream>
 	using std::cerr, std::endl;
 
@@ -42,9 +43,9 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 	if (DEBUG_INSIGHT_KEY_PRESSED && getActivationState() == Hovered) {
 		if (auto* root = getMain(); root) {
 //cerr << getAbsolutePosition().x << ", " << getAbsolutePosition().y << endl;
-			root->draw_outline(ctx, sf::Color::Yellow);
+			root->draw_outline(ctx, Color::Yellow);
 		}
-		draw_outline(lctx, sf::Color::White);
+		draw_outline(lctx, Color::White);
 	}
 #endif
 
@@ -54,19 +55,19 @@ void Layout::draw(const gfx::RenderContext& ctx) const
 #ifdef DEBUG
 		// "Dim" the widget rect. if disabled:
 		if (widget->disabled()) {
-			widget->draw_outline(lctx, sf::Color::Transparent, Theme::bgColor * sf::Color(200, 200, 200, 50));
+			widget->draw_outline(lctx, Color::None, Theme::bgColor * Color(200, 200, 200, 50));
 		}
 		// Draw an outline around the widget:
 		if (DEBUG_INSIGHT_KEY_PRESSED) {
 			if (widget->getActivationState() == Hovered) {
 				if (auto* root = getMain(); root) {
 					widget->draw_outline(lctx,
-						const_cast<Widget*>(widget)->isLayout() ? sf::Color::White : sf::Color::Blue);
+						const_cast<Widget*>(widget)->isLayout() ? Color::White : Color::Blue);
 				}
 			} else if (widget->getActivationState() == Focused) {
 				if (auto* root = getMain(); root) {
 					widget->draw_outline(lctx,
-						const_cast<Widget*>(widget)->isLayout() ? sf::Color::Cyan : sf::Color::Green);
+						const_cast<Widget*>(widget)->isLayout() ? Color::Cyan : Color::Green);
 				}
 			}
 		}

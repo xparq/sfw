@@ -1,13 +1,12 @@
 #include "sfw/GUI-main.hpp"
 #include "sfw/Theme.hpp"
+#include "sfw/gfx/Color.hpp"
 #include "sfw/widget/Tooltip.hpp"
 
 #include "SAL/util/diagnostics.hpp"
 
-//!! Stuff for clearing the bg. when not owning the entire window
-//!! (Should be moved to the Renderer!)
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/RectangleShape.hpp> //!! For clearing the bg. when not owning the entire window
+                                            //!!?? The clear-bg. feature itself should be moved to the Renderer?!
 
 #include <charconv>
 #include <system_error>
@@ -402,7 +401,7 @@ void GUI::setWallpaper(const Wallpaper::Cfg& cfg)
 		setWallpaper(cfg.filename, cfg.placement, cfg.tint);
 }
 
-void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf::Color tint)
+void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, Color tint)
 {
 	// This may also get called way too early, even before any widgets
 	// are added (i.e. from the initial setTheme() via the ctor!), so
@@ -412,9 +411,9 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf:
 
 	if (filename.empty())
 	{
-		filename = Theme::wallpaper.filename;
+		filename  = Theme::wallpaper.filename;
 		placement = Theme::wallpaper.placement;
-		tint = Theme::wallpaper.tint;
+		tint      = Theme::wallpaper.tint;
 	}
 	if (filename.empty())
 		return;
@@ -434,9 +433,14 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, sf:
 	}
 }
 
-void GUI::setWallpaperColor(sf::Color tint)
+void GUI::setWallpaperColor(Color tint)
 {
 	m_wallpaper.setColor(tint);
+}
+
+Color GUI::getWallpaperColor() const
+{
+	return m_wallpaper.getColor();
 }
 
 bool GUI::hasWallpaper()

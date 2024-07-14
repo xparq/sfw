@@ -4,8 +4,9 @@
 
 #include "sfw/Widget.hpp"
 #include "sfw/gfx/element/Text.hpp"
+#include "sfw/gfx/Color.hpp"
 
-#include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/Text.hpp> //!!SFML: sf::Text::Style, ...
 
 #include <string_view>
 
@@ -22,11 +23,11 @@ class Label: public Widget
 public:
     explicit Label(std::string_view text = "");
 
-    Label* setText(std::string_view text);
+    Label*      setText(std::string_view text);
     std::string getText() const;
 
-    Label* setFillColor(const sf::Color& color);
-    const sf::Color& getFillColor() const;
+    Label* setFillColor(Color color);
+    Color  getFillColor() const;
 
     Label* setTextSize(size_t size);
     size_t getTextSize() const;

@@ -80,7 +80,7 @@ geometry::fRect Box::getRect() const
 }
 
 
-void Box::setFillColor(sf::Color color)
+void Box::setFillColor(Color color)
 {
 	m_fillColor = color;
 }
@@ -166,9 +166,9 @@ void Box::applyState(ActivationState state)
 	m_activationState = state;
 }
 
-void Box::draw(const SAL::gfx::RenderContext& ctx) const //override
+void Box::draw(const gfx::RenderContext& ctx) const //override
 {
-	SAL::gfx::TexturedVertex2::draw_trianglestrip(ctx, Theme::getTexture(), m_vertices, VERTEX_COUNT);
+	gfx::TexturedVertex2::draw_trianglestrip(ctx, Theme::getTexture(), m_vertices, VERTEX_COUNT);
 
 	// Overdraw with a filled rect (presumably with some alpha!) if fillColor was set:
 	if (m_fillColor)

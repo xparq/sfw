@@ -10,6 +10,7 @@
 
 #include "SAL/gfx/element/Font.hpp"
 #include "SAL/geometry/Rectangle.hpp"
+#include "SAL/gfx/Color.hpp"
 #include "SAL/gfx/Render.hpp"
 
 #include "SAL/sfml.hpp" //!! Should be "interfaced" away!...
@@ -56,6 +57,10 @@ public:
 	//!! store a reference to it!
 	//!!void setFont(const Font&) { ...; _recalc(); }
 	const Font& getFont() const { return _font_ref; }
+
+	// Proxies for some already used SFML features:
+	void  setFillColor(Color c) {        ((native_type*)this)->setFillColor(c); }
+	Color getFillColor() const  { return ((native_type*)this)->getFillColor(); }
 
 
 	void draw(const gfx::RenderContext& ctx) const override;

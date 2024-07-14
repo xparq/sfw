@@ -32,13 +32,13 @@ std::string Label::getText() const
 }
 
 
-Label* Label::setFillColor(const sf::Color& color)
+Label* Label::setFillColor(const Color color)
 {
 	m_text.setFillColor(color);
 	return this;
 }
 
-const sf::Color& Label::getFillColor() const
+Color Label::getFillColor() const
 {
 	return m_text.getFillColor();
 }

@@ -60,12 +60,16 @@ namespace SFML
 } // namespace SFML
 
 
-// Save the specific adapter type to a backend-agnostic symbol...
-//namespace active_backend
-//{
+	// Save the specific adapter type to a backend-agnostic symbol...
+	//!!
+	//!! This looks totally useless, as this entire header is dispached by the selected backend,
+	//!! so things defined here could just live directly in adapter::, no need for SFML:: too
+	//!! -- but... The build system can't also dispatch the translation units yet, so it would
+	//!! just compile -- and link -- everything together, causing name clashes across backends!
+	//!!
 	template <typename NumT>
 	using Rectangle_Impl = SFML::Rectangle_Impl<NumT>;
-//}
+
 
 } // namespace SAL::adapter
 

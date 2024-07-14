@@ -2,15 +2,13 @@
 #define _YGM78SY487Y3G45YNV87M475D70YRT7YHVM579H_
 
 
+#include "sfw/math/Vector.hpp"
+#include "sfw/gfx/Color.hpp"
+#include "sfw/gfx/element/TexturedVertex2.hpp"
 #include "sfw/gfx/Render.hpp"
 
-#include "sfw/math/Vector.hpp" //!!?? SAL/...
 
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/Vertex.hpp>
-
-
-namespace sfw
+namespace sfw//!!::parts
 {
 
 class CheckMark: public gfx::Drawable
@@ -23,7 +21,7 @@ public:
 
 	void setSize(float size);
 	fVec2 getSize() const;
-	void setColor(const sf::Color& color);
+	void setColor(Color color);
 
 public: //! <- NOT private, because draw() may be accessed directly (statically),
         //!    rather than just polymorphically (dynamically) via a pointer!
@@ -32,11 +30,11 @@ public: //! <- NOT private, because draw() may be accessed directly (statically)
 private:
 	void updateGeometry(float x, float y);
 
-	sf::Vertex m_vertices[4];
+	gfx::TexturedVertex2 m_vertices[4];
 
 }; // class CheckMark
 
-} // namespace sfw
+} // namespace sfw//!!::parts
 
 
 #endif // _YGM78SY487Y3G45YNV87M475D70YRT7YHVM579H_

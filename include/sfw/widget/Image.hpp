@@ -3,15 +3,12 @@
 
 
 #include "sfw/Widget.hpp"
-#include "SAL/gfx/element/Texture.hpp"
-#include "SAL/gfx/element/TexturedVertex2.hpp"
-
-//!!#include "SAL/geometry/Rectangle.hpp"
+#include "sfw/gfx/element/Texture.hpp"
+#include "sfw/gfx/element/TexturedVertex2.hpp"
 #include "sfw/geometry/Rectangle.hpp"
+#include "sfw/gfx/Color.hpp"
 
 #include <string_view>
-
-#include <SFML/Graphics/Color.hpp>
 
 
 namespace sfw
@@ -45,7 +42,7 @@ public:
     // Relative scaling based on the current size, not the original
     Image* rescale(float factor);
 
-    Image* setColor(const sf::Color& color);
+    Image* setColor(Color color);
 
 private:
     void draw(const gfx::RenderContext& ctx) const override;

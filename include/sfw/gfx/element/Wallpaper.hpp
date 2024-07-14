@@ -3,18 +3,17 @@
 
 #include "sfw/gfx/element/GenericWallpaper.hpp" //!! Pretty stupid experimental design...
 
-#include "SAL/gfx/element/Texture.hpp"
-#include "SAL/gfx/element/TexturedVertex2.hpp"
-#include "SAL/math/Vector.hpp"
-//!!#include "SAL/math/Vector.hpp"
-#include "sfw/math/Vector.hpp" //!!
-//!!#include "SAL/geometry/Rectangle.hpp"
-#include "sfw/geometry/Rectangle.hpp" //!!
-#include "SAL/gfx/Render.hpp"
+#include "sfw/gfx/element/Texture.hpp"
+#include "sfw/gfx/element/TexturedVertex2.hpp"
+#include "sfw/math/Vector.hpp"
+#include "sfw/geometry/Rectangle.hpp"
+#include "sfw/gfx/Render.hpp"
+#include "sfw/gfx/Color.hpp"
 
-#include <SFML/Graphics/Transformable.hpp>
-#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Image.hpp> //!! DIRECT USE of sf::Image!
+#include <SFML/Graphics/Transformable.hpp> //!! Wallpaper is defined as an sf::Transformable!
 
+#include <string>
 #include <string_view>
 
 
@@ -24,7 +23,7 @@ namespace sfw
 /**
  * Draw an image, possibly stretched, onto a rectangle
  */
-class Wallpaper: public GenericWallpaper, public SAL::gfx::Drawable, public sf::Transformable
+class Wallpaper: public GenericWallpaper, public gfx::Drawable, public sf::Transformable
 {
 	static constexpr geometry::iRect NullRect{};
 
@@ -32,10 +31,10 @@ public:
 	struct Cfg
 	{
 		std::string filename;
-		Placement placement;
-		sf::Color tint;
+		Placement   placement;
+		Color       tint;
 
-		Cfg(const std::string& f = "", Wallpaper::Placement p = Center, sf::Color c = sf::Color::White)
+		Cfg(std::string_view f = "", Wallpaper::Placement p = Center, Color c = Color::White)
 		:
 			filename(f),
 			placement(p),
@@ -47,13 +46,13 @@ public:
 	Wallpaper();
 	Wallpaper(std::string_view filename,   const geometry::iRect& r = NullRect);
 	Wallpaper(const sf::Image& image,      const geometry::iRect& r = NullRect);
-	Wallpaper(const SAL::gfx::Texture& texture, const geometry::iRect& r = NullRect);
+	Wallpaper(const gfx::Texture& texture, const geometry::iRect& r = NullRect);
 
 	Wallpaper* setImage(std::string_view filename,   const geometry::iRect& r = NullRect);
 	Wallpaper* setImage(const sf::Image& image,      const geometry::iRect& r = NullRect);
-	Wallpaper* setImage(const SAL::gfx::Texture& texture, const geometry::iRect& r = NullRect);
+	Wallpaper* setImage(const gfx::Texture& texture, const geometry::iRect& r = NullRect);
 
-	const SAL::gfx::Texture& texture() const { return m_texture; }
+	const gfx::Texture& texture() const { return m_texture; }
 
 	Wallpaper* setSize(iVec2 size);
 	iVec2      getSize() const;
@@ -68,18 +67,18 @@ public:
 	// Relative scaling based on the current size
 	Wallpaper* rescale(float factor);
 
-	Wallpaper* setColor(const sf::Color& color);
-	sf::Color  getColor() const;
+	Wallpaper* setColor(const Color& color);
+	Color      getColor() const;
 
 public: //! <- NOT private, because draw() may be accessed directly (statically),
         //!    rather than just polymorphically (dynamically) via a pointer!
-	void draw(const SAL::gfx::RenderContext& ctx) const override;
+	void draw(const gfx::RenderContext& ctx) const override;
 
 private:
-	SAL::gfx::Texture m_texture;
-	iVec2 m_baseSize;
-	float m_scalingFactor = 1.f;
-	SAL::gfx::TexturedVertex2 m_vertices[4];
+	gfx::Texture         m_texture;
+	iVec2                m_baseSize;
+	float                m_scalingFactor = 1.f;
+	gfx::TexturedVertex2 m_vertices[4];
 };
 
 

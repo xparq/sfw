@@ -7,6 +7,7 @@
 #include "sfw/gfx/element/Arrow.hpp"
 #include "sfw/gfx/element/ItemBox.hpp"
 
+#include <vector>
 #include <string_view>
 #include <utility> // forward
 
@@ -48,8 +49,8 @@ public:
 	auto set(std::string_view label);
 	auto set(const T& value); // Would call T::op==!
 
-	OptionsBox<T>* setTextColor(const sf::Color& color);
-	OptionsBox<T>* setFillColor(const sf::Color& color);
+	OptionsBox<T>* setTextColor(Color color);
+	OptionsBox<T>* setFillColor(Color color);
 
 	// -------- Actions...
 
@@ -105,8 +106,7 @@ private:
 		Item(std::string_view text, const T& value);
 	};
 
-	typedef std::vector<Item> ItemVector;
-	ItemVector m_items;
+	std::vector<Item> m_items;
 	size_t m_currentIndex;
 
 	// Visual components

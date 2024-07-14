@@ -4,12 +4,14 @@
 
 #include "sfw/InputWidget.hpp"
 #include "sfw/gfx/element/Text.hpp"
-#include "sfw/gfx/element/Texture.hpp"
 #include "sfw/gfx/element/Font.hpp"
+#include "sfw/gfx/element/Texture.hpp"
+#include "sfw/gfx/Color.hpp"
 
 #include <string_view>
 
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Text.hpp> //!! sf::Text::Style
 
 
 namespace sfw
@@ -37,7 +39,7 @@ public:
 
 	ImageButton* setTextSize(size_t size);
 	ImageButton* setTextStyle(sf::Text::Style style);
-	ImageButton* setTextColor(sf::Color color);
+	ImageButton* setTextColor(Color color);
 
 	ImageButton* setTexture(const gfx::Texture& texture);
 		// Also resets the scaling; see setSize!

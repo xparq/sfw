@@ -109,7 +109,7 @@ Image* Image::rescale(float factor)
 }
 
 
-Image* Image::setColor(const sf::Color& color)
+Image* Image::setColor(Color color)
 {
 	for (int i = 0; i < 4; ++i)
 		m_vertices[i].color(color);

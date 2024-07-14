@@ -333,7 +333,7 @@ const sf::Transform& Widget::getTransform() const
 // Diagnostics ---------------------------------------------------------------
 
 #ifdef DEBUG
-void Widget::draw_outline(const gfx::RenderContext& ctx, sf::Color outlinecolor, sf::Color fillcolor/* = Transparent*/) const
+void Widget::draw_outline(const gfx::RenderContext& ctx, Color outlinecolor, Color fillcolor/* = None*/) const
 {
 	auto r = sf::RectangleShape(getSize()); r.setPosition(getAbsolutePosition());
 	r.setFillColor(fillcolor);

@@ -15,13 +15,13 @@ using namespace geometry;
 
 Theme::Cfg Theme::DEFAULT =
 {
-	.name = "",
-	.basePath = "asset/",
-	.textureFile = "texture/default.png",
-	.bgColor = sf::Color::White,
-	.wallpaper = {},
-	.textSize = 12,
-	.fontFile = "font/default.ttf",
+	.name          = "",
+	.basePath      = "asset/",
+	.textureFile   = "texture/default.png",
+	.bgColor       = Color::White,
+	.wallpaper     = {},
+	.textSize      = 12,
+	.fontFile      = "font/default.ttf",
 	.multiTooltips = false, //! Ignotred! The desig. init. value can't be made distinguishable
 	                        //! from an artificial "use default" inline member-init val. in Cfg::.
 };
@@ -67,7 +67,7 @@ size_t Theme::textSize = Theme::DEFAULT.textSize;
 Theme::Style Theme::click;
 Theme::Style Theme::input;
 
-sf::Color      Theme::bgColor = sf::Color::White;
+Color          Theme::bgColor = Color::White;
 Wallpaper::Cfg Theme::wallpaper{};
 bool           Theme::clearBackground = true;
 

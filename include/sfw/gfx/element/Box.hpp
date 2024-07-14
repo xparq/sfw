@@ -4,18 +4,17 @@
 
 #include "sfw/ActivationState.hpp"
 
+//!!?? Should we use the SAL headers explicitly instead, here in the sfw::parts layer?!
 #include "sfw/math/Vector.hpp"
-//!!??#include "SAL/math/Vector.hpp"
 #include "sfw/geometry/Rectangle.hpp"
-//!!??#include "SAL/geometry/Rectangle.hpp"
-#include "SAL/gfx/element/TexturedVertex2.hpp"
-#include "SAL/gfx/element/Text.hpp"
-#include "SAL/gfx/Render.hpp"
-
-#include <SFML/Graphics/Color.hpp> //!! Use our own adapter class!
+#include "sfw/gfx/element/TexturedVertex2.hpp"
+#include "sfw/gfx/element/Text.hpp"
+#include "sfw/gfx/Render.hpp"
+#include "sfw/gfx/Color.hpp"
 
 #include <cmath>
 #include <optional>
+
 
 namespace sfw//!!::parts
 {
@@ -48,7 +47,7 @@ public:
 
 	// Fill the interior of the box with a color, overriding its texture
 	// The edges will NOT be affected!
-	void setFillColor(sf::Color color);
+	void setFillColor(Color color);
 
 	void press();
 	void release();
@@ -124,7 +123,7 @@ private:
 
 	ActivationState m_activationState;
 	SAL::gfx::TexturedVertex2 m_vertices[VERTEX_COUNT];
-	std::optional<sf::Color> m_fillColor;
+	std::optional<Color> m_fillColor;
 };
 
 

@@ -51,7 +51,7 @@ CXX = ${CXX.$(TOOLCHAIN)}
 _compflags_warnings.gcclike := -Wall -pedantic -Wextra -Wshadow -Wwrite-strings
 CFLAGS_COMMON = -I. -Iinclude
 CFLAGS_COMMON.linux = -o "$@" -MMD $(_compflags_warnings.gcclike) -O3 -fPIC
-CFLAGS_COMMON.mingw = -o "$@" -MMD $(_compflags_warnings.gcclike) -O3
+CFLAGS_COMMON.mingw = -o "$@" -MMD $(_compflags_warnings.gcclike)
 CFLAGS_COMMON.msvc  = -Fo"$@" -nologo -W4 -O2
 CFLAGS_COMMON.msvc.static =
 CFLAGS_COMMON.msvc.shared =
@@ -59,9 +59,9 @@ CFLAGS_COMMON.msvc += ${CFLAGS_COMMON.msvc.$(LIB_MODE)}
 
 CFLAGS_COMMON.linux.debug_0 = -DNDEBUG
 CFLAGS_COMMON.linux.debug_1 = -DDEBUG -g -fsanitize=address
-CFLAGS_COMMON.mingw.debug_0 = -DNDEBUG
-#!!CFLAGS_COMMON.mingw.debug_1 = -DDEBUG -g #! Not with w64devkit: -fsanitize=address (See also at LDFLAGS!)
-CFLAGS_COMMON.mingw.debug_1    = -DDEBUG -g -fsanitize=undefined -fsanitize-trap # w64devkit/issues/148
+CFLAGS_COMMON.mingw.debug_0 = -DNDEBUG -O3
+#!!CFLAGS_COMMON.mingw.debug_1 = -DDEBUG -O0 -g -ggdb #! Not with w64devkit: -fsanitize=address (See also at LDFLAGS!)
+CFLAGS_COMMON.mingw.debug_1    = -DDEBUG -O0 -g -ggdb -fsanitize=undefined -fsanitize-trap # w64devkit/issues/148
 CFLAGS_COMMON.msvc.debug_0 = -DNDEBUG
 CFLAGS_COMMON.msvc.debug_1 = -DDEBUG -Zi -fsanitize=address
 

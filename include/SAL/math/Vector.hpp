@@ -80,8 +80,8 @@ namespace SAL//!!::math
 
 
 	protected:
-		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
 		constexpr auto adapter() const { return static_cast<const Impl*>(this); }
+		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
 
 	}; // class Vector_Interface
 
