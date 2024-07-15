@@ -22,7 +22,7 @@ Theme::Cfg Theme::DEFAULT =
 	.wallpaper     = {},
 	.textSize      = 12,
 	.fontFile      = "font/default.ttf",
-	.multiTooltips = false, //! Ignotred! The desig. init. value can't be made distinguishable
+	.multiTooltips = false, //! Ignored! The desig. init. value can't be made distinguishable
 	                        //! from an artificial "use default" inline member-init val. in Cfg::.
 };
 

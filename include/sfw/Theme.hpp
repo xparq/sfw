@@ -38,14 +38,13 @@ public:
 		//
 		// Note: these are not "defaults" here, but "unset" markers (and/or diagnostic sentinels)
 		// (except when the type doesn't allow such "off-band" values; then it's indeed a default).
-		const char*    name = nullptr;
-		const char*    basePath = nullptr;
-		const char*    textureFile = nullptr;
-		Color          bgColor = Color::None; // "transparent black"
-//!!??		Color          bgColor = Color::White; // Color::None could be the "unset" color, but white may still be more practical for debugging here
-		Wallpaper::Cfg wallpaper = {};
-		size_t         textSize = 0; //!!?? uint16_t: a) fixed (-> ABI compat.!), b) smaller, c) but may need annoying extra casts, d) uint_least16_t is the guaranteed type actually...
-		const char*    fontFile = nullptr;
+		const char*    name          = nullptr;
+		const char*    basePath      = nullptr;
+		const char*    textureFile   = nullptr;
+		Color          bgColor       = Color::None; // "transparent black": closest to an unset "null" color value
+		Wallpaper::Cfg wallpaper     = {};
+		size_t         textSize      = 0; //!!?? uint16_t: a) fixed (-> ABI compat.!), b) smaller, c) but may need annoying extra casts, d) uint_least16_t is the guaranteed type actually...
+		const char*    fontFile      = nullptr;
 		bool           multiTooltips = false;
 
 	protected:

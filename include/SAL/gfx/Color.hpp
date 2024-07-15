@@ -1,8 +1,3 @@
-//!!
-//!! Don't just move this to a gfx/Color class -- at least definitely not
-//!! directly into that class (which shouldn't have all these deps)!...
-//!!
-
 #ifndef _DFGM9W3804QWM89E70DFRNYGUYMCHW9D85MYHUV_
 #define _DFGM9W3804QWM89E70DFRNYGUYMCHW9D85MYHUV_
 
@@ -10,12 +5,14 @@
 #include "SAL.hpp"
 #include SAL_ADAPTER(gfx/Color)
 
-#include "SAL/util/diagnostics.hpp"
+#include <cstdint>  // uint32_t, uint8_t
 
-#include <cstdint> // uint32_t, uint8_t
-#include <cstdlib> // strtoul
+//!! Move the from-text conv. from this class (which shouldn't have these deps)
+//!! to an optionally included component!...
 #include <string_view>
-#include <string> // For a temorary inside the hex -> color converter... :-/
+#include <charconv> // from_chars
+
+#include "SAL/util/diagnostics.hpp"
 
 
 namespace SAL::gfx
@@ -58,43 +55,89 @@ namespace SAL::gfx
 
 		constexpr RGBAColor(std::uint32_t rgba)
 		:	Impl(rgba) {}
-		/*
-		:	r(uint8_t((rgba & 0xff000000) >> 24)),
-			g(uint8_t((rgba & 0x00ff0000) >> 16)),
-			b(uint8_t((rgba & 0x0000ff00) >> 8)),
-			a(uint8_t( rgba & 0x000000ff)) {}
-		*/
+
 		constexpr RGBAColor(std::uint32_t rgb, std::uint8_t alpha)
 		:	Impl(rgb << 8 | alpha) {}
-		/*
-		:	r(uint8_t((rgb & 0xff000000) >> 16)),
-			g(uint8_t((rgb & 0x00ff0000) >> 8)),
-			b(uint8_t( rgb & 0x0000ff00)),
-			a(alpha) {}
-		*/
-/*!!		
+
 		explicit constexpr RGBAColor(std::string_view csshexcolor)
 		{
-			auto len = csshexcolor.size();
+			auto len = csshexcolor.length();
 
+			//!! No runtime format checking! But, well, the worst case is a bogus color...
 			SAL_ASSERT(len == 7 || len == 9 || len == 4 || len == 5);
 			SAL_ASSERT(csshexcolor[0] == '#');
 
-			// Note: strtoul will just return 0 for garbage.
+			constexpr auto CComp = [](const std::string_view& str, unsigned pos, unsigned width) {
+				SAL_ASSERT(                  1 + width*pos + width <= str.length());
+				const char* p = str.data() + 1 + width*pos;
+				uint8_t n = 0;
+				//auto [p, err] = 
+					std::from_chars(p, p + width, n, 16);
+				return n;
+			};
+
+			switch (len)
+			{
+			case 7: // #rrggbb
+				r( CComp(csshexcolor, 0, 2) );
+				g( CComp(csshexcolor, 1, 2) );
+				b( CComp(csshexcolor, 2, 2) );
+				a( Opaque );
+				break;
+			case 4: // #rgb
+				r( CComp(csshexcolor, 0, 1) * 17 );
+				g( CComp(csshexcolor, 1, 1) * 17 );
+				b( CComp(csshexcolor, 2, 1) * 17 );
+				a( Opaque );
+				break;
+			case 9: // #rrggbbaa
+				r( CComp(csshexcolor, 0, 2) );
+				g( CComp(csshexcolor, 1, 2) );
+				b( CComp(csshexcolor, 2, 2) );
+				a( CComp(csshexcolor, 3, 2) );
+				break;
+			case 5: // #rgba
+				r( CComp(csshexcolor, 0, 1) * 17 );
+				g( CComp(csshexcolor, 1, 1) * 17 );
+				b( CComp(csshexcolor, 2, 1) * 17 );
+				a( CComp(csshexcolor, 3, 1) * 17 );
+				break;
+			default:;
+			}
+		}
+
+/*!! Shorter, but more branching:
+
+		explicit constexpr RGBAColor(std::string_view csshexcolor)
+		{
+			auto len = csshexcolor.length();
+
+			//!! No runtime format checking! But, well, the worst case is a bogus color...
+			SAL_ASSERT(len == 7 || len == 9 || len == 4 || len == 5);
+			SAL_ASSERT(csshexcolor[0] == '#');
+
+			constexpr auto CComp = [](const std::string_view& str, unsigned pos, unsigned width) {
+				SAL_ASSERT(pos + width <= str.length());
+				const char* p = str.data() + pos;
+				uint8_t n = 0;
+				//auto [p, err] = 
+					std::from_chars(p, p + width, n, 16);
+				return n;
+			};
 
 			if (len >= 7) // #rrggbb[aa]
 			{
-				r( (uint8_t)strtoul(csshexcolor.substr(1, 2).c_str(), nullptr, 16) );
-				g( (uint8_t)strtoul(csshexcolor.substr(3, 2).c_str(), nullptr, 16) );
-				b( (uint8_t)strtoul(csshexcolor.substr(5, 2).c_str(), nullptr, 16) );
-				a( (len == 9) ? (uint8_t)strtoul(csshexcolor.substr(7, 2).c_str(), nullptr, 16) : Opaque );
+				r( CComp(csshexcolor, 1, 2) );
+				g( CComp(csshexcolor, 3, 2) );
+				b( CComp(csshexcolor, 5, 2) );
+				a( (len == 9) ? CComp(csshexcolor, 7, 2) : (uint8_t)Opaque );
 			}
 			else if (len >= 4) // #rgb[a]
 			{
-				r( (uint8_t)strtoul(csshexcolor.substr(1, 1).c_str(), nullptr, 16) * 17 );
-				g( (uint8_t)strtoul(csshexcolor.substr(2, 1).c_str(), nullptr, 16) * 17 );
-				b( (uint8_t)strtoul(csshexcolor.substr(3, 1).c_str(), nullptr, 16) * 17 );
-				a( (len == 5) ? (uint8_t)strtoul(csshexcolor.substr(4, 1).c_str(), nullptr, 16) * 17 : Opaque );
+				r( CComp(csshexcolor, 1, 1) * 17 );
+				g( CComp(csshexcolor, 2, 1) * 17 );
+				b( CComp(csshexcolor, 3, 1) * 17 );
+				a( (len == 5) ? CComp(csshexcolor, 4, 1) * 17 : (uint8_t)Opaque );
 			}
 			else
 			{
@@ -104,50 +147,6 @@ namespace SAL::gfx
 			}
 		}
 !!*/
-
-		explicit constexpr RGBAColor(std::string_view hexcolor_strview)
-		{
-			//!! strtoul() can't deal with string_views! :-/
-			auto hexcolor = std::string(hexcolor_strview);
-
-			SAL_ASSERT(hexcolor.size() == 7 || hexcolor.size() == 4 || hexcolor.size() == 9 || hexcolor.size() == 5);
-			SAL_ASSERT(hexcolor[0] == '#');
-
-#	define CCOMP(str, pos, width) (std::uint8_t)std::strtoul(hexcolor.substr(1 + (pos)*(width), width).c_str(), nullptr, 16)
-
-			//!! No checking though!... But strtoul might even throw!... :-o
-			switch (hexcolor.size())
-			{
-			case 7: // #rrggbb
-				r( CCOMP(hexcolor, 0, 2) );
-				g( CCOMP(hexcolor, 1, 2) );
-				b( CCOMP(hexcolor, 2, 2) );
-				a( 255 );
-				break;
-			case 4: // #rgb
-				r( CCOMP(hexcolor, 0, 1) * 17 );
-				g( CCOMP(hexcolor, 1, 1) * 17 );
-				b( CCOMP(hexcolor, 2, 1) * 17 );
-				a( 255 );
-				break;
-			case 9: // #rrggbbaa
-				r( CCOMP(hexcolor, 0, 2) );
-				g( CCOMP(hexcolor, 1, 2) );
-				b( CCOMP(hexcolor, 2, 2) );
-				a( CCOMP(hexcolor, 3, 2) );
-				break;
-			case 5: // #rgba
-				r( CCOMP(hexcolor, 0, 1) * 17 );
-				g( CCOMP(hexcolor, 1, 1) * 17 );
-				b( CCOMP(hexcolor, 2, 1) * 17 );
-				a( CCOMP(hexcolor, 3, 1) * 17 );
-				break;
-			default:;
-			}
-#	undef CCOMP
-
-		}
-
 	//!!	std::string get_hex() const (uint32_t rgb, uint8_t alpha = 255) { ... }
 
 		// Generic (implicit) "get RGBA":
@@ -177,7 +176,7 @@ namespace SAL::gfx
 
 
 		// Some predefined colors, for convenience:
-		static constinit const RGBAColor None; // Tansparent!
+		static constinit const RGBAColor None; // Tansparent black...
 		static constinit const RGBAColor Black;
 		static constinit const RGBAColor White;
 		static constinit const RGBAColor Green;
@@ -189,8 +188,8 @@ namespace SAL::gfx
 
 	}; // class RGBAColor<Impl>
 
-///*!! I don't even know how to set these with a template, but
-//     I do know it will be a fucking nightmare, yet again:
+		//!! I didn't even know how to write these properly if templated, but
+		//!! I did know it was gonna be a fucking nightmare, again...
 		template <class Impl> constinit const RGBAColor<Impl> RGBAColor<Impl>::None    = 0x00000000;
 		template <class Impl> constinit const RGBAColor<Impl> RGBAColor<Impl>::Black   = 0x000000ff;
 		template <class Impl> constinit const RGBAColor<Impl> RGBAColor<Impl>::White   = 0xffffffff;
@@ -200,124 +199,46 @@ namespace SAL::gfx
 		template <class Impl> constinit const RGBAColor<Impl> RGBAColor<Impl>::Yellow  = 0xffff00ff;
 		template <class Impl> constinit const RGBAColor<Impl> RGBAColor<Impl>::Magenta = 0xff00ffff;
 		template <class Impl> constinit const RGBAColor<Impl> RGBAColor<Impl>::Cyan    = 0x00ffffff;
-//!!*/
 
-/*!!
-	class Color //!!?? or: RGBAColor : Color
-	{
-		enum : unsigned {
-			Transparent = 0,
-			Opaque = 255,
-		};
 
-		uint8_t r;
-		uint8_t g;
-		uint8_t b;
-		uint8_t a;
-
-		Color() = default; // uninitialized
-
-		constexpr Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = Opaque)
-		:	r(r), g(g), b(b), a(a) {}
-
-		constexpr Color(uint32_t rgba)
-		:	r(uint8_t((rgba & 0xff000000) >> 24)),
-			g(uint8_t((rgba & 0x00ff0000) >> 16)),
-			b(uint8_t((rgba & 0x0000ff00) >> 8)),
-			a(uint8_t((rgba & 0x000000ff)) {}
-
-		constexpr Color(uint32_t rgb, uint_8 alpha)
-		:	r(uint8_t((rgb & 0xff000000) >> 16)),
-			g(uint8_t((rgb & 0x00ff0000) >> 8)),
-			b(uint8_t( rgb & 0x0000ff00),
-			a(alpha) {}
-
-		explicit constexpr Color(const std::string& csshexcolor)
-		{
-			auto len = hexcolor.size();
-
-			assert(len == 7 || len == 9 || len == 4 || len == 5);
-			assert(csshexcolor[0] == '#');
-
-			// Note: strtoul will just return 0 for garbage.
-
-			if (len >= 7) // #rrggbb[aa]
-			{
-				color.r = (uint8_t)strtoul(csshexcolor.substr(1, 2).c_str(), nullptr, 16);
-				color.g = (uint8_t)strtoul(csshexcolor.substr(3, 2).c_str(), nullptr, 16);
-				color.b = (uint8_t)strtoul(csshexcolor.substr(5, 2).c_str(), nullptr, 16);
-				color.a = (len == 9) ? (uint8_t)strtoul(csshexcolor.substr(7, 2).c_str(), nullptr, 16) : Opaque;
-			{
-			else if (len >= 4) // #rgb[a]
-			{
-				color.r = (uint8_t)strtoul(csshexcolor.substr(1, 1).c_str(), nullptr, 16) * 17;
-				color.g = (uint8_t)strtoul(csshexcolor.substr(2, 1).c_str(), nullptr, 16) * 17;
-				color.b = (uint8_t)strtoul(csshexcolor.substr(3, 1).c_str(), nullptr, 16) * 17;
-				color.a = (len == 5) ? (uint8_t)strtoul(csshexcolor.substr(4, 1).c_str(), nullptr, 16) * 17 : Opaque;
-			}
-			else
-			{
-				// Give a chance to catch it in DEBUG mode (but leave
-				// it uninitialized, as in the default ctor):
-				assert(csshexcolor == "well-formed");
-			}
-		}
-
-		operator uint32_t() const { return getRGBA(); }
-
-		void set(uint32_t rgb, uint8_t alpha) { setRGBA((rgb << 8) | alpha); }
-	//!!	void setRGBA(uint32_t rgba), uint8_t alpha = 255) { ... }
-	//!!	// Leave alpha unmodified:
-	//!!	void setRGB( uint32_t rgb) uint8_t alpha = 255) { ... }
-
-		uint32_t getRGBA() const { return (getRGB() << 8) | a; }
-		uint32_t getRGB()  const { return (r << 24) | (g << 16) | (b << 8) | a; }
-
-	//!!	std::string getCSShex() const (uint32_t rgb, uint8_t alpha = 255) { return (rgb << 8) | alpha; }
-
-	//!!Move to some derived Color_SFML class:
-	//!!	oprator sf::Color() { return sf::Color(getRGBA()); }
-	}; // class Color
-!!*/
-
-/*!!
-inline sf::Color Color(const std::string& hexcolor)
+/*!! Don't forget that this can also be a free function (but not with this obsolete impl.):
+inline sf::Color Color(const std::string& csshexcolor)
 {
-	assert(hexcolor.size() == 7 || hexcolor.size() == 4 || hexcolor.size() == 9 || hexcolor.size() == 5);
-	assert(hexcolor[0] == '#');
+	assert(csshexcolor.length() == 7 || csshexcolor.length() == 4 || csshexcolor.length() == 9 || csshexcolor.length() == 5);
+	assert(csshexcolor[0] == '#');
 
 	sf::Color color = sf::Color::Black;
 
-#define CCOMP(str, pos, width) (uint8_t)std::strtoul(hexcolor.substr(1 + (pos)*(width), width).c_str(), nullptr, 16)
-	switch (hexcolor.size())
+#define CComp(str, pos, width) (uint8_t)std::strtoul(csshexcolor.substr(1 + (pos)*(width), width).c_str(), nullptr, 16)
+	switch (csshexcolor.length())
 	{
 	case 7: // #rrggbb
-		color.r = CCOMP(hexcolor, 0, 2);
-		color.g = CCOMP(hexcolor, 1, 2);
-		color.b = CCOMP(hexcolor, 2, 2);
+		color.r = CComp(csshexcolor, 0, 2);
+		color.g = CComp(csshexcolor, 1, 2);
+		color.b = CComp(csshexcolor, 2, 2);
 		color.a = 255;
 		break;
 	case 4: // #rgb
-		color.r = CCOMP(hexcolor, 0, 1) * 17;
-		color.g = CCOMP(hexcolor, 1, 1) * 17;
-		color.b = CCOMP(hexcolor, 2, 1) * 17;
+		color.r = CComp(csshexcolor, 0, 1) * 17;
+		color.g = CComp(csshexcolor, 1, 1) * 17;
+		color.b = CComp(csshexcolor, 2, 1) * 17;
 		color.a = 255;
 		break;
 	case 9: // #rrggbbaa
-		color.r = CCOMP(hexcolor, 0, 2);
-		color.g = CCOMP(hexcolor, 1, 2);
-		color.b = CCOMP(hexcolor, 2, 2);
-		color.a = CCOMP(hexcolor, 3, 2);
+		color.r = CComp(csshexcolor, 0, 2);
+		color.g = CComp(csshexcolor, 1, 2);
+		color.b = CComp(csshexcolor, 2, 2);
+		color.a = CComp(csshexcolor, 3, 2);
 		break;
 	case 5: // #rgba
-		color.r = CCOMP(hexcolor, 0, 1) * 17;
-		color.g = CCOMP(hexcolor, 1, 1) * 17;
-		color.b = CCOMP(hexcolor, 2, 1) * 17;
-		color.a = CCOMP(hexcolor, 3, 1) * 17;
+		color.r = CComp(csshexcolor, 0, 1) * 17;
+		color.g = CComp(csshexcolor, 1, 1) * 17;
+		color.b = CComp(csshexcolor, 2, 1) * 17;
+		color.a = CComp(csshexcolor, 3, 1) * 17;
 		break;
 	default:;
 	}
-#undef CCOMP
+#undef CComp
 	return color;
 
 } // Color()

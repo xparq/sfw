@@ -79,7 +79,6 @@ private:
 
 	const Font& _font_ref; //!! This being a ref. would prevent adding setFont(), BTW!... :-o
 	fVec2       _sf_padding;
-	fVec2       _pos_offset;
 };
 
 } // namespace SAL::gfx
