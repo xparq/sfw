@@ -44,3 +44,6 @@ sfml-widgets.depend
 
 # VS "solution" file occasionally used for debugging:
 *.sln
+
+# Misc...
+.gdb_history

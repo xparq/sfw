@@ -433,6 +433,7 @@ try {
 		if (w->find_widget("Wallpaper")) w->template find_widget<CheckBox>("Wallpaper")->set(demo.hasWallpaper());
 		// Update the wallpaper alpha slider:
 		if (w->find_widget("Wallpaper α")) w->template find_widget<CheckBox>("Wallpaper α")->set(demo.hasWallpaper());
+//cerr << "Theme::cfg.bgColor: " << hex << (unsigned)Theme::cfg.bgColor << '\n';
 	});
 	for (auto& t: themes) { themeselect->add(t.name, t); }
 	themeselect->set(DEFAULT_THEME);

@@ -24,6 +24,8 @@
 #include "SAL/gfx/Color.hpp"
 
 #include <SFML/Graphics/Vertex.hpp>
+//#include <SFML/Graphics/Color.hpp>
+//#include <SFML/System/Vector2.hpp>
 
 
 namespace SAL::gfx::adapter
@@ -50,18 +52,20 @@ namespace SFML
 		ColorVertex2_Impl& operator = (const native_type& nv) { _d = nv; return *this; }
 		
 		// Convert to SFML
-		operator const native_type& () const { return native(); }
 		operator       native_type& ()       { return native(); }
+		operator const native_type& () const { return native(); }
 
 		// Accessors for the position, color, texture pos...
-		constexpr fVec2     _position() const              { return native().position; } // fVec2 auto-converts from sf::Vector2f
-		constexpr Color     _color()    const              { return native().color; }
-//!! Type mismatch (SAL vs. native), but also confusing syntax: .prop() = x...:
-//!!		constexpr fVec2&    _position()                    { return native().position; } // fVec2 auto-converts from sf::Vector2f
-//!!		constexpr Color&    _color()                       { return native().color; }
 
-		constexpr void      _position(fVec2 pos)           { native().position = pos; }
-		constexpr void      _color(Color c)                { native().color = c; }
+		//!! Brittle binary-compatibility "exploits":
+		constexpr fVec2&    _position_ref()          { return reinterpret_cast<fVec2&>(native().position); } //!!...Add some checks (sizeof & ...)!
+		constexpr Color&    _color_ref()             { return reinterpret_cast<Color&>(native().color); }    //!!...Add some checks (sizeof & ...)!
+
+		constexpr fVec2     _position_copy() const   { return native().position; } // fVec2 auto-converts from sf::Vector2f
+		constexpr Color     _color_copy()    const   { return native().color; }    // Color auto-converts from sf::Color
+
+		constexpr void      _position_set(fVec2 p)   { native().position = p; }  // fVec2 auto-converts to sf::Vector2f
+		constexpr void      _color_set(Color c)      { native().color = c; }       // Color auto-converts to sf::Color
 
 
 		//!! Be a bit more sophisticated than this embarrassment! :)
@@ -75,8 +79,8 @@ namespace SFML
 	protected: //! Not private: meant to be mixed-in!
 		native_type _d;
 
-		const native_type& native() const { return _d; }
 		      native_type& native()       { return _d; }
+		const native_type& native() const { return _d; }
 	};
 
 } // namespace SFML

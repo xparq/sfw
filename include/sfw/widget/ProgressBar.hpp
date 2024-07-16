@@ -12,6 +12,7 @@
 #include "sfw/geometry/Orientation.hpp"
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/element/Text.hpp"
+#include "sfw/gfx/element/TexturedVertex2.hpp"
 
 
 namespace sfw
@@ -79,15 +80,20 @@ private:
 	float track_length() const;
 	float val_to_barlength(float v) const;
 
-	enum VertexIndex : unsigned { TopLeft, BottomLeft, TopRight, BottomRight, _VERTEX_COUNT_ };
+	enum : unsigned {
+		//!! Reuse these from... somewhere...:
+		TopLeft, BottomLeft, TopRight, BottomRight,
+		_VERTEX_COUNT_
+	};
 
 	// Data
-	Cfg        m_cfg;
-	float      m_value;
-	Box        m_box;
-	sf::Vertex m_bar[_VERTEX_COUNT_];
-	gfx::Text  m_label;
-}; // ProgressBar
+	Cfg                  m_cfg;
+	float                m_value;
+	Box                  m_box;
+	gfx::TexturedVertex2 m_bar[_VERTEX_COUNT_];
+	gfx::Text            m_label;
+
+}; // class ProgressBar
 
 
 //----------------------------------------------------------------------------

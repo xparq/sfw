@@ -36,14 +36,14 @@ namespace SAL::gfx
 		using Impl::Impl;
 
 		// Accessors...
-		constexpr fVec2     position() const        { return adapter()->_position(); }
-		constexpr Color     color()    const        { return adapter()->_color(); }
-//!! Doesn't work, but also confusing syntax: .prop() = x...:
-//!!		constexpr fVec2&    position()              { return adapter()->_position(); }
-//!!		constexpr Color&    color()                 { return adapter()->_color(); }
+		constexpr fVec2&    position()              { return adapter()->_position_ref(); }
+		constexpr Color&    color()                 { return adapter()->_color_ref(); }
 
-		constexpr void      position(fVec2 pos)     { adapter()->_position(pos); }
-		constexpr void      color(Color c)          { adapter()->_color(c); }
+		constexpr fVec2     position() const        { return adapter()->_position_copy(); }
+		constexpr Color     color()    const        { return adapter()->_color_copy(); }
+
+		constexpr void      position(fVec2 pos)     { adapter()->_position_set(pos); }
+		constexpr void      color(Color c)          { adapter()->_color_set(c); }
 
 
 		//!! Be a bit more sophisticated than this embarrassment! :)
@@ -55,7 +55,7 @@ namespace SAL::gfx
 	protected:
 		constexpr       auto adapter()       { return static_cast<      Impl*>(this); }
 		constexpr const auto adapter() const { return static_cast<const Impl*>(this); }
-			//!!?? WTF did just `auto` here broke the const adapter()-> calls, while
+			//!!?? WTF did just `auto` here broke the const adapter()-> calls earlier, while
 			//!!?? the pretty much isomorphic Vector accessors have always compiled fine?! :-o
 			//!!?? Is the vector code actually incorrect (just `auto` losing `const`),
 			//!!?? and I've just been lucky?!

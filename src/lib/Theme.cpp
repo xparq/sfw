@@ -12,6 +12,50 @@ namespace sfw
 {
 using namespace geometry;
 
+//============================================================================
+// BEGIN class Theme::Cfg
+//============================================================================
+
+bool Theme::Cfg::apply()
+{
+	// Pick up some defaults first...
+	// (This really should be a constructor, but that would piss off C++, making it reject desig. init.! :-/ )
+	if (!name)                 name        = Theme::DEFAULT.name;
+	if (!basePath)             basePath    = Theme::DEFAULT.basePath;
+	if (!fontFile)             fontFile    = Theme::DEFAULT.fontFile;
+	if (!textureFile)          textureFile = Theme::DEFAULT.textureFile;
+	if (textSize <= 1)         textSize    = Theme::DEFAULT.textSize;
+	if (bgColor == 0xBadC0100) bgColor     = Theme::DEFAULT.bgColor; // See #425 for that code choice!
+
+	// Update the global (`static`) Theme data...
+
+	// Save the config params first, for later reference... (!!Should later become the full, normative theme config itself!)
+	Theme::cfg = *this;
+
+	if (string path = string(basePath) + fontFile; !Theme::loadFont(path))
+	{
+		return false; //!! SFML has already explained the situation...
+	}
+	if (string path = string(basePath) + textureFile; !Theme::loadTexture(path))
+	{
+		return false; //!! SFML has already explained the situation...
+	}
+	Theme::textSize = textSize;
+
+	Theme::bgColor = bgColor;
+	Theme::wallpaper = wallpaper;
+
+	return true;
+}
+
+//============================================================================
+// END class Theme::Cfg
+//============================================================================
+
+
+//============================================================================
+// BEGIN class Theme
+//============================================================================
 
 Theme::Cfg Theme::DEFAULT =
 {
@@ -26,39 +70,6 @@ Theme::Cfg Theme::DEFAULT =
 	                        //! from an artificial "use default" inline member-init val. in Cfg::.
 };
 
-
-bool Theme::Cfg::apply()
-{
-	// Pick up some defaults first...
-	// (This really should be a constructor, but that would piss off C++ and make it reject the designated inits. :-/ )
-	if (!name)         name        = Theme::DEFAULT.name;
-	if (!basePath)     basePath    = Theme::DEFAULT.basePath;
-	if (!fontFile)     fontFile    = Theme::DEFAULT.fontFile;
-	if (!textureFile)  textureFile = Theme::DEFAULT.textureFile;
-	if (textSize <= 1) textSize    = Theme::DEFAULT.textSize;
-
-	// Update the global (`static`) Theme data...
-
-	// Save the config params first, for later reference... (!!Should later become the full, normative theme config itself!)
-	Theme::cfg = *this;
-
-	if (string path = string(basePath) + fontFile; !Theme::loadFont(path))
-	{
-		return false; // SFML has already explained the situation...
-	}
-	if (string path = string(basePath) + textureFile; !Theme::loadTexture(path))
-	{
-		return false; // SFML has already explained the situation...
-	}
-	Theme::textSize = textSize;
-
-	Theme::bgColor = bgColor;
-	Theme::wallpaper = wallpaper;
-
-	return true;
-}
-
-//============================================================================
 Theme::Cfg Theme::cfg; //!! Mostly unused yet, but slowly migrating to it...
 
 size_t Theme::textSize = Theme::DEFAULT.textSize;

@@ -25,11 +25,14 @@ namespace SAL::gfx
 		using Base::Base;
 
 		// Accessors for texture pos...
-		constexpr iVec2     texture_position() const      { return Impl::_texture_position(); }
-//!! Doesn't work, but also confusing syntax: .prop() = x...:
-//!!		constexpr iVec2&    texture_position()            { return Impl::_texture_position(); }
 
-		constexpr void      texture_position(iVec2 txpos) { Impl::_texture_position(txpos); }
+//!! Can't have this: no direct access to the backend vector: it has different type! :-/ (See Impl.hpp!)
+//!! Note: just leaving this enabled would take precedence over the const one! :-/
+//!!		constexpr iVec2&    texture_position()            { return Impl::_texture_position_ref(); } // _texture_position_ref() will abort if called!
+
+		constexpr iVec2     texture_position() const      { return Impl::_texture_position_copy(); }
+
+		constexpr void      texture_position(iVec2 txpos) { Impl::_texture_position_set(txpos); }
 
 		//!! Be a bit more sophisticated than this embarrassment! :)
 		static void draw_trianglestrip(const gfx::RenderContext& ctx,
@@ -37,6 +40,10 @@ namespace SAL::gfx
 	                                       const TexturedVertex2_Interface* v_array,
 	                                       unsigned v_count)
 			{ Impl::_draw_trianglestrip(ctx, texture, v_array, v_count); } // Implicit conversion of v_array to Impl*!
+
+	protected:
+		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
+		constexpr auto adapter() const { return static_cast<const Impl*>(this); }
 
 	}; // class TexturedVertex2_Interface
 

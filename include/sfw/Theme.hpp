@@ -29,21 +29,24 @@ public:
 	// Quick-And-Dirty Theme Config Pack
 	// -- will gradually encompass the entire Theme class,
 	//    by moving from static Theme data to config objects...
-	//    This is the initial version to support the Demo app.
+	//    This is the initial version, just to support the demo/test apps.
 	struct Cfg
 	{
 		// Note: the ordering is optimized for init lists like
 		//
-		//  { "asset/custom", "MyClassic", "mytextures.png", Color("#e6e8e0"), 12, "font/MyFont.ttf" }
+		//  { "asset_dir/custom", "MyTheme", "mytextures.png", Color("#e6e8e0"), 12, "font/MyFont.ttf" }
+		//  { "asset_dir/custom", "MyTheme", "mytextures.png", Color("#e6e8e0"), 14 } // Default font, but larger
 		//
 		// Note: these are not "defaults" here, but "unset" markers (and/or diagnostic sentinels)
 		// (except when the type doesn't allow such "off-band" values; then it's indeed a default).
 		const char*    name          = nullptr;
 		const char*    basePath      = nullptr;
 		const char*    textureFile   = nullptr;
-		Color          bgColor       = Color::None; // "transparent black": closest to an unset "null" color value
+		Color          bgColor       = 0xBadC0100; // Not using (reserving!) Color::None here as the unset ("null") value,
+		                                           // to allow using it for "no background color" in a theme config!
+		                                           // See #425 for (much ;) ) more!
 		Wallpaper::Cfg wallpaper     = {};
-		size_t         textSize      = 0; //!!?? uint16_t: a) fixed (-> ABI compat.!), b) smaller, c) but may need annoying extra casts, d) uint_least16_t is the guaranteed type actually...
+		size_t         textSize      = 0;          //!! #424 (Rename), #426 (Stop using size_t for trivially small things)
 		const char*    fontFile      = nullptr;
 		bool           multiTooltips = false;
 
@@ -94,7 +97,7 @@ public:
 	static Style click;
 	static Style input;
 
-	static size_t textSize;
+	static size_t textSize;     //!! #424 (Rename), #426 (Stop using size_t for trivially small things)
 
 	static Color bgColor;
 	static Wallpaper::Cfg wallpaper;

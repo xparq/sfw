@@ -15,6 +15,7 @@
 #include "SAL/gfx/Color.hpp"
 
 #include <type_traits> // is_same
+#include <cassert> //!! Might interfere with SAL/diag. in code using this header!
 
 
 namespace SAL::gfx::adapter
@@ -44,8 +45,8 @@ namespace SFML
 				/// drivers that are not able to process integer coordinates correctly.
 
 		// Copy
-		constexpr TexturedVertex2_Impl(TexturedVertex2_Impl&&) = default;
 		constexpr TexturedVertex2_Impl(const TexturedVertex2_Impl&) = default;
+		constexpr TexturedVertex2_Impl(TexturedVertex2_Impl&&) = default;
 		constexpr TexturedVertex2_Impl& operator = (const TexturedVertex2_Impl&) = default;
 		constexpr TexturedVertex2_Impl& operator = (TexturedVertex2_Impl&&) = default;
 		//!!?? Are the rval versions useful at all? Can they spare an extra copy? Wouldn't bet on it.
@@ -55,16 +56,19 @@ namespace SFML
 		constexpr TexturedVertex2_Impl& operator = (const native_type& nv) { Base::_d = nv; return *this; }
 
 		// Convert to SFML
-		constexpr operator const native_type& () const { return native(); }
 		constexpr operator       native_type& ()       { return native(); }
+		constexpr operator const native_type& () const { return native(); }
 
 
 		// Accessors for texture pos...
-		constexpr iVec2     _texture_position() const      { return iVec2((int)native().texCoords.x, (int)native().texCoords.y); } //! See the int<->float comment at the ctors!
-//!! Type mismatch (SAL vs. native), but also confusing syntax: .prop() = x...:
-//!!		constexpr iVec2&    _texture_position()            { return iVec2((int)native().texCoords.x, (int)native().texCoords.y); } //! See the int<->float comment at the ctors!
+		constexpr iVec2     _texture_position_copy() const { return iVec2((int)native().texCoords.x, (int)native().texCoords.y); } //! See the int<->float comment at the ctors!
+//!! Can't just brute-force alias this: the native type is a float vector!!!...:
+		constexpr iVec2&    _texture_position_ref()        { //!! if constexpr (!std::is_same_v<decltype(native().texCoords), sf::Vector2i>)
+		                                                     //!! 	static_assert(, "CAN'T DO THIS!..."); //!!?? ALWAYS fires, can't compile! -- Unlike in Rectangle::right/bottom! :-o
+		                                                     assert("DO NOT CALL _texture_position_ref()!..." && false);
+		                                                     static iVec2 dummy; return dummy; }
 
-		constexpr void      _texture_position(iVec2 txpos) { native().texCoords = {(float)txpos.x(), (float)txpos.y()}; } //! See the int<->float comment at the ctors!
+		constexpr void      _texture_position_set(iVec2 txpos) { native().texCoords = {(float)txpos.x(), (float)txpos.y()}; } //! See the int<->float comment at the ctors!
 
 
 		//!! Be a bit more sophisticated than this embarrassment! :)
@@ -79,8 +83,8 @@ namespace SFML
 		}
 
 	private:
-		constexpr const native_type& native() const { return _d; }
 		constexpr       native_type& native()       { return _d; }
+		constexpr const native_type& native() const { return _d; }
 	};
 
 } // namespace SFML

@@ -14,7 +14,8 @@ namespace sfw
 using namespace geometry;
 
 ProgressBar::ProgressBar(const Cfg& cfg/*, const Style& style*/) :
-	m_cfg(cfg)
+	m_cfg(cfg),
+	m_box(Box::Input) //!! #411 (Cringy legacy misnomer for setting the frame to sunken, from the default raised!)
 {
 	setFocusable(false); //!! Should be inherited from sg. like OutputWidget or StaticWidget...
 
@@ -76,12 +77,15 @@ void ProgressBar::draw(const gfx::RenderContext& ctx) const
 {
 	auto sfml_renderstates = ctx.props;
 	sfml_renderstates.transform *= getTransform();
-	sfml_renderstates.texture = &Theme::getTexture();
+	sfml_renderstates.texture = &Theme::getTexture(); //!! -> also: draw_trianglestrip(..., Theme::getTexture()...) below! :-/
+	auto ctx_mod = ctx;
+	ctx_mod.props = sfml_renderstates;
+	//!! Doing things above in that roundabout way to emphasize the (in)direct SFML use!...
 
-	m_box.draw({ctx.target, sfml_renderstates});
-	ctx.target.draw(m_bar, _VERTEX_COUNT_, sf::PrimitiveType::TriangleStrip, sfml_renderstates);
+	m_box.draw(ctx_mod);
+	gfx::TexturedVertex2::draw_trianglestrip(ctx_mod, Theme::getTexture(), m_bar, _VERTEX_COUNT_); //!! Reconcile the texture sent explicitly & ctx.props.texture!...
 	if (m_cfg.label_placement != LabelNone)
-		m_label.draw({ctx.target, sfml_renderstates});
+		m_label.draw(ctx_mod);
 }
 
 
@@ -115,16 +119,16 @@ void ProgressBar::updateGeometry()
 	const float y1 = Theme::PADDING;
 	const float x2 = (m_cfg.orientation == Horizontal ? m_cfg.length : Theme::getBoxHeight()) - Theme::PADDING;
 	const float y2 = (m_cfg.orientation == Horizontal ? Theme::getBoxHeight() : m_cfg.length) - Theme::PADDING;
-	m_bar[TopLeft]    .position = {x1, y1};
-	m_bar[BottomLeft] .position = {x1, y2};
-	m_bar[TopRight]   .position = {x2, y1};
-	m_bar[BottomRight].position = {x2, y2};
+	m_bar[TopLeft]    .position( {x1, y1} );
+	m_bar[BottomLeft] .position( {x1, y2} );
+	m_bar[TopRight]   .position( {x2, y1} );
+	m_bar[BottomRight].position( {x2, y2} );
 
-	auto brect = fRect(Theme::getProgressBarTextureRect());
-	m_bar[TopLeft]    .texCoords = {brect.left()                , brect.top()};
-	m_bar[BottomLeft] .texCoords = {brect.left()                , brect.top() + brect.height()};
-	m_bar[TopRight]   .texCoords = {brect.left() + brect.width(), brect.top()};
-	m_bar[BottomRight].texCoords = {brect.left() + brect.width(), brect.top() + brect.height()};
+	auto barrect = fRect(Theme::getProgressBarTextureRect());
+	m_bar[TopLeft]    .texture_position( {barrect.left()                , barrect.top()} );
+	m_bar[BottomLeft] .texture_position( {barrect.left()                , barrect.top() + barrect.height()} );
+	m_bar[TopRight]   .texture_position( {barrect.left() + barrect.width(), barrect.top()} );
+	m_bar[BottomRight].texture_position( {barrect.left() + barrect.width(), barrect.top() + barrect.height()} );
 
 	// Extend the widget box if the label will be outside the bar...
 
@@ -178,9 +182,9 @@ void ProgressBar::updateGeometry()
 	auto bar_length = val_to_barlength(clamped_value);
 	if (m_cfg.orientation == Horizontal)
 	{
-		m_bar[TopRight].position.x =
-			m_bar[BottomRight].position.x =
-				m_bar[TopLeft].position.x + bar_length;
+		m_bar[TopRight].position().x() =
+			m_bar[BottomRight].position().x() =
+				m_bar[TopLeft].position().x() + bar_length;
 	
 		if (m_cfg.label_placement == LabelOver)
 		{
@@ -190,9 +194,9 @@ void ProgressBar::updateGeometry()
 	}
 	else
 	{
-		m_bar[TopLeft].position.y =
-			m_bar[TopRight].position.y =
-				m_bar[BottomLeft].position.y - bar_length;
+		m_bar[TopLeft].position().y() =
+			m_bar[TopRight].position().y() =
+				m_bar[BottomLeft].position().y() - bar_length;
 
 		if (m_cfg.label_placement == LabelOver)
 		{

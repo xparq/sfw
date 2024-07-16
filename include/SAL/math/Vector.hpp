@@ -62,7 +62,7 @@ namespace SAL//!!::math
 		bool operator ==  (const Vector_Interface<Impl>&) const = default;
 		// OTOH, the meaningless <=> WOULD, so that needs to be deleted:
 		auto operator <=> (const Vector_Interface<Impl>&) const = delete;
-		// (Ironically,, op== WOULD be made automatically available from a <=>, but well...)
+		// (Ironically, op== WOULD be made automatically available from a <=>, but well...)
 
 		constexpr auto  x() const { return adapter()->_x(); }
 		constexpr auto  y() const { return adapter()->_y(); }
