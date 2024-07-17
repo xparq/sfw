@@ -20,15 +20,15 @@ jobs:
 #!! And my setup script doesn't care about that yet, so, disabling:
 #        cc: [clang++, g++]
 #!! Also, as it turns out, the default g++ version is 11 on GitHub!... :-/
-        cc: [g++]
+        cc: [g++-14]
         target: [linux]
     steps:
       - uses: actions/checkout@v3
       - name: Install SFML dependencies...
         run: |
           cat /etc/os-release; cat /etc/issue
-          g++ --version
-          # Bummer: Ubuntu 22.04 still doesn't have GNU make 4.4 (e.g. for .WAIT)! :-o :-/
+          ${{ matrix.cc }} --version
+          # Bummer: Even Ubuntu 24.04 still doesn't have GNU make 4.4 (e.g. for .WAIT)! :-o :-/
           make --version
           sudo apt install libgl-dev
           # The rest is only needed for static builds:
@@ -36,7 +36,8 @@ jobs:
           sudo apt install libxrandr-dev
           sudo apt install libxcursor-dev
           sudo apt install libxi-dev
-          sudo apt install libudev-dev
+#!! This just started failing this week, and the entire internet is silent about it:
+#!!          sudo apt install libudev-dev
       - name: Download & setup SFML/master...
         run: ./tooling/sfml-setup ${{ matrix.target }}
       - name: Build (Ubuntu only! Windows is being manually tested locally for now...)
