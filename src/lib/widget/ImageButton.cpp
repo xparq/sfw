@@ -16,8 +16,8 @@ ImageButton::ImageButton(const gfx::Texture& texture, std::string_view label):
 	m_pressed(false)
 {
 	setTexture(texture); // Must call it for the geometry calculations! (The m_bg ctor is not enough!)
-	m_text.setFont(Theme::getFont());
-	m_text.setCharacterSize((unsigned)Theme::textSize);
+	m_text.font(Theme::getFont());
+	m_text.font_size(Theme::fontSize);
 
 	setText(label);
 }
@@ -26,7 +26,7 @@ ImageButton::ImageButton(const gfx::Texture& texture, std::string_view label):
 ImageButton* ImageButton::setTexture(const gfx::Texture& texture)
 {
 	int width  = texture.size().x();
-	int height = texture.size().y() / 3; // default, hover, focus
+	int height = texture.size().y() / 3; // [0]: default, [1]: hover, [2]: focus
 
 	m_background.setTexture(texture);
 	m_background.setTextureRect(sf::IntRect({0, 0}, {width, height}));
@@ -72,7 +72,7 @@ ImageButton* ImageButton::setSize(fVec2 size)
 
 ImageButton* ImageButton::setFont(const gfx::Font& font)
 {
-	m_text.setFont(font);
+	m_text.font(font);
 	centerText();
 	return this;
 }
@@ -80,13 +80,13 @@ ImageButton* ImageButton::setFont(const gfx::Font& font)
 
 const gfx::Font& ImageButton::getFont() const
 {
-	return m_text.getFont();
+	return m_text.font();
 }
 
 
-ImageButton* ImageButton::setTextSize(size_t size)
+ImageButton* ImageButton::setFontSize(unsigned size)
 {
-	m_text.setCharacterSize((unsigned)size);
+	m_text.font_size(size);
 	centerText();
 	return this;
 }
@@ -101,7 +101,7 @@ ImageButton* ImageButton::setTextStyle(sf::Text::Style style)
 
 ImageButton* ImageButton::setTextColor(Color color)
 {
-	m_text.setFillColor(color);
+	m_text.color(color);
 	return this;
 }
 

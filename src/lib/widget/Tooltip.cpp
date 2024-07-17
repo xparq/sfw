@@ -55,7 +55,7 @@ void Tooltip::setText(const std::string& text)
 	m_text.set(text);
 	m_length = text.length();
 
-	m_text.setCharacterSize(11);
+	m_text.font_size(11);
 }
 
 
@@ -67,7 +67,7 @@ void Tooltip::show()
 		// Reset the colors changed by Fadeout
 		m_box.colorFill   = {255, 255, 220, 224};
 		m_box.colorBorder = m_box.colorFill * Color{160, 160, 160, 255};
-		m_text.setFillColor({0, 0, 0, 255});
+		m_text.color({0, 0, 0, 255});
 /*!!
 		m_mouseLastPos = gui->getMousePosition();
 //DEBUG:		setPosition(m_mouseLastPos);
@@ -169,7 +169,7 @@ void Tooltip::initView()
 	}
 
 	m_box.size = size;
-	m_text.setPosition({padding.x(), padding.y()});
+	m_text.position({padding.x(), padding.y()});
 }
 
 
@@ -211,7 +211,11 @@ void Tooltip::onTick()
 				m_box.colorFill.a(m_box.colorFill.a() - DELTA);
 //!! Can't:			if (m_box.colorBorder.a) m_box.colorBorder.a -= DELTA;
 				if (m_box.colorBorder.a()) m_box.colorBorder.a(m_box.colorBorder.a() - DELTA);
-				m_text.setFillColor(Color(0, 0, 0, m_text.getFillColor().a() - DELTA));
+				m_text.color({0, 0, 0, uint8_t(m_text.color().a() - DELTA)});
+
+//!! This can't work yet, without somehow hooking an sf::...::setColor into that get-ref / op= chain...
+//!! (Which would probably be as difficult as implementing ()-less property accessors in general!)
+//!!				m_text.color().a() -= DELTA;
 			}
 			else setState(Off);
 			/*if (elapsed(FADEOUT_TIME))

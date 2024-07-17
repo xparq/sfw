@@ -18,6 +18,8 @@
 
 //#include "SAL/util/cpp/macros.hpp" // SAL_CONST_THIS
 
+//!!#include <cassert>
+
 
 namespace SAL::gfx::adapter
 {
@@ -35,12 +37,6 @@ class Font_Impl //!! Can't just derive from sf::Font, as it's not default-constr
 public:
 	using native_type = sf::Font;
 
-/*	bool load(std::string_view filename) {
-		auto result = sf::Font::openFromFile(filename);
-		if (result) native(result.value()); // Save a pointer to the original!
-		return result.has_value();
-	}
-*/
 	bool load(std::string_view filename) {
 		_native_font = sf::Font::openFromFile(filename);
 		return _valid();
@@ -49,7 +45,7 @@ public:
 	//--------------------------------------------------------------------
 	// Queries...
 
-	constexpr bool _valid() const { return (bool)_native_font; }
+	constexpr bool _valid() const { return (bool)_native_font; } //!!?? Or has_value()?
 
 	constexpr float _get_line_spacing(unsigned fontSize) const { return native().getLineSpacing(fontSize); }
 
@@ -73,12 +69,6 @@ public:
 //!!??WTF, WOULD THIS ALSO DELETE THE CONST VERSION?!
 //!!	constexpr operator native_type& () = delete;
 
-
-	constexpr const native_type& native() const {
-		_err_if_null();
-//!!		return *_native_font_ptr;
-		return _native_font.value();
-	}
 
 /*!!
 	//!! Can't just also allow assigning: must free and/or allocate etc., so needs a real setter! :-/
@@ -105,16 +95,29 @@ public:
 protected:
 
 	//!! CONSOLIDATE:
-	void _err_if_null() const { if (!_valid()) throw ("- no font!"); }
+	//!! First off, it should theoretically be an assert, as always having a native font is an invariant!
+	//!!?? But then why is it an std::optional at all? Is it ONLY because we get it that way from SFML,
+	//!!?? and we just shouldn't (and can't?) copy it out from there?
+	void _err_if_null() const { if (!_valid()) throw ("- No sf::Font in SAL::Font?!"); }
 
 
 	//--------------------------------------------------------------------
 	// Data...
 	//
+
 private:
 	//!! native_type* _native_font_ptr = nullptr;
 	//!!unique_ptr<native_type> _native_font_ptr;
 	std::optional<sf::Font> _native_font;
+		//!!?? Is it std::optional ONLY because we get it that way from SFML,
+		//!!?? and we just shouldn't (and can't?) copy it out from there?
+		//!! Note: std::optional can at least start empty, so we can set (and reset) it after constr.!
+
+public: // Only public for diagnostics (hopefully...):
+	constexpr const native_type& native() const {
+		_err_if_null();
+		return _native_font.value(); // Just a ref.
+	}
 
 }; // class Font_Impl
 

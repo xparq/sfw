@@ -110,7 +110,7 @@ private:
 	size_t m_currentIndex;
 
 	// Visual components
-	ItemBox<gfx::Text> m_box;    // The entire widget "assembly" (incl. the arrows)
+	ItemBox<gfx::Text> m_box;    // Covers the entire widget area (incl. the arrows)!
 	ItemBox<Arrow> m_arrowLeft;  // Control element for "Select Prev."
 	ItemBox<Arrow> m_arrowRight; // Control element for "Select Next"
 };

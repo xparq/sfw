@@ -3,6 +3,8 @@
 
 #include "sfw/Theme.hpp" //!!!!!!!!!!! NO!... Don't depend on it! But the mandatory default font for SFML... :-( 
 
+#include <cassert>
+
 
 //--------------------------------------------------------------------
 // Draw a border around the text, to check positioning & sizing
@@ -63,7 +65,8 @@ namespace SAL::gfx
 
 Text::Text(std::string_view s/* = ""*/, unsigned int height/* = 30*/) :
 	native_type(sfw::Theme::getFont().native(), SAL::stdstringview_to_SFMLString(s), height),
-	_font_ref(sfw::Theme::getFont()) // Mirroring that of sf::Text, solely for use within the wrapper layer!
+//!!?? Rethink (see e.g. `Font& font()`!...):
+	_font_ptr(&sfw::Theme::getFont()) // Mirroring that of sf::Text, solely for use within the wrapper layer!
 {
 	_recalc();
 }
@@ -72,15 +75,26 @@ Text::Text(std::string_view s/* = ""*/, unsigned int height/* = 30*/) :
 //----------------------------------------------------------------------------
 void Text::set(std::string_view str)
 {
-	setString(SAL::stdstringview_to_SFMLString(str));
+	native().setString(SAL::stdstringview_to_SFMLString(str));
 	_recalc();
 }
 
 std::string Text::get() const
 {
-	return SAL::SFMLString_to_stdstring(getString());
+	return SAL::SFMLString_to_stdstring(native().getString());
 }
 
+/*!!??
+size_t Text::length() const
+{
+	return native().getString().getSize(); //!!?? #432: NOT UTF8-aware!
+}
+??!!*/
+
+bool Text::empty() const
+{
+	return native().getString().isEmpty();
+}
 
 //----------------------------------------------------------------------------
 fVec2 Text::size() const
@@ -124,9 +138,41 @@ cerr	<< "BOX pos: " << box.position()
 //!!	setOrigin(save);
 }
 
-void Text::position(fVec2 pos) { setPosition(pos); }
 
-fVec2 Text::position() const    { return getPosition(); }
+//----------------------------------------------------------------------------
+void  Text::position(fVec2 p)         {        native().setPosition(p); }
+fVec2 Text::position() const          { return native().getPosition(); }
+
+
+//----------------------------------------------------------------------------
+void Text::font(const Font& f)
+{
+	assert(&f);
+	native().setFont(f);
+	_font_ptr = &f;
+	_recalc();
+}
+
+const Font& Text::font() const
+{
+	assert(_font_ptr); //!!?? Just an assert is not enough here!...
+		//!! OTOH: every font access must then run-time check it!... :-o
+		//!! So, this assert SHOULD really be enough after all!
+
+	// Does the native sf::Text have the same idea about the current font?
+	[[maybe_unused]] const auto& sf_font = native().getFont(); // Unused in DEBUG builds!
+	assert(&sf_font == &_font_ptr->native());
+
+	return *_font_ptr;
+}
+
+void     Text::font_size(unsigned s)  { native().setCharacterSize((int)s); _recalc(); }
+unsigned Text::font_size() const      { return native().getCharacterSize(); }
+
+
+//----------------------------------------------------------------------------
+void   Text::color(Color c) { native().setFillColor(c); }
+Color  Text::color() const  { return native().getFillColor(); }
 
 
 //----------------------------------------------------------------------------

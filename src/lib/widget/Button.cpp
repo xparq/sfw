@@ -29,7 +29,7 @@ Button::Button(const std::string_view text, std::function<void(Button*)> callbac
 
 Button* Button::setText(std::string_view text)
 {
-	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>);
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>); // Just in case I ever change it... ;)
 	m_box.item().set(text);
 	recomputeGeometry();
 	return this;
@@ -37,7 +37,7 @@ Button* Button::setText(std::string_view text)
 
 std::string Button::getText() const
 {
-	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>);
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>); // Just in case I ever change it... ;)
 	return m_box.item().get();
 }
 
@@ -51,6 +51,7 @@ Button* Button::setColor(Color c)
 
 Button* Button::setTextColor(Color c)
 {
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>); // Just in case I ever change it... ;)
 	m_box.setItemColor(c);
 	return this;
 }
@@ -69,8 +70,9 @@ Button* Button::click()
 
 void Button::onThemeChanged()
 {
-	m_box.item().setFont(Theme::getFont());
-	m_box.item().setCharacterSize((int)Theme::textSize);
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>); // Just in case I ever change it... ;)
+	m_box.item().font(Theme::getFont());
+	m_box.item().font_size(Theme::fontSize);
 	m_box.setSize((float)Theme::minWidgetWidth, Theme::getBoxHeight());
 	recomputeGeometry();
 }
@@ -84,7 +86,7 @@ void Button::recomputeGeometry() // override
 	m_box.setSize((float)width, Theme::getBoxHeight());
 	setSize(m_box.getSize());
 
-	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>);
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>); // Just in case I ever change it... ;)
 	m_box.item().center_in(getRect());
 }
 

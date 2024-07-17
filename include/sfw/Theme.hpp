@@ -46,7 +46,7 @@ public:
 		                                           // to allow using it for "no background color" in a theme config!
 		                                           // See #425 for (much ;) ) more!
 		Wallpaper::Cfg wallpaper     = {};
-		size_t         textSize      = 0;          //!! #424 (Rename), #426 (Stop using size_t for trivially small things)
+		unsigned       fontSize      = 0;
 		const char*    fontFile      = nullptr;
 		bool           multiTooltips = false;
 
@@ -97,7 +97,7 @@ public:
 	static Style click;
 	static Style input;
 
-	static size_t textSize;     //!! #424 (Rename), #426 (Stop using size_t for trivially small things)
+	static unsigned fontSize;
 
 	static Color bgColor;
 	static Wallpaper::Cfg wallpaper;

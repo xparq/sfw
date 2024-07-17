@@ -29,8 +29,8 @@ public:
     Label* setFillColor(Color color);
     Color  getFillColor() const;
 
-    Label* setTextSize(size_t size);
-    size_t getTextSize() const;
+    Label*   setFontSize(unsigned size);
+    unsigned getFontSize() const;
 
     Label* setStyle(sf::Text::Style style); //!! Direct SFML usage!
 

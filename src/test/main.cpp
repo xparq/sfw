@@ -230,7 +230,7 @@ try {
 	form->add("Text", new TextBox())
 		->setPlaceholder("Type something!")
 		->set("Hello world!")
-		->setCallback([&](auto* w) { text.setString(w->getString()); });
+		->setCallback([&](auto* w) { text.set(w->get()); });
 	// Length limit & pulsating cursor
 	form->add("Text with limit (5)", new TextBox(50.f, TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
@@ -370,12 +370,12 @@ try {
 	if (buttonimg.load("demo/sfmlwidgets-themed-button.png")) // SFML would print an error if failed
 	{
 		buttons_form->add("Native size", new ImageButton(buttonimg, "All defaults"))
-			->setTextSize(20)
+			->setFontSize(20)
 			->setCallback([]/*(auto* w)*/ { toy_anim_on = true; });
 
 
 		buttons_form->add("Customized", new ImageButton(buttonimg, "Bold"))
-			->setTextSize(20)
+			->setFontSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
 			->setTextColor(Color("#d0e0c0"))
@@ -444,12 +444,12 @@ try {
 	// "theme-selector" widget, so that it remembers the updated size (for each theme)!)
 	right_bar->add(Label("Theme font size (use the m. wheel):"));
 	right_bar->add(Slider({.length = 100, .range = {8, 18}}))
-		->set((float)themes[DEFAULT_THEME].textSize)
+		->set((float)themes[DEFAULT_THEME].fontSize)
 		->setCallback([&] (auto* w){
 			assert(demo.find_widget("theme-selector"));
 			auto& themecfg = demo.find_widget<OBTheme>("theme-selector")->current();
-			themecfg.textSize = (size_t)w->get();
-cerr << "font size: "<< themecfg.textSize << endl; //!!#196
+			themecfg.fontSize = (size_t)w->get();
+cerr << "font size: "<< themecfg.fontSize << endl; //!!#196
 			demo.setTheme(themecfg);
 		});
 

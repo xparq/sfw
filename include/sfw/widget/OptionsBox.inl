@@ -212,8 +212,9 @@ template <class T> void OptionsBox<T>::draw(const gfx::RenderContext& ctx) const
 
 template <class T> void OptionsBox<T>::onThemeChanged()
 {
-	m_box.item().setFont(Theme::getFont());
-	m_box.item().setCharacterSize((unsigned)Theme::textSize);
+	static_assert(std::is_convertible_v<decltype(m_box.item()), gfx::Text>); // Just in case I ever change it... ;)
+	m_box.item().font(Theme::getFont());
+	m_box.item().font_size((unsigned)Theme::fontSize);
 
 	// Update width to accomodate the widest element
 	auto width = (float)Theme::minWidgetWidth;
@@ -236,18 +237,16 @@ template <class T> void OptionsBox<T>::onThemeChanged()
 	// Right arrow
 	m_arrowRight.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
 	m_arrowRight.setPosition(m_box.getSize().x() - Theme::getBoxHeight(), 0);
-	//!!WOW! Doing the same in reverse would make it fall apart spectacularly!! :-ooo
+	//!!?? WOW! Doing the same in reverse would make it fall apart spectacularly!! :-ooo
 	//!!m_arrowRight.setPosition(m_box.getSize().x - Theme::getBoxHeight(), 0);
 	//!!m_arrowRight.setSize(Theme::getBoxHeight(), Theme::getBoxHeight());
-
 	m_arrowRight.centerItem(m_arrowRight.item());
 }
 
 
 template <class T> void OptionsBox<T>::onActivationChanged(ActivationState state)
 {
-	// Hovered state is handled in the onMouseMoved callback
-	if (state == ActivationState::Default || state == ActivationState::Focused)
+	if (state == ActivationState::Default || state == ActivationState::Focused) // Hovering is handled by onMouseMoved!
 	{
 		m_arrowLeft.applyState(state);
 		m_arrowRight.applyState(state);

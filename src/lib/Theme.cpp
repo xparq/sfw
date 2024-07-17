@@ -24,7 +24,7 @@ bool Theme::Cfg::apply()
 	if (!basePath)             basePath    = Theme::DEFAULT.basePath;
 	if (!fontFile)             fontFile    = Theme::DEFAULT.fontFile;
 	if (!textureFile)          textureFile = Theme::DEFAULT.textureFile;
-	if (textSize <= 1)         textSize    = Theme::DEFAULT.textSize;
+	if (fontSize <= 1)         fontSize    = Theme::DEFAULT.fontSize;
 	if (bgColor == 0xBadC0100) bgColor     = Theme::DEFAULT.bgColor; // See #425 for that code choice!
 
 	// Update the global (`static`) Theme data...
@@ -40,7 +40,7 @@ bool Theme::Cfg::apply()
 	{
 		return false; //!! SFML has already explained the situation...
 	}
-	Theme::textSize = textSize;
+	Theme::fontSize = fontSize;
 
 	Theme::bgColor = bgColor;
 	Theme::wallpaper = wallpaper;
@@ -64,7 +64,7 @@ Theme::Cfg Theme::DEFAULT =
 	.textureFile   = "texture/default.png",
 	.bgColor       = Color::White,
 	.wallpaper     = {},
-	.textSize      = 12,
+	.fontSize      = 12,
 	.fontFile      = "font/default.ttf",
 	.multiTooltips = false, //! Ignored! The desig. init. value can't be made distinguishable
 	                        //! from an artificial "use default" inline member-init val. in Cfg::.
@@ -72,7 +72,7 @@ Theme::Cfg Theme::DEFAULT =
 
 Theme::Cfg Theme::cfg; //!! Mostly unused yet, but slowly migrating to it...
 
-size_t Theme::textSize = Theme::DEFAULT.textSize;
+unsigned Theme::fontSize = Theme::DEFAULT.fontSize;
 
 //!! LEGACY:
 Theme::Style Theme::click;
@@ -218,7 +218,7 @@ float Theme::getBoxHeight()
 
 float Theme::getLineSpacing()
 {
-	return m_font.lineSpacing((unsigned)textSize);
+	return m_font.lineSpacing((unsigned)fontSize);
 }
 
 

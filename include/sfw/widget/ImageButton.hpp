@@ -34,10 +34,10 @@ public:
 		// an explicit setSize call will rescale the image to the new size.
 	//!!?? Shouldn't this be virtual then?! Not even the base Widget setSize is!
 
-	ImageButton* setFont(const gfx::Font& font);
+	ImageButton*     setFont(const gfx::Font& font);
 	const gfx::Font& getFont() const;
+	ImageButton* setFontSize(unsigned size);
 
-	ImageButton* setTextSize(size_t size);
 	ImageButton* setTextStyle(sf::Text::Style style);
 	ImageButton* setTextColor(Color color);
 
@@ -58,9 +58,9 @@ private:
 	void press();
 	void release();
 
-	gfx::Text m_text;
+	gfx::Text  m_text;
 	sf::Sprite m_background;
-	bool m_pressed;
+	bool       m_pressed;
 
 }; // class ImageButton
 

@@ -139,9 +139,9 @@ void ProgressBar::updateGeometry()
 		//!! Anyway, the entire LabelOutside feature is kinda useless, TBH.
 		//!! (Not that the other modes won't need care at all.)
 
-	m_label.setFont(Theme::getFont());
-	m_label.setFillColor(Theme::input.textColor);
-	m_label.setCharacterSize((unsigned)Theme::textSize);
+	m_label.font(Theme::getFont());
+	m_label.color(Theme::input.textColor);
+	m_label.font_size(Theme::fontSize);
 
 	float labelWidth  = m_label.size().x();
 	float labelHeight = m_label.size().y();

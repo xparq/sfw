@@ -150,16 +150,15 @@ namespace SAL::geometry
 		constexpr operator bool () { return (bool)dx() && (bool)dy(); } // Area != 0?
 			// So, the position doesn't matter. Also, negative size is OK. Also, not ||, unlike Vector's.
 
+		constexpr bool operator == (const Rectangle_Interface& other) const { return Impl::native() == other.Impl::native(); }
+			//!! This used to catch every stray cat as a free function, so moved here inside the class!...
+
+
 	protected:
 		constexpr auto adapter()       { return static_cast<      Impl*>(this); }
 		constexpr auto adapter() const { return static_cast<const Impl*>(this); }
 
 	}; // class Rectangle_Interface
-
-//!! Ugh, this is pretty horribly vague here:
-//!!	template <Scalar NumT = float>
-	constexpr bool operator == (const auto& a, const auto& b) { return a.native() == b.native(); }
-
 
 //----------------------------------------------------------------------------
 //!!?? FIX...

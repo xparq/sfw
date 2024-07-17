@@ -58,12 +58,14 @@ public:
 
 	//------------------------------------------------------------------------
 	// Legacy support for SFML strings
-	// (Will be done in an automatically backand-matched derived variant class in the future!)
+	// (Will be done in an automatically backend-matched derived variant class in the future!)
+/*!! -> #431!
 	TextBox*   setString(const sf::String& content);
 	sf::String getString() const;
-	sf::String getSelectedString() const;
 	TextBox*   setPlaceholderString(const sf::String& placeholder);
 	sf::String getPlaceholderString() const;
+!!*/
+	sf::String getSelectedString() const;
 
 	//------------------------------------------------------------------------
 	// Commands (for binding to input events; note the PascalCase for these)

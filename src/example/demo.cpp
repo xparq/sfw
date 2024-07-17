@@ -168,7 +168,7 @@ try {
 	form->add("Text", new sfw::TextBox(175)) // <- width (pixels)
 		->setPlaceholder("Type something!")
 		->set("Hello world!")
-		->setCallback([&](auto* w) { text.setString(w->getString()); });
+		->setCallback([&](auto* w) { text.set(w->get()); });
 	// Another text box, with length limit & pulsating cursor
 	form->add("Text with limit (5)", new sfw::TextBox(50.f, sfw::TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
@@ -290,11 +290,11 @@ try {
 		combined_labels->add(sfw::Label("- native size"));
 
 		imgbuttons_form->add(combined_labels, new sfw::ImageButton(buttonimg, "Start rotating"))
-			->setTextSize(20)
+			->setFontSize(20)
 			->setCallback([]/*(auto* w)*/ { toy_anim_on = true; });
 
 		imgbuttons_form->add("- customized", new sfw::ImageButton(buttonimg, "Stop"))
-			->setTextSize(20)
+			->setFontSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
 			->setSize({180, 35})
 			->setTextColor(Color("#d0e0c0"))
@@ -390,15 +390,15 @@ try {
 	right_bar->add(sfw::Slider({.length = 100, .range = {8, 20}}), "font size slider")
 		//!! Would be tempting to sync the initial font size directly with
 		//!! the theme selector widget -- but can't: the GUI is not up yet, so...
-		//!! ->set(w->getWidget<OBTheme>("theme-selector")->current().textSize) //! getWidget would fail here!
-		->set((float)themes[DEFAULT_THEME].textSize)
+		//!! ->set(w->getWidget<OBTheme>("theme-selector")->current().fontSize) //! getWidget would fail here!
+		->set((float)themes[DEFAULT_THEME].fontSize)
 		->setCallback([&] (auto* w){
 			assert(demo.find_widget("theme-selector"));
 // UNCHECKED:		auto& themecfg = demo.find_widget<OBTheme>("theme-selector")->current();
 			demo.call<OBTheme>("theme-selector", [&](auto* ts) {
 				auto& themecfg = ts->get();
-				themecfg.textSize = (size_t)w->get();
-cerr << "font size: "<< themecfg.textSize << endl; //!!#196
+				themecfg.fontSize = (size_t)w->get();
+cerr << "font size: "<< themecfg.fontSize << endl; //!!#196
 				demo.setTheme(themecfg);
 			});
 		});

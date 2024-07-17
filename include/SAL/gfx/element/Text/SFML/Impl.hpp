@@ -34,12 +34,15 @@ public:
 	void        set(std::string_view str);
 	std::string get() const;
 
+//!!	size_t length() const; //!!?? #432: NOT UTF8-aware! Returns the native "char length"!(?)
+	bool   empty() const;
+
 	//!! Could be done via sf::Transformable::setScale(), but no client code needs it yet, so... nope:
 	//!!void  resize(fVec2 size) { return setSize(size); }
 
-	fVec2 size() const;
-	fVec2 position() const;
+	fVec2 size() const; //!! Confusing! This is not the length of the content string!...
 
+	fVec2 position() const;
 	void  position(fVec2 pos);
 
 	// Centering should do nothing with a null rect, but in fact we might use that internally
@@ -51,16 +54,14 @@ public:
 	//!!void  setOrigin(fVec2 o);
 	//!!fVec2 getOrigin() const;
 
-	//!! Just using the original directly, with auto-converting Font -> sf::Font:
-	//!! However, it WOULD need to be intercepted to auto-adjust for the weird SFML sizing quirk!
-	//!! But this class can only set the font at construction-time, due to only being able to
-	//!! store a reference to it!
-	//!!void setFont(const Font&) { ...; _recalc(); }
-	const Font& getFont() const { return _font_ref; }
+	void        font(const Font& font);
+	const Font& font() const;
 
-	// Proxies for some already used SFML features:
-	void  setFillColor(Color c) {        ((native_type*)this)->setFillColor(c); }
-	Color getFillColor() const  { return ((native_type*)this)->getFillColor(); }
+	void     font_size(unsigned s);
+	unsigned font_size() const;
+
+	void   color(Color c);
+	Color  color() const;
 
 
 	void draw(const gfx::RenderContext& ctx) const override;
@@ -68,6 +69,11 @@ public:
 
 	//--------------------------------------------------------------------
 	// Internals...
+
+protected:
+	constexpr       auto& native()       { return *((      native_type*)this); }
+	constexpr const auto& native() const { return *((const native_type*)this); }
+
 private:
 	void _recalc();
 
@@ -77,7 +83,7 @@ private:
 	//--------------------------------------------------------------------
 	// Data...
 
-	const Font& _font_ref; //!! This being a ref. would prevent adding setFont(), BTW!... :-o
+	const Font* _font_ptr;
 	fVec2       _sf_padding;
 };
 

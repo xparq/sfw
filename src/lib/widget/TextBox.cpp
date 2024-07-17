@@ -82,7 +82,7 @@ std::string TextBox::getSelected() const
 
 size_t TextBox::length() const
 {
-	//!!NOT UTF8-aware: return get().length();
+	//!!?? NOT UTF8-aware: return get().length()! But... see #432!!!
 	return m_text.getString().getSize();
 }
 
@@ -101,7 +101,7 @@ TextBox* TextBox::setMaxLength(size_t maxLength)
 }
 
 
-TextBox*  TextBox::setPlaceholder(const std::string& placeholder)
+TextBox* TextBox::setPlaceholder(const std::string& placeholder)
 {
 	m_placeholder.set(placeholder);
 
@@ -649,16 +649,17 @@ void TextBox::onThemeChanged()
 //!! of what may have caused them)! And it would be called from onResize, too,
 //!! if that becomes a thing (likely for a multi-line TextBox in the future).
 
-	m_text.setFont(Theme::getFont());
-	m_text.setFillColor(Theme::input.textColor);
-	m_text.setCharacterSize((unsigned)Theme::textSize);
+	m_text.font(Theme::getFont());
+	m_text.color(Theme::input.textColor);
+	m_text.font_size(Theme::fontSize);
 
-	m_placeholder.setFont(Theme::getFont());
-	m_placeholder.setFillColor(Theme::input.textPlaceholderColor);
-	m_placeholder.setCharacterSize((unsigned)Theme::textSize);
+	m_placeholder.font(Theme::getFont());
+	m_placeholder.color(Theme::input.textPlaceholderColor);
+	m_placeholder.font_size(Theme::fontSize);
+
 	//!! This is a "static fixture", can't move, so it's *probably* OK to
 	//!! reposition it only once per theme change:
-	m_placeholder.setPosition({framing_offset, framing_offset});
+	m_placeholder.position({framing_offset, framing_offset});
 
 	m_cursorColor = Theme::input.textColor;
 	m_cursorRect.setFillColor(Theme::input.textColor);
@@ -695,7 +696,7 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 	//!!Original: (tends to overflow the input rect -- how come it worked upstream?! :-o )
 	//!!glScissor(pos.x + Theme::borderSize, ctx.target.getSize().y - (pos.y + getSize().y), getSize().x, getSize().y);
 
-	if (m_text.getString().isEmpty())
+	if (m_text.empty())
 	{
 		m_placeholder.draw({ctx.target, sfml_renderstates});
 	}
@@ -737,10 +738,10 @@ void TextBox::draw(const gfx::RenderContext& ctx) const
 	//!!??Not needed now, but could be here: glDisable(GL_SCISSOR_TEST);
 }
 
-
 //------------------------------------------------------------------------
 // Direct support for SFML strings
 //!!Will be done in an automatically backand-matched derived variant class later!
+/*!! -> #431!
 TextBox* TextBox::setString(const sf::String& content)
 {
 	return set(SAL::SFMLString_to_stdstring(content));
@@ -751,20 +752,21 @@ sf::String TextBox::getString() const
 	return m_text.getString();
 }
 
-sf::String TextBox::getSelectedString() const
-{
-	return m_selection.empty() ? "" : m_text.getString().substring(m_selection.lower(), m_selection.length());
-}
-
 TextBox*  TextBox::setPlaceholderString(const sf::String& placeholder)
 {
-	m_placeholder.setString(placeholder);
+	m_placeholder.set(placeholder);
 	return this;
 }
 
 sf::String TextBox::getPlaceholderString() const
 {
-	return m_placeholder.getString();
+	return m_placeholder.get();
+}
+*/
+
+sf::String TextBox::getSelectedString() const
+{
+	return m_selection.empty() ? "" : m_text.getString().substring(m_selection.lower(), m_selection.length());
 }
 
 

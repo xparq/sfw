@@ -235,7 +235,7 @@ try {
 		textrect.setPosition({w->getSize().x() / 2, w->getSize().y() / 2});
 
 		text.setOrigin(tsize / 2);
-		text.setPosition(w->getSize() / 2);
+		text.position(w->getSize() / 2);
 
 		auto sfml_renderstates = ctx.props;
 		sfml_renderstates.transform *= w->getTransform();
@@ -266,7 +266,7 @@ try {
 	form->add("Text", new TextBox())
 		->setPlaceholder("Type something!")
 		->set("Hello world!")
-		->setCallback([&](auto* w) { text.setString(w->getString()); });
+		->setCallback([&](auto* w) { text.set(w->get()); });
 	// Length limit & pulsating cursor
 	form->add("Text with limit (5)", new TextBox(50.f, TextBox::CursorStyle::PULSE))
 		->setMaxLength(5)
@@ -474,33 +474,33 @@ try {
 	// "theme-selector" widget, so that it remembers the updated size (for each theme)!)
 	right_bar->add(Label("Theme font size (use the m. wheel):"));
 	right_bar->add(Slider({.length = 100, .range = {8, 18}}))
-		->set((float)themes[DEFAULT_THEME].textSize)
+		->set((float)themes[DEFAULT_THEME].fontSize)
 		->setCallback([&] (auto* w){
 #if 0 // OLD
 			assert(demo.find_widget("theme-selector")); // Freak out and die in DEBUG mode.
 			if (auto ts = demo.find_widget<OBTheme>("theme-selector"); ts) { // Check silently in non-DEBUG.
 				auto& themecfg = ts->current(); // or, synonym: ->get();
-				themecfg.textSize = (size_t)w->get();
-cerr << "font size (method 1): "<< themecfg.textSize << endl; //!!#196
+				themecfg.fontSize = (size_t)w->get();
+cerr << "font size (method 1): "<< themecfg.fontSize << endl; //!!#196
 				demo.setTheme(themecfg);
 			}
 #elif 0 // NEW, BUT EVEN MORE CUMBERSOME
 			if (auto res = demo.call<OBTheme>("theme-selector", [](auto* ts) { return ts->get(); }); res) {
 				auto& themecfg = res.value();
-				themecfg.textSize = (size_t)w->get();
-cerr << "font size (method 2): "<< themecfg.textSize << endl; //!!#196
+				themecfg.fontSize = (size_t)w->get();
+cerr << "font size (method 2): "<< themecfg.fontSize << endl; //!!#196
 				demo.setTheme(themecfg);
 			}
 #elif 1 // NEW, WITH get<> -- AWKWARD IN ANOTHER WAY (needs access to the default theme cfg.; can't do ref. for the default, and falls back to it with different semantics!)
 			auto themecfg = demo.get<OBTheme>("theme-selector", themes[DEFAULT_THEME]); // NOTE: not a ref; can't write to the result directly!
-			themecfg.textSize = (size_t)w->get();
-cerr << "font size (method 3): "<< themecfg.textSize << endl; //!!#196
+			themecfg.fontSize = (size_t)w->get();
+cerr << "font size (method 3): "<< themecfg.fontSize << endl; //!!#196
 			demo.setTheme(themecfg);
 #elif 0 // NEW, LEAN
 			demo.call<OBTheme>("theme-selector", [&](auto* ts) {
 				auto& themecfg = ts->get();
-				themecfg.textSize = (size_t)w->get();
-cerr << "font size (method 4): "<< themecfg.textSize << endl; //!!#196
+				themecfg.fontSize = (size_t)w->get();
+cerr << "font size (method 4): "<< themecfg.fontSize << endl; //!!#196
 				demo.setTheme(themecfg);
 			});
 #endif				

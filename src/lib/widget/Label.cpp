@@ -21,39 +21,39 @@ Label::Label(std::string_view text)
 
 Label* Label::setText(std::string_view text)
 {
-	m_text.setString(SAL::stdstringview_to_SFMLString(text));
+	m_text.set(text);
 	recomputeGeometry();
 	return this;
 }
 
 std::string Label::getText() const
 {
-	return SAL::SFMLString_to_stdstring(m_text.getString());
+	return m_text.get();
 }
 
 
 Label* Label::setFillColor(const Color color)
 {
-	m_text.setFillColor(color);
+	m_text.color(color);
 	return this;
 }
 
 Color Label::getFillColor() const
 {
-	return m_text.getFillColor();
+	return m_text.color();
 }
 
 
-Label* Label::setTextSize(size_t size)
+Label* Label::setFontSize(unsigned size)
 {
-	m_text.setCharacterSize((unsigned)size);
+	m_text.font_size(size);
 	recomputeGeometry();
 	return this;
 }
 
-size_t Label::getTextSize() const
+unsigned Label::getFontSize() const
 {
-	return m_text.getCharacterSize();
+	return m_text.font_size();
 }
 
 
@@ -74,13 +74,11 @@ void Label::draw(const gfx::RenderContext& ctx) const
 
 void Label::onThemeChanged()
 {
-	m_text.setFont(Theme::getFont());
+	m_text.font(Theme::getFont());
 	m_text.position({Theme::PADDING, Theme::PADDING}); //!!??  ... + m_text.getLocalBounds().top});
-	                                                 //!! The "canonical" SFML offest correction would
-	                                                 //!! make the positioning inconsistent: some text
-	                                                 //!! would then sit on the baseline, some won't etc.!
-	m_text.setFillColor(Theme::click.textColor);
-	m_text.setCharacterSize((unsigned)Theme::textSize);
+	                                                   //!! Do the "canonical" SFML offest correction!... Preferably implicitly!
+	m_text.color(Theme::click.textColor);
+	m_text.font_size(Theme::fontSize);
 	recomputeGeometry();
 }
 
