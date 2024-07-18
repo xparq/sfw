@@ -128,7 +128,7 @@ LDFLAGS.linux.debug_1  = -o "$@" -fsanitize=address
 LDFLAGS.mingw.debug_0  = -o "$@"
 LDFLAGS.mingw.debug_1  = -o "$@" #! Not with w64devkit: -fsanitize=address (See also at CFLAGS!)
 LDFLAGS.msvc.debug_0   = -nologo -out:"$@"
-LDFLAGS.msvc.debug_1   = -nologo -out:"$@"
+LDFLAGS.msvc.debug_1   = -nologo -out:"$@" -debug
 LDFLAGS = ${LDFLAGS.$(TOOLCHAIN).debug_$(DEBUG)}
 
 
