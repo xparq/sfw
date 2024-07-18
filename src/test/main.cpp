@@ -575,7 +575,7 @@ cerr << "font size: "<< themecfg.fontSize << endl; //!!#196
 		// also without requiring an initial extra draw outside the loop.
 		// (-> FizzBuzz?... ;) )
 		auto event = window.pollEvent();
-		while (event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore the raw mouse-move event spam of SFML3! :-/
+		while (event && event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore the raw mouse-move event spam of SFML3! :-/
 		if (event)
 		{
 			// Pass the event to the GUI:
