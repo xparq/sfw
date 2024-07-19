@@ -7,7 +7,7 @@
 
 #include <SFML/Window/Event.hpp>
 
-namespace sf //! Inject to sf:: for innocent client code to actually find it (via ADL)!
+namespace sf //! Inject into sf:: (to let innocent client code actually find it via ADL)!
 {
 // FFS, still no default == (at least for PODs), even in c++20?! :-/
 // (https://stackoverflow.com/a/27837789/1479945)

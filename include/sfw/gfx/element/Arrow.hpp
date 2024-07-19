@@ -36,7 +36,7 @@ namespace sfw//!!::parts
 	protected:
 		void updateGeometry(fVec2 pos, Direction direction);
 
-		Direction m_direction;
+		Direction         m_direction;
 		gfx::TextureFrame m_frame;
 	};
 

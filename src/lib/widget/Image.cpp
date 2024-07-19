@@ -74,7 +74,9 @@ Image* Image::setCropRect(const geometry::iRect& r)
 	if (width  > m_texture.size().x()) width  = m_texture.size().x();
 	if (height > m_texture.size().y()) height = m_texture.size().y();
 
-	m_baseSize = {width, height};
+	m_baseSize = fVec2{width, height}; //! Vec2 could, but won't do it implicitly: m_baseSize = {width, height};
+	//!!?? Well, with MSVC it still does! :-o
+	// Or, for more control: m_baseSize = {(float)width, (float)height};
 
 	// Update texture "crop window"
 	m_vertices[0].texture_position({left        , top});
@@ -124,9 +126,9 @@ void Image::onResized()
 	auto size = getSize();
 	auto right = size.x(), bottom = size.y();
 
-	m_vertices[0].position({0, 0});
-	m_vertices[1].position({0, bottom});
-	m_vertices[2].position({right, 0});
+	m_vertices[0].position({});
+	m_vertices[1].position({0.f, bottom});
+	m_vertices[2].position({right, 0.f});
 	m_vertices[3].position({right, bottom});
 }
 

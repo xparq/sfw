@@ -10,17 +10,12 @@
 
 namespace sfw//!!::math
 {
-//!!??	using namespace SAL; //!! Woahh!... :-o :)
-//#if 0	
 	using SAL/*!!::math!!*/::fVec2;
 	using SAL/*!!::math!!*/::iVec2;
 	using SAL/*!!::math!!*/::uVec2;
 	using SAL/*!!::math!!*/::dVec2;
-
 	using SAL/*!!::math!!*/::Vec2;
 	using SAL/*!!::math!!*/::Vec;
-	using SAL/*!!::math!!*/::VectorArg;
-//#endif
 }
 
 

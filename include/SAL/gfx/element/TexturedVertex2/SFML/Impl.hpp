@@ -63,10 +63,12 @@ namespace SFML
 		// Accessors for texture pos...
 		constexpr iVec2     _texture_position_copy() const { return iVec2((int)native().texCoords.x, (int)native().texCoords.y); } //! See the int<->float comment at the ctors!
 //!! Can't just brute-force alias this: the native type is a float vector!!!...:
+/*!! Couldn't compile it without warnings with both MSVC and GCC, so... Just disabled entirely:
 		constexpr iVec2&    _texture_position_ref()        { //!! if constexpr (!std::is_same_v<decltype(native().texCoords), sf::Vector2i>)
 		                                                     //!! 	static_assert(, "CAN'T DO THIS!..."); //!!?? ALWAYS fires, can't compile! -- Unlike in Rectangle::right/bottom! :-o
 		                                                     assert("DO NOT CALL _texture_position_ref()!..." && false);
 		                                                     static iVec2 dummy; return dummy; }
+!!*/
 
 		constexpr void      _texture_position_set(iVec2 txpos) { native().texCoords = {(float)txpos.x(), (float)txpos.y()}; } //! See the int<->float comment at the ctors!
 

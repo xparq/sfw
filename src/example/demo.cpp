@@ -296,7 +296,7 @@ try {
 		imgbuttons_form->add("- customized", new sfw::ImageButton(buttonimg, "Stop"))
 			->setFontSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
-			->setSize({180, 35})
+			->setSize({180.f, 35.f}) //!! setSize() etc. should use an autoconverting Vector variant!
 			->setTextColor(Color("#d0e0c0"))
 			->setCallback([]/*(auto* w)*/ { toy_anim_on = false; });
 	}

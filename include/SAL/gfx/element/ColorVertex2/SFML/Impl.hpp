@@ -38,28 +38,32 @@ namespace SFML
 		using native_type = sf::Vertex;
 	
 	public:
-		ColorVertex2_Impl() : _d({0,0}, Color::White) {} //!! SFML init list!
+		constexpr ColorVertex2_Impl() : _d({0,0}, Color::White) {} //!! SFML init list!
 
-		ColorVertex2_Impl(fVec2 pos, Color color) : _d(pos, color) {} // fVec2 auto-converts to sf::Vector
-//!!??OR:	ColorVertex2_Impl(const fVec2& pos, Color color) : _d(pos, color) {} // fVec2 auto-converts to sf::Vector
+		constexpr ColorVertex2_Impl(fVec2 pos, Color color) : _d(pos, color) {} // fVec2 auto-converts to sf::Vector
+//!!??OR:	constexpr ColorVertex2_Impl(const fVec2& pos, Color color) : _d(pos, color) {} // fVec2 auto-converts to sf::Vector
 			
 		// Copy
-		ColorVertex2_Impl(const ColorVertex2_Impl&) = default;
-		ColorVertex2_Impl& operator = (const ColorVertex2_Impl&) = default;
+		constexpr ColorVertex2_Impl(const ColorVertex2_Impl&) = default;
+		constexpr ColorVertex2_Impl& operator = (const ColorVertex2_Impl&) = default;
 
 		// Copy from SFML
-		ColorVertex2_Impl(const native_type& nv) : _d(nv) {}
-		ColorVertex2_Impl& operator = (const native_type& nv) { _d = nv; return *this; }
+		constexpr ColorVertex2_Impl(const native_type& nv) : _d(nv) {}
+		constexpr ColorVertex2_Impl& operator = (const native_type& nv) { _d = nv; return *this; }
 		
 		// Convert to SFML
-		operator       native_type& ()       { return native(); }
-		operator const native_type& () const { return native(); }
+		constexpr operator       native_type& ()       { return native(); }
+		constexpr operator const native_type& () const { return native(); }
 
 		// Accessors for the position, color, texture pos...
 
-		//!! Brittle binary-compatibility "exploits":
-		constexpr fVec2&    _position_ref()          { return reinterpret_cast<fVec2&>(native().position); } //!!...Add some checks (sizeof & ...)!
-		constexpr Color&    _color_ref()             { return reinterpret_cast<Color&>(native().color); }    //!!...Add some checks (sizeof & ...)!
+	//!!
+	//!! Brittle binary-compatibility "UB exploits" (retest at least at major SFML releases):
+	//!!
+		//!!constexpr  // C++ doesn't even allow constexpr with reinterpret_cast... :-/
+			fVec2&    _position_ref()          { return reinterpret_cast<fVec2&>(native().position); } //!!...Add some checks (sizeof & ...)!
+		//!!constexpr  // C++ doesn't even allow constexpr with reinterpret_cast... :-/
+			Color&    _color_ref()             { return reinterpret_cast<Color&>(native().color); }    //!!...Add some checks (sizeof & ...)!
 
 		constexpr fVec2     _position_copy() const   { return native().position; } // fVec2 auto-converts from sf::Vector2f
 		constexpr Color     _color_copy()    const   { return native().color; }    // Color auto-converts from sf::Color
@@ -79,8 +83,8 @@ namespace SFML
 	protected: //! Not private: meant to be mixed-in!
 		native_type _d;
 
-		      native_type& native()       { return _d; }
-		const native_type& native() const { return _d; }
+		constexpr       native_type& native()       { return _d; }
+		constexpr const native_type& native() const { return _d; }
 	};
 
 } // namespace SFML

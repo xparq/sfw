@@ -58,7 +58,9 @@ void Arrow::move(fVec2 delta)
 
 fVec2 Arrow::getSize() const
 {
-	return m_frame.texture_size();
+	return fVec2(m_frame.texture_size());
+		//!! Not m_frame.size(): that's not even initialized to non-0...
+		//!! TextureFrame is not the best Impl for this!...
 }
 
 

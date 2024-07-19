@@ -121,8 +121,8 @@ private:
 	void setSegmentTextureCoords(StripSegment n, int txleft, int txtop, int txwidth, int txheight);                            
 
 
-	ActivationState m_activationState;
-	SAL::gfx::TexturedVertex2 m_vertices[VERTEX_COUNT];
+	ActivationState      m_activationState;
+	gfx::TexturedVertex2 m_vertices[VERTEX_COUNT];
 	std::optional<Color> m_fillColor;
 };
 

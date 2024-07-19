@@ -419,7 +419,7 @@ void GUI::setWallpaper(std::string filename, Wallpaper::Placement placement, Col
 		return;
 
 	m_wallpaper.setImage(filename);
-	m_wallpaper.setSize(getSize()); //!!Rename it to `setWallSize` or sg. more expressive!
+	m_wallpaper.setSize(getSize());
 	m_wallpaper.setColor(tint);
 	m_wallpaper.enable();
 
@@ -501,7 +501,7 @@ void GUI::onResized()
 #ifdef DEBUG
 //cerr <<"resized to " <<getSize().x <<" x "<<getSize().y <<" /" <<sessionTime() <<endl;
 #endif
-	m_wallpaper.setSize(iVec2((int)getSize().x(), (int)getSize().y())); //!!... So sad... :-/
+	m_wallpaper.setSize(getSize());
 }
 
 

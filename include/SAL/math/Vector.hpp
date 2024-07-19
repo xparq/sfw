@@ -19,7 +19,8 @@
 #include "Scalar.hpp"
 
 #include <cmath> // round
-#include <utility> // swap
+#include <utility> // swap, forward
+#include <type_traits> // is_same, enable_if
 
 
 namespace SAL//!!::math
@@ -49,7 +50,29 @@ namespace SAL//!!::math
 	class Vector_Interface : public Impl // mixin
 	{
 	public:
-		// Convert from the native type:
+		// Convert from rval with different number type:
+			//!! - These attempts both failed to enable this ctor for e.g. const iRect const_ir; auto cfr = fRect(const_ir4);
+			//!!	template <class OtherT> Vector_Interface(OtherT&& other) ...
+			//!!	... requires (!std::is_same_v<typename OtherT::number_type, typename Impl::number_type>)
+		template <class OtherT,
+			typename = std::enable_if_t< !std::is_same_v<typename std::decay_t<OtherT>::number_type, typename Impl::number_type> >
+				//!! decay_t (or at least std::remove_cvref_t) is CRITICAL for accepting both const/non-const OtherT ctor args.! :-o
+		>
+		constexpr explicit Vector_Interface(OtherT&& other)
+			: Impl( {(typename Impl::number_type)std::forward<OtherT>(other).x(),
+			         (typename Impl::number_type)std::forward<OtherT>(other).y()} ) {}
+
+		//!!?? How come this has never been actually called?! :-o
+		template <class SameT,
+			typename = std::enable_if_t< std::is_same_v<typename std::decay_t<SameT>::number_type, typename Impl::number_type> >
+				//!! decay_t (or at least std::remove_cvref_t) is CRITICAL for accepting both const/non-const OtherT ctor args.! :-o
+		>
+		constexpr Vector_Interface(const SameT& other) : Impl(std::forward(other.native()))
+		{ //!!??static_
+			assert("FINALLY HERE!... :)" && false); } //!!?? WHY IS THIS NEVER ACTUALLY INSTANTIATED IN GCC, BUT IS IN MSVC?! :-o (No failed static_assert in GCC! :-o )
+
+
+		// Convert from native (backend) vector:
 		using Impl::Impl; // Elevate the backend-specific ctors for implicit backend -> adapter conversions!
 
 		// Convert to the native type:
@@ -87,7 +110,7 @@ namespace SAL//!!::math
 
 
 //----------------------------------------------------------------------------
-// Convenience type aliases...
+// "Dictionary" type aliases...
 //----------------------------------------------------------------------------
 
 	template <unsigned Dim = 2, Scalar NumT = float> // GPUs prefer float (https://www.reddit.com/r/cpp_questions/comments/1bjl3d5/why_cuda_c_uses_float/)
@@ -106,6 +129,19 @@ namespace SAL//!!::math
 	using iVec2 = Vector_Interface<adapter::/*math::active_backend::*/Vector2_Impl<int>>;
 	using uVec2 = Vector_Interface<adapter::/*math::active_backend::*/Vector2_Impl<unsigned>>;
 	using dVec2 = Vector_Interface<adapter::/*math::active_backend::*/Vector2_Impl<double>>;
+
+//----------------------------------------------------------------------------
+// C++ deduction guides, both for Vec2 v{x, y} to work...
+//----------------------------------------------------------------------------
+
+	template <unsigned Dim = 2, Scalar NumT = float>
+	Vector_Interface(NumT&& x, NumT&& y) -> Vector_Interface<adapter::/*math::active_backend::*/Vector2_Impl<NumT, Dim>>; //!! Dim is NOT used, just a reminder!
+
+	// The default null vector is float:
+	//!! Except... This seems to not do anything with GCC! Vec2{1, 2} is still not 
+	template <unsigned Dim = 2, Scalar NumT = float>
+	Vector_Interface() -> Vector_Interface<adapter::/*math::active_backend::*/Vector2_Impl<float, Dim>>; //!! Dim is NOT used, just a reminder!
+
 } // SAL//!!::math
 
 
@@ -120,7 +156,7 @@ namespace SAL//!!::math
 
 namespace SAL//!!::math
 {
-	template <Vector V> using VectorArg = std::conditional_t<SmallVector<V>, V, const V&>;
+	//!! template <Vector V> using VectorArg = std::conditional_t<SmallVector<V>, V, const V&>;
 	
 	//!! There should be automatic dispatching on object size (sizeof(v) > sizeof(void*, or e.g. twice that size) 
 	//!! for switching to const Vector& instead of by-val!
@@ -137,10 +173,21 @@ namespace SAL//!!::math
 	_VECTOR_OP operator + (V v, Scalar auto scalar) { return V( v.x() + scalar, v.y() + scalar ); } // Commutative!
 	_VECTOR_OP operator + (Scalar auto scalar, V v) { return V( v.x() + scalar, v.y() + scalar ); }
 	_VECTOR_OP operator - (V v, Scalar auto scalar) { return V( v.x() - scalar, v.y() - scalar ); }
-	_VECTOR_OP operator * (V v, Scalar auto scalar) { return V( v.x() * scalar, v.y() * scalar ); } // Commutative!
-	_VECTOR_OP operator * (Scalar auto scalar, V v) { return V( v.x() * scalar, v.y() * scalar ); }
 	_VECTOR_OP operator / (V v, Scalar auto scalar) { return V( v.x() / scalar, v.y() / scalar ); }
-
+//!!	_VECTOR_OP operator * (V v, Scalar auto scalar) { return V( v.x() * scalar, v.y() * scalar ); } // Commutative!
+//!!	_VECTOR_OP operator * (Scalar auto scalar, V v) { return V( v.x() * scalar, v.y() * scalar ); }
+	_VECTOR_OP operator * (V v, Scalar auto scalar) { return V( typename V::number_type(v.x() * scalar), typename V::number_type(v.y() * scalar) ); } // Commutative!
+	_VECTOR_OP operator * (Scalar auto scalar, V v) { return V( typename V::number_type(v.x() * scalar), typename V::number_type(v.y() * scalar) ); }
+/*!!??
+	// Supporting mixed number types -- multiplying with a non-NumT scalar would require a
+	// tedious explicit conversion (involving dismantling the vector) without these!
+	_VECTOR_OP operator * (V v, int scalar)    { return V( typename V::number_type(v.x() * scalar), typename V::number_type(v.y() * scalar) ); } // Commutative!
+	_VECTOR_OP operator * (int scalar, V v)    { return V( typename V::number_type(v.x() * scalar), typename V::number_type(v.y() * scalar) ); }
+	_VECTOR_OP operator * (V v, float scalar)  { return V( typename V::number_type(v.x() * scalar), typename V::number_type(v.y() * scalar) ); } // Commutative!
+	_VECTOR_OP operator * (float scalar, V v)  { return V( typename V::number_type(v.x() * scalar), typename V::number_type(v.y() * scalar) ); }
+	_VECTOR_OP operator * (V v, double scalar) { return V( typename V::number_type(v.x() * scalar), typename V::number_type(v.y() * scalar) ); } // Commutative!
+	_VECTOR_OP operator * (double scalar, V v) { return V( typename V::number_type(v.x() * scalar), typename V::number_type(v.y() * scalar) ); }
+??!!*/
  	// Unary -
  	_VECTOR_OP operator - (V v) { return V( -v.x(), -v.y() ); }
 
@@ -159,13 +206,6 @@ namespace SAL//!!::math
 	_VECTOR_OP & operator *= (V& self, Scalar auto scalar) { self.x() *= scalar; self.y() *= scalar; return self; }
 	_VECTOR_OP & operator /= (V& self, Scalar auto scalar) { self.x() /= scalar; self.y() /= scalar; return self; }
 
-
-//----------------------------------------------------------------------------
-// C++ deduction guide for Vec2 v{x, y} to work...
-//----------------------------------------------------------------------------
-
-	template <unsigned Dim = 2, Scalar NumT>
-	Vector_Interface(NumT&& x, NumT&& y) -> Vector_Interface<adapter::/*math::active_backend::*/Vector2_Impl<NumT, Dim>>; //!! Dim is NOT unused, just a reminder!
 } // namespace SAL//!!::math
 
 
@@ -177,10 +217,8 @@ namespace SAL//!!::math
   namespace SAL//!!::math
   {
 	_VECTOR_OP & operator << (std::ostream& out, V v) { out <<"("<< v.x() <<", "<< v.y() <<")"; return out; }
-	_VECTOR_OP & operator >> (std::istream& in,  V v) {
-		static_assert(false, "Vector op<< is not implemented yet!"); //!! It's far less trivial than writing. :-/
-		return in;
-	}
+//!! Not yet:
+//!!	_VECTOR_OP & operator >> (std::istream& in,  V v) { return in; }
   } // namespace SAL//!!::math
 
 #else  // SAL_VECTOR_STREAMABLE

@@ -75,11 +75,13 @@ Wallpaper* Wallpaper::setCropRect(const iRect& r)
 	if (width  > m_texture.size().x()) width  = m_texture.size().x();
 	if (height > m_texture.size().y()) height = m_texture.size().y();
 
-	m_baseSize = {width, height};
+	m_baseSize = fVec2{width, height}; //! Vec2 could, but won't do it implicitly: m_baseSize = {width, height};
+	//!!?? Well, with MSVC it still does! :-o
+	// Or, for more control: m_baseSize = {(float)width, (float)height};
 
 	// Update texture "crop window"
-	m_vertices[0].texture_position({left         , top});
-	m_vertices[1].texture_position({left         , top + height});
+	m_vertices[0].texture_position({left        , top});
+	m_vertices[1].texture_position({left        , top + height});
 	m_vertices[2].texture_position({left + width, top});
 	m_vertices[3].texture_position({left + width, top + height});
 
@@ -109,7 +111,7 @@ Wallpaper* Wallpaper::rescale(float factor)
 }
 
 
-Wallpaper* Wallpaper::setColor(const Color& color)
+Wallpaper* Wallpaper::setColor(Color color)
 {
 	for (int i = 0; i < 4; ++i)
 		m_vertices[i].color(color);
@@ -122,24 +124,19 @@ Color Wallpaper::getColor() const
 }
 
 
-Wallpaper* Wallpaper::setSize(iVec2 size)
+Wallpaper* Wallpaper::setSize(fVec2 size)
 {
-	m_vertices[0].position( {0,               0} );
-	m_vertices[1].position( {0,               (float)size.y()} );
-	m_vertices[2].position( {(float)size.x(), 0} );
-	m_vertices[3].position( {(float)size.x(), (float)size.y()} );
+	m_vertices[0].position( {} );
+	m_vertices[1].position( {0.f, size.y()} );
+	m_vertices[2].position( {size.x(), 0.f} );
+	m_vertices[3].position( {size.x(), size.y()} );
 
 	return this;
 }
 
-iVec2 Wallpaper::getSize() const
+fVec2 Wallpaper::getSize() const
 {
-//!! OLD:
-	return { (int)m_vertices[3].position().x() - (int)m_vertices[0].position().x(),
-	         (int)m_vertices[3].position().y() - (int)m_vertices[0].position().y() };
-//!! USE THIS, if Vec2 type conversions get implemented:
-//!!	
-//!!	return iVec2(m_vertices[3].position() - m_vertices[0].position()); //! The explicit iVec conversion is optional, actually.
+	return m_vertices[3].position() - m_vertices[0].position();
 }
 
 

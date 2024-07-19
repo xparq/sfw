@@ -17,7 +17,8 @@ Tooltip::Tooltip(Widget* owner, std::string text):
 	assert(owner);
 //!!	setParent(owner); //!!See comment at the decl. of m_owner!
 
-	m_box.position = {0, 0};
+//!! If it shouldn't be at (0,0):
+//!!	m_box.position({...});
 
 	setText(text);
 }
@@ -164,7 +165,7 @@ void Tooltip::initView()
 		setPosition({getPosition().x() - size.x(), pos.y()});
 		if (getPosition().x() < 0)
 		{
-			setPosition({0, pos.y()});
+			setPosition({0.f, pos.y()});
 		}
 	}
 
@@ -212,7 +213,6 @@ void Tooltip::onTick()
 //!! Can't:			if (m_box.colorBorder.a) m_box.colorBorder.a -= DELTA;
 				if (m_box.colorBorder.a()) m_box.colorBorder.a(m_box.colorBorder.a() - DELTA);
 				m_text.color({0, 0, 0, uint8_t(m_text.color().a() - DELTA)});
-
 //!! This can't work yet, without somehow hooking an sf::...::setColor into that get-ref / op= chain...
 //!! (Which would probably be as difficult as implementing ()-less property accessors in general!)
 //!!				m_text.color().a() -= DELTA;

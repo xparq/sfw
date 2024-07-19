@@ -54,12 +54,16 @@ public:
 //!!??	TextureFrame_Impl(sfw::geometry::fRect r) : TextureFrame_Impl(r.top, r.left, r.width, r.height) {}
 
 	TextureFrame_Impl() = default;
-	TextureFrame_Impl(float tx, float ty, float tdx, float tdy) {
+	TextureFrame_Impl(int tx, int ty, int tdx, int tdy) {
 		_texture_rect(tx, ty, tdx, tdy); _rect(0, 0, 0, 0);
 	}
+	TextureFrame_Impl(float tx, float ty, float tdx, float tdy) :
+		TextureFrame_Impl((int)tx, (int)ty, (int)tdx, (int)tdy) {}
 
 
 	// Accessors...
+
+	// Vertex coords...
 
 	constexpr float _x1()         const { return _vertex(TopLeft).position.x; }
 	constexpr float _y1()         const { return _vertex(TopLeft).position.y; }
@@ -71,16 +75,6 @@ public:
 	constexpr float _dx()         const { return _vertex(BottomRight).position.x - _vertex(TopLeft).position.x; }
 	constexpr float _dy()         const { return _vertex(BottomRight).position.y - _vertex(TopLeft).position.y; }
 
-	constexpr float _texture_x1() const { return _vertex(TopLeft).texCoords.x; }
-	constexpr float _texture_y1() const { return _vertex(TopLeft).texCoords.y; }
-	constexpr float _texture_x2() const { return _vertex(BottomRight).texCoords.x; }
-	constexpr float _texture_y2() const { return _vertex(BottomRight).texCoords.y; }
-	constexpr float _texture_x()  const { return _texture_x1(); }
-	constexpr float _texture_y()  const { return _texture_y1(); }
-	//! These are not well-defined if the shape is no longer rectangular:
-	constexpr float _texture_dx() const { return _vertex(BottomRight).texCoords.x - _vertex(TopLeft).texCoords.x; }
-	constexpr float _texture_dy() const { return _vertex(BottomRight).texCoords.y - _vertex(TopLeft).texCoords.y; }
-
 	constexpr void _rect(float x, float y, float dx, float dy) {
 		//!!?? How about rounding, like in setPosition()?!
 		_vertex(TopLeft    ).position = sf::Vector2f(x,      y);
@@ -89,27 +83,6 @@ public:
 		_vertex(BottomRight).position = sf::Vector2f(x + dx, y + dy);
 	}
 
-	constexpr void _texture_rect(int x, int y, int dx, int dy) {
-		//!!?? How about rounding, like in setPosition()?!
-		_vertex(TopLeft    ).texCoords = sf::Vector2f(x,      y);
-		_vertex(BottomLeft ).texCoords = sf::Vector2f(x,      y + dy);
-		_vertex(TopRight   ).texCoords = sf::Vector2f(x + dx, y);
-		_vertex(BottomRight).texCoords = sf::Vector2f(x + dx, y + dy);
-	}
-
-//!! These can't work without storing the orientation and calling _place(...)! :-o
-//!!	constexpr void  position(float x, float y)     { rect(x, y, _dx(), _dy()); }
-//!!	constexpr void  position(fVec2 pos)            { rect(pos.x(), pos.y(), _dx(), _dy()); }
-//!!	constexpr void  size(float dx, float dy)       { rect(_x(), _y(), dx, dy); }
-	constexpr fVec2 position() const               { return {_x(), _y()}; }
-	constexpr fVec2 size()     const               { return {_dx(), _dy()}; }
-
-	constexpr void  texture_position(int x, int y) { _texture_rect(x, y, _texture_dx(), _texture_dy()); }
-	constexpr void  texture_size(int dx, int dy)   { _texture_rect(_texture_x(), _texture_y(), dx, dy); }
-	constexpr iVec2 texture_position() const       { return {_texture_x(),  _texture_y()}; }
-	constexpr iVec2 texture_size()     const       { return {_texture_dx(), _texture_dy()}; }
-
-
 	// Per-vertex positions...
 	//!!?? Replace these with sg. like _vertex(i).position(...), after having a SALified Vertex, too!...:
 	constexpr fVec2 _position(unsigned i) const { return _vertex(i).position; } // SAL::Vector auto-converts to/from the current backend's vector type, if any.
@@ -117,6 +90,27 @@ public:
 	constexpr void  _position(unsigned i, float x, float y) { _vertex(i).position = sf::Vector2f(x, y); }
 //!!??	constexpr void  _position(unsigned i, fVec2 pos)        { _position(i, pos.x(), pos.y()); } //!! This unpacking + repacking (for tighter DRY) might throw off the optimizer!
 	constexpr void  _position(unsigned i, fVec2 pos)        { _vertex(i).position = pos; } // SAL::Vector auto-converts to/from the current backend's vector type, if any.
+
+
+	// Texel coords...
+
+	constexpr int _texture_x1() const { return (int)_vertex(TopLeft).texCoords.x; }
+	constexpr int _texture_y1() const { return (int)_vertex(TopLeft).texCoords.y; }
+	constexpr int _texture_x2() const { return (int)_vertex(BottomRight).texCoords.x; }
+	constexpr int _texture_y2() const { return (int)_vertex(BottomRight).texCoords.y; }
+	constexpr int _texture_x()  const { return _texture_x1(); }
+	constexpr int _texture_y()  const { return _texture_y1(); }
+	//! These are not well-defined if the shape is no longer rectangular:
+	constexpr int _texture_dx() const { return (int)_vertex(BottomRight).texCoords.x - (int)_vertex(TopLeft).texCoords.x; }
+	constexpr int _texture_dy() const { return (int)_vertex(BottomRight).texCoords.y - (int)_vertex(TopLeft).texCoords.y; }
+
+	constexpr void _texture_rect(int x, int y, int dx, int dy) {
+		//!!?? How about rounding, like in setPosition()?!
+		_vertex(TopLeft    ).texCoords = sf::Vector2f((float)x,      (float)y);
+		_vertex(BottomLeft ).texCoords = sf::Vector2f((float)x,      (float)y + dy);
+		_vertex(TopRight   ).texCoords = sf::Vector2f((float)x + dx, (float)y);
+		_vertex(BottomRight).texCoords = sf::Vector2f((float)x + dx, (float)y + dy);
+	}
 
 
 	//void rotate(float angle); //!! Only with a higher-level SFML object, that is already sf::Transformable

@@ -377,7 +377,7 @@ try {
 		buttons_form->add("Customized", new ImageButton(buttonimg, "Bold"))
 			->setFontSize(20)
 			->setTextStyle(sf::Text::Style::Bold)
-			->setSize({180, 35})
+			->setSize(fVec2{180, 35}) //!! setSize() etc. should use an autoconverting Vector variant!
 			->setTextColor(Color("#d0e0c0"))
 			->setCallback([]/*(auto* w)*/ { toy_anim_on = false; });
 	}

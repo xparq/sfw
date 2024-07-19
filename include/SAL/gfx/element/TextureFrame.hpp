@@ -31,9 +31,23 @@ namespace SAL::gfx
 
 		using Direction = Impl::Direction;
 
-		TextureFrame(fVec2 size) : TextureFrame(0, 0, size.x(), size.y()) {}
+		TextureFrame(fVec2 size) : TextureFrame(0.f, 0.f, size.x(), size.y()) {}
 
 		TextureFrame(geometry::fRect texture_rect) : Impl(texture_rect.x(), texture_rect.y(), texture_rect.dx(), texture_rect.dy()) {}
+
+
+	//!! These can't work without storing the orientation and calling _place(...)! :-o
+	//!!	constexpr void  position(float x, float y)     { rect(x, y, _dx(), _dy()); }
+	//!!	constexpr void  position(fVec2 pos)            { rect(pos.x(), pos.y(), _dx(), _dy()); }
+	//!!	constexpr void  size(float dx, float dy)       { rect(_x(), _y(), dx, dy); }
+		constexpr fVec2 position() const               { return {_x(), _y()}; }
+		constexpr fVec2 size()     const               { return {_dx(), _dy()}; }
+
+		constexpr void  texture_position(int x, int y) { _texture_rect(x, y, _texture_dx(), _texture_dy()); }
+		constexpr void  texture_size(int dx, int dy)   { _texture_rect(_texture_x(), _texture_y(), dx, dy); }
+		constexpr iVec2 texture_position() const       { return {_texture_x(),  _texture_y()}; }
+		constexpr iVec2 texture_size()     const       { return {_texture_dx(), _texture_dy()}; }
+
 
 		void place(fVec2 pos, Direction dir) { _place(pos.x(), pos.y(), dir); }
 

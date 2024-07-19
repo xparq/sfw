@@ -8,6 +8,7 @@
 #include <SFML/System/Vector2.hpp>
 
 #include <utility> // forward
+#include <type_traits> // is_same, enable_if
 
 
 namespace SAL/*!!::math!!*/::adapter
@@ -29,13 +30,29 @@ namespace SFML
 		constexpr       auto& native()       { return _d; }
 		constexpr const auto& native() const { return _d; }
 
+		// Null vector, with explicit zero-init:
+		constexpr Vector2_Impl() : _d(0, 0) {}
+
+		//!! Making this a teamplate only because MSVC seems to still go for implicit conversions without it:
+		//!! - Except it didn't help!... :-o
+		template <Scalar T> //!! This didn't fix the weird MSVC leniency either: ..., typename = std::enable_if_t<std::is_same_v<T, NumT>> >
+			requires (std::is_same_v<T, NumT>)
+		constexpr Vector2_Impl(number_type x, number_type y) : _d(x, y) {}
+
+		// Convenience conversions from common numeric types, when different from NumT:
+		//!! These might hide actual accidents, though!...
+		//!!NOTE: With these in the Interface class (as ... : Impl(...) {} ) each basic init type deduction test case failed! :-o
+		template <Scalar T>
+			requires (!std::is_same_v<T, NumT>)
+		constexpr explicit Vector2_Impl(T x, T y) : _d((number_type)x, (number_type)y) {}
+
+/*!!?? WHAT IF THIS ISN'T HERE?...
 		template <Vector V>
-		constexpr Vector2_Impl(V&& v) : _d(v.x(), v.y()) {}
+		constexpr Vector2_Impl(V&& v) : _d((number_type)v.x(), (number_type)v.y()) {}
 //!!			{ static_assert(std::is_same_v<IVector::number_type, NumT>); }
 //!!??			{ static_assert(std::is_convertible_v<IVector::number_type, NumT>); }
-
+??!!*/
 		//!! No need for these with the template below:
-		//constexpr Vector2_Impl() : _d() {}
 		//constexpr Vector2_Impl(sf::Vector2<NumT> v) : _d(v) {}
 		//!! Alas, this alone still won't make Vect2 v{x, y} work, though (no ADL
 		//!! from ctor params: https://stackoverflow.com/a/29677814/1479945):
@@ -43,6 +60,7 @@ namespace SFML
 		constexpr Vector2_Impl(T&&... args) : _d(std::forward<T>(args)...) {}
 		//!! Adding this explicitly (and moving above the template) doesn't help:
 		//!!constexpr Vector2_Impl(NumT x, NumT y) : _d(x, y) {}
+
 
 		constexpr auto& _x()       { return _d.x; }
 		constexpr auto& _y()       { return _d.y; }
@@ -53,9 +71,10 @@ namespace SFML
 		bool operator == (const Vector2_Impl&) const = default;
 	};
 
+/*!!?? This prevents accepting other types than NumT, though (for explicit conversion by the ctor)!
 	template <Scalar NumT>
 	Vector2_Impl(NumT x, NumT y) -> Vector2_Impl<NumT>;
-
+??!!*/
 } // namespace SFML
 
 

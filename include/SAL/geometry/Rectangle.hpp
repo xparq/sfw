@@ -15,6 +15,8 @@
 //!!
 #include "SAL/math/Vector.hpp"
 
+#include <cassert>
+
 namespace SAL::geometry
 {
 	template <class R>
@@ -58,40 +60,51 @@ namespace SAL::geometry
 
 /*!! OLD:
 		// Convert from lval with different number type:
-		template <class OtherRectT>// requires (!std::is_same_v<typename OtherRectT::number_type, typename Impl::number_type>)
-		constexpr Rectangle_Interface(const OtherRectT& other) //! `const` would break rval inputs like auto r = fRect(), despite having an rval ctor, too! :-o
+		template <class OtherT>// requires (!std::is_same_v<typename OtherT::number_type, typename Impl::number_type>)
+		constexpr Rectangle_Interface(const OtherT& other) //! `const` would break rval inputs like auto r = fRect(), despite having an rval ctor, too! :-o
 			: Impl( {(typename Impl::number_type)other.x(),     (typename Impl::number_type)other.y()},
 			        {(typename Impl::number_type)other.width(), (typename Impl::number_type)other.height()} ) { static_assert(false, "HERE"); }
 !!*/
 		// Convert from rval with different number type:
 			//!! These versions both failed to enable this ctor for e.g. const iRect const_ir; auto cfr = fRect(const_ir4);
-			//	template <Rectangle OtherRectT> Rectangle_Interface(OtherRectT&& other) ...
-			//	... requires (!std::is_same_v<typename OtherRectT::number_type, typename Impl::number_type>)
-		template <Rectangle OtherRectT,
-			typename = std::enable_if_t< !std::is_same_v<typename std::decay_t<OtherRectT>::number_type, typename Impl::number_type> >
+			//	template <Rectangle OtherT> Rectangle_Interface(OtherT&& other) ...
+			//	... requires (!std::is_same_v<typename OtherT::number_type, typename Impl::number_type>)
+		template <Rectangle OtherT,
+			typename = std::enable_if_t< !std::is_same_v<typename std::decay_t<OtherT>::number_type, typename Impl::number_type> >
 				//!! decay_t (or at least std::remove_cvref_t) is CRITICAL for accepting both const/non-const OtherRect ctor args.! :-o
 		>
-		constexpr Rectangle_Interface(OtherRectT&& other) //!!{ static_assert(false, "HERE"); }
-			: Impl( {(typename Impl::number_type)std::forward<OtherRectT>(other).x(),     (typename Impl::number_type)std::forward<OtherRectT>(other).y()},
-			        {(typename Impl::number_type)std::forward<OtherRectT>(other).width(), (typename Impl::number_type)std::forward<OtherRectT>(other).height()} ) {} //!!{ static_assert(false, "HERE"); }
+		constexpr Rectangle_Interface(OtherT&& other)
+			: Impl( {(typename Impl::number_type)std::forward<OtherT>(other).x(),     (typename Impl::number_type)std::forward<OtherT>(other).y()},
+			        {(typename Impl::number_type)std::forward<OtherT>(other).width(), (typename Impl::number_type)std::forward<OtherT>(other).height()} ) {} //!!{ static_assert(false, "HERE"); }
 
 		//!! Also: if the converting ctor above indeed transparently covers rvals/lvals & const/non-consts,
 		//!! then do the same for the plain (Other == Self) copy/move ctors below:
 
-//!!?? WHY ARE THESE NEVER ACTUALLY SELECTED IN GCC, BUT ARE IN MSVC?! :-o (Not a failed assert ever! :-o )
-		template <Rectangle SameRectT,
-			typename = std::enable_if_t< std::is_same_v<typename std::decay_t<SameRectT>::number_type, typename Impl::number_type> >
+		//!!?? How come this has never been actually selected (not just instantiated)?!
+		template <Rectangle SameT,
+			typename = std::enable_if_t< std::is_same_v<typename std::decay_t<SameT>::number_type, typename Impl::number_type> >
+				//!! decay_t (or at least std::remove_cvref_t) is CRITICAL for accepting both const/non-const OtherT ctor args.! :-o
+		>
+		constexpr Rectangle_Interface(const SameT& other) : Impl(std::forward(other.native()))
+		{ //!!??static_
+			assert("FINALLY HERE!... :)" && false); } //!!?? WHY IS THIS NEVER ACTUALLY INSTANTIATED IN GCC, BUT IS IN MSVC?! :-o (No failed static_assert in GCC! :-o )
+/*!! OLD:
+//!!?? WHY ARE THESE NEVER ACTUALLY INSTANTIATED IN GCC, BUT ARE IN MSVC?! :-o (No failed static_assert in GCC! :-o )
+		template <Rectangle SameT,
+			typename = std::enable_if_t< std::is_same_v<typename std::decay_t<SameT>::number_type, typename Impl::number_type> >
 				//!! decay_t (or at least std::remove_cvref_t) is CRITICAL for accepting both const/non-const OtherRect ctor args.! :-o
 		>
-		constexpr Rectangle_Interface(const SameRectT& other) : Impl(std::forward(other.native())) { static_assert(false, "HERE"); }
-/*!! OLD:
+		constexpr Rectangle_Interface(const SameT& other) : Impl(std::forward(other.native()))
+		{ //!!??static_
+			assert("SHOULDN'T BE HERE!" && false); }
+
 		// Copy:
-		template <class SameRectT> requires (std::is_same_v<typename SameRectT::number_type, typename Impl::number_type>)
-		constexpr Rectangle_Interface(const SameRectT& other) : Impl(other.native()) { static_assert(false, "HERE"); }
+		template <class SameT> requires (std::is_same_v<typename SameT::number_type, typename Impl::number_type>)
+		constexpr Rectangle_Interface(const SameT& other) : Impl(other.native()) { static_assert(false, "HERE"); }
 
 		// Move (still should just be a copy though):
-		template <class SameRectT> requires (std::is_same_v<typename SameRectT::number_type, typename Impl::number_type>)
-		constexpr Rectangle_Interface(SameRectT&& other) : Impl(std::move(other.native())) { static_assert(false, "HERE"); }
+		template <class SameT> requires (std::is_same_v<typename SameT::number_type, typename Impl::number_type>)
+		constexpr Rectangle_Interface(SameT&& other) : Impl(std::move(other.native())) { static_assert(false, "HERE"); }
 !!*/
 		// All other signatures are passed to the native impl.:
 		using Impl::Impl; // Elevate the backend-specific ctors for implicit backend -> abstract conversions!
@@ -132,8 +145,8 @@ namespace SAL::geometry
 		constexpr auto& height()       { return dy(); }
 		constexpr auto& left()         { return x(); }
 		constexpr auto& top()          { return y(); }
-		constexpr auto& right()        { static_assert(false, "Not implemented!"); }
-		constexpr auto& bottom()       { static_assert(false, "Not implemented!"); }
+		constexpr auto& right()        { assert("Not implemented!" && false); }
+		constexpr auto& bottom()       { assert("Not implemented!" && false); }
 
 		constexpr auto& width(Scalar auto n)  { dx() = n; return *this; }
 		constexpr auto& height(Scalar auto n) { dy() = n; return *this; }
@@ -181,16 +194,16 @@ namespace SAL::geometry
 //!!	Rectangle_Interface(Vector auto&& pos, Vector auto&& size) -> Rectangle_Interface<adapter::/*active_backend::*/Rectangle_Impl<NumT>>;
 
 #if 0	//!!?? These didn't help with declaring the cvt ctor with (const OtherT&):
-	template <Scalar NumT = float, class OtherRectT>
-		requires (!std::is_same_v<typename OtherRectT::number_type, NumT>)
-	Rectangle_Interface(OtherRectT&& other) -> Rectangle_Interface<adapter::/*active_backend::*/Rectangle_Impl<NumT>>;
+	template <Scalar NumT = float, class OtherT>
+		requires (!std::is_same_v<typename OtherT::number_type, NumT>)
+	Rectangle_Interface(OtherT&& other) -> Rectangle_Interface<adapter::/*active_backend::*/Rectangle_Impl<NumT>>;
 
-	template <Scalar NumT = float, class OtherRectT>
-		requires (!std::is_same_v<typename OtherRectT::number_type, NumT>)
-	Rectangle_Interface(const OtherRectT& other) -> Rectangle_Interface<adapter::/*active_backend::*/Rectangle_Impl<NumT>>;
+	template <Scalar NumT = float, class OtherT>
+		requires (!std::is_same_v<typename OtherT::number_type, NumT>)
+	Rectangle_Interface(const OtherT& other) -> Rectangle_Interface<adapter::/*active_backend::*/Rectangle_Impl<NumT>>;
 
-	template <class SameRectT>
-	Rectangle_Interface(const SameRectT& other) -> Rectangle_Interface<adapter::/*active_backend::*/Rectangle_Impl<typename SameRectT::number_type>>;
+	template <class SameT>
+	Rectangle_Interface(const SameT& other) -> Rectangle_Interface<adapter::/*active_backend::*/Rectangle_Impl<typename SameT::number_type>>;
 #endif
 
 

@@ -48,10 +48,10 @@ private:
     void draw(const gfx::RenderContext& ctx) const override;
     void onResized() override;
 
-    SAL::gfx::Texture m_texture;
-    fVec2 m_baseSize;
-    float m_scalingFactor = 1.f;
-    SAL::gfx::TexturedVertex2 m_vertices[4];
+    gfx::Texture         m_texture;
+    fVec2                m_baseSize;
+    float                m_scalingFactor = 1.f;
+    gfx::TexturedVertex2 m_vertices[4];
 };
 
 } // namespace sfw

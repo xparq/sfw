@@ -47,7 +47,7 @@ public:
 
 	constexpr bool _valid() const { return (bool)_native_font; } //!!?? Or has_value()?
 
-	constexpr float _get_line_spacing(unsigned fontSize) const { return native().getLineSpacing(fontSize); }
+	float _get_line_spacing(unsigned fontSize) const { return native().getLineSpacing(fontSize); }
 
 
 	//--------------------------------------------------------------------
@@ -98,7 +98,7 @@ protected:
 	//!! First off, it should theoretically be an assert, as always having a native font is an invariant!
 	//!!?? But then why is it an std::optional at all? Is it ONLY because we get it that way from SFML,
 	//!!?? and we just shouldn't (and can't?) copy it out from there?
-	void _err_if_null() const { if (!_valid()) throw ("- No sf::Font in SAL::Font?!"); }
+	constexpr void _err_if_null() const { if (!_valid()) throw ("- No sf::Font in SAL::Font?!"); }
 
 
 	//--------------------------------------------------------------------

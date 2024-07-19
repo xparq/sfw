@@ -124,9 +124,9 @@ void ProgressBar::updateGeometry()
 	m_bar[TopRight]   .position( {x2, y1} );
 	m_bar[BottomRight].position( {x2, y2} );
 
-	auto barrect = fRect(Theme::getProgressBarTextureRect());
-	m_bar[TopLeft]    .texture_position( {barrect.left()                , barrect.top()} );
-	m_bar[BottomLeft] .texture_position( {barrect.left()                , barrect.top() + barrect.height()} );
+	auto barrect = Theme::getProgressBarTextureRect();
+	m_bar[TopLeft]    .texture_position( {barrect.left()                  , barrect.top()} );
+	m_bar[BottomLeft] .texture_position( {barrect.left()                  , barrect.top() + barrect.height()} );
 	m_bar[TopRight]   .texture_position( {barrect.left() + barrect.width(), barrect.top()} );
 	m_bar[BottomRight].texture_position( {barrect.left() + barrect.width(), barrect.top() + barrect.height()} );
 

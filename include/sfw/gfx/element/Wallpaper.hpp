@@ -54,8 +54,8 @@ public:
 
 	const gfx::Texture& texture() const { return m_texture; }
 
-	Wallpaper* setSize(iVec2 size);
-	iVec2      getSize() const;
+	Wallpaper* setSize(fVec2 size);
+	fVec2      getSize() const;
 
 	Wallpaper*      setCropRect(const geometry::iRect& r);
 	geometry::iRect getCropRect() const;
@@ -67,7 +67,7 @@ public:
 	// Relative scaling based on the current size
 	Wallpaper* rescale(float factor);
 
-	Wallpaper* setColor(const Color& color);
+	Wallpaper* setColor(Color color);
 	Color      getColor() const;
 
 public: //! <- NOT private, because draw() may be accessed directly (statically),
@@ -76,7 +76,7 @@ public: //! <- NOT private, because draw() may be accessed directly (statically)
 
 private:
 	gfx::Texture         m_texture;
-	iVec2                m_baseSize;
+	fVec2                m_baseSize;
 	float                m_scalingFactor = 1.f;
 	gfx::TexturedVertex2 m_vertices[4];
 };
