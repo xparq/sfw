@@ -1,13 +1,16 @@
 #include "sfw/GUI.hpp"
 
-#include "SAL/util/diagnostics.hpp"
-
-#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>   // The app should create its own window, the GUI just uses it!
+#include <SFML/Graphics.hpp> // Only for a direct SFML drawing example.
 
 #include <string> // to_string
 #include <iostream> // cerr, for errors, cout for some "demo" info
 #include <thread>
 #include <chrono>
+
+//#include "SAL/util/diagnostics.hpp"
+#include <cassert>
+
 
 using namespace std;
 
@@ -498,15 +501,14 @@ cerr << "font size: "<< themecfg.fontSize << endl; //!!#196
 		// made by other threads), without either awkwardly duplicating the updates
 		// in a nested event-puming loop or having an initial extra draw outside
 		// the main loop. (-> FizzBuzz?... ;) )
-		auto event = window.pollEvent();
-		while (event && event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore the raw mouse-move event spam of SFML3! :-/
-		if (event)
+		auto event = demo.poll();
+		if (event) // Don't ever touch the event, unless it's checked to be true!
 		{
 			// Pass the event to the GUI:
-			demo.process(event.value());
+			demo.process(event);
 
 			// Close on Esc:
-			if (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape)
+			if (event.is<sf::Event::KeyPressed>() && event.get<sf::Event::KeyPressed>().code == sf::Keyboard::Key::Escape)
 				demo.close();
 		}
 

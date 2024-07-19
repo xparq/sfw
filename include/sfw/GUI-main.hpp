@@ -9,6 +9,7 @@
 #include "sfw/gfx/Color.hpp"
 #include "sfw/gfx/Render.hpp"
 #include "sfw/math/Vector.hpp"
+#include "sfw/Event.hpp"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
@@ -69,13 +70,22 @@ public:
 	bool active();
 	operator bool() { return active(); }
 
+
 	/**
-	 * Process events from the backend (i.e. SFML)
-	 * Returns false if the GUI is inactive, or when the underlying backend's
-	 * CLOSE event has been received. In that case close() will also be called
-	 * (which will deactivate the GUI).
+	 * Get the last input event from the active input event source
+	 * (The input source is always the event queue of the associated window
+	 * currently.)
 	 */
-	bool process(const sf::Event& event);
+	event::Input poll();
+
+	/**
+	 * Process input event
+	 * Returns false if the GUI is inactive, or when the underlying backend's
+	 * CLOSE event has been received. In that case close() will also be called,
+	 * which will deactivate the GUI (but not close the host window itself,
+	 * unless the GUI was set up to manage ("own") the window).
+	 */
+	bool process(const event::Input& event);
 
 	/**
 	 * Draw the entire GUI to the backend (i.e. SFML)
@@ -175,7 +185,8 @@ private:
 
 // ---- Data -----------------------------------------------------------------
 	std::error_code m_error;
-	sf::RenderWindow& m_window;
+	sf::RenderWindow& m_window;      //!! Refine to focus on being a RenderTarget (the host windowing chores could have a separate API)
+	sfw::event::Source m_inputQueue; //!! ...especially as the event handling has now been abstracted away from the window!
 	bool m_own_window;
 	sfw::Theme::Cfg m_themeCfg;
 	sfw::Wallpaper m_wallpaper;

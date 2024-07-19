@@ -574,17 +574,16 @@ cerr << "font size: "<< themecfg.fontSize << endl; //!!#196
 		// changes by other threads), without duplicating those updates, and
 		// also without requiring an initial extra draw outside the loop.
 		// (-> FizzBuzz?... ;) )
-		auto event = window.pollEvent();
-		while (event && event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore the raw mouse-move event spam of SFML3! :-/
-		if (event)
+		auto event = demo.poll();
+		if (event) // Don't ever touch the event, unless it's checked to be true!
 		{
 			// Pass the event to the GUI:
-			demo.process(event.value());
+			demo.process(event);
 
 			// Handle window-closing explicitly, as we've configured the
 			// GUI manager to not do that automatically in this setup:
-			if (event->is<sf::Event::Closed>() || // And also close on Esc:
-			   (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape))
+			if (event.is<sf::Event::Closed>() || // And also close on Esc:
+			   (event.is<sf::Event::KeyPressed>() && event.get<sf::Event::KeyPressed>().code == sf::Keyboard::Key::Escape))
 			{
 				window.close(); // Not demo.close() if the GUI doesn't own the window!
 				                // Also: window.close() will indirectly disable the GUI.

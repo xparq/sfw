@@ -29,7 +29,7 @@ Widget::Widget() :
 }
 
 Widget::Widget(Widget&& tmp) :
-	Event::Handler(tmp),
+	event::Handler(tmp),
 	m_parent(tmp.m_parent),
 	m_previous(tmp.m_previous),
 	m_next(tmp.m_next),
@@ -49,7 +49,7 @@ Widget::Widget(Widget&& tmp) :
 }
 
 Widget::Widget(const Widget& other) :
-	Event::Handler(other),
+	event::Handler(other),
 	m_parent(other.m_parent),
 	m_previous(other.m_previous),
 	m_next(other.m_next),

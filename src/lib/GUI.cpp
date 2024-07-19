@@ -24,7 +24,7 @@ GUI* GUI::DefaultInstance = nullptr;
 //----------------------------------------------------------------------------
 GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the_window):
 	m_error(), // no error by default
-	m_window(window),
+	m_window(window), m_inputQueue(window),
 	m_own_window(own_the_window), //!!Rename to sg. like manage_host_window
 	m_themeCfg(themeCfg)
 {
@@ -98,8 +98,26 @@ bool GUI::closed()
 	return m_closed;
 }
 
+
 //----------------------------------------------------------------------------
-bool GUI::process(const sf::Event& event)
+event::Input GUI::poll()
+{
+	if (!active())
+		return event::Input{}; // null event, evaluates to false
+
+	auto event = m_inputQueue.poll();
+
+	// Filter out the raw mouse-move event spam flood of SFML3...
+	// I guess, as an unfortunate side-effect, this would prevent copy elision, though! :-/
+	while (event && event->is<sf::Event::MouseMovedRaw>())
+		event = m_inputQueue.poll();
+
+	return event;
+}
+
+
+//----------------------------------------------------------------------------
+bool GUI::process(const event::Input& event)
 {
 	thread_local bool event_processing_started = false;
 

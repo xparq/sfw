@@ -50,7 +50,7 @@ class Widget; template <std::derived_from<Widget> W = Widget> class WidgetPtr;
 //!!C++: No, can't just make this a template like this (for *optional* CRTP support):
 //!!struct WidgetProxy{};
 //!!template <class W = WidgetProxy>
-class Widget : public gfx::Drawable, public Event::Handler
+class Widget : public gfx::Drawable, public event::Handler
 {
 public:
 	// Widget geometry

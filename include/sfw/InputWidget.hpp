@@ -110,13 +110,13 @@ public:
 	//    applying (committing) the changes as the new content of the widget.
     	W* setCallback(std::function<void(W*)> callback)
 	{
-		on(Event::Update, [callback] (Event::Handler* w) { callback((W*)w); } );
+		on(event::Update, [callback] (event::Handler* w) { callback((W*)w); } );
 		return (W*)this;
 	}
 
 	W* setCallback(std::function<void()> callback)
 	{
-		on(Event::Update, callback);
+		on(event::Update, callback);
 		return (W*)this;
 	}
 
@@ -143,9 +143,9 @@ protected:
 
 	virtual void onUpdated() //!! -> "EventHandler::invoke_callback(Updated)", and "updated" -> "notify(Updated)" or sg...
 	{
-		using namespace Event::internal;
+		using namespace event::internal;
 		
-		auto callback = m_callbackMap[Event::Update];
+		auto callback = m_callbackMap[event::Update];
 		assert( std::holds_alternative<Callback_w>(callback) || std::holds_alternative<Callback_void>(callback) );
 			//!!?? This may no longer be true after getting something from the map that may not have
 			//!!?? been there! Seems to still work, so probably true, but make it explicit whether the
