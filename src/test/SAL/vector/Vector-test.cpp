@@ -1,12 +1,13 @@
-﻿#define SAL_VECTOR_STREAMABLE
+﻿#define VEC
+#define SAL_VECTOR_STREAMABLE
 #include "SAL/math/Vector.hpp"
+using namespace SAL;
 
 #include <iostream>
 #include <fstream> // just for updating the run-count file :)
 #include <type_traits> // is_same
 
 using namespace std;
-using namespace SAL;
 
 
 //!!Nope, can only be a class member:
@@ -37,6 +38,7 @@ static_assert(is_same_v<decltype(Vec2<unsigned>{1, 2}), Vec2<unsigned>>);
 static_assert(is_same_v<decltype(Vec2<float>{1, 2}),    Vec2<float>>);
 static_assert(is_same_v<decltype(Vec2<double>{1u, 2u}), Vec2<double>>);
 // - typename-driven:
+#ifndef VEC
 static_assert(is_same_v<decltype(iVec2(1.f, 2.f)), Vec2<int>>);
 static_assert(is_same_v<decltype(uVec2(1, 2)),     Vec2<unsigned>>);
 static_assert(is_same_v<decltype(fVec2(1, 2)),     Vec2<float>>);
@@ -45,6 +47,7 @@ static_assert(is_same_v<decltype(iVec2{1.f, 2.f}), Vec2<int>>);
 static_assert(is_same_v<decltype(uVec2{1, 2}),     Vec2<unsigned>>);
 static_assert(is_same_v<decltype(fVec2{1, 2}),     Vec2<float>>);
 static_assert(is_same_v<decltype(dVec2{1u, 2u}),   Vec2<double>>);
+#endif
 
 
 Vec<2> vec_2_float;      static_assert(is_same_v<decltype(vec_2_float), Vec2<float>>);
@@ -54,10 +57,13 @@ Vec2<float> Vec2_float;
 //!! These don't compile with MSVC! In fact, it even crashes! :)
 #ifndef _MSC_VER
 Vec2 Vec2_float_implied; static_assert(is_same_v<decltype(Vec2_float), decltype(Vec2_float_implied)>);
+
 Vec implicit_2d_null_float;
 	static_assert(is_same_v<decltype(implicit_2d_null_float), Vec2<float>>);
+// Aggreg. init? Why does it compile then, if the vectors are not even aggregates (because of having ctors)?
 Vec implicit_2d_double = {111.0, 222.0}; //!! Should warn about the narrowing conversion!
 	static_assert(is_same_v<decltype(implicit_2d_double), Vec2<double>>);
+
 /*
 	src/test/SAL/vector/Vector-test.cpp(23): error C2641: cannot deduce template arguments for 'SAL::Vec2'
 	src/test/SAL/vector/Vector-test.cpp(23): error C3203: 'Vec2': unspecialized alias template can't be us
@@ -109,9 +115,6 @@ auto auto_null_int2_p = Vec2<int>();  static_assert(is_same_v<decltype(auto_null
 auto auto_null_int_b = Vec2{};        static_assert(is_same_v<decltype(auto_null_int_b), Vec2<float>>);
 auto auto_null_int_p = Vec2();        static_assert(is_same_v<decltype(auto_null_int_p), Vec2<float>>);
 
-static_assert(is_same_v<iVec2, Vec2<int>>);
-static_assert(is_same_v<fVec2, Vec2<float>>);
-
 
 //----------------------------------------------------------------------------
 // Values...
@@ -119,15 +122,36 @@ static_assert(is_same_v<fVec2, Vec2<float>>);
 int main()
 {
 	//!! For now, SFML is the only backend, so its vector type is just named here directly:
+#ifdef VEC
+	sf::Vector2f sfv{5.f, 7.f}; static_assert(is_same_v< decltype(sfv), fVec2::foreign_type >);
+#else
 	sf::Vector2f sfv{5.f, 7.f}; static_assert(is_same_v< decltype(sfv), SAL::adapter::/*!!math::active_backend::!!*/Vector2_Impl<float>::native_type >);
+#endif
 
+	//
+cout << "\nStreaming...\n";
+	//
 
-	cout << "default: " << Vec2<int>().x() <<", "<< Vec2<int>().y() << '\n';
-	cout << "Can also << with SFW_VECTOR_HAS_STREAM_OPS: "
-	     << Vec2<int>() <<", "<< Vec2<float>(1.23, 45.34) << '\n';
 	// SFML doesn't have <<:
 	//cout << sfv;
+#ifndef SAL_VECTOR_STREAMABLE
+#error Define SAL_VECTOR_STREAMABLE to compile this test!
+#endif
+	cout << "Can << (with SAL_VECTOR_STREAMABLE): "
+	     << Vec2<int>() <<", "<< Vec2<float>(1.23, 45.34) << '\n';
 
+	//
+cout << "\nZero-init...\n";
+	//
+	iVec2 zero{}; assert(!zero);
+	cout << "iVec2 zero{} == "<< zero << '\n';
+
+	cout << "Vec2<int>().x(), .y(): " << Vec2<int>().x() <<", "<< Vec2<int>().y() << '\n';
+	cout << "Vec2<int>(): " << Vec2<int>() << '\n';
+
+	//
+cout << "\nCoord-wise init...\n";
+	//
 	Vec2 vint{4, 5};         static_assert(is_same_v<decltype(vint),     Vec2<int>>);
 	Vec2 vdbl{4.0, 5.6};     static_assert(is_same_v<decltype(vdbl),     Vec2<double>>);
 	Vec2 vdbl_alt(4.0, 5.6); static_assert(is_same_v<decltype(vdbl_alt), Vec2<double>>);
@@ -138,7 +162,6 @@ int main()
 	fVec2 vf_from_dbl{4.0, 5.6};
 	// Should fail:
 	//Vec2 vx{4.0, 5.6f};
-
 	cout << "int vector (size: "<< sizeof(vint) <<"): " << vint << '\n';
 	cout << "float vector (size: "<< sizeof(vflt) <<"): " << vflt << '\n';
 	cout << "double vector (size: "<< sizeof(vdbl) <<"): " << vdbl << '\n';
@@ -159,11 +182,11 @@ int main()
 	//!!Vec2{sfv};
 
 	// Convert to backend types:
-	iVec2 ivec_to_cvt{1, 2};
-		sf::Vector2i sfvi_receiving_1 = ivec_to_cvt;       static_assert(is_same_v<decltype(sfvi_receiving_1), sf::Vector2i>);
-		sf::Vector2i sfvi_receiving_2(ivec_to_cvt);        static_assert(is_same_v<decltype(sfvi_receiving_2), sf::Vector2i>);
-		auto sfvi_receiving_3 = sf::Vector2i(ivec_to_cvt); static_assert(is_same_v<decltype(sfvi_receiving_3), sf::Vector2i>);
-		auto sfvi_receiving_4 = (sf::Vector2i)ivec_to_cvt; static_assert(is_same_v<decltype(sfvi_receiving_4), sf::Vector2i>);
+	iVec2 ivec_to_sf{1, 2};
+		sf::Vector2i sfvi_receiving_1 = ivec_to_sf;       static_assert(is_same_v<decltype(sfvi_receiving_1), sf::Vector2i>);
+		sf::Vector2i sfvi_receiving_2(ivec_to_sf);        static_assert(is_same_v<decltype(sfvi_receiving_2), sf::Vector2i>);
+		auto sfvi_receiving_3 = sf::Vector2i(ivec_to_sf); static_assert(is_same_v<decltype(sfvi_receiving_3), sf::Vector2i>);
+		auto sfvi_receiving_4 = (sf::Vector2i)ivec_to_sf; static_assert(is_same_v<decltype(sfvi_receiving_4), sf::Vector2i>);
 
 
 	//--------------------------------------------------------------------
@@ -173,9 +196,13 @@ int main()
 
 	//--------------------------------------------------------------------
 	// Manipulating the native type:
-	auto v_23 = Vec2{2, 3};
+	auto v_23 = iVec2{2, 3};
+#ifdef VEC
+	v_23.foreign().y = 4;
+#else
 	v_23.native().y = 4;
-	cout << "(2, 3) changed (y := 4) via native() access: " << v_23 << '\n';
+#endif
+	cout << "(2, 3) changed (y := 4) via foreign() access: " << v_23 << '\n';
 
 
 	//--------------------------------------------------------------------
@@ -197,7 +224,8 @@ int main()
 	// Implicit conv. is not enabled (will need another Vector type for that! -> #443):
 	//fVec2 fvec_receiving_1 = ivec2f;
 
-	//!! Not checked currently! There should be explicitly selectable checking versions!
+	//!! Not checked currently! There should be -- explicitly selectable -- checking versions!
+	//!! (Well, a literal like this at least it triggers a warning. :) )
 	auto ivfromdv_overflow = iVec2(1.0e100, -2.0e200);
 	cout << "*SILENT* overflowing conv. of " << dVec2(1.0e100, -2.0e200) << " to " << ivfromdv_overflow << "! :-( \n";
 
@@ -213,9 +241,10 @@ int main()
 
 	//--------------------------------------------------------------------
 	// Misc. operators...
+#ifndef VEC
 	auto flipped = fVec2(6, 7).flip();
 	cout << "(6, 7) flipped:" << flipped << '\n';
-
+#endif
 
 	// No .0 formatting, despite not being int! :-o
 	//double x = 1; cout << x << '\n'; cout << sizeof(x) << '\n';

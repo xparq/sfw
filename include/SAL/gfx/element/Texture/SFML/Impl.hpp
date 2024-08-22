@@ -6,7 +6,6 @@
 // This helper class can be used to help existing APIs continue to rely
 // on a non-RAII, non-dynamically created empty texture.
 
-
 #include "SAL/geometry/Rectangle.hpp"
 
 #include <SFML/Graphics/Texture.hpp>
@@ -35,7 +34,12 @@ public:
 		{ auto res = sf::Texture::loadFromImage(image, false, r); // false: no sRTGB support in this adapter...
 		  if (res) { native() = res.value(); } return res.has_value(); }
 
-	iVec2 size() const { return native().getSize(); }
+	iVec2 size() const { return iVec2(uVec2(native().getSize())); } // getSize() is unsigned!
+ 	//!! xparq/pocketvec#18:
+	//!!OK:       iVec2 size() const { auto [x, y] = native().getSize(); return iVec2(x, y); }
+	//!!ALSO OK!: iVec2 size() const { return iVec2(native().getSize()); } //!! This is an "explicit" SFML ctor call as far as C++ is concerned! :-o
+	//!!BUT NOT THIS, unless VEC_IMPLICIT_NUM_CONV:
+	//!!          iVec2 size() const { return uVec2(native().getSize()); }
 
 	//!! Since we're just subclassing sf::Texture, these are redundant:
 	constexpr const native_type& native() const { return *this; }
