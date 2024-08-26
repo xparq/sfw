@@ -378,35 +378,35 @@ void Slider::draw(const gfx::RenderContext& ctx) const
 
 // callbacks ------------------------------------------------------------------
 
-void Slider::onKeyPressed(const sf::Event::KeyChanged& key)
+void Slider::onKeyPressed(const event::KeyCombination& key)
 {
 	auto faster = sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LControl)
 	           || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::RControl);
 
 	auto delta = faster ? 2 * step() : step(); //!!Less hamfist!...
 	auto delta_redir = m_cfg.invert ? -delta : delta;
-	switch (key.code)
+	switch (key.code) //!!XLAT below!...
 	{
-	case sf::Keyboard::Key::Left:
+	case unsigned(sf::Keyboard::Key::Left):
 		if (m_cfg.orientation == Horizontal) dec(delta_redir);
 		else if (m_cfg.use_all_arrow_keys)   dec(delta);
 		break;
-	case sf::Keyboard::Key::Right:
+	case unsigned(sf::Keyboard::Key::Right):
 		if (m_cfg.orientation == Horizontal) inc(delta_redir);
 		else if (m_cfg.use_all_arrow_keys)   inc(delta);
 		break;
-	case sf::Keyboard::Key::Down:
+	case unsigned(sf::Keyboard::Key::Down):
 		if (m_cfg.orientation == Vertical)   dec(delta_redir);
 		else if (m_cfg.use_all_arrow_keys)   dec(delta);
 		break;
-	case sf::Keyboard::Key::Up:
+	case unsigned(sf::Keyboard::Key::Up):
 		if (m_cfg.orientation == Vertical)   inc(delta_redir);
 		else if (m_cfg.use_all_arrow_keys)   inc(delta);
 		break;
-	case sf::Keyboard::Key::Home:
+	case unsigned(sf::Keyboard::Key::Home):
 		update(range().min);
 		break;
-	case sf::Keyboard::Key::End:
+	case unsigned(sf::Keyboard::Key::End):
 		update(range().max);
 		break;
 	default:

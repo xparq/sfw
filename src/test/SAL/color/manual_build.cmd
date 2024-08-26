@@ -1,5 +1,3 @@
-g++ -O1 ^
-	-std=c++23 -I../../../../include -I../../../../extern/sfml/mingw/include ^
-	-save-temps -fverbose-asm ^
-	-Wall ^
-	*.cpp ^
+@echo off
+
+call %~dP0../../../../tooling/test/build_separately-gcc.cmd %*

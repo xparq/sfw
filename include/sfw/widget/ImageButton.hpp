@@ -51,8 +51,8 @@ private:
 	void onMouseMoved(float x, float y) override;
 	void onMousePressed(float x, float y) override;
 	void onMouseReleased(float x, float y) override;
-	void onKeyPressed(const sf::Event::KeyChanged& key) override;
-	void onKeyReleased(const sf::Event::KeyChanged& key) override;
+	void onKeyPressed(const event::KeyCombination& key) override;
+	void onKeyReleased(const event::KeyCombination& key) override;
 
 	void centerText();
 	void press();

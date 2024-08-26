@@ -743,14 +743,14 @@ cerr << "font size (method 4): "<< themecfg.fontSize << endl; //!!#196
 		//!! Can't shortcut it when the GUI doesn't own the window, so when
 		//!! it gets deactivated it wouldn't block the rest of the world, too:
 		//!!while (window.pollEvent(event) && demo.process(event) || )
-		while (const auto event = window.pollEvent())
+		while (const auto event = demo.poll())
 		{
-			demo.process(event.value());
+			demo.process(event);
 
 			// Handle the window-closing explicitly, as we've configured
 			// the GUI manager to not do that in this setup:
-			if (event->is<sf::Event::Closed>() || // And also close on Esc:
-			   (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape))
+			if (event.is<event::WindowClosed>() || // And also close on Esc:
+			   (event.is<event::KeyPressed>() && event.get_if<event::KeyPressed>()->code == unsigned(sf::Keyboard::Key::Escape)))
 			{
 				window.close(); // Not demo.close() if the GUI doesn't own the window!
 				                // Also: window.close() will indirectly disable the GUI.

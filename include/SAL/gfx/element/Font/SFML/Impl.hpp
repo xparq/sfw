@@ -26,7 +26,7 @@ namespace SAL::gfx::adapter
 
 namespace SFML
 {
-static_assert( ! std::is_default_constructible_v<sf::Font> );
+//static_assert( ! std::is_default_constructible_v<sf::Font> );
 // But it's copyable?! :-o WHY?! It's NOT just a handle!
 //!!?! And how?! It doesn't have a copy ctor, only a user-defined custom one! :-o
 static_assert( std::is_copy_constructible_v<sf::Font> );
@@ -38,7 +38,7 @@ public:
 	using native_type = sf::Font;
 
 	bool load(std::string_view filename) {
-		_native_font = sf::Font::openFromFile(filename);
+		_native_font = sf::Font::createFromFile(filename);
 		return _valid();
 	}
 
@@ -115,6 +115,11 @@ private:
 
 public: // Only public for diagnostics (hopefully...):
 	constexpr const native_type& native() const {
+		_err_if_null();
+		return _native_font.value(); // Just a ref.
+	}
+
+	constexpr native_type& native() {
 		_err_if_null();
 		return _native_font.value(); // Just a ref.
 	}

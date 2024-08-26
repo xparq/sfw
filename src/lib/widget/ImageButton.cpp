@@ -168,9 +168,9 @@ void ImageButton::onMouseReleased(float x, float y)
 }
 
 
-void ImageButton::onKeyPressed(const sf::Event::KeyChanged& key)
+void ImageButton::onKeyPressed(const event::KeyCombination& key)
 {
-	if (key.code == sf::Keyboard::Key::Enter)
+	if (key.code == unsigned(sf::Keyboard::Key::Enter)) //!!XLAT
 	{
 		press();
 		onUpdated();
@@ -178,9 +178,9 @@ void ImageButton::onKeyPressed(const sf::Event::KeyChanged& key)
 }
 
 
-void ImageButton::onKeyReleased(const sf::Event::KeyChanged& key)
+void ImageButton::onKeyReleased(const event::KeyCombination& key)
 {
-	if (key.code == sf::Keyboard::Key::Enter)
+	if (key.code == unsigned(sf::Keyboard::Key::Enter)) //!!XLAT
 	{
 		release();
 	}

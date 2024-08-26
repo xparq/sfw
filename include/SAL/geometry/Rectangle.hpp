@@ -46,25 +46,25 @@ namespace SAL::geometry
 	public:
 		constexpr Rectangle_Interface() = default;
 
-		//!!?? Accept native vector types (our Vector auto-converts to those, so they work, too),
+		//!!?? Accept backend vector types (our Vector auto-converts to those, so they work, too),
 		//!!?? but that might not actually be a good thing -- could be confusingly permissive, and
 		//!!?? also untenable with more complex classes, which then would also be expected to support
-		//!!?? all sorts of other native types transparently (with minor combinatoric explosions)!
+		//!!?? all sorts of other backend types transparently (with minor combinatoric explosions)!
 		//!!?? (And the confusion part: generic APIs are not expected to work with "random" foreign
 		//!!?? types; however, supporting the types of the current backend could be excused.)
 		constexpr Rectangle_Interface(Impl::vector_type position, Impl::vector_type size)
-			: Impl(position.native(), size.native()) {}
+			: Impl(position.foreign(), size.foreign()) {}
 
 		constexpr Rectangle_Interface(Impl::vector_type size)
-			: Impl({0,0}, size.native()) {}
+			: Impl({0,0}, size.foreign()) {}
 
-/*!! OLD:
-		// Convert from lval with different number type:
-		template <class OtherT>// requires (!std::is_same_v<typename OtherT::number_type, typename Impl::number_type>)
-		constexpr Rectangle_Interface(const OtherT& other) //! `const` would break rval inputs like auto r = fRect(), despite having an rval ctor, too! :-o
-			: Impl( {(typename Impl::number_type)other.x(),     (typename Impl::number_type)other.y()},
-			        {(typename Impl::number_type)other.width(), (typename Impl::number_type)other.height()} ) { static_assert(false, "HERE"); }
-!!*/
+//!! OLD:
+//		// Convert from lval with different number type:
+//		template <class OtherT>// requires (!std::is_same_v<typename OtherT::number_type, typename Impl::number_type>)
+//		constexpr Rectangle_Interface(const OtherT& other) //! `const` would break rval inputs like auto r = fRect(), despite having an rval ctor, too! :-o
+//			: Impl( {(typename Impl::number_type)other.x(),     (typename Impl::number_type)other.y()},
+//			        {(typename Impl::number_type)other.width(), (typename Impl::number_type)other.height()} ) { /*!!NOPE:static_!!*/assert(false, "HERE"); }
+//!!
 		// Convert from rval with different number type:
 			//!! These versions both failed to enable this ctor for e.g. const iRect const_ir; auto cfr = fRect(const_ir4);
 			//	template <Rectangle OtherT> Rectangle_Interface(OtherT&& other) ...
@@ -75,7 +75,7 @@ namespace SAL::geometry
 		>
 		constexpr Rectangle_Interface(OtherT&& other)
 			: Impl( {(typename Impl::number_type)std::forward<OtherT>(other).x(),     (typename Impl::number_type)std::forward<OtherT>(other).y()},
-			        {(typename Impl::number_type)std::forward<OtherT>(other).width(), (typename Impl::number_type)std::forward<OtherT>(other).height()} ) {} //!!{ static_assert(false, "HERE"); }
+			        {(typename Impl::number_type)std::forward<OtherT>(other).width(), (typename Impl::number_type)std::forward<OtherT>(other).height()} ) {} //!!{ /*!!NOPE:static_!!*/assert(false, "HERE"); }
 
 		//!! Also: if the converting ctor above indeed transparently covers rvals/lvals & const/non-consts,
 		//!! then do the same for the plain (Other == Self) copy/move ctors below:
@@ -86,26 +86,28 @@ namespace SAL::geometry
 				//!! decay_t (or at least std::remove_cvref_t) is CRITICAL for accepting both const/non-const OtherT ctor args.! :-o
 		>
 		constexpr Rectangle_Interface(const SameT& other) : Impl(std::forward(other.native()))
-		{ //!!??static_
-			assert("FINALLY HERE!... :)" && false); } //!!?? WHY IS THIS NEVER ACTUALLY INSTANTIATED IN GCC, BUT IS IN MSVC?! :-o (No failed static_assert in GCC! :-o )
-/*!! OLD:
-//!!?? WHY ARE THESE NEVER ACTUALLY INSTANTIATED IN GCC, BUT ARE IN MSVC?! :-o (No failed static_assert in GCC! :-o )
+		{
+			assert("FINALLY HERE!... :)" && false); } //!!?? WHY IS THIS NEVER ACTUALLY INSTANTIATED IN GCC, BUT IS IN MSVC?! :-o (No failed assert in GCC! :-o )
+			//!! Oh, BTW, no, static_assert is useless for this purpose, however straightforward
+			//!! it would be...: https://groups.google.com/a/isocpp.org/g/std-proposals/c/d2ADcbygYn4/m/jNtpL2GpBgAJ
+#if 0 //!! OLD:
+	//!!?? WHY ARE THESE NEVER ACTUALLY INSTANTIATED IN GCC, BUT ARE IN MSVC?! :-o (No failed asserts in GCC! :-o )
 		template <Rectangle SameT,
 			typename = std::enable_if_t< std::is_same_v<typename std::decay_t<SameT>::number_type, typename Impl::number_type> >
 				//!! decay_t (or at least std::remove_cvref_t) is CRITICAL for accepting both const/non-const OtherRect ctor args.! :-o
 		>
 		constexpr Rectangle_Interface(const SameT& other) : Impl(std::forward(other.native()))
-		{ //!!??static_
-			assert("SHOULDN'T BE HERE!" && false); }
+		{
+			/*!!NOPE:static_!!*/assert("SHOULDN'T BE HERE!" && false); }
 
 		// Copy:
 		template <class SameT> requires (std::is_same_v<typename SameT::number_type, typename Impl::number_type>)
-		constexpr Rectangle_Interface(const SameT& other) : Impl(other.native()) { static_assert(false, "HERE"); }
+		constexpr Rectangle_Interface(const SameT& other) : Impl(other.native()) { /*!!NOPE:static_!!*/assert(false, "HERE"); }
 
 		// Move (still should just be a copy though):
 		template <class SameT> requires (std::is_same_v<typename SameT::number_type, typename Impl::number_type>)
-		constexpr Rectangle_Interface(SameT&& other) : Impl(std::move(other.native())) { static_assert(false, "HERE"); }
-!!*/
+		constexpr Rectangle_Interface(SameT&& other) : Impl(std::move(other.native())) { /*!!NOPE:static_!!*/assert(false, "HERE"); }
+#endif
 		// All other signatures are passed to the native impl.:
 		using Impl::Impl; // Elevate the backend-specific ctors for implicit backend -> abstract conversions!
 

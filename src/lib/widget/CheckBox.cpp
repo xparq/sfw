@@ -3,7 +3,7 @@
 
 #include "SAL/util/diagnostics.hpp"
 
-#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/RenderTarget.hpp> //!! DIRECT SFML USE IN draw()
 
 #include <algorithm>
 	using std::max;
@@ -90,9 +90,9 @@ void CheckBox::onMouseReleased(float x, float y)
 }
 
 
-void CheckBox::onKeyPressed(const sf::Event::KeyChanged& key)
+void CheckBox::onKeyPressed(const event::KeyCombination& key)
 {
-	if (key.code == sf::Keyboard::Key::Space)
+	if (key.code == unsigned(sf::Keyboard::Key::Space)) //!!XLAT
 	{
 		toggle();
 	}

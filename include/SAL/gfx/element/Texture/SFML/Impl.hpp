@@ -27,12 +27,13 @@ public:
 	Texture() : sf::Texture(sf::Texture::create({1, 1}).value()) {} //!! Assumed never to fail...
 
 	bool load(std::string_view filename, const geometry::iRect& r = {})
-		{ auto res = sf::Texture::loadFromFile(filename, false, r); // false: no sRTGB support in this adapter...
+		{ auto res = sf::Texture::createFromFile(filename, false, r); // false: no sRTGB support in this adapter...
 		  if (res) { native() = res.value(); } return res.has_value(); }
 
 	bool set(const sf::Image& image, const geometry::iRect& r = {})
-		{ auto res = sf::Texture::loadFromImage(image, false, r); // false: no sRTGB support in this adapter...
-		  if (res) { native() = res.value(); } return res.has_value(); }
+		{ auto res = native().loadFromImage(image, false, r); // false: no sRTGB support in this adapter...
+//!!OLD:	  if (res) { native() = res.value(); } return res.has_value(); }
+	          return res; }
 
 	iVec2 size() const { return iVec2(uVec2(native().getSize())); } // getSize() is unsigned!
  	//!! xparq/pocketvec#18:

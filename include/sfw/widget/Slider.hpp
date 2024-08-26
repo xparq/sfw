@@ -99,7 +99,7 @@ private:
 	void draw(const gfx::RenderContext& ctx) const override;
 
 	// Callbacks
-	void onKeyPressed(const sf::Event::KeyChanged& key) override;
+	void onKeyPressed(const event::KeyCombination& key) override;
 	void onMousePressed(float x, float y) override;
 	void onMouseMoved(float x, float y) override;
 	void onMouseReleased(float x, float y) override;

@@ -48,9 +48,9 @@ protected:
 	void onMousePressed(float x, float y) override;
 	void onMouseReleased(float x, float y) override;
 	void onMouseWheelMoved(int delta) override;
-	void onKeyPressed(const sf::Event::KeyChanged& key) override;
-	void onKeyReleased(const sf::Event::KeyChanged& key) override;
-	void onTextEntered(char32_t unichar) override;
+	void onKeyPressed(const event::KeyCombination& key) override;
+	void onKeyReleased(const event::KeyCombination& key) override;
+	void onTextEntered(char32_t codepoint) override;
 
 private:
 	Widget* m_hoveredWidget;

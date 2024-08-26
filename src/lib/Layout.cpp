@@ -3,7 +3,6 @@
 #include "sfw/widget/Tooltip.hpp"
 #include "sfw/gfx/Render.hpp"
 
-#include "SAL/sfml.hpp" // for sf::Event::KeyChanged::== (Should be "interfaced" away!...)
 
 #ifdef DEBUG
 #   include "sfw/GUI-main.hpp"
@@ -12,7 +11,7 @@
 	using std::cerr, std::endl;
 
 	namespace {
-		static auto DEBUG_INSIGHT_KEY = sf::Keyboard::Key::LAlt;
+		static auto DEBUG_INSIGHT_KEY = unsigned(sf::Keyboard::Key::LAlt); //!!XLAT //!! Just a key.code for now (but later: KeyCombination{ ... })
 		static auto DEBUG_INSIGHT_KEY_PRESSED = false;
 	}
 
@@ -274,7 +273,7 @@ void Layout::onMouseWheelMoved(int delta)
 }
 
 
-void Layout::onKeyPressed(const sf::Event::KeyChanged& key)
+void Layout::onKeyPressed(const event::KeyCombination& key)
 {
 	//!! Handle hotkeys (with bottom-up context bubbling, somehow inverting the top-down
 	//!! logic of the event flow from Main -> container(s) -> leaf widget) -> #277
@@ -303,7 +302,7 @@ void Layout::onKeyPressed(const sf::Event::KeyChanged& key)
 }
 
 
-void Layout::onKeyReleased(const sf::Event::KeyChanged& key)
+void Layout::onKeyReleased(const event::KeyCombination& key)
 {
 	if (m_focusedWidget)
 	{
@@ -316,11 +315,11 @@ void Layout::onKeyReleased(const sf::Event::KeyChanged& key)
 }
 
 
-void Layout::onTextEntered(char32_t unichar)
+void Layout::onTextEntered(char32_t codepoint)
 {
 	if (m_focusedWidget)
 	{
-		m_focusedWidget->onTextEntered(unichar);
+		m_focusedWidget->onTextEntered(codepoint);
 	}
 }
 

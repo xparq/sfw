@@ -67,7 +67,7 @@ void Form::recomputeGeometry()
 {
 	if (empty()) return;
 
-	fVec2 size;
+	fVec2 size{};
 	m_labelColumnWidth = 0;
 	const auto minLineHeight = Theme::getBoxHeight();
 	auto column_gap = Theme::MARGIN;
@@ -86,13 +86,12 @@ void Form::recomputeGeometry()
 		m_labelColumnWidth = max(m_labelColumnWidth, label->getSize().x());
 		// Check the "content" widget
 		lineHeight = max(lineHeight, content->getSize().y());
-		size.x() = max(size.x(), content->getSize().x());
-
-		size.y() += lineHeight + Theme::MARGIN;
+		size = fVec2(max(size.x(), content->getSize().x()),
+		             size.y() + lineHeight + Theme::MARGIN); //!! fVec2() needed to disambiguate op= candidates... :-/
 	}
 
-	// Add max. label width + gap...
-	size.x() += m_labelColumnWidth + column_gap;
+	// Add the max. label width + gap to the horiz. size...
+	size.x(size.x() + m_labelColumnWidth + column_gap);
 	setSize(size);
 
 	//---------------------------------

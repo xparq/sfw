@@ -46,7 +46,7 @@ private:
 	void onActivationChanged(ActivationState state) override;
 	void onThemeChanged() override;
 	void onMouseReleased(float x, float y) override;
-	void onKeyPressed(const sf::Event::KeyChanged& key) override;
+	void onKeyPressed(const event::KeyCombination& key) override;
 
 	// State
 	Box m_box;

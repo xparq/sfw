@@ -133,9 +133,9 @@ void Button::onMouseReleased(float x, float y)
 }
 
 
-void Button::onKeyPressed(const sf::Event::KeyChanged& key)
+void Button::onKeyPressed(const event::KeyCombination& key)
 {
-	if (key.code == sf::Keyboard::Key::Enter || key.code == sf::Keyboard::Key::Space)
+	if (key.code == unsigned(sf::Keyboard::Key::Enter) || key.code == unsigned(sf::Keyboard::Key::Space)) //!!XLAT
 	{
 		m_box.press();
 		onUpdated();
@@ -143,9 +143,9 @@ void Button::onKeyPressed(const sf::Event::KeyChanged& key)
 }
 
 
-void Button::onKeyReleased(const sf::Event::KeyChanged& key)
+void Button::onKeyReleased(const event::KeyCombination& key)
 {
-	if (key.code == sf::Keyboard::Key::Enter)
+	if (key.code == unsigned(sf::Keyboard::Key::Enter)) //!!XLAT
 	{
 		m_box.release();
 	}

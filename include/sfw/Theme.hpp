@@ -12,10 +12,10 @@
 //#include "SAL/geometry/Rectangle.hpp" // Definitely done already by the rectangular things above. ;)
 //#include "sfw/gfx/Color.hpp"          // Also this, by those colorful things above. :)
 
-#include <SFML/Window.hpp>
-#include <SFML/Window/Event.hpp>
+#include "sfw/event/Keyboard.hpp" // KeyState
 
-#include <map>
+#include <SFML/Window.hpp>
+
 #include <string>
 #include <string_view>
 
@@ -109,8 +109,8 @@ public:
 	static float PADDING; // Spacing inside widgets
 	static float MARGIN;  // Spacing between widgets
 
-	static sf::Event::KeyChanged previousWidgetKey;
-	static sf::Event::KeyChanged nextWidgetKey;
+	static event::KeyState previousWidgetKey;
+	static event::KeyState nextWidgetKey;
 
 	static const sf::Cursor& mousePointer;
 

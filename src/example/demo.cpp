@@ -508,7 +508,7 @@ cerr << "font size: "<< themecfg.fontSize << endl; //!!#196
 			demo.process(event);
 
 			// Close on Esc:
-			if (event.is<sf::Event::KeyPressed>() && event.get<sf::Event::KeyPressed>().code == sf::Keyboard::Key::Escape)
+			if (event.is<sfw::event::KeyPressed>() && event.get_if<sfw::event::KeyPressed>()->code == unsigned(sf::Keyboard::Key::Escape))
 				demo.close();
 		}
 

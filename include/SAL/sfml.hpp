@@ -2,39 +2,6 @@
 #define _LASKDRUHTNIUSCE5H7Y7N4W0987YW4U58MSDHFMYKJHN_
 
 
-//!!----------------------------------------------------------------------------
-//!! This should (also?) be moved to an SFML-backed Event adapter:
-
-#include <SFML/Window/Event.hpp>
-
-namespace sf //! Inject into sf:: (to let innocent client code actually find it via ADL)!
-{
-// FFS, still no default == (at least for PODs), even in c++20?! :-/
-// (https://stackoverflow.com/a/27837789/1479945)
-inline bool operator==(const sf::Event::KeyChanged& key1, const sf::Event::KeyChanged& key2)
-{
-    return key1.code == key2.code
-      //&& key1.scancode == key2.scancode
-        && key1.alt == key2.alt
-        && key1.control == key2.control
-        && key1.shift == key2.shift
-        && key1.system == key2.system
-    ;
-}
-} // namespace sf
-
-inline bool SFML_keypress_has_modifiers(const sf::Event::KeyChanged& key)
-// Is there a sane way already to check this?
-{
-    return key.alt
-        || key.control
-        || key.shift
-        || key.system
-    ;
-}
-
-
-//----------------------------------------------------------------------------
 #include <SFML/System/String.hpp>
 #include <string>
 #include <string_view>

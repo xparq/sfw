@@ -32,8 +32,8 @@ namespace SFML
 		constexpr const auto& native() const { return _d; }
 
 		// Intercept our vectors:
-		constexpr Rectangle_Impl(Vec2<NumT> pos, Vec2<NumT> size)               : _d(pos.native(), size.native()) {}
-//!!?? OR:	constexpr Rectangle_Impl(const Vec2<NumT>& pos, const Vec2<NumT>& size) : _d(pos.native(), size.native()) {}
+		constexpr Rectangle_Impl(Vec2<NumT> pos, Vec2<NumT> size)               : _d(pos.foreign(), size.foreign()) {}
+//!!?? OR:	constexpr Rectangle_Impl(const Vec2<NumT>& pos, const Vec2<NumT>& size) : _d(pos.foreign(), size.foreign()) {}
 
 		// Forward the original signatures:
 		template <typename... T>

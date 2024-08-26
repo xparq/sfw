@@ -93,8 +93,8 @@ float Theme::MARGIN = 4.f;
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 // Note: desig. init would zero the missing fields, which is fine for us, but not for GCC. :-/
 #endif
-sf::Event::KeyChanged Theme::nextWidgetKey =     { .code = sf::Keyboard::Key::Tab };
-sf::Event::KeyChanged Theme::previousWidgetKey = { .code = sf::Keyboard::Key::Tab, .shift = true };
+event::KeyState Theme::nextWidgetKey =     { .code = unsigned(sf::Keyboard::Key::Tab) }; //!!XLAT
+event::KeyState Theme::previousWidgetKey = { .code = unsigned(sf::Keyboard::Key::Tab), .shift = true }; //!!XLAT
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
@@ -112,7 +112,7 @@ const sf::Cursor& Theme::getDefaultMousePointer()
 	//! Creates and copies a whole new cursor instance on every call! :-/
 	//! (Fortuantely, it's only even called once, though...)
 
-	static const auto c = sf::Cursor::loadFromSystem(sf::Cursor::Type::Arrow); // std::optional, actually
+	static const auto c = sf::Cursor::createFromSystem(sf::Cursor::Type::Arrow); // std::optional, actually
 		//!! Basically a singleton system resource anyway, and
 	        //!! Theme is also static, so no "additional" harm done...
 	        //!! But if it does support RAII with stacked state restore,

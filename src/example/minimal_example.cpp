@@ -6,7 +6,8 @@ int main()
 	//
 	// Normal SFML app init...
 	//
-	sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal", sf::Style::Titlebar);
+	sf::RenderWindow window(sf::VideoMode({800, 600}), "SFW Minimal (polling loop)", sf::Style::Titlebar);
+	window.setFramerateLimit(30);
 
 	//
 	// GUI Setup...
@@ -22,7 +23,7 @@ int main()
 	// Add a button
 	gui.add(sfw::Button("Close!", [&] { gui.close(); }));
 
-	// Event loop (blocking variant)
+	// Main event loop (polling variant; note: the GUI will be redrawn in each frame, regardless of changes)
 	while (gui) // Or while(gui.active()), but we're in a minimal example. ;)
 	{
 		// Render the GUI
@@ -31,12 +32,16 @@ int main()
 		// Actually show the (updated) window content
 		window.display();
 
-		// Process events, one by one, waiting until the next one comes
-		if (auto event = window.waitEvent(); event)
+		// Process events in the queue (each one, to avoid possible congestion),
+		// and pass them back to the GUI, until closing or an error has occured
+		while (auto event = gui.poll())
 		{
-			gui.process(event); // Pass it to the GUI!
+			if (event)
+			{
+				gui.process(event); // Pass it to the GUI!
 
-			// Your own custom event processing here...
+				// Your own custom event processing here...
+			}
 		}
 	}
 }

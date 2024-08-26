@@ -3,7 +3,7 @@
 
 
 #include "sfw/InputWidget.hpp"
-#include "sfw/TextSelection.hpp"
+#include "sfw/TextSelection.hpp" //!!?? -> ::parts, or rather another -- abstract -- component lib!
 #include "sfw/gfx/element/Text.hpp"
 #include "sfw/gfx/element/Box.hpp"
 #include "sfw/gfx/Color.hpp"
@@ -92,7 +92,7 @@ protected:
 	void set_selection(size_t from, size_t to);
 	void clear_selection();
 	void delete_selected();
-	bool flip_selection(const sf::Event::KeyChanged& key, size_t from, size_t to);
+	bool flip_selection(const event::KeyCombination& key, size_t from, size_t to);
 	void update_view();
 	size_t pos_at_mouse(float mouse_x);
 
@@ -100,15 +100,15 @@ private:
 	void draw(const gfx::RenderContext& ctx) const override;
 
 	// Callbacks
-	void onKeyPressed(const sf::Event::KeyChanged& key) override;
-	void onKeyReleased(const sf::Event::KeyChanged& key) override;
+	void onKeyPressed(const event::KeyCombination& key) override;
+	void onKeyReleased(const event::KeyCombination& key) override;
 	void onMouseEnter() override;
 	void onMouseLeave() override;
 	void onMousePressed(float x, float y) override;
 	void onMouseReleased(float x, float y) override;
 	void onMouseMoved(float x, float y) override;
 	void onMouseWheelMoved(int delta) override;
-	void onTextEntered(char32_t unichar) override;
+	void onTextEntered(char32_t codepoint) override;
 	void onActivationChanged(ActivationState state) override;
 	void onThemeChanged() override;
 

@@ -293,44 +293,44 @@ template <class T> void OptionsBox<T>::onMouseWheelMoved(int delta)
 }
 
 
-template <class T> void OptionsBox<T>::onKeyPressed(const sf::Event::KeyChanged& key)
+template <class T> void OptionsBox<T>::onKeyPressed(const event::KeyCombination& key)
 {
-	switch (key.code)
+	switch (key.code) //!!XLAT below!
 	{
-	case sf::Keyboard::Key::Left:
-	case sf::Keyboard::Key::Up:
+	case unsigned(sf::Keyboard::Key::Left):
+	case unsigned(sf::Keyboard::Key::Up):
 		selectPrevious();
 		m_arrowLeft.press();
 		break;
-	case sf::Keyboard::Key::Right:
-	case sf::Keyboard::Key::Down:
+	case unsigned(sf::Keyboard::Key::Right):
+	case unsigned(sf::Keyboard::Key::Down):
 		selectNext();
 		m_arrowRight.press();
 		break;
-	case sf::Keyboard::Key::Home:
-	case sf::Keyboard::Key::PageUp:
+	case unsigned(sf::Keyboard::Key::Home):
+	case unsigned(sf::Keyboard::Key::PageUp):
 		selectFirst();
 		break;
-	case sf::Keyboard::Key::End:
-	case sf::Keyboard::Key::PageDown:
+	case unsigned(sf::Keyboard::Key::End):
+	case unsigned(sf::Keyboard::Key::PageDown):
 		selectLast();
 		break;
 	default: ; // (Just for GCC to shut up...)
 	}
 }
 
-template <class T> void OptionsBox<T>::onKeyReleased(const sf::Event::KeyChanged& key)
+template <class T> void OptionsBox<T>::onKeyReleased(const event::KeyCombination& key)
 {
-	switch (key.code)
+	switch (key.code) //!!XLAT below!
 	{
-	case sf::Keyboard::Key::Left:
-	case sf::Keyboard::Key::Up:
+	case unsigned(sf::Keyboard::Key::Left):
+	case unsigned(sf::Keyboard::Key::Up):
 		m_arrowLeft.release();
 		// Without this the focus rect would be lost on the arrow (#137):
 		update_arrow_pressed_state(m_arrowLeft, -1, -1); // -1,-1 to avoid the "hover" state
 		break;
-	case sf::Keyboard::Key::Right:
-	case sf::Keyboard::Key::Down:
+	case unsigned(sf::Keyboard::Key::Right):
+	case unsigned(sf::Keyboard::Key::Down):
 		m_arrowRight.release();
 		// Without this the focus rect would be lost on the arrow (#137):
 		update_arrow_pressed_state(m_arrowRight, -1, -1); // -1,-1 to avoid the "hover" state

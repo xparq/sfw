@@ -582,8 +582,8 @@ cerr << "font size: "<< themecfg.fontSize << endl; //!!#196
 
 			// Handle window-closing explicitly, as we've configured the
 			// GUI manager to not do that automatically in this setup:
-			if (event.is<sf::Event::Closed>() || // And also close on Esc:
-			   (event.is<sf::Event::KeyPressed>() && event.get<sf::Event::KeyPressed>().code == sf::Keyboard::Key::Escape))
+			if (event.is<event::WindowClosed>() || // And also close on Esc:
+			   (event.is<event::KeyPressed>() && event.get_if<event::KeyPressed>()->code == unsigned(sf::Keyboard::Key::Escape)))
 			{
 				window.close(); // Not demo.close() if the GUI doesn't own the window!
 				                // Also: window.close() will indirectly disable the GUI.
@@ -598,8 +598,10 @@ cerr << "font size: "<< themecfg.fontSize << endl; //!!#196
 
 	return EXIT_SUCCESS;
 
+} catch(const exception&) {
+	cerr << "- ERROR: Unhandled std C++ exception!" << endl;
 } catch(...) {
-	cerr << "- ERROR: UNHANDLED EXCEPTION!" << endl;
+	cerr << "- ERROR: UNHANDLED EXCEPTION OF UNKNOWN TYPE!" << endl;
 }
 
 //----------------------------------------------------------------------------

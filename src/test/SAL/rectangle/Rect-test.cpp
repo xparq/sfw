@@ -1,5 +1,7 @@
 ﻿#include "SAL/geometry/Rectangle.hpp"
 
+using namespace VEC_NAMESPACE;
+
 #include <iostream>
 #include <fstream> // just for updating the run-count file :)
 #include <type_traits> // is_same
@@ -48,7 +50,8 @@ int main()
 
 	static_assert(is_same_v<decltype(Vec2{1, 2}), Vec2<int>>);
 
-	iRect ir4(Vector_Interface<adapter::Vector2_Impl<int, 2>>(1, 2), Vector_Interface<adapter::Vector2_Impl<int, 2>>(3, 4));
+//!!	iRect ir4(Vector_Interface<adapter::Vector2_Impl<int, 2>>(1, 2), Vector_Interface<adapter::Vector2_Impl<int, 2>>(3, 4));
+	iRect ir4(Vec2<int>(1, 2), Vec2<int>(3, 4));
 	iRect ir4_2p(iVec2(1, 2), iVec2(3, 4));
 	iRect ir4_2b{ Vec2{1, 2},  Vec2{3, 4}};
 	iRect ir4_3 = iRect(iVec2(1, 2), iVec2(3, 4));   static_assert(is_same_v<decltype(ir4_3), Rect<int>>);

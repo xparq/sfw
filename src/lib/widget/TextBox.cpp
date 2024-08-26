@@ -307,11 +307,11 @@ void TextBox::delete_selected()
 	update_view();
 }
 
-bool TextBox::flip_selection([[maybe_unused]] const sf::Event::KeyChanged& key,
+bool TextBox::flip_selection([[maybe_unused]] const event::KeyCombination& key,
                             [[maybe_unused]] size_t from, [[maybe_unused]] size_t to)
 {
 #ifdef CFG_KEEP_SELECTION_ON_SHIFT_LEFT_RIGHT
-	if (!SFML_keypress_has_modifiers(key) && m_selection && getCursorPos() == from)
+	if (!key.has_modifier() && m_selection && getCursorPos() == from)
 	{
 		m_selection.resume(); // It's already stopped (by releasing Shift), so setCursorPos would kill it without this!
 		m_selection.set_from_to(getCursorPos(), to);
@@ -422,21 +422,21 @@ cerr << endl;
 //--- Event handlers ---------------------------------------------------------
 //----------------------------------------------------------------------------
 
-void TextBox::onKeyReleased(const sf::Event::KeyChanged& key)
+void TextBox::onKeyReleased(const event::KeyCombination& key)
 {
-	if (key.code == sf::Keyboard::Key::LShift || key.code == sf::Keyboard::Key::RShift)
+	if (key.code == unsigned(sf::Keyboard::Key::LShift) || key.code == unsigned(sf::Keyboard::Key::RShift)) //!!XLAT
 	{
 		m_selection.stop();
 	}
 }
 
 
-void TextBox::onKeyPressed(const sf::Event::KeyChanged& key)
+void TextBox::onKeyPressed(const event::KeyCombination& key)
 {
-	switch (key.code)
+	switch (key.code) //!!XLAT below!
 	{
-	case sf::Keyboard::Key::LShift:
-	case sf::Keyboard::Key::RShift:
+	case unsigned(sf::Keyboard::Key::LShift):
+	case unsigned(sf::Keyboard::Key::RShift):
 		// If there's a (volatile) selection, here that means it's just been stopped.
 		// Pressing Shift again then could be interpreted as an intent to resume it
 		// (for adjusting its extent), so it's reasonable to allow that.
@@ -472,68 +472,68 @@ void TextBox::onKeyPressed(const sf::Event::KeyChanged& key)
 	// 2. do nothing with it, and then 3. move the cursor a bit and kill it...
 	// (See flip_selection() for more!)
 	//------------------------------------------------------------------------
-	case sf::Keyboard::Key::Left:
+	case unsigned(sf::Keyboard::Key::Left):
 		if (!flip_selection(key, m_selection.upper(), m_selection.lower()))
 			Backward(key.control);
 		break;
 
-	case sf::Keyboard::Key::Right:
+	case unsigned(sf::Keyboard::Key::Right):
 		if (!flip_selection(key, m_selection.lower(), m_selection.upper()))
 			Forward(key.control);
 		break;
 
-	case sf::Keyboard::Key::Backspace:
+	case unsigned(sf::Keyboard::Key::Backspace):
 		if (m_selection) delete_selected(); //!!??Is there a hidden UC with _has_modifiers(key) && m_selection?
 		else if (key.control) DelBackward();
 		else DelPrevChar();
 		break;
 
-	case sf::Keyboard::Key::Delete:
+	case unsigned(sf::Keyboard::Key::Delete):
 		if (key.shift) Cut();
 		else if (m_selection) delete_selected(); //!!??Is there a hidden UC with _has_modifiers(key) && m_selection?
 		else if (key.control) DelForward();
 		else DelNextChar();
 		break;
 
-	case sf::Keyboard::Key::Home:
-	case sf::Keyboard::Key::Up:
+	case unsigned(sf::Keyboard::Key::Home):
+	case unsigned(sf::Keyboard::Key::Up):
 		Home();
 		break;
 
-	case sf::Keyboard::Key::End:
-	case sf::Keyboard::Key::Down:
+	case unsigned(sf::Keyboard::Key::End):
+	case unsigned(sf::Keyboard::Key::Down):
 		End();
 		break;
 
 	// "Apply"
-	case sf::Keyboard::Key::Enter:
+	case unsigned(sf::Keyboard::Key::Enter):
 		setChanged(); //!! None of the inidividual editing actions update this yet,
 		              //!! so we just force it here for the time being...
 		updated(); //!!TBD: Should it be forced even if !changed()?
 		break;
 
 	// Ctrl+A: Select All
-	case sf::Keyboard::Key::A:
+	case unsigned(sf::Keyboard::Key::A):
 		if (key.control) SelectAll();
 		break;
 
 	// Ctrl+V: Paste
-	case sf::Keyboard::Key::V:
+	case unsigned(sf::Keyboard::Key::V):
 		if (key.control) Paste();
 		break;
 
 	// Ctrl+C: Copy
-	case sf::Keyboard::Key::C:
+	case unsigned(sf::Keyboard::Key::C):
 		if (key.control) Copy();
 		break;
 
 	// Ctrl+X: Cut
-	case sf::Keyboard::Key::X:
+	case unsigned(sf::Keyboard::Key::X):
 		if (key.control) Cut();
 		break;
 
 	// Ctrl+Insert: Copy, Shift+Insert: Paste
-	case sf::Keyboard::Key::Insert:
+	case unsigned(sf::Keyboard::Key::Insert):
 		if (key.control) Copy();
 		else if (key.shift) Paste();
 		break;
@@ -605,17 +605,17 @@ void TextBox::onMouseWheelMoved(int delta)
 }
 
 
-void TextBox::onTextEntered(char32_t unichar)
+void TextBox::onTextEntered(char32_t codepoint)
 {
 	// Ignore some control code ranges
-	if (unichar >= 32 && (unichar < 127 || unichar >= 160))
+	if (codepoint >= 32 && (codepoint < 127 || codepoint >= 160))
 	{
 		delete_selected(); // Delete selected text on entering a new char.
 
 		if (sf::String content = m_text.getString(); content.getSize() < m_maxLength)
 		{
 			// Insert character at the cursor
-			content.insert(m_cursorPos, unichar);
+			content.insert(m_cursorPos, codepoint);
 			m_text.setString(content);
 			setCursorPos(m_cursorPos + 1);
 		}

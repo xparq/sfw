@@ -13,17 +13,20 @@ namespace sfw
 
 void VBox::recomputeGeometry()
 {
-    fVec2 pos, size;
-    foreach([&](Widget* w) {
-        w->setPosition(pos);
-        pos.y() += w->getSize().y() + Theme::MARGIN;
+	fVec2 pos{}, size{};
+	foreach([&](Widget* w) {
+		// Place widgets one after the other in a vertical column:
+		w->setPosition(pos);
+		pos += {0.f, w->getSize().y() + Theme::MARGIN};
 
-        // The layout width is the largest widget width
-        if (w->getSize().x() > size.x())
-            size.x() = w->getSize().x();
-    });
-    size.y() = max(0.f, pos.y() - Theme::MARGIN); // 0 for an empty container
-    Widget::setSize(size);
+		// Adjust width to the widest widget:
+		auto dx = w->getSize().x();
+		if (dx > size.x()) size.x(dx);
+	});
+
+	// Set layout height past the bottom widget:
+	size.y(max(0.f, pos.y() - Theme::MARGIN)); // 0 for an empty container
+	Widget::setSize(size);
 }
 
 

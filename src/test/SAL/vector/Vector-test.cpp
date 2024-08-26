@@ -1,5 +1,6 @@
 ﻿#define VEC
 #define SAL_VECTOR_STREAMABLE
+//#define VEC_IMPLICIT_NUM_CONV //!! Only temporarily, for some test cases! Keep it commented out!
 #include "SAL/math/Vector.hpp"
 using namespace SAL;
 
@@ -38,7 +39,6 @@ static_assert(is_same_v<decltype(Vec2<unsigned>{1, 2}), Vec2<unsigned>>);
 static_assert(is_same_v<decltype(Vec2<float>{1, 2}),    Vec2<float>>);
 static_assert(is_same_v<decltype(Vec2<double>{1u, 2u}), Vec2<double>>);
 // - typename-driven:
-#ifndef VEC
 static_assert(is_same_v<decltype(iVec2(1.f, 2.f)), Vec2<int>>);
 static_assert(is_same_v<decltype(uVec2(1, 2)),     Vec2<unsigned>>);
 static_assert(is_same_v<decltype(fVec2(1, 2)),     Vec2<float>>);
@@ -47,24 +47,45 @@ static_assert(is_same_v<decltype(iVec2{1.f, 2.f}), Vec2<int>>);
 static_assert(is_same_v<decltype(uVec2{1, 2}),     Vec2<unsigned>>);
 static_assert(is_same_v<decltype(fVec2{1, 2}),     Vec2<float>>);
 static_assert(is_same_v<decltype(dVec2{1u, 2u}),   Vec2<double>>);
-#endif
 
 
 Vec<2> vec_2_float;      static_assert(is_same_v<decltype(vec_2_float), Vec2<float>>);
 Vec<2, int> vec_2_int;
 Vec2<float> Vec2_float;
 
-//!! These don't compile with MSVC! In fact, it even crashes! :)
+
+using fVec3 = Vec<3, float>;
+
 #ifndef _MSC_VER
+//!! These don't compile with MSVC!  (It even crashed earlier; I guess with the CRTP version ("flexivec")!)
+//!! "cannot deduce template arguments for 'SAL::Vec2'" (...and Vec)
+//!! Despite: template <unsigned Dim = 2, Scalar NumT = float>
+//!!          using Vec = VEC_NAMESPACE::Vector<Dim, NumT, adapter::VectorAdapter>;
+//!! and:     template <Scalar NumT = float>
+//!!          using Vec2  = Vec<2, NumT>;
 Vec2 Vec2_float_implied; static_assert(is_same_v<decltype(Vec2_float), decltype(Vec2_float_implied)>);
 
 Vec implicit_2d_null_float;
 	static_assert(is_same_v<decltype(implicit_2d_null_float), Vec2<float>>);
-// Aggreg. init? Why does it compile then, if the vectors are not even aggregates (because of having ctors)?
+
+/* Not compiling by GCC either any more (albeit is used to, for a while; I guess with the CRTP version, "flexivec"):
 Vec implicit_2d_double = {111.0, 222.0}; //!! Should warn about the narrowing conversion!
+	//!!?? Aggreg. init? Why does it compile then, if the vectors are not even aggregates (because of their ctors)?
+	//!!   No, it seems to be "copy-list-initialization", whatever the fuck it is; only learned because
+	//!!   it no longer compiles, "fortunately" (after I don't know which apparently unrelated change):
+	//!!   "Vector-test.cpp:64:39: error: class template argument deduction for 'SAL::Vec<Dim, NumT>' failed: 
+	//!!   explicit deduction guide selected in copy-list-initialization
+	//!!   ...
+	//!!   note: explicit deduction guide declared here:
+	//!!     107 | constexpr Vector(Coords... coords) : adapter_type{static_cast<number_type>(coords)...}"
 	static_assert(is_same_v<decltype(implicit_2d_double), Vec2<double>>);
 
-/*
+//!!Vec<float> implicit_2d_double = {111.0, 222.0}; //!! Should warn about the narrowing conversion!
+!!*/
+
+//!! For GCC, see e.g. https://stackoverflow.com/questions/65688740/can-alias-templates-have-default-template-parameters
+//!! (Albeit they did even have a crash for GCC, too, there! :) )
+/*!! The MSVC crash:
 	src/test/SAL/vector/Vector-test.cpp(23): error C2641: cannot deduce template arguments for 'SAL::Vec2'
 	src/test/SAL/vector/Vector-test.cpp(23): error C3203: 'Vec2': unspecialized alias template can't be us
 	ed as a template argument for template parameter '<unnamed-symbol>', expected a real type
@@ -77,12 +98,12 @@ Vec implicit_2d_double = {111.0, 222.0}; //!! Should warn about the narrowing co
 	stopping compilation
 	INTERNAL COMPILER ERROR in 'C:\SW\devel\tool\lang\MSVC+WinSDK\current\VC\Tools\MSVC\14.35.32215\bin\Ho
 	stX64\x64\cl.exe'
-*/
+!!*/
 #endif // _MSC_VER
 
 //!! Neither does this:
 #ifndef _MSC_VER
-Vec implicit_2d_float = {111.0f, 222.0f}; //!! Should warn about the narrowing conversion!
+Vec implicit_2d_float = {111.0f, 222.0f};
 	static_assert(is_same_v<decltype(implicit_2d_float), Vec2<float>>);
 /*
 	src/test/SAL/vector/Vector-test.cpp(48): fatal error C1001: Internal compiler error.
@@ -167,6 +188,28 @@ cout << "\nCoord-wise init...\n";
 	cout << "double vector (size: "<< sizeof(vdbl) <<"): " << vdbl << '\n';
 	cout << "float-from-double vector (size: "<< sizeof(vf_from_dbl) <<"): " << vf_from_dbl << '\n';
 
+	//
+cout << "\nInit from coord-struct - matching num-type...\n";
+	//
+	struct VCoords2i { int x, y; };
+	struct VCoords2f { float x, y; };
+	struct VCoords3f { float x, y, z; };
+
+	VCoords2i i2coords1 = {10, 20};
+	VCoords3f f3coords1 = {1.5f, 2.5f, 3.5f};
+	iVec2 v1_from_coordstruct_i2 = i2coords1;
+	fVec3 v1_from_coordstruct_f3 = VCoords3f{1.5f, 2.5f, 3.5f}; //f3coords1
+	cout << "Vector<2, int>   from coord. struct {"<< i2coords1.x <<", "<< i2coords1.y <<"}: " << v1_from_coordstruct_i2 << '\n';
+	cout << "Vector<3, float> from coord. struct {"<< f3coords1.x <<", "<< f3coords1.y <<", "<< f3coords1.z <<"}: " << v1_from_coordstruct_f3 << '\n';
+	//
+cout << "\nInit from coord-struct - foreign num-type...\n";
+	//
+	VCoords2i i2coords2 = {2147483647, 2147483647};
+	VCoords2f f2coords2 = {1.5f, 2.5f};
+	iVec2 v2_from_coordstruct_i2 = f2coords2;
+	fVec2 v2_from_coordstruct_f2 = i2coords2;
+	cout << "Vector<2, int>   from *float* coord. struct {"<< f2coords2.x <<", "<< f2coords2.y <<"}: " << v2_from_coordstruct_i2 << '\n';
+	cout << "Vector<3, float> from *int* coord. struct {"  << i2coords2.x <<", "<< i2coords2.y <<"}: " << v2_from_coordstruct_f2 << '\n';
 
 	//--------------------------------------------------------------------
 	// Copy & assignment:

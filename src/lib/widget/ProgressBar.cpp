@@ -182,9 +182,14 @@ void ProgressBar::updateGeometry()
 	auto bar_length = val_to_barlength(clamped_value);
 	if (m_cfg.orientation == Horizontal)
 	{
+/*!! *Sigh...*
 		m_bar[TopRight].position().x() =
 			m_bar[BottomRight].position().x() =
 				m_bar[TopLeft].position().x() + bar_length;
+!!*/
+		auto x_end = m_bar[TopLeft].position().x() + bar_length;
+		m_bar[TopRight]   .position().x(x_end);
+		m_bar[BottomRight].position().x(x_end);
 	
 		if (m_cfg.label_placement == LabelOver)
 		{
@@ -194,9 +199,14 @@ void ProgressBar::updateGeometry()
 	}
 	else
 	{
+/*!! *Sigh...*
 		m_bar[TopLeft].position().y() =
 			m_bar[TopRight].position().y() =
 				m_bar[BottomLeft].position().y() - bar_length;
+!!*/
+		auto y_end = m_bar[BottomLeft].position().y() - bar_length;
+		m_bar[TopLeft] .position().y(y_end);
+		m_bar[TopRight].position().y(y_end);
 
 		if (m_cfg.label_placement == LabelOver)
 		{

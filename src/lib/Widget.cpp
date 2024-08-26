@@ -15,7 +15,6 @@
 #
 #endif
 
-
 namespace sfw
 {
 using enum ActivationState;
@@ -137,8 +136,10 @@ Widget* Widget::setPosition(float x, float y)
 	//!! Note: no reflow, unlike in setSize(), as that would cause infinite looping in the current model.
 	//!! Reflowing could guarantee to keep this newly set (local-to-parent) position though,
 	//!! and it would make sense to still trigger it in some (yet to be implemented) cases.
+//!! *Sigh...*
+//!!	m_position = {std::round(x), std::round(y)};
+	m_position.x(x).y(y).round();
 
-	m_position = {std::round(x), std::round(y)};
 	m_transform = sf::Transform(
 		1, 0, m_position.x(), // translate x
 		0, 1, m_position.y(), // translate y
