@@ -23,7 +23,7 @@ GUI* GUI::DefaultInstance = nullptr;
 
 //----------------------------------------------------------------------------
 GUI::GUI(sf::RenderWindow& window, const sfw::Theme::Cfg& themeCfg, bool own_the_window):
-	m_error(), // no error by default
+	m_error(), m_fatal_error(false), // No errors yet...
 	m_window(window), m_inputQueue(window),
 	m_own_window(own_the_window), //!!Rename to sg. like manage_host_window
 	m_themeCfg(themeCfg)
@@ -51,14 +51,14 @@ bool GUI::active()
 	// - the gui has been (explicitly) closed
 	// - it's in "error state"
 	// - the (hosting) window is not open (regardless of owning it or not)
-	return !m_closed && !m_error && m_window.isOpen();
+	return !m_closed && !m_fatal_error && m_window.isOpen();
 }
 
 
 //----------------------------------------------------------------------------
 bool GUI::reset()
 {
-	m_error = std::error_code();
+	m_error = std::error_code(); m_fatal_error = false;
 
 //!! This isn't useful here at all, as the generic layout resizer will
 //!! shrink it back down dynamically anyway...:
@@ -103,13 +103,14 @@ bool GUI::closed()
 event::Input GUI::poll()
 {
 	if (!active())
-		return event::Input{}; // null event, evaluates to false
+		return event::Event(); // Null event, evaluates to false.
 
 	auto event = m_inputQueue.poll();
 
+	//!! Move this to event::Source, and make the filtering configurable!
 	// Filter out the raw mouse-move event spam flood of SFML3...
 	// I guess, as an unfortunate side-effect, this would prevent copy elision, though! :-/
-	while (event && event->is<sf::Event::MouseMovedRaw>())
+	while (event && event.is<event::MouseMovedRaw>())
 		event = m_inputQueue.poll();
 
 	return event;
@@ -133,44 +134,54 @@ bool GUI::process(const event::Input& event)
 
 	if (!active()) return false;
 
-	if (auto mouseMoved = event.getIf<sf::Event::MouseMoved>())
+	using namespace event;
+
+	if (auto mousemove = event.get_if<MouseMoved>())
 	{
-		fVec2 mouse = convertMousePosition(mouseMoved->position);
-		onMouseMoved(mouse.x(), mouse.y());
+		//!! NOT YET:
+		//!!auto [x, y] = convertMousePosition(mouseState->position);
+		//!!
+		//!! BTW... If the vector interface class ALREADY copies left and right, it could just
+		//!! stop pretending to focus on being an adapter, and just be a native SAL type instead,
+		//!! with extra conversions on top of that to/from the backend, rather than the other way
+		//!! around (i.e. being an adapter first, a wrapper around the native type).
+		//!!
+		auto mpos = convertMousePosition(mousemove->position);
+		onMouseMoved(mpos.x(), mpos.y());
 	}
-	else if (auto mouseWheel = event.getIf<sf::Event::MouseWheelScrolled>())
+	else if (auto mousewheel = event.get_if<MouseWheelMoved>())
 	{
-		onMouseWheelMoved((int)mouseWheel->delta);
+		onMouseWheelMoved((int)mousewheel->delta);
 	}
-	else if (auto mouseButtonPress = event.getIf<sf::Event::MouseButtonPressed>())
+	else if (auto mousepress = event.get_if<MouseButtonPressed>())
 	{
-		if (mouseButtonPress->button == sf::Mouse::Button::Left)
+		if ((mousepress->button == static_cast<decltype(mousepress->button)>(sf::Mouse::Button::Left))) //!! Such an abomination!...
 		{
-			fVec2 mouse = convertMousePosition(mouseButtonPress->position);
-			onMousePressed(mouse.x(), mouse.y());
+			fVec2 mpos = convertMousePosition(mousepress->position);
+			onMousePressed(mpos.x(), mpos.y());
 		}
 	}
-	else if (auto mouseButtonRelease = event.getIf<sf::Event::MouseButtonReleased>()) // -> https://github.com/SFML/SFML/issues/2990#issuecomment-2195516979
+	else if (auto mouserelease = event.get_if<MouseButtonReleased>()) //!! Chk if still relevat here -> https://github.com/SFML/SFML/issues/2990#issuecomment-2195516979
 	{
-		if (mouseButtonRelease->button == sf::Mouse::Button::Left)
+		if (mouserelease->button == static_cast<decltype(mouserelease->button)>(sf::Mouse::Button::Left))
 		{
-			fVec2 mouse = convertMousePosition(mouseButtonRelease->position);
-			onMouseReleased(mouse.x(), mouse.y());
+			fVec2 mpos = convertMousePosition(mouserelease->position);
+			onMouseReleased(mpos.x(), mpos.y());
 		}
 	}
-	else if (auto keyPress = event.getIf<sf::Event::KeyPressed>())
+	else if (auto keypress = event.get_if<KeyPressed>())
 	{
-		onKeyPressed(*keyPress);
+		onKeyPressed(*keypress);
 	}
-	else if (auto keyRelease = event.getIf<sf::Event::KeyReleased>()) // -> https://github.com/SFML/SFML/issues/2990#issuecomment-2195516979
+	else if (auto keyrelease = event.get_if<KeyReleased>()) //!! Chk if still relevat here -> https://github.com/SFML/SFML/issues/2990#issuecomment-2195516979
 	{
-		onKeyReleased(*keyRelease);
+		onKeyReleased(*keyrelease);
 	}
-	else if (auto input = event.getIf<sf::Event::TextEntered>())
+	else if (auto textinput = event.get_if<TextEntered>())
 	{
-		onTextEntered(input->unicode);
+		onTextEntered(textinput->codepoint);
 	}
-	else if (event.is<sf::Event::Closed>())
+	else if (event.is<WindowClosed>())
 	{
 		close();
 		return false;
@@ -192,15 +203,17 @@ bool GUI::setTheme(const sfw::Theme::Cfg& themeCfg)
 		m_themeCfg = themeCfg;
 	}
 
-	// Do this even if the config has not been changed, to allow calling from the ctor!
+	// Doing this even if the config has not been changed, to allow calling this from the ctor!
 	if (!m_themeCfg.apply())
 	{
 		m_error = make_error_code(errc::invalid_argument); //!!Should actually be a custom one!
 		cerr << "- ERROR: Failed to setup theme!\n";
+		//!! Should retry with some hard defaults, instead of dying!...
+		m_fatal_error = true;
 		return false;
 	}
 
-	// OK, tell everyone about what just happened
+	// OK, tell everyone about what just happened:
 	themeChanged();
 
 	return true;
@@ -401,7 +414,7 @@ void GUI::setMouseCursor(sf::Cursor::Type cursorType)
 {
 	if (cursorType != m_cursorType)
 	{
-		if (Theme::mousePointer.loadFromSystem(cursorType))
+		if (Theme::mousePointer.createFromSystem(cursorType))
 		{
 			m_window.setMouseCursor(Theme::mousePointer);
 			m_cursorType = cursorType;

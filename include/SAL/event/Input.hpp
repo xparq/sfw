@@ -5,9 +5,19 @@
 #include "SAL.hpp"
 #include SAL_ADAPTER(event/Input)
 
+#include "SAL/event/Keyboard.hpp" // Needed for its exports to SAL::event!
+
+//!!#include <variant>
+
 
 namespace SAL::event
 {
+	//--------------------------------------------------------------------
+	using Input = //!!adapter::
+			Input_Impl;
+
+
+	//--------------------------------------------------------------------
 	//!! LEGACY LEFTOVER EXPERIM. codes for widget updates (or whatnot):
 	enum ID
 	{
@@ -18,10 +28,6 @@ namespace SAL::event
 
 		_EVENTS_
 	};
-
-
-	//!!...
-	using Input = adapter::Input_Impl;
 
 } // namespace SAL::event
 

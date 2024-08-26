@@ -64,6 +64,6 @@ _For other (both planned and completed) changes see the [issues](https://github.
 
 ## More...
 
-* a [minimal example](src/examples/minimal_example.cpp) (or [another](src/examples/minimal_example-polling.cpp), with a polling event loop)
+* a [minimal example](src/examples/minimal_example.cpp)
 * a fairly comprehensive example: [`demo.cpp`](src/examples/demo.cpp)
-* see the headers in the [`include`](include/sfw) dir for an authoritative reference (they're easy to read)
+* see the headers in the [`include`](include/sfw) dir for an authoritative reference (most of them are easy to read)

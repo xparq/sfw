@@ -54,18 +54,23 @@ int main() try
 		//SAL::event::Input event = event_source.poll();
 		//SAL::event::Input event = demo.poll();
 		auto event = demo.poll();
-
-		while (event && event->is<sf::Event::MouseMovedRaw>()) event = window.pollEvent(); // Ignore the raw mouse-move event spam of SFML3! :-/
 		if (event)
 		{
 			// Pass the event to the GUI:
 			demo.process(event);
 
 			// Close on Esc:
-			if (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Escape)
+/*!! OLD:
+			if (event.is<sf::Event::KeyPressed>() && event.get<sf::Event::KeyPressed>().code == sf::Keyboard::Key::Escape)
 				demo.close();
 
-			if (event->is<sf::Event::KeyPressed>() && event->getIf<sf::Event::KeyPressed>()->code == sf::Keyboard::Key::Space)
+			if (event.is<sf::Event::KeyPressed>() && event.get<sf::Event::KeyCombination>().code == sf::Keyboard::Key::Space)
+				cout << "SPACE" << '\n';
+!!*/
+			if (event.get_if<event::KeyPressed>()->code == static_cast<int>(sf::Keyboard::Key::Escape)) //!!
+				demo.close();
+
+			if (event.get_if<event::KeyPressed>()->code == static_cast<int>(sf::Keyboard::Key::Space)) //!!
 				cout << "SPACE" << '\n';
 		}
 

@@ -184,7 +184,8 @@ private:
 	void renderBackground();
 
 // ---- Data -----------------------------------------------------------------
-	std::error_code m_error;
+	std::error_code m_error;         // A LastError kinda thing.
+	bool            m_fatal_error;   // If the last error was fatal, the GUI will be deactivated (active() will return false).
 	sf::RenderWindow& m_window;      //!! Refine to focus on being a RenderTarget (the host windowing chores could have a separate API)
 	sfw::event::Source m_inputQueue; //!! ...especially as the event handling has now been abstracted away from the window!
 	bool m_own_window;

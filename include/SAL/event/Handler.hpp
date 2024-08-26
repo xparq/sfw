@@ -27,7 +27,7 @@ namespace SAL::event
 		};
 	}
 
-	using Callback  = std::variant<internal::Callback_w, internal::Callback_void>;
+	using Callback = std::variant<internal::Callback_w, internal::Callback_void>;
 	using CallbackMap = std::unordered_map<ID, Callback, internal::IDHash<ID>>;
 //!!??	using CallbackMap = std::unordered_map<ID, Callback>; // (see comment above at IDHash)
 
@@ -49,8 +49,8 @@ namespace SAL::event
 		virtual void onMouseWheelMoved(int) {}
 		virtual void onMouseEnter() {}
 		virtual void onMouseLeave() {}
-		virtual void onKeyPressed(const sf::Event::KeyChanged&) {}
-		virtual void onKeyReleased(const sf::Event::KeyChanged&) {}
+		virtual void onKeyPressed(const KeyCombination&) {}
+		virtual void onKeyReleased(const KeyCombination&) {}
 		virtual void onTextEntered(char32_t) {}
 		virtual void onTick() {}
 	};
