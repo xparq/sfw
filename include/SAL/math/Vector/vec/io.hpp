@@ -62,9 +62,9 @@
 
   namespace VEC_NAMESPACE {
 	namespace io {
-		const char* io::separator     = "";
-		const char* io::bracket_open  = "";
-		const char* io::bracket_close = "";
+		inline const char* io::separator     = "";
+		inline const char* io::bracket_open  = "";
+		inline const char* io::bracket_close = "";
 	}
 
 	template <UniformVectorData V> std::ostream& operator << (std::ostream& out, const V&) { return out; }
@@ -90,9 +90,9 @@
 
   namespace VEC_NAMESPACE {
 	namespace io {
-		const char* separator     = VEC_IO_SEPARATOR_DEFAULT;
-		const char* bracket_open  = VEC_IO_BRACKET_OPEN_DEFAULT;
-		const char* bracket_close = VEC_IO_BRACKET_CLOSE_DEFAULT;
+		inline const char* separator     = VEC_IO_SEPARATOR_DEFAULT;
+		inline const char* bracket_open  = VEC_IO_BRACKET_OPEN_DEFAULT;
+		inline const char* bracket_close = VEC_IO_BRACKET_CLOSE_DEFAULT;
 	}
 
 	template <UniformVectorData V>

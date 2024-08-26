@@ -13,22 +13,23 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Vector3.hpp>
 
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 # include "../io.hpp"
 # ifdef VEC_CPP_IMPORT_STD
    import std;
 #  include <assert.h> //! No <cassert> with import std! :-/
 # else
 #  include <iostream>
+#  include <cassert>
 # endif
-#endif // DEBUG
+#endif // VEC_DEBUG
 
 namespace VEC_NAMESPACE
 {
 namespace adapter
 {
 
-template <unsigned Dim, vec::Scalar NumT> requires (Dim == 2 || Dim == 3)
+template <unsigned Dim, Scalar NumT> requires (Dim == 2 || Dim == 3)
 struct SFML : public std::conditional_t<Dim == 2, sf::Vector2<NumT>, sf::Vector3<NumT>>
 {
 	// Helper props used by the vector classes:
@@ -46,14 +47,14 @@ struct SFML : public std::conditional_t<Dim == 2, sf::Vector2<NumT>, sf::Vector3
 	// Alas, the foreign copy ctor can't be reused (it's not inherited), so:
 	constexpr SFML(const foreign_type& other) : foreign_type(other)
 	{
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 		std::cerr << "[Adapter created from native object ("<< other.x <<","<< other.y << ")]\n";
 #endif
 	}
 
 	// The adapter's own copy ctor:
 	constexpr SFML(const SFML& other)
-#ifndef DEBUG
+#ifndef VEC_DEBUG
 		= default;
 #else
 		: foreign_type(static_cast<foreign_type>(other)) 
@@ -90,7 +91,7 @@ struct SFML : public std::conditional_t<Dim == 2, sf::Vector2<NumT>, sf::Vector3
 
 	constexpr auto&       set(unsigned i, NumT val) { assert(i < dim);
 		if constexpr (Dim == 2) { if (i==0) this->x = val; else if (i==1) this->y = val; }
-		else { if (i==0) this->x = val; else if (i==1) this->y = val; else if (i==2) this->z = val; }
+		else                    { if (i==0) this->x = val; else if (i==1) this->y = val; else if (i==2) this->z = val; }
 		return *this; }
 };
 

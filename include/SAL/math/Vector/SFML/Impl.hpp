@@ -1,7 +1,7 @@
 ﻿#ifndef _RVSRTYNFDGYSVEC336AB64N7W568VW47W57RT7_
 #define _RVSRTYNFDGYSVEC336AB64N7W568VW47W57RT7_
 
-#include "../vec/adapter/sfml.hpp"
+#include "../vec/adapter/SFML.hpp"
 
 namespace SAL/*!!::math!!*/::adapter
 {

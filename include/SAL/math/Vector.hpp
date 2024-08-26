@@ -9,13 +9,13 @@
 #ifndef _CMOIWD756B87NC2X45TORIUTLBYGH67845NET_
 #define _CMOIWD756B87NC2X45TORIUTLBYGH67845NET_
 
-#define VEC_NO_DIRECT_COORDS // Acccess only via .x() (not .x)
+#define VEC_NO_DIRECT_COORDS // Acccess only via .x() (not .x)!
 #include "Vector/vec/adapter.hpp"
 
 #ifdef SAL_VECTOR_STREAMABLE
 # include "Vector/vec/io.hpp"
 #else
-//# define VEC_NO_IOS
+//# define VEC_NO_IOS // No need if io.hpp isn't even included.
 #endif
 
 

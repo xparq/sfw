@@ -18,7 +18,7 @@
 # include <utility> // integer_sequence, decay
 #endif
 
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 # include "io.hpp" // Can be disabled with VEC_NO_IOS, but still needed for the syntax!
 #include "data.hpp" // VectorData for a static_assert...
 # ifdef VEC_CPP_IMPORT_STD
@@ -26,7 +26,7 @@
 # else
 #  include <iostream> // We're printing other things than vectors anyway...
 # endif
-#endif // DEBUG
+#endif // VEC_DEBUG
 
 
 #include "vector-fw.hpp" //! Including only for double-checking: should fail if out of sync!
@@ -75,8 +75,9 @@ public:
 	constexpr Vector() = default;
 
 	// Copy from another Vector:
+	//--------------------------------------------------------------------
 	//constexpr Vector(const Vector& other) = default;
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 	constexpr Vector(const Vector& other) : adapter_type(other.adapter())
 	{
 std::cerr << "[Vector: COPY CTOR CALLED! other == "<< other <<"\n";
@@ -86,16 +87,18 @@ std::cerr << "[Vector: COPY CTOR CALLED! other == "<< other <<"\n";
 #endif
 
 	// Coord.-wise - implicit for same number types
+	//--------------------------------------------------------------------
 	template <Scalar... Coords>
 		requires (sizeof...(Coords) == Dim && (std::same_as<Coords, number_type> && ...))
 	constexpr Vector(Coords... coords) : adapter_type{coords...}
 	{
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 std::cerr << "[Vector: created from coordinates - with same NumT]\n";
 #endif
 	}
 
 	// Coord.-wise - forced number conv. for diff. types
+	//--------------------------------------------------------------------
 	// (If the types aren't convertible, the compilation will fail.)
 	template <Scalar... Coords>
 		requires (sizeof...(Coords) == Dim && (!std::same_as<Coords, number_type> || ...))
@@ -106,12 +109,13 @@ std::cerr << "[Vector: created from coordinates - with same NumT]\n";
 #endif
 	constexpr Vector(Coords... coords) : adapter_type{static_cast<number_type>(coords)...}
 	{
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 std::cerr << "[Vector: created from coordinates - with different NumT!]\n";
 #endif
 	}
 
-	// Conv. from "vector-like object" - implicit conv. for same number types
+	// Conv. from "vector-like" object - implicit with same number types
+	//--------------------------------------------------------------------
 	/*!!
 	template <UniformVectorData V>
 	constexpr Vector(const V& v)
@@ -124,7 +128,7 @@ std::cerr << "[Vector: created from coordinates - with different NumT!]\n";
 		requires (V::dim == Dim && std::same_as<typename V::number_type, NumT>)
 	constexpr Vector(const V& v)
 		: Vector(v, std::make_integer_sequence<unsigned, Dim>{}) {
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 std::cerr << "[Vector: converted from UniformVectorData with same NumT]\n";
 #endif
 	}
@@ -137,8 +141,8 @@ std::cerr << "[Vector: converted from UniformVectorData with same NumT]\n";
 				//!! Brace-init may still work even if the adapter (array!) has no such ctor!
 		public:
 
-
-	// Conv. from "vector-like object" - forced number conv. for diff. types
+	// Conv. from "vector-like" object - forced number conv. for diff. num. types
+	// - explicit, unless VEC_IMPLICIT_NUM_CONV
 	//--------------------------------------------------------------------
 	template <UniformVectorData V>
 		requires (V::dim == Dim && !std::same_as<typename V::number_type, NumT>) //!!?? && std::is_nothrow_convertible<V::number_type, NumT>)
@@ -147,7 +151,7 @@ std::cerr << "[Vector: converted from UniformVectorData with same NumT]\n";
 #endif
 	constexpr Vector(const V& v)
 		: Vector(v, std::make_integer_sequence<unsigned, Dim>{}) {
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 std::cerr << "[Vector: converted from UniformVectorData - with different NumT!]\n";
 #endif
 	}
@@ -159,12 +163,26 @@ std::cerr << "[Vector: converted from UniformVectorData - with different NumT!]\
 		public:
 
 
+	// Conv. from "vector-coord.-struct-like" object - same number-type
+	//--------------------------------------------------------------------
+	//!! Unfortunately, these will suppress the `explicit` modifier of the target ctors
+	//!! (if VEC_IMPLICIT_NUM_CONV is not defined)! :-/
+	template <VectorDirectCoords<Dim, NumT> V> requires (Dim == 2)
+	constexpr Vector(const V& v) : Vector(v.x, v.y) {}
+
+	template <VectorDirectCoords<Dim, NumT> V> requires (Dim == 3)
+	constexpr Vector(const V& v) : Vector(v.x, v.y, v.z) {}
+
+	template <VectorDirectCoords<Dim, NumT> V> requires (Dim == 4)
+	constexpr Vector(const V& v) : Vector(v.x, v.y, v.z, v.w) {}
+
+/*!!
 	// Convert from adapter_type
 	//--------------------------------------------------------------------
 	constexpr Vector(const adapter_type& dadapter) //!!?? -> templatize for A&& and std::forward<decltype(a)>(...)?
 		: adapter_type(dadapter) //!! Optimize to use ref...() for big enough NumT sizes!
 	{
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 std::cerr << "[Vector: CTOR with DataAdapter == "<< dadapter <<"]\n";
 #endif
 	}
@@ -180,8 +198,38 @@ std::cerr << "[Vector: CTOR with DataAdapter == "<< dadapter <<"]\n";
 
 		return *this;
 	}
+!!*/
 
-	// Convert to the underlying data type directly, via the adapter:
+	// Convert from the underlying ("foreign") data type
+	//--------------------------------------------------------------------
+	constexpr Vector(const foreign_type& data)
+		: adapter_type(data)
+	{
+#ifdef VEC_DEBUG
+std::cerr << "[Vector: CTOR with opaque foreign data (which we can't print...)]\n";
+#endif
+	}
+
+	// And its op= pair (-> #20):
+	constexpr Vector& operator = (const foreign_type& data)
+	{
+#ifdef VEC_DEBUG
+std::cerr << "[Vector: op= with opaque foreign data (which we can't print...)]\n";
+#endif
+		(adapter_type&)*this = data; //!! "implicitly-declared 'adapter...::operator=(const adapter...&)' is deprecated"
+		                             //!!?? (adapter_type&) = ... implies at least a defaulted op= in every adapter (-- why exactly??!!)
+//		(foreign_type&)*this = data; //!! OTOH, this silently assumes that adapters can't have any state (data)! :-/
+/*!!
+		[this]<unsigned... I>(const auto& vdata, std::integer_sequence<unsigned, I...>)
+		constexpr { ((this->template ref<I>() = vdata.template get<I>()), ...);
+		} (dadapter, std::make_integer_sequence<unsigned, dim>{});
+!!*/
+		return *this;
+	}
+
+
+	// Convert to the underlying data type (via its adapter):
+	//--------------------------------------------------------------------
 	constexpr operator       foreign_type& ()       { return (      foreign_type&)adapter(); }
 	constexpr operator const foreign_type& () const { return (const foreign_type&)adapter(); }
 
@@ -204,7 +252,7 @@ std::cerr << "[Vector: CTOR with DataAdapter == "<< dadapter <<"]\n";
 
 	constexpr auto length() const;
 	constexpr auto length_squared() const;
-	//!! Redesign these falsely intuitive, but actually unlearnable, error-prone pairs:
+
 	constexpr Vector& normalize(); // -> #11
 	constexpr Vector  normalized() const; // -> #11
 
@@ -213,31 +261,21 @@ std::cerr << "[Vector: CTOR with DataAdapter == "<< dadapter <<"]\n";
 	constexpr Vector  rounded() const;
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - - - - - -
-#ifdef VEC_NO_DIRECT_COORDS //!! MOVED FROM AbstractVector, TEMPORARILY!... -> #48
+#ifdef VEC_NO_DIRECT_COORDS //!! -> #48
 //!! No way to actually remove members from the overload set by SFINAE or concepts
 //!! (like ...requires (!HasDirectCoords<adapter_type>) etc.) Those happen too late:
-//!! the name is already introduced, and will stick; it would just be disabled.
-//!! (If my -- and ChatGPT's... -- current understanding is correct.)
-	constexpr number_type  x() const
-	{
-		if constexpr (HasCoordFuncs<adapter_type>)   return adapter().x();
-		else return adapter().template get<0>();
-	}
-	constexpr number_type  y() const
-	{
-		if constexpr (HasCoordFuncs<adapter_type>)   return adapter().y();
-		else return adapter().template get<1>();
-	}
-	constexpr number_type  z() const requires(Dim >= 3)
-	{
-		if constexpr (HasCoordFuncs<adapter_type>)   return adapter().z();
-		else return adapter().template get<2>();
-	}
-	constexpr number_type  w() const requires(Dim >= 4)
-	{
-		if constexpr (HasCoordFuncs<adapter_type>)   return adapter().w();
-		else return adapter().template get<3>();
-	}
+//!! the name is already introduced, and will stick; it would just get disabled
+//!! (if my (and ChatGPT's) current understanding is correct).
+	// Getters:
+	constexpr NumT  x()  const                     { return adapter().template get<0>(); }
+	constexpr NumT  y()  const                     { return adapter().template get<1>(); }
+	constexpr NumT  z()  const  requires(Dim >= 3) { return adapter().template get<2>(); }
+	constexpr NumT  w()  const  requires(Dim >= 4) { return adapter().template get<3>(); }
+	// Setters:
+	constexpr auto& x(NumT val)                    { adapter().template set<0>(val); return *this; }
+	constexpr auto& y(NumT val)                    { adapter().template set<1>(val); return *this; }
+	constexpr auto& z(NumT val) requires(Dim >= 3) { adapter().template set<2>(val); return *this; }
+	constexpr auto& w(NumT val) requires(Dim >= 4) { adapter().template set<3>(val); return *this; }
 #endif // VEC_NO_DIRECT_COORDS
 
 }; // class Vector
@@ -255,7 +293,7 @@ struct Vector_traits< Vector<Dim, NumT, Adapter> > {
 
 
 // 'we good?
-#ifdef DEBUG
+#ifdef VEC_DEBUG
 static_assert(AdapterVector<Vector</*dummy*/3, /*dummy*/float, VectorData>>);
 #endif
 

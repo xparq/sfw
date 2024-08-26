@@ -81,35 +81,37 @@ concept HasCoordAccess = // Implying dim >= 2 (as usual):
 	   requires(V t) { { t.x } -> std::same_as<void>; }
 	&& requires(V t) { { t.y } -> std::same_as<void>; };
 
-/*!!?? -> #39 etc.
-// Classes (structs) with direct/named coord. access (.x, .y, ...)
+// Classes (structs) with direct/named coord. access (.x, .y, ...),
+// *BUT* not being any of the n-dim. types already handled by ctors...
+// (otherwise it would be an ambiguous soup).
 //
-//!! This is not the right minimum for vectors! Too strict:
-//!! excludes anything with constructors (e.g. sf::Vector2)!
-//!!
 //!! Also: Checking for construction in a derived concept with {x, y, ...} or
 //!! (x, y, ...) would be pointless:
 //!! a) {...} is there for aggregates already (albeit the stupid C++ rule of
 //!!    mandating an extra empty {} if there's a(n empty) base would make it
 //!!    useless for anything non-trivial...), and
 //!! b) the point is unification anyway...
-//!!
-//!!?? namespace internal {  <-- the ?? is for "...but maybe still useful publicly?"
 //
-template <class V, unsigned Dim>
-concept VectorAggregate = requires { std::is_aggregate_v<V>; }
+// -> x1ab/flexivec#47, x1ab/flexivec#39 etc.
+//
+template <class V, unsigned Dim, typename NumT>
+concept VectorDirectCoords = true
 && (Dim >= 2 && Dim <= 4 ? requires(V v) {
-		{ v.x };// -> std::same_as<typename V::number_type&>;
-		{ v.y };// -> std::same_as<typename V::number_type&>;
+		{ v.x } -> std::convertible_to<NumT>;
+		{ v.y } -> std::convertible_to<NumT>;
 	} : true)
 && (Dim >= 3 && Dim <= 4 ? requires(V v) {
-		{ v.z };// -> std::same_as<typename V::number_type&>;
+		{ v.z } -> std::convertible_to<NumT>;
 	} : true)
 && (Dim == 4 ? requires(V v) {
-		{ v.w };// -> std::same_as<typename V::number_type&>;
-	} : true);
-//!!?? } // namespace internal
-??!!*/
+		{ v.w } -> std::convertible_to<NumT>;
+	} : true)
+&& requires {
+		// Exclude something that only the vec::Vector has:
+		//! Congrats, C++, for the terminally fucked-up `requires { requires !requires{} }` syntax! :-o
+		requires !requires { V::dim; }; //!! and/or: n.template get<1>();
+		requires !requires { V::adapter_type; };
+	};
 
 
 // Generic ("trivial") vector data (struct)
