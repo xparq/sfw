@@ -21,6 +21,11 @@ ifndef VERBOSE
 MUTE = @
 endif
 
+# Helpers for handling spaces in filenames
+SPACE       := $(subst ,, )
+SPACE_ESC   := $(subst ,,\ )
+SPACE_TOKEN := [SPACE]
+
 
 ifeq "$(BUILDENV_OS)" "windows"
 #!!$(info BUILDENV_OS: $(BUILDENV_OS))
@@ -63,7 +68,7 @@ CFLAGS_COMMON.mingw.debug_0 = -DNDEBUG -O3
 #!!CFLAGS_COMMON.mingw.debug_1 = -DDEBUG -O0 -g #! Not with w64devkit: -fsanitize=address (See also at LDFLAGS!)
 CFLAGS_COMMON.mingw.debug_1    = -DDEBUG -O0 -g -gdwarf-4 -gstrict-dwarf -fsanitize=undefined -fsanitize-trap # w64devkit/issues/148
 CFLAGS_COMMON.msvc.debug_0 = -DNDEBUG
-CFLAGS_COMMON.msvc.debug_1 = -DDEBUG -Zi -fsanitize=address
+CFLAGS_COMMON.msvc.debug_1 = -DDEBUG -Zi -FS #! -> #449: -fsanitize=address
 
 CFLAGS_COMMON += ${CFLAGS_COMMON.$(TOOLCHAIN)} 
 CFLAGS_COMMON += ${CFLAGS_COMMON.$(TOOLCHAIN).debug_$(DEBUG)} 

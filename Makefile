@@ -135,16 +135,15 @@ VTAG_NOTC = $(FILE_SUFFIX)
 
 LIBOBJ         = $(LIBSRC:%.cpp=$(OBJDIR)/%$(objext))
 #!! These aren't derived directly from ...SRC to allow decoupling the exes from single source files later:
-_test_srcs     = $(shell $(FIND) $(TEST_SRCDIR) -name "*.cpp" -type f)
+_test_srcs     = $(shell $(FIND) $(TEST_SRCDIR) -not \( -path "*/.*" -type d -prune \) -name "*.cpp" -type f)
 TEST_EXES      = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(TEST_DIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(exeext))
-_example_srcs  = $(shell $(FIND) $(EXAMPLES_SRCDIR) -name "*.cpp" -type f)
+_example_srcs  = $(shell $(FIND) $(EXAMPLES_SRCDIR) -not \( -path "*/.*" -type d -prune \) -name "*.cpp" -type f)
 EXAMPLE_EXES   = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(DEMO_DIR)/%$(TOOLCHAIN_TAG)$(FILE_SUFFIX)$(exeext))
 
 #!! This junk is needed to stop GNU make automatically deleting the object files! :-o
 #!! (Except it didn't work; see comments at the "Main rules" section!...)
 _test_objs     = $(_test_srcs:$(TEST_SRCDIR)/%.cpp=$(OBJDIR)/$(TESTS_TAGDIR)/%$(objext))
 _example_objs  = $(_example_srcs:$(EXAMPLES_SRCDIR)/%.cpp=$(OBJDIR)/$(EXAMPLES_TAGDIR)/%$(objext))
-          
 
 #!!FILE_SUFFIX_DEBUG_1                      := -DBG
 #!!DIR_SUFFIX_DEBUG_1                       := .DBG
